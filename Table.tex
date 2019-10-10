@@ -1,0 +1,1338 @@
+\documentclass[a4paper,10pt]{article}
+
+\usepackage[right=0.5cm,left=0.5cm,top=0.5cm,bottom=1.75cm]{geometry}
+\usepackage{pgf}
+\usepackage{tikz}
+\usepackage[utf8]{inputenc}
+\usepackage{xargs}
+\usetikzlibrary{arrows,automata}
+\usetikzlibrary{matrix}
+\usetikzlibrary{positioning}
+\usetikzlibrary{shapes.geometric}
+\usetikzlibrary{shapes.multipart}
+
+\tikzset{
+	entity/.style={
+		rectangle split,
+		rectangle split parts=2,
+		draw=black, very thick,
+		inner sep=2pt,
+		text centered,
+	},
+	table/.style={
+		rectangle split,
+		rectangle split parts=3,
+		draw=black, very thick,
+		inner sep=2pt,
+		text centered,
+	},
+	relation/.style={
+	ellipse,
+	draw=black, very thick,
+	inner sep=2pt,
+	text centered,
+	},
+	lien/.style={
+	fill=white,
+	%above,
+	%sloped,
+	},
+	relationWithAttribut/.style={
+		ellipse split,
+		draw=black, very thick,
+		inner sep=2pt,
+		text centered,
+	},
+}
+\newcommandx{\entity}[3][3=]{
+\node[entity,#3] (#1) {
+	#1
+	\nodepart{two}
+	\begin{tabular}{l}
+		#2
+	\end{tabular}};
+}
+\newcommandx{\relation}[2][2=]{
+	\node[relation,#2](#1){#1};
+}
+\newcommandx{\relationWithAttribut}[3][3=]{
+\node[relationWithAttribut,#3](#1)
+{#1 \nodepart{lower} #2};
+}
+\newcommandx{\relationWithAttributs}[3][3=]{
+	\node[relationWithAttribut,#3](#1)
+	{#1 \nodepart{lower} 	\begin{tabular}{l}
+			#2
+	\end{tabular}};
+}
+
+\newcommand{\lien}[3]{\path (#1) edge node[lien] {#3} (#2);}
+\newcommandx{\tableEntity}[4][4=]{
+	\node[table,#4] (#1) {
+		#1
+		\nodepart{two}
+		\begin{tabular}{l@{\ \ :}l@{\ \ (}l@{)}l}
+			id & int & ID&\\
+			#2
+		\end{tabular}
+		\nodepart{three}
+		\begin{tabular}{l}
+			primary key (id)\\
+			#3
+		\end{tabular}
+	};
+}
+\newcommand{\lkey}[2]{\path[<-] (#1) edge (#2);}
+\newcommand{\lkeyloop}[1]{\draw[->] (#1.north west) ..controls+(60:1.25cm) and +(120:1.25cm) .. (#1.95);}
+\newcommand{\fkey}[2]{foreign key (#1) $\to$ #2}
+\newcommand{\unique}[1]{unique (#1)}
+%Arbre
+\newcommandx{\arbreERD}[2][2=]{
+	\node[relation,#2](filiation#1){filiation#1};
+	\entity{Arbre#1}{feuille\\num}[above=0.75cm of filiation#1]
+	\node[relation,above=1.65cm of Arbre#1](parent#1){parent#1};
+}
+\newcommand{\lienArbreERD}[1]{
+	\lien{Arbre#1.north west}{parent#1.west}{\begin{tabular}{c}fils\\$0-N$\end{tabular}}
+	\lien{Arbre#1.north east}{parent#1.east}{\begin{tabular}{c}parent\\$0-1$\end{tabular}}
+	\lien{Arbre#1.south}{filiation#1.north}{$1$}
+}
+\newcommandx{\arbreTable}[2][2=]{
+	\tableEntity{Arbre#1}{
+		parent & int & pt & NULL\\
+		num& int & num&\\
+		feuille & bool & fl &
+	}{
+		\fkey{parent}{Arbre#1}\\
+		\unique{parent, num}
+	}{#2}
+}
+\newcommand{\lkeyArbre}[1]{\lkeyloop{Arbre#1}}
+\begin{document}
+\section{Predef}
+\subsection{Commentaire}
+\subsubsection{ERD}
+\begin{tikzpicture}[thick]
+	\matrix[ampersand replacement=\&,column sep =2.5cm, row sep =0.5cm]{
+		\entity{Commentaire}{
+		creation \\
+		modification \\
+		texte} 
+		\&
+		\relationWithAttribut{CiblageCommentaire}{num}
+		\&
+		\entity{CibleCommentaire}{
+			idCible  \\
+			cible  \\
+			dateTime 
+			}\\
+		\hline\\
+		};
+	\lien{Commentaire.east}{CiblageCommentaire.west}{$0-N$}
+	\lien{CibleCommentaire.west}{CiblageCommentaire.east}{$1$}
+\end{tikzpicture}
+
+\subsubsection{Tables}
+
+\begin{tikzpicture}[thick]
+\matrix[ampersand replacement=\&,column sep =1cm,row sep =0.5cm]{
+	\tableEntity{Commentaire}{
+		creation & dateTime&crea & \\
+		modification & dateTime & modif  & \\
+		texte & text & text & NULL
+	}{ }	
+	\&	
+	\tableEntity{CibleCommentaire}{
+		idCommentaire & int & idCm &\\
+		idCible & int & idCb& \\
+		cible & int & cb & \\
+		dateTime & dateTime & dt & \\
+		num & int & num&
+	}{
+		\fkey{idCommentaire}{Commentaire}\\
+		\unique{idCible, cible, num}
+	}\\
+	\hline\\
+};
+\lkey{Commentaire}{CibleCommentaire}
+\end{tikzpicture}
+\subsection{Donnée}
+\subsubsection{ERD}
+\begin{tikzpicture}[thick]
+	\matrix[ampersand replacement=\&,column sep =1.5cm, row sep =0.75cm]{
+		\arbreERD{Donnee}
+		\&
+		\relation{calibrageDonnee}
+		\&
+		\entity{DonneeCard}{
+			cible\\
+			card\\
+			exact
+		}\\
+		\entity{Donnee}{
+			idProg\\
+			nom\\
+			type\\
+			typeVal
+		}
+		\&
+		\relation{ciblageDonnee}
+		\&
+		\entity{CibleDonnee}{
+			idCible\\
+			cible\\
+			num\\
+			dateTime\\
+			valeur
+		}\\
+		\hline\\	
+	};
+
+	\lienArbreERD{Donnee}
+	\lien{filiationDonnee}{Donnee}{$0-1$}
+	\lien{Donnee}{ciblageDonnee}{$0-N$}
+	\lien{ciblageDonnee}{CibleDonnee}{$1$}
+	\lien{Donnee}{calibrageDonnee}{$0-N$}
+	\lien{calibrageDonnee}{DonneeCard}{$1$}
+	\end{tikzpicture}
+\subsubsection{Tables}
+
+\begin{tikzpicture}[thick]
+\matrix[ampersand replacement=\&,column sep =1cm, row sep =1cm]{
+	\arbreTable{Donnee}
+	\&
+	\tableEntity{DonneeCard}{
+		idDonnee& int & idDn &\\
+		cible&int&cb&\\
+		card& int & cd &\\
+		exact& bool& ex&
+	}{
+		\fkey{idDonnee}{Donnee}\\
+		\unique{idDonnee, cible}
+	}\\
+	\tableEntity{Donnee}{
+		idProg&int&idPg&NULL\\
+		nom&text&nm&\\
+		type&int&tp&\\
+		typeVal&int&tpV
+	}{
+		\fkey{id}{ArbreDonnee}\\
+		\unique{idProg}
+	}
+	\&
+	\tableEntity{CibleDonnee}{
+		idDonnee&int&idDn&\\
+		idCible&int&idCb&\\
+		cible&int&cb&\\
+		num&int&num&\\
+		dateTime&dateTime&dt&\\
+		valeur&blod&val&NULL
+	}{
+		\unique{idDonnee, idCible, cible, num}
+	}\\
+	\hline\\
+};
+\lkeyArbre{Donnee}
+\lkey{ArbreDonnee}{Donnee}
+\lkey{Donnee}{DonneeCard}
+\path[<-] (Donnee) edge[dashed] (CibleDonnee);
+\end{tikzpicture}
+
+\subsection{Historique et Utilisation}
+\subsubsection{ERD}
+	\begin{tikzpicture}[thick]
+	\matrix[ampersand replacement=\&,column sep =1.5cm, row sep =0.5cm]{
+		\arbreERD{Usage}
+		\&
+		\entity{Utilisation}{
+			
+			idCible\\
+			cible\\
+			idEtat\\
+			etat\\
+			num\\
+			dt
+		}
+		\&
+		\entity{Historique}{
+			idCible\\
+			cible\\
+			idEtat\\
+			etat\\
+			num\\
+			dateTime
+		}\\
+		\entity{Usage}{
+			nc\\
+			nom\\
+			type
+		}
+		\&
+		\relation{designationUtilisation}
+		\&
+		\\
+		\hline\\
+	};
+	\lienArbreERD{Usage}
+	\lien{filiationUsage}{Usage}{$1$}
+	\lien{Utilisation}{designationUtilisation}{$1$}
+	\lien{Usage}{designationUtilisation}{$0-N$}	
+	\end{tikzpicture}
+	\subsubsection{Tables}
+	\begin{tikzpicture}[thick]
+	\matrix[ampersand replacement=\&,column sep =1cm, row sep =0.7cm]{
+		\arbreTable{Usage}
+		\&
+		\tableEntity{Usage}{
+			nc&text&nc&\\
+			nom&text&nm&\\
+			type&int&tp&
+		}{
+			\fkey{id}{ArbreUsage}\\
+			\unique{nom, type}
+		}
+		\\
+		\tableEntity{Historique}{
+			idCible&int&idCb&\\
+			cible&int&cb&\\
+			idEtat&int&idEt&\\
+			etat&int&et&\\
+			num&int&num&\\
+			dateTime&dateTime&dt&
+		}{
+			\unique{idCible, cible, num}
+		}
+		\&
+		\tableEntity{Utilisation}{
+			idUsage&int&idUs&\\
+			idCible&int&idCb&\\
+			cible&int&cb&\\
+			idEtat&int&idEt&\\
+			etat&int&et&\\
+			num&int&num&\\
+			dateTime&dateTime&dt&
+		}{
+			\fkey{idUsage}{Usage}\\
+			\unique{idCible, cible, num}
+		}\\
+		\hline\\
+	};
+	\lkeyArbre{Usage}
+	\lkey{ArbreUsage}{Usage}
+	\lkey{Usage}{Utilisation}
+	\end{tikzpicture}
+	
+	\subsection{MotCle}
+	\subsubsection{ERD}
+	\begin{tikzpicture}[thick]
+	\matrix[ampersand replacement=\&,column sep =1.5cm, row sep =1cm]{
+		\arbreERD{MotCle}
+		\&
+		\relation{controleMotCle}
+		\&
+		\entity{PermissionMotCle}{
+			cible\\
+			code
+		}\\
+		\entity{MotCle}{
+			nc\\
+			nom
+		}
+		\&
+		\relation{ciblageMotCle}
+		\&
+		\entity{CibleMotCle}{
+			idCible\\
+			cible
+		}\\
+		\hline\\	
+	};
+	\lienArbreERD{MotCle}
+	\lien{filiationMotCle}{MotCle}{$1$}
+	\lien{MotCle}{ciblageMotCle}{$0-N$}
+	\lien{ciblageMotCle}{CibleMotCle}{$1$}
+	\lien{MotCle}{controleMotCle}{$0-N$}
+	\lien{controleMotCle}{PermissionMotCle}{$1$}
+	\end{tikzpicture}
+	
+	\subsubsection{Tables}
+	\begin{tikzpicture}[thick]
+	\matrix[ampersand replacement=\&,column sep =1cm, row sep =1cm]{
+		\arbreTable{MotCle}	
+		\&
+		\tableEntity{PermissionMotCle}{
+			idMotCle& int & idMC &\\
+			cible&int&cb&\\
+			code& int & cd &
+		}{
+			\fkey{idMotCle}{MotCle}\\
+			\unique{idMC, cible}
+		}\\
+		\tableEntity{MotCle}{
+			nc&text&nc&\\
+			nom&text&nm&
+		}{
+			\fkey{id}{ArbreMotCle}\\
+		}
+		\&
+		\tableEntity{CibleMotCle}{
+			idMC&int&idMC&\\
+			idCible&int&idCb&\\
+			cible&int&cb&
+		}{
+			\fkey{idMC}{MotCle}\\
+			\unique{idMotCle, idCible, cible}
+		}\\
+		\hline\\
+	};
+	\lkeyArbre{MotCle}
+	\lkey{ArbreMotCle}{MotCle}
+	\lkey{MotCle}{PermissionMotCle}
+	\lkey{MotCle}{CibleMotCle}
+	\end{tikzpicture}
+	\subsection{Restriction et Version}
+	\subsubsection{ERD}
+	\begin{tikzpicture}[thick]
+	\matrix[ampersand replacement=\&,column sep =3cm, row sep =0.5cm]{
+		\entity{Restriction}{
+			idCible\\
+			cible\\
+			code	
+		}
+		\&
+		\entity{Version}{
+			num\\
+			dateTime
+		}\\
+		\hline\\
+	};
+	\end{tikzpicture}
+	\subsubsection{Tables}
+	\begin{tikzpicture}[thick]
+	\matrix[ampersand replacement=\&,column sep =1.5cm, row sep =0.5cm]{
+		\tableEntity{Restriction}{
+			idCible&int&idCb&\\
+			cible&int&cb&\\
+			code&int&cd&	
+		}{
+			\unique{idCible,cible}
+		}
+		\&
+		\tableEntity{Version}{
+			num&int&num&\\
+			dateTime&dateTime&dt&
+		}{
+			\unique{num}
+		}\\
+		\hline\\
+	};
+	\end{tikzpicture}
+	\subsection{Texte}
+	\subsubsection{ERD}
+	\begin{tikzpicture}[thick]
+	\matrix[ampersand replacement=\&,column sep =3cm, row sep =0.5cm]{
+		\entity{Texte}{
+			creation\\
+			modification\\
+			texte
+		}
+		\&
+		\relationWithAttribut{ciblageTexte}{num}
+		\&
+		\entity{CibleTexte}{
+			idCible\\
+			cible\\
+			type\\
+			dateTime
+		}\\
+		\&
+		\relation{sourceTexte}
+		\&
+		\entity{Source}{
+			nc\\
+			nom\\
+			type
+		}\\
+		\hline\\
+	};
+	\lien{Texte}{ciblageTexte}{$0-N$}
+	\lien{ciblageTexte}{CibleTexte}{$1$}
+	\lien{Texte}{sourceTexte}{$0-N$}
+	\lien{sourceTexte}{Source}{$0-N$}
+	\end{tikzpicture}
+	\subsubsection{Tables}
+	\begin{tikzpicture}[thick]
+	\matrix[ampersand replacement=\&,column sep =1.5cm, row sep =0.25cm]{
+		\tableEntity{Texte}{
+			creation&dateTime&crea&\\
+			modification&dateTime&modif&\\
+			texte&text&txt&NULL
+		}{}
+		\&
+		\tableEntity{CibleTexte}{
+			idTexte&int&idTxt&\\
+			idCible&int&idCb&\\
+			cible&int&cb&\\
+			type&int&tp&\\
+			num&int&num&\\
+			dateTime&dateTime&dt	
+		}{
+			\fkey{idTexte}{Texte}\\
+			\unique{idCible, cible, type, num}
+		}\\
+		\tableEntity{SourceTexte}{
+			idTexte&int&idTxt&\\
+			idSource&int&idSr&
+		}{
+			\fkey{idTexte}{Texte}\\
+			\fkey{idSource}{Source}\\
+			\unique{idTexte, idSource}
+		}
+		\&
+		\tableEntity{Source}{
+			nc&text&nc&\\
+			nom&text&nm&\\
+			type&int&tp	
+		}{
+			\unique{nom}
+		}\\
+		\hline\\
+	};
+	\lkey{Texte}{CibleTexte}
+	\lkey{Texte}{SourceTexte}
+	\lkey{Source}{SourceTexte}
+	\end{tikzpicture}
+	\subsection{Type}
+	\subsection{ERD}
+	\begin{tikzpicture}[thick]
+	\matrix[ampersand replacement=\&,column sep =3cm, row sep =0.5cm]{
+		\entity{Type}{
+			idProg\\
+			nc\\
+			nom
+		}	
+		\node[relation,above=1.65cm of Type](parentType){parentType};
+		\&
+		\relation{controleType}
+		\&
+		\entity{PermissionType}{
+			cible\\
+			code
+		}\\
+		\hline\\
+	};
+	\lien{Type}{controleType}{$0-1$}
+	\lien{controleType}{PermissionType}{$1$}
+	\lien{Type.north west}{parentType.west}{\begin{tabular}{c}fils\\$0-N$\end{tabular}}
+	\lien{Type.north east}{parentType.east}{\begin{tabular}{c}parent\\$0-1$\end{tabular}}
+	\end{tikzpicture}
+\subsubsection{Tables}
+	
+
+\begin{tikzpicture}[thick]
+\matrix[ampersand replacement=\&,column sep =1.5cm, row sep =0.5cm]{
+	\tableEntity{Type}{
+		idProg&int&idPg&NULL\\
+		parent&int&pt&NULL\\
+		nc&text&nc&\\
+		nom&text&nm&	
+	}{
+		\fkey{parent}{Type}\\
+		\unique{idProg}\\
+		\unique{nom,parent}
+		
+	}
+	\&
+	\tableEntity{PermissionType}{
+		idTp& int & idTp &\\
+		cible&int&cb&\\
+		code& int & cd &
+	}{
+		\fkey{idTp}{Type}\\
+		\unique{idTp,cible}
+	}\\
+	\hline\\
+};
+\lkey{Type}{PermissionType}
+\lkeyloop{Type}
+\end{tikzpicture}
+\subsection{Calendrier}
+\subsubsection{ERD}
+\begin{tikzpicture}[thick]
+\matrix[ampersand replacement=\&,column sep =2cm, row sep =0.5cm]{
+	
+	
+	\entity{Evenement}{
+		creation\\
+		modification\\
+		debut\\
+		fin\\
+		nc\\
+		nom\\
+		type
+	}
+	\&
+	\relation{affiche}
+	\&
+	\entity{Style}{
+		nom\\
+		couleur\\
+		fond\\
+		forme\\
+		bordure
+	}\\
+	\&
+	\relation{ciblageEvenement}
+	\&
+	\entity{CibleEvenement}{
+		idCible\\
+		cible\\
+		num\\
+	}\\
+	\hline\\
+};
+\lien{Evenement}{affiche}{$1$}
+\lien{affiche}{Style}{$0-N$} 
+\lien{Evenement}{ciblageEvenement}{$0-N$}
+\lien{ciblageEvenement}{CibleEvenement}{$1$}
+\end{tikzpicture}
+\subsubsection{Table}
+\begin{tikzpicture}[thick]
+\matrix[ampersand replacement=\&,column sep =1cm, row sep =0.5cm]{
+	\tableEntity{CibleEvenement}{
+		idEvenement&int&idEv\\
+		idCible&int&idCb\\
+		cible&int&cb\\
+		num&int&num\\
+	}{
+		\fkey{idEvenement}{Evenement}\\
+		\unique{idCilbe, cible, num}
+	}
+	\&
+	\tableEntity{Evenement}{
+		idStyle&int&idSt\\
+		creation&dateTime&crea\\
+		modification&dateTime&modif\\
+		debut&dateTime&deb\\
+		fin&deteTime&fin\\
+		nc&text&nc\\
+		nom&text&nm\\
+		type&int&tp
+	}{
+		\fkey{idStyle}{Style}\\
+		\unique{nom}
+	}
+	\&
+	\tableEntity{Style}{
+		nom&text&nm\\
+		couleur&color&cl\\
+		fond&brush&fd\\
+		forme&int&fm\\
+		bordure&int&bd
+	}{
+		\unique{nom}
+	}
+	\\
+	\hline\\
+};
+\lkey{Evenement}{CibleEvenement}
+\lkey{Style}{Evenement}  
+\end{tikzpicture}
+
+\section{Inventaire}
+\subsection{Predef utilisées}
+\begin{itemize}
+	\item Commentaire
+	\item Donnée
+	\item Historique
+	\item Mot Clé
+	\item Restriction
+	\item Type
+	\item Version
+\end{itemize}
+\subsection{ERD}
+
+\begin{tikzpicture}[thick]
+\small
+\matrix[ampersand replacement=\&,column sep =1.25cm, row sep =0.8cm]{
+	\arbreERD{Etat}
+	\&
+		\entity{Etat}{
+		idProg\\
+		nc\\
+		nom\\
+		type}
+	\&
+	\relation{etatPresent}
+	\&
+	\entity{Acquisition}{
+		nc\\
+		nom\\
+		dateTime\\
+		type	}
+	\\
+	\&
+		\relation{instance}
+	\& 
+	\entity{Element}{num}
+	\&
+	\relation{acquisitionElement}
+	\\
+	\arbreERD{Collection}
+	\&
+	\entity{Collection}{
+		nc\\
+		nom\\
+		type}
+	\&
+	\relationWithAttribut{composition}{
+		\begin{tabular}{l}
+		num\\
+		type\\
+		valeur
+		\end{tabular}}
+	\&
+	\arbreERD{Ingredient}
+	\\
+	\arbreERD{Geographie}
+	\&
+	\entity{Geographie}{
+		nc\\
+		nom\\
+		type
+	}
+	\&
+	\relationWithAttribut{Origine}{type}
+	
+	\&
+	\entity{Ingredient}{
+		nc\\
+		nom\\
+		type}
+	\\
+	\entity{Valeur}{
+		idCible\\
+		cible\\
+		num\\
+		dateTime\\
+		type\\
+		valeur
+	}\\
+	\hline\\
+};
+\lien{Etat}{etatPresent}{$0-N$}
+\lien{Acquisition}{acquisitionElement}{$1-N$}
+\lien{filiationEtat}{Etat}{1}
+\lienArbreERD{Etat}
+\lien{Element}{etatPresent}{$1$}
+\lien{Element}{acquisitionElement}{$1$}
+\lienArbreERD{Collection}
+\lien{filiationCollection}{Collection}{$1$}
+\lien{Collection}{instance}{$0-N$}
+\lien{Element}{instance}{$1$}
+\lienArbreERD{Geographie}
+\lien{Geographie}{filiationGeographie}{$1$}
+\lien{Origine}{Geographie}{$0-N$}
+\lien{Collection}{Origine}{$0-N$}
+\lienArbreERD{Ingredient}
+\lien{filiationIngredient}{Ingredient}{$1$}
+\lien{Ingredient}{composition}{$0-N$}
+\lien{Collection}{composition}{$0-N$}
+\end{tikzpicture}
+\subsection{Tables}
+\begin{tikzpicture}[thick]
+\footnotesize
+\matrix[ampersand replacement=\&,column sep =0.25cm, row sep =0.9cm]{
+	\arbreTable{Etat}
+	\&
+		\tableEntity{Etat}{
+		idProg&int&idPg&NULL\\
+		nc&text&nc&\\
+		nom&text&nm&\\
+		type&int&tp&
+	}{
+		\fkey{id}{ArbreEtat}\\
+		\unique{nom}\\
+		\unique{idProg}
+	}
+	\&
+	\tableEntity{Acquisition}{
+		nc & text & nc&\\
+		nom&text&nm&\\
+		dateTime&dateTime&dt&\\
+		type&int&tp&
+	}{
+		\unique{nom}
+	}\\
+	\arbreTable{Collection}
+	\&
+	\tableEntity{Collection}{
+		nc&text&nc&\\
+		nom&text&nm&\\
+		type&int&tp&
+	}{
+		\fkey{id}{ArbreCollection}\\
+		\unique{nom}
+	}
+	\&
+	\tableEntity{Element}{
+		idCollection&int&idCol&\\
+		idEtat&int&idEt&\\
+		idAcquisition&int&idAc&\\
+		num&int&num&
+	}{
+		\fkey{idCollection}{Collection}\\
+		\fkey{idEtat}{Etat}\\
+		\fkey{idAcquisition}{Acquisition}\\
+		\unique{idCollection, num}
+	}\\
+	\tableEntity{Origine}{
+		idCollection&int&idCol&\\
+		idGeo&int&idGeo&\\
+		type&int&tp&
+	}{
+		\fkey{idCollection}{Collection}\\
+		\fkey{idGeo}{Geographie}\\
+		\unique{idCollection, type}
+	}
+	\&
+	\tableEntity{Composition}{
+		idCollection&int&indCol&\\
+		idIngredient&int&idIng&\\
+		num&int&num&\\
+		type&int&tp&\\
+		valeur&double&val&NULL
+	}{
+		\fkey{idCollection}{Collection}\\
+		\fkey{idIngredient}{Ingredient}\\
+		\unique{idCollection, num}
+	}
+	\&
+	\tableEntity{Valeur}{
+		idCible&int&idCb&\\
+		cible&int&cb&\\
+		num&int&num&\\
+		dateTime&dateTime&dt\\
+		type&int&tp&\\
+		valeur&int&val&ǸULL
+	}{
+		\unique{idCible, cible, type, num}
+	}\\
+	\tableEntity{Geographie}{
+		nc&text&nc&\\
+		nom&text&nm&\\
+		type&int&tp&
+	}{
+		\fkey{id}{ArbreGeographie}\\
+		\unique{nom}
+	}
+	\&
+	\tableEntity{Ingredient}{
+		nc&text&nc&\\
+		nom&text&nm&\\
+		type&int&tp&
+	}{
+		\fkey{id}{ArbreIngredient}\\
+		\unique{nom}
+	}\\
+	\arbreTable{Geographie}
+	\&
+	\arbreTable{Ingredient}
+	\\
+};
+\lkeyloop{ArbreEtat}
+\lkey{ArbreEtat}{Etat}
+\lkeyloop{ArbreCollection}
+\lkey{ArbreCollection}{Collection}
+\lkeyloop{ArbreGeographie}
+\lkey{ArbreGeographie}{Geographie}
+\lkeyloop{ArbreIngredient}
+\lkey{ArbreIngredient}{Ingredient}
+\lkey{Etat}{Element}
+\lkey{Acquisition}{Element}
+\lkey{Collection}{Element}
+\lkey{Collection}{Origine}
+\lkey{Geographie}{Origine}
+\lkey{Collection}{Composition}
+\lkey{Ingredient}{Composition}
+\end{tikzpicture}
+\newpage
+\section{Notes}
+\subsection{Predef}
+\begin{itemize}
+	\item Calendrier
+	\item Commentaire
+	\item Donnée
+	\item Mot Clé
+	\item Restriction
+	\item Texte
+	\item Type
+	\item Utilisation
+	\item Version
+\end{itemize}
+\subsection{ERD}
+\begin{tikzpicture}[thick]
+\matrix[ampersand replacement=\&,column sep =0.5cm, row sep =1.25cm]{
+	\arbreERD{Cours}
+	\&
+	\&
+	\arbreERD{MiseEnForme}
+	\\
+	\entity{Cours}{
+		version
+	}
+	\&
+	\relation{calibrage}
+	\&
+	\entity{MiseEnForme}{
+		nom\\
+		debut\\
+		fin\\
+		num\\
+		valeur
+	}
+	\\
+	\arbreERD{Exercice}\\
+	\entity{Exercice}{
+		type\\
+		version
+	}\\
+};
+\lienArbreERD{Cours}
+\lienArbreERD{MiseEnForme}
+\lienArbreERD{Exercice}
+\lien{filiationCours}{Cours}{$1$}
+\lien{filiationMiseEnForme}{MiseEnForme}{$1$}
+\lien{filiationExercice}{Exercice}{$1$} 
+\lien{calibrage}{Cours}{$1$}
+\lien{calibrage}{MiseEnForme}{$0-N$}
+\end{tikzpicture}
+\newpage
+\begin{tikzpicture}[thick]
+\footnotesize
+
+	\entity{TypeEtablissement}{
+		nc\\
+		nom
+	}
+	
+	\relation{typageEtablissement}[below=0.75cm of TypeEtablissement]
+	
+	\relation{dansTypeEtablissement}[right=2cm of TypeEtablissement]
+	
+	\entity{Etablissement}{
+		nc\\
+		nom
+	}[below=0.75cm of typageEtablissement]
+	
+	\relation{dansEtablissement}[below=1cm of dansTypeEtablissement]
+	
+	\relation{classeDans}[right=2cm of Etablissement]
+	
+	\entity{Niveau}{
+		nc\\
+		nom\\
+		type
+	}[right=3cm of dansEtablissement]
+
+	\relation{filiationNiveau}[above=2cm of Niveau]
+	
+	\relation{duNiveau}[below=0.75cm of Niveau]
+	
+	\entity{Classe}{
+		num
+	}[right=2cm of classeDans]
+
+	\relation{groupePour}[below=2.85cm of Classe]
+	\entity{Annee}{
+		num
+	}[right=1.5cm of groupePour]
+
+	\relation{pendant}[above=1cm of Annee]
+	
+	\entity{Groupe}{
+		nc\\
+		nom\\
+		type\\
+		alpha
+	}[below=0.9cm of groupePour]
+	
+	%\relationWithAttribut{controlePourGroupe}{num}[below=0.75cm of Groupe]
+	
+	%\relation{controlePourClasse}[left=3.5cm of pendant]
+		
+	\relationWithAttribut{dansGroupe}{num}[right=1.75cm of Groupe]
+	
+	\entity{Eleve}{
+		nom\\
+		prenom\\
+		date\\
+		fille
+	}[right=1.75cm of dansGroupe]
+	
+	\relationWithAttributs{dansClasse}{
+		entree\\
+		sortie
+	}[above=1.5cm of Eleve]
+	
+	\entity{TypeControle}{
+		nc\\
+		nom\\
+		code\\
+		appreciation\\
+		decimale\\
+		total\\
+		modif
+	}[below=0.5cm of Etablissement]
+	
+	\relation{filiationTypeControle}[right=0.5cm of TypeControle]
+	\relation{typageControle}[below=0.75cm of TypeControle]
+	
+	\entity{Controle}{
+		nc\\
+		nom\\
+		num\\
+		dateTime\\
+		decimale\\
+		minima\\
+		total\\
+		saisie
+	}[below=0.75cm of typageControle]
+	
+	\arbreERD{Enonce}[below=4.85cm of Controle]
+	
+	\relation{obtenue}[below=0.65cm of Eleve]
+	
+	\relationWithAttribut{dansControle}{num}[right=1cm of Controle]
+	
+	\entity{Note}{
+		num\\
+		dateTime\\
+		saisie\\
+		valeur
+	}[below=0.65cm of obtenue]
+	\relation{auControle}[left=5.5cm of Note]
+	\relationWithAttributs{valide}{dateTime\\valeur}[below=1cm of Note]
+	\entity{Enonce}{
+		type\\
+		version
+	}[right=1.5cm of ArbreEnonce]
+	
+	
+	\relation{ventile}[right=1.5cm of Enonce]
+	\arbreERD{Bareme}[below=5cm of ventile]
+	
+	\entity{Point}{
+		num\\
+		type\\
+		valeur\\
+		version
+	}[right=1.75cm of ventile]
+	
+	\relation{priseEnCompte}[below=1.6cm of Point]
+	\entity{Bareme}{type\\valeur}[below=1.4cm of priseEnCompte]
+	
+\lien{typageEtablissement}{TypeEtablissement}{$0-N$}
+\lien{typageEtablissement}{Etablissement}{$1$}
+\lien{Etablissement}{dansEtablissement}{$0-N$}
+\lien{Niveau}{dansEtablissement}{$0-N$}
+\lien{Niveau}{dansTypeEtablissement}{$1-N$}
+\lien{TypeEtablissement}{dansTypeEtablissement}{$0-N$}
+\lien{Niveau.north west}{filiationNiveau.west}{\begin{tabular}{c}precedent\\$0-N$\end{tabular}}
+\lien{Niveau.north east}{filiationNiveau.east}{\begin{tabular}{c}suivant\\$0-N$\end{tabular}}
+\lien{Annee}{pendant}{$0-N$}
+\lien{Classe}{pendant}{$1$}
+\lien{Classe}{duNiveau}{$1$}
+\lien{duNiveau}{Niveau}{$0-N$}
+\lien{Classe}{classeDans}{$1$}
+\lien{Etablissement}{classeDans}{$0-N$}
+\lien{Annee}{groupePour}{$0-N$}
+\lien{Classe}{groupePour}{$0-N$}
+\lien{Groupe}{groupePour}{$1$}
+\lien{Classe}{dansClasse}{$0-N$}
+%\lien{Classe}{controlePourClasse}{$0-N$}
+%\lien{Groupe}{controlePourGroupe}{$0-N$}
+%\lien{Controle.south east}{controlePourGroupe}{$0-N$}
+\lien{Controle}{typageControle}{$1$}
+\lien{TypeControle}{typageControle}{$0-N$}
+\lien{Eleve}{dansGroupe}{$0-N$}
+\lien{Eleve}{dansClasse}{$1-N$}
+\lien{Groupe}{dansGroupe}{$0-N$}
+%\lien{Controle}{controlePourClasse}{$0-1$}
+\lien{Controle.south east}{auControle}{$0-N$}
+\lien{Note}{auControle}{$1$}
+\lien{Note}{obtenue}{$1$}
+\lien{obtenue}{Eleve}{$0-N$}
+\lien{Enonce}{filiationEnonce.east}{$1$}
+\lien{Enonce}{dansControle}{$0-N$}
+\lien{Controle}{dansControle}{$0-N$}
+\lienArbreERD{Enonce}
+\lien{Point}{valide}{$0-N$}
+\lien{Note}{valide}{$0-N$}
+\lien{Enonce}{ventile}{$0-N$}
+\lien{Point}{ventile}{$1$}
+\lienArbreERD{Bareme}
+\lien{Bareme}{filiationBareme}{$1$}
+\lien{Bareme}{priseEnCompte}{$0-1$}
+\lien{Point}{priseEnCompte}{$0-N$}
+\lien{dansControle.east}{Eleve.south west}{$0-N$}
+\lien{dansControle}{Groupe}{$0-N$}
+\lien{dansControle}{Classe}{$0-N$}
+\lien{TypeControle.north east}{filiationTypeControle.north}{\begin{tabular}{c}pere\\$0-1$\end{tabular}}
+\lien{TypeControle.south east}{filiationTypeControle.south}{\begin{tabular}{c}fils\\$0-N$\end{tabular}}  
+\end{tikzpicture}
+\subsection{Tables}
+
+\begin{tikzpicture}[thick]
+\footnotesize
+
+	\tableEntity{TypeEtablissement}{
+		nc&text&nc&\\
+		nom&text&nm&
+	}{\unique{nom}}
+
+	\tableEntity{TypeEtablissementNiveau}{
+		idTpEtab&int&idTE&\\
+		idNiveau&int&idNiv
+	}{
+		\fkey{idTpEtab}{TypeEtablissement}\\
+		\fkey{idNiveau}{Niveau}\\
+		\unique{idTpEtab, idNiveau}
+	}[right=1.5cm of TypeEtablissement]
+	
+	\tableEntity{FiliationNiveau}{
+	idPrecedent&int&idP\\
+	idSuivant&int&idS
+	}{
+		\fkey{idPrecedant}{Niveau}\\
+		\fkey{idSuivuit}{Niveau}\\
+		\unique{idPrecedent, idSuivant}
+	}[right=1.5cm of TypeEtablissementNiveau]
+	
+	\tableEntity{Etablissement}{
+		idTpEtab&int&idTE\\
+		nc&text&nc&\\
+		nom&text&nm&
+	}{
+		\fkey{idTpEtab}{TypeEtablissement}\\
+		\unique{nom}
+	}[below=0.65cm of TypeEtablissement]
+	
+	\tableEntity{EtablissementNiveau}{
+		idEtab&int&idEt&\\
+		idNiv&int&idNiv
+	}{
+		\fkey{idEtab}{Etablissement}\\
+		\fkey{idNiv}{Niveau}\\
+		\unique{idEtab, idNiv}
+	}[right=1.5cm of Etablissement]
+
+	\tableEntity{Niveau}{
+		nc&text&nc\\
+		nom&text&nm\\
+		type&int&tp
+	}{
+		\unique{nom}	
+	}[below=0.5cm of FiliationNiveau]
+
+	\tableEntity{Annee}{
+		num&int&num
+	}{
+		\unique{num}
+	}[below=0.25cm of Etablissement]
+	
+	\tableEntity{DansClasse}{
+		idCl&int&idCl&\\
+		idEl&int&idEl&\\
+		entree&dateTime&ent&\\
+		sortie&dateTime&sort&NULL
+	}{
+		\fkey{idClasse}{Classe}\\
+		\fkey{idEleve}{Eleve}\\
+		\unique{idClasse, idEleve}
+	}[below=0.5cm of Niveau]
+
+		\tableEntity{Classe}{
+		idAn&int&idAn\\
+		idEtab&int&idEt\\
+		idNiv&int&idNv\\
+		num&int&num
+	}{
+		\fkey{idEtab}{Etablissement}\\
+		\fkey{idNiv}{Niveau}\\
+		\unique{idEtab, idNiv, num}
+	}[left=1.5cm of DansClasse]
+
+	\tableEntity{GroupePour}{
+		idAn&int&idAn&NULL\\
+		idCl&int&idCl&NULL\\
+		idGr&int&idGr
+	}{
+		\fkey{idAn}{Annee}\\
+		\fkey{idCl}{Classe}\\
+		\fkey{idGr}{Groupe}\\
+		\unique{idAn, idGr}\\
+		\unique{idCl, idGr}
+	}[below=0.4cm of Annee]
+	
+	\tableEntity{Groupe}{
+		nc&text&nc&\\
+		nom&text&nm&\\
+		type&int&tp\\
+		alpha&int&al
+	}{
+		\unique{nom}
+	}[below=0.4cm of GroupePour]
+		
+	\tableEntity{DansGroupe}{
+		idEl&int&idEl\\
+		idGr&int&idGr\\
+		num&int&num
+	}{
+		\fkey{idEl}{Eleve}\\
+		\fkey{idGr}{Groupe}\\
+		\unique{idEl, idGr}
+	}[below=0.2cm of Classe]
+	
+	\tableEntity{Eleve}{
+		nom&text&nm\\
+		prenom&text&pnm\\
+		date&date&dt\\
+		fille&bool&fl
+	}{
+		\unique{nom, prenom, date}
+	}[below=0.5cm of DansClasse]
+	
+	\tableEntity{Note}{
+		idCtr&int&idCtr\\
+		idEl&int&idEl\\
+		num&int&num\\
+		dateTime&int&dt\\
+		saisie&bool&ss\\
+		valeur&int&vl&NULL
+	}{
+		\fkey{idCtr}{Controle}\\
+		\fkey{idEl}{Eleve}\\
+		\unique{idCtr, idEl, num}
+	}[below=0.5cm of Eleve]
+	
+	\tableEntity{DansControle}{
+		idCtr&int&idCtr\\
+		idEnonce&int&idEn\\
+		idCl&int&idCl&NULL\\
+		idEl&int&idEl&NULL\\
+		idGr&int&idGr&NULL\\
+		num&int&num&NULL
+	}{
+		\fkey{idCtr}{Controle}\\
+		\fkey{idEnonce}{Enonce}\\
+		\fkey{idCl}{Classe}\\
+		\fkey{idGr}{Groupe}\\
+		\fkey{idEl}{Eleve}\\
+		\unique{idCtr, idCl}\\
+		\unique{idCtr, idGr, num}\\
+		\unique{idCtr, idEl}
+	}[below=0.2cm of DansGroupe]
+
+	\tableEntity{Valide}{
+		idNote&int&idNt\\
+		idPoint&int&idPt\\
+		dataTime&dateTime&dt\\
+		valeur&int&vl
+	}{
+		\fkey{idNote}{Note}\\
+		\fkey{idPoint}{Point}\\
+		\unique{idNote, idPoint}
+	}[below=0.5cm of Note]
+
+	\tableEntity{TypeControle}{
+		parent&int&pt&NULL\\
+		nc&text&nc\\
+		nom&text&nm\\
+		code&int&cd\\
+		appreciation&bool&app\\
+		decimale&int&dcm\\
+		total&int&tt\\
+		modif&bool&md
+	}{
+		\fkey{parent}{TypeControle}\\
+		\unique{nom}
+	}[below=0.75cm of Groupe]
+
+	\tableEntity{Controle}{
+		idTp&int&idTp\\
+		nc&text&nc\\
+		nom&text&nm\\
+		num&int&num\\
+		dateTime&dateTime&dt\\
+		decimale&int&dc\\
+		minima&int&min\\
+		total&int&tt\\
+		saisie&bool&ss
+	}{
+		\unique{nom}\\
+		\fkey{idTp}{TypeControle}\\
+	}[below=0.4cm of TypeControle]
+	
+	\tableEntity{Point}{
+		idEnonce&int&idEn\\
+		num&int&num\\
+		type&int&tp\\
+		valeur&int&vl\\
+		version&int&ver
+	}{
+		\fkey{idEnponce}{Enonce}\\
+		\unique{idEnonce, num}
+	}[below=0.5cm of Valide]
+
+	\tableEntity{Enonce}{
+		idCtr&int&idCtr&NULL\\
+		type&int&tp\\
+		version&int&ver\\
+		ARBRE ENONCE
+	}{
+		\fkey{id}{ArbreEnonce}\\
+		\fkey{idCtr}{Controle}
+	}[below=0.4cm of DansControle]
+
+	\tableEntity{Bareme}{
+		idPoint&int&idPt&NULL\\
+		type&int&tp\\
+		valeur&double&vl&NULL\\
+		ARBRE BAREME
+	}{
+		\fkey{id}{ArbreBareme}\\
+		\fkey{idPoint}{Point}
+	}[below=0.2cm of Enonce]
+\lkey{TypeEtablissement}{TypeEtablissementNiveau}
+\lkey{Etablissement}{EtablissementNiveau}
+\lkey{TypeEtablissement}{Etablissement}
+\lkey{Niveau.north}{FiliationNiveau.south west}
+\lkey{Niveau.north}{FiliationNiveau.south east}
+\lkey{Niveau.north west}{TypeEtablissementNiveau}
+\lkey{Niveau}{Etablissement}{Niveau}
+\lkey{Etablissement}{Classe}
+\lkey{Niveau.south west}{Classe} 
+\lkey{Classe}{DansClasse} 
+\lkey{Annee}{Classe}
+\lkey{Annee}{GroupePour}
+\lkey{Classe}{GroupePour} 
+\lkey{Groupe}{GroupePour}
+\lkey{Eleve}{DansClasse}
+\lkey{Eleve}{DansGroupe}
+\lkey{Groupe}{DansGroupe}
+\lkey{Eleve}{Note}
+\lkey{Classe.south east}{DansControle.north east} 
+\lkey{Groupe}{DansControle}
+\lkey{Eleve}{DansControle.north east} 
+\lkey{Controle.north east}{DansControle.south west} 
+\lkey{Enonce}{DansControle} 
+\lkey{Note}{Valide}
+\lkey{TypeControle}{Controle}
+\lkey{Point}{Valide}
+\lkeyloop{TypeControle}
+\lkey{Enonce}{Point}
+\lkey{Point}{Bareme}
+\lkey{Controle.north east}{Note.south west}
+\end{tikzpicture}	
+\end{document}
