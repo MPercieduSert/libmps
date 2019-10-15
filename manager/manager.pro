@@ -45,8 +45,7 @@ SOURCES += \
     ManagersPredef.cpp \
     ManagerSql.cpp \
     ReqSql.cpp \
-    UniqueSqlBase.cpp \
-    EntitiesPredef.cpp
+    UniqueSqlBase.cpp
 
 HEADERS += \
     AbstractGestionAutorisation.h \
@@ -70,8 +69,7 @@ HEADERS += \
     ManagersPredef.h \
     ManagerSql.h \
     ReqSql.h \
-    UniqueSqlBase.h \
-    EntitiesPredef.h
+    UniqueSqlBase.h
 unix {
     target.path = /usr/lib
     INSTALLS += target

@@ -539,17 +539,17 @@
 	}{
 		\fkey{parent}{Type}\\
 		\unique{idProg}\\
-		\unique{nom,parent}
+		\unique{nom, parent}
 		
 	}
 	\&
 	\tableEntity{PermissionType}{
-		idTp& int & idTp &\\
+		idType& int & idTp &\\
 		cible&int&cb&\\
 		code& int & cd &
 	}{
-		\fkey{idTp}{Type}\\
-		\unique{idTp,cible}
+		\fkey{idType}{Type}\\
+		\unique{idType, cible}
 	}\\
 	\hline\\
 };
@@ -1104,8 +1104,8 @@
 	idPrecedent&int&idP\\
 	idSuivant&int&idS
 	}{
-		\fkey{idPrecedant}{Niveau}\\
-		\fkey{idSuivuit}{Niveau}\\
+		\fkey{idPrecedent}{Niveau}\\
+		\fkey{idSuivant}{Niveau}\\
 		\unique{idPrecedent, idSuivant}
 	}[right=1.5cm of TypeEtablissementNiveau]
 	
@@ -1120,11 +1120,11 @@
 	
 	\tableEntity{EtablissementNiveau}{
 		idEtab&int&idEt&\\
-		idNiv&int&idNiv
+		idNiveau&int&idNiv
 	}{
 		\fkey{idEtab}{Etablissement}\\
-		\fkey{idNiv}{Niveau}\\
-		\unique{idEtab, idNiv}
+		\fkey{idNiveau}{Niveau}\\
+		\unique{idEtab, idNiveau}
 	}[right=1.5cm of Etablissement]
 
 	\tableEntity{Niveau}{
@@ -1142,8 +1142,8 @@
 	}[below=0.25cm of Etablissement]
 	
 	\tableEntity{DansClasse}{
-		idCl&int&idCl&\\
-		idEl&int&idEl&\\
+		idClasse&int&idCl&\\
+		idEleve&int&idEl&\\
 		entree&dateTime&ent&\\
 		sortie&dateTime&sort&NULL
 	}{
@@ -1155,24 +1155,24 @@
 		\tableEntity{Classe}{
 		idAn&int&idAn\\
 		idEtab&int&idEt\\
-		idNiv&int&idNv\\
+		idNiveau&int&idNv\\
 		num&int&num
 	}{
 		\fkey{idEtab}{Etablissement}\\
-		\fkey{idNiv}{Niveau}\\
-		\unique{idEtab, idNiv, num}
+		\fkey{idNiveau}{Niveau}\\
+		\unique{idEtab, idNiveau, num}
 	}[left=1.5cm of DansClasse]
 
 	\tableEntity{GroupePour}{
 		idAn&int&idAn&NULL\\
-		idCl&int&idCl&NULL\\
-		idGr&int&idGr
+		idClasse&int&idCl&NULL\\
+		idGroupe&int&idGr
 	}{
 		\fkey{idAn}{Annee}\\
-		\fkey{idCl}{Classe}\\
-		\fkey{idGr}{Groupe}\\
-		\unique{idAn, idGr}\\
-		\unique{idCl, idGr}
+		\fkey{idClasse}{Classe}\\
+		\fkey{idGroupe}{Groupe}\\
+		\unique{idAn, idGroupe}\\
+		\unique{idClasse, idGroupe}
 	}[below=0.4cm of Annee]
 	
 	\tableEntity{Groupe}{
@@ -1185,13 +1185,13 @@
 	}[below=0.4cm of GroupePour]
 		
 	\tableEntity{DansGroupe}{
-		idEl&int&idEl\\
-		idGr&int&idGr\\
+		idEleve&int&idEl\\
+		idGroupe&int&idGr\\
 		num&int&num
 	}{
-		\fkey{idEl}{Eleve}\\
-		\fkey{idGr}{Groupe}\\
-		\unique{idEl, idGr}
+		\fkey{idEleve}{Eleve}\\
+		\fkey{idGroupe}{Groupe}\\
+		\unique{idEleve, idGroupe}
 	}[below=0.2cm of Classe]
 	
 	\tableEntity{Eleve}{
@@ -1204,40 +1204,40 @@
 	}[below=0.5cm of DansClasse]
 	
 	\tableEntity{Note}{
-		idCtr&int&idCtr\\
-		idEl&int&idEl\\
+		idControle&int&idCtr\\
+		idEleve&int&idEl\\
 		num&int&num\\
 		dateTime&int&dt\\
 		saisie&bool&ss\\
 		valeur&int&vl&NULL
 	}{
-		\fkey{idCtr}{Controle}\\
-		\fkey{idEl}{Eleve}\\
-		\unique{idCtr, idEl, num}
+		\fkey{idControle}{Controle}\\
+		\fkey{idEleve}{Eleve}\\
+		\unique{idControle, idEleve, num}
 	}[below=0.5cm of Eleve]
 	
 	\tableEntity{DansControle}{
-		idCtr&int&idCtr\\
+		idControle&int&idCtr\\
 		idEnonce&int&idEn\\
-		idCl&int&idCl&NULL\\
-		idEl&int&idEl&NULL\\
-		idGr&int&idGr&NULL\\
+		idClasse&int&idCl&NULL\\
+		idEleve&int&idEl&NULL\\
+		idGroupe&int&idGr&NULL\\
 		num&int&num&NULL
 	}{
-		\fkey{idCtr}{Controle}\\
+		\fkey{idControle}{Controle}\\
 		\fkey{idEnonce}{Enonce}\\
-		\fkey{idCl}{Classe}\\
-		\fkey{idGr}{Groupe}\\
-		\fkey{idEl}{Eleve}\\
-		\unique{idCtr, idCl}\\
-		\unique{idCtr, idGr, num}\\
-		\unique{idCtr, idEl}
+		\fkey{idClasse}{Classe}\\
+		\fkey{idGroupe}{Groupe}\\
+		\fkey{idEleve}{Eleve}\\
+		\unique{idControle, idClasse}\\
+		\unique{idControle, idGroupe, num}\\
+		\unique{idControle, idEleve}
 	}[below=0.2cm of DansGroupe]
 
 	\tableEntity{Valide}{
 		idNote&int&idNt\\
 		idPoint&int&idPt\\
-		dataTime&dateTime&dt\\
+		dateTime&dateTime&dt\\
 		valeur&int&vl
 	}{
 		\fkey{idNote}{Note}\\
@@ -1260,7 +1260,7 @@
 	}[below=0.75cm of Groupe]
 
 	\tableEntity{Controle}{
-		idTp&int&idTp\\
+		idType&int&idTp\\
 		nc&text&nc\\
 		nom&text&nm\\
 		num&int&num\\
@@ -1271,7 +1271,7 @@
 		saisie&bool&ss
 	}{
 		\unique{nom}\\
-		\fkey{idTp}{TypeControle}\\
+		\fkey{idType}{TypeControle}\\
 	}[below=0.4cm of TypeControle]
 	
 	\tableEntity{Point}{
@@ -1281,25 +1281,25 @@
 		valeur&int&vl\\
 		version&int&ver
 	}{
-		\fkey{idEnponce}{Enonce}\\
+		\fkey{idEnonce}{Enonce}\\
 		\unique{idEnonce, num}
 	}[below=0.5cm of Valide]
 
 	\tableEntity{Enonce}{
-		idCtr&int&idCtr&NULL\\
+		idControle&int&idCtr&NULL\\
 		type&int&tp\\
 		version&int&ver\\
-		ARBRE ENONCE
+		ARBRE & ENONCE&
 	}{
 		\fkey{id}{ArbreEnonce}\\
-		\fkey{idCtr}{Controle}
+		\fkey{idContole}{Controle}
 	}[below=0.4cm of DansControle]
 
 	\tableEntity{Bareme}{
 		idPoint&int&idPt&NULL\\
 		type&int&tp\\
 		valeur&double&vl&NULL\\
-		ARBRE BAREME
+		ARBRE & BAREME&
 	}{
 		\fkey{id}{ArbreBareme}\\
 		\fkey{idPoint}{Point}

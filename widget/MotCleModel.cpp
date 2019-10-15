@@ -62,9 +62,9 @@ void MotCleModel::setIdSet(const QSet<int> & idSet)
         ListPtr<CibleMotCle> cibleMotcleList(m_bdd->getList<CibleMotCle>(CibleMotCle::Cible,m_cible,CibleMotCle::IdCible,*i));
         for(ListPtr<CibleMotCle>::iterator j = cibleMotcleList.begin(); j != cibleMotcleList.end(); ++j)
         {
-            QMap<int,bool>::iterator k = m_idMotCle.find((*j).idMC());
+            QMap<int,bool>::iterator k = m_idMotCle.find((*j).idMotCle());
             if(k == m_idMotCle.end())
-                m_idMotCle[(*j).idMC()] = newValue;
+                m_idMotCle[(*j).idMotCle()] = newValue;
             else if(*k == TousJusquaPresent)
                 *k = Tous;
         }
@@ -85,7 +85,7 @@ void MotCleModel::setTreeMotCle()
                                  {
                                     MotClePermission perm(motCle.id(),m_cible);
                                     m_bdd->getUnique(perm);
-                                    return perm.num() != bdd::motClePermissionNum::InterditMCNum;
+                                    return perm.in(bdd::motClePermissionNum::InterditMCNum);
     }),
                 [](const MotCle & motCle)->QPair<MotCle,int>{return QPair<MotCle,int>(motCle,Aucun);}));
 }

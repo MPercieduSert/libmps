@@ -9,7 +9,6 @@
 #include "ManagerOfModifControlePermission.h"
 #include "Managers.h"
 #include "EntityPredef.h"
-#include "EntitiesPredef.h"
 
 namespace bdd {
     //! Associe un numéro de cible.

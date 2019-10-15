@@ -21,7 +21,7 @@ TreeModelMotCle::TreeModelMotCle(BddPredef * bdd, const QMap<int,QString> & head
         {
             MotClePermission permission(id, m_cibleList[j]);
             m_bdd->get(permission);
-            m_permission[id][j] = permission.num();
+            m_permission[id][j] = permission.code();
         }
     }
 }

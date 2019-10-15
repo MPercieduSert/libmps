@@ -73,11 +73,11 @@ public:
     template<class Ent> Ent getEntityInDonnee(int idCible, int cible, int num = 0);
 
     //! Renvoie le nombre des entités liées à la cible.
-    virtual int nbrEntityCible(int cible) const
+    virtual int nbrEntityCible(int /*cible*/) const
         {return 0;}//à finir
 
     //! Renvoie le nom des entités liées à la cible.
-    virtual QMap<int,QString> nomsEntityCible(int cible) const
+    virtual QMap<int,QString> nomsEntityCible(int /*cible*/) const
         {return QMap<int,QString>();}//à finir
 
     //! Renvoie l'identifiant de la donnée d'idProg idP fourni ou -1 si elle n'existe pas.
@@ -128,7 +128,7 @@ template<class Ent> Ent BddPredef::getEntityInDonnee(int idCible, int Cible, int
     QPair<int,int> interval(intervalEntityInDonnee(idCible,Cible,num));
     ListPtr<CibleDonnee> liste (getList<CibleDonnee>(QList<CibleDonnee::Position>()<<CibleDonnee::Num
                                                      <<CibleDonnee::Num
-                                                     <<CibleDonnee::IdDn
+                                                     <<CibleDonnee::IdDonnee
                                                      <<CibleDonnee::IdCible
                                                      <<CibleDonnee::Cible,
                                                      QList<QVariant>()<<interval.first
@@ -160,7 +160,7 @@ template<class Ent> void BddPredef::setEntityInDonnee(const Ent & entity, int id
             if(offset != 0)
             {
                 ListPtr<CibleDonnee> liste (getList<CibleDonnee>(QList<CibleDonnee::Position>()<<CibleDonnee::Num
-                                                                 <<CibleDonnee::IdDn
+                                                                 <<CibleDonnee::IdDonnee
                                                                  <<CibleDonnee::IdCible
                                                                  <<CibleDonnee::Cible,
                                                                  QList<QVariant>()<<intervalOld.second

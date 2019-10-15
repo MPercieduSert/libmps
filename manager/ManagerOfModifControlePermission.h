@@ -10,23 +10,23 @@
 /*! \ingroup groupeManager
  * \brief Classe template des différents manageurs à modification controlée de permission.
  */
-template<class Ent> class ManagerOfModifControlePermission : public ManagerOfPermission<Ent>,
-                                                                           public ManagerOfModifControle<Ent>
+template<class ManagerOfPerm> class ManagerOfModifControlePermission : public ManagerOfPerm,
+                                                                           public ManagerOfModifControle<typename ManagerOfPerm::EntType>
 {
 protected:
-    using ManagerPermission = ManagerOfPermission<Ent>;
+    using Ent = typename ManagerOfPerm::EntType;
     using ManagerMC = ManagerOfModifControle<Ent>;
-
-    using ManagerPermission::add;
+    using ManagerOfPerm::add;
 
 public:
-    using ManagerPermission::sameInBdd;
+    using ManagerOfPerm::sameInBdd;
     using ManagerMC::del;
 
     //! Constructeur
-    ManagerOfModifControlePermission (const InfoBdd & info, AbstractGestionAutorisation<Ent> * gestionAutorisation = new GestionAutorisationNoRestrictif<Ent>(),
+    ManagerOfModifControlePermission (const InfoBdd & info,
+                                      AbstractGestionAutorisation<Ent> * gestionAutorisation = new GestionAutorisationNoRestrictif<Ent>(),
                                       AbstractUniqueSqlTemp<Ent> * unique = new NoUniqueSql<Ent>())
-        : ManagerSql<Ent>(info, unique), ManagerOfPermission<Ent> (info,unique),
+        : ManagerSql<Ent>(info, unique), ManagerOfPerm(info,unique),
           ManagerOfModifControle<Ent>(info, gestionAutorisation, unique)
     {}
 
@@ -50,11 +50,11 @@ protected:
 
     //! Réimplemente modify.
     void modify(const Ent & entity) override
-        {ManagerPermission::modify(entity);}
+        {ManagerOfPerm::modify(entity);}
 
     //! Réimplemente modify.
     void modify(const Ent & entity, int id) override
-        {ManagerPermission::modify(entity,id);}
+        {ManagerOfPerm::modify(entity,id);}
 
     //! Appelle la fonction de modification parent souhaitée.
     void modifyParent(const Ent & entity) override
@@ -67,4 +67,9 @@ protected:
 
 template<class Ent> bool ManagerOfModifControlePermission<Ent>::del(int id)
     {return ManagerMC::del(id);}
+
+//! Manager de permission de type num à modification controlé.
+template<class Ent> using ManagerOfModifControlePermissionNum = ManagerOfModifControlePermission<ManagerOfPermissionNum<Ent>>;
+//! Manager de permission de type code à modification controlé.
+template<class Ent> using ManagerOfModifControlePermissionCode = ManagerOfModifControlePermission<ManagerOfPermissionCode<Ent>>;
 #endif // MANAGEROFMODIFCONTROLEPERMISSION_H

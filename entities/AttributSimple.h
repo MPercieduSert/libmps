@@ -486,9 +486,16 @@ public:
             m_valeur*=valeur;
     }
 
+    //! Retire une valeur.
+    void del(int valeur)
+    {
+        if(in(valeur))
+            m_valeur/=valeur;
+    }
+
     //! Teste si la valeur est contenue.
-    bool isIn(int valeur)
-        {return m_valeur%valeur;}
+    bool in(int valeur) const
+        {return m_valeur%valeur == 0;}
 
     //! Teste la validité de la valeur.
     bool isValidAttribut() const final override
@@ -503,17 +510,21 @@ public:
         return i > r;
     }
 
-    //! Retire une valeur.
-    void minus(int valeur)
+    QList<int> list() const
     {
-        if(!(m_valeur%valeur))
-            m_valeur/=valeur;
+        QList<int> L;
+        auto r = sqrt(m_valeur);
+        for(auto i = 2; i<= r; ++i)
+            if(in(i))
+                L.append(i);
+        return L;
     }
 
     //! Modifie la donnée à partir d'un QVariant.
     void setDataP(const QVariant & value, int /*pos*/) override
         {set(value.toInt());}
 };
+
 /*! \ingroup groupeAttributEntity
  * \brief Classe mère des attributs de type double.
  */
@@ -597,7 +608,7 @@ public:
 SINGLE_ATTRIBUT(AlphaAttribut,AttributIntSup,AttributIntSup<0>,Alpha,alpha,int)
 SINGLE_ATTRIBUT(CardAttribut,AttributIntSup,AttributIntSup<-1>,Card,card,int)
 SINGLE_ATTRIBUT(CibleAttribut,AttributIntSup,AttributIntSup<0>,Cible,cible,int)
-SINGLE_ATTRIBUT(CodeAttribut,AttributIntSup,AttributIntSup<0>,Code,code,int)
+SINGLE_ATTRIBUT(CodeAttribut,AttributCode,AttributCode,Code,code,int)
 SINGLE_ATTRIBUT(CreationAttribut,AttributDateTimeValide,AttributDateTimeValide,Creation,creation,QDateTime)
 SINGLE_ATTRIBUT(DateValideAttribut,AttributDateValide,AttributDateValide,Date,date,QDate)
 SINGLE_ATTRIBUT(DateTimeCurrentAttribut,AttributDateTimeCurrent,AttributDateTimeCurrent,DateTime,dateTime,QDateTime)

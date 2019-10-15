@@ -25,8 +25,7 @@
  */
 namespace bdd {
     //! Autorisation de modification d'une entité.
-    enum Autorisation{//Toute = 0,
-                      //Aucune = 1,
+    enum Autorisation{Toute = 1,
                       Modif = 2,
                       Suppr = 3};
     //! Identifiant pour les fonctions d'agrega.

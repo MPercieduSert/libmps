@@ -7,6 +7,7 @@ QString AttributEntity::affiche() const
         {return nameAttribut().append(" (").append(validToString()).append("): ").append(toStringAttribut());}
 
 DESTR_VIDE_DEF(AttributBool)
+DESTR_VIDE_DEF(AttributCode)
 DESTR_VIDE_DEF(AttributDateTimeCurrent)
 DESTR_VIDE_DEF(AttributDateNull)
 DESTR_VIDE_DEF(AttributDateValide)
@@ -25,6 +26,7 @@ DESTR_VIDE_DEF(AlphaAttribut)
 DESTR_VIDE_DEF(CardAttribut)
 DESTR_VIDE_DEF(CibleAttribut)
 DESTR_VIDE_DEF(CreationAttribut)
+DESTR_VIDE_DEF(CodeAttribut)
 DESTR_VIDE_DEF(DateValideAttribut)
 DESTR_VIDE_DEF(DateTimeCurrentAttribut)
 DESTR_VIDE_DEF(DateTimeValideAttribut)

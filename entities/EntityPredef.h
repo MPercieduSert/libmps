@@ -63,15 +63,15 @@ namespace donnee {
 }
 
 // Entités de type prédéfinies
-ID1_ENTITY(CibleCommentaire,CibleDateTimeCurrentNum,InfoEntity::CibleCommentaireId,Cm)
-
-ID1_ENTITY(CibleMotCle,Cible,InfoEntity::CibleMotCleId,MC)
-ID1_ENTITY(CibleTexte,CibleDateTimeCurrentNumType,InfoEntity::CibleTexteId,Txt)
-ID1_ENTITY(MotClePermission,IdCibleCode,InfoEntity::MotClePermissionId,MC)
+ID1_ENTITY(CibleCommentaire,CibleDateTimeCurrentNum,InfoEntity::CibleCommentaireId,Commentaire)
+ID1_ENTITY(CibleDonnee,CibleNegDateTimeCurrentNumValeurVariant,InfoEntity::CibleDonneeId,Donnee)
+ID1_ENTITY(CibleMotCle,Cible,InfoEntity::CibleMotCleId,MotCle)
+ID1_ENTITY(CibleTexte,CibleDateTimeCurrentNumType,InfoEntity::CibleTexteId,Texte)
+ID1_ENTITY(MotClePermission,IdCibleCode,InfoEntity::MotClePermissionId,MotCle)
 ID1_ENTITY(Type,IdArbreSimpleNcNom,InfoEntity::TypeId,Prog);
-ID1_ENTITY(TypePermission,IdCibleCode,InfoEntity::TypePermissionId,Tp)
-ID1_ENTITY(Utilisation,Utilisation,InfoEntity::UtilisationId,Us)
-RELATION_ENTITY(TexteSource,,InfoEntity::TexteSourceId,Sr,Txt)
+ID1_ENTITY(TypePermission,IdCibleCode,InfoEntity::TypePermissionId,Type)
+ID1_ENTITY(Utilisation,Utilisation,InfoEntity::UtilisationId,Usage)
+RELATION_ENTITY(TexteSource,,InfoEntity::TexteSourceId,Source,Texte)
 using Commentaire = TexteEntity<InfoEntity::CommentaireId>;
 using MotCle = NcNomEntity<InfoEntity::MotCleId>;
 using Texte = TexteEntity<InfoEntity::TexteId>;
@@ -142,7 +142,7 @@ public:
                    Exact = PositionEnum<ExactAttribut,DonneeCard>::Position,
                    Cible = PositionEnum<CibleAttribut,DonneeCard>::Position,
                    NbrAtt = EAID::NbrAtt,
-                   IdDn = Id1,};
+                   IdDonnee = Id1,};
 
     //! Cardinal.
     enum cardinal {Infini = -1};
@@ -150,13 +150,13 @@ public:
 
     using EAID::EntityAttributsID;
     BASE_ENTITY(DonneeCard)
-    ALIAS_CLE(Dn,1)
+    ALIAS_CLE(Donnee,1)
 
     //! Constructeur à partir des valeurs d'un ensemble d'attributs unique.
     DonneeCard(int idDn, int cible, int id = 0)
         : EAID(id)
     {
-        setIdDn(idDn);
+        setIdDonnee(idDn);
         setCible(cible);
     }
 

@@ -1,15 +1,15 @@
 #include "BddPredef.h"
 
 template<> bool BddPredef::del<Commentaire>(int id)
-    {return delList(getList<CibleCommentaire>(CibleCommentaire::IdCm,id)) && delSimple<Commentaire>(id);}
+    {return delList(getList<CibleCommentaire>(CibleCommentaire::IdCommentaire,id)) && delSimple<Commentaire>(id);}
 
 template<> bool BddPredef::del<Donnee>(int id)
 {
     return foreachBeginChild<Donnee>(id,
                                      [this](int id)->bool
     {
-            return delList(getList<CibleDonnee>(CibleDonnee::IdDn,id))
-                    && delList(getList<DonneeCard>(DonneeCard::IdDn,id))
+            return delList(getList<CibleDonnee>(CibleDonnee::IdDonnee,id))
+                    && delList(getList<DonneeCard>(DonneeCard::IdDonnee,id))
                     && delSimple<Donnee>(id);
     }
     ,false);
@@ -20,19 +20,19 @@ template<> bool BddPredef::del<MotCle>(int id)
     return foreachBeginChild<MotCle>(id,
                                      [this](int id)->bool
     {
-            return delList(getList<CibleMotCle>(CibleMotCle::IdMC,id))
-                    && delList(getList<MotClePermission>(MotClePermission::IdMC,id))
+            return delList(getList<CibleMotCle>(CibleMotCle::IdMotCle,id))
+                    && delList(getList<MotClePermission>(MotClePermission::IdMotCle,id))
                     && delSimple<MotCle>(id);
     }
     ,false);
 }
 
 template<> bool BddPredef::del<Source>(int id)
-    {return delList(getList<TexteSource>(TexteSource::IdSr,id)) && delSimple<Source>(id);}
+    {return delList(getList<TexteSource>(TexteSource::IdSource,id)) && delSimple<Source>(id);}
 
 template<> bool BddPredef::del<Texte>(int id)
-    {return delList(getList<TexteSource>(TexteSource::IdTxt,id))
-            && delList(getList<CibleTexte>(CibleTexte::IdTxt,id))
+    {return delList(getList<TexteSource>(TexteSource::IdTexte,id))
+            && delList(getList<CibleTexte>(CibleTexte::IdTexte,id))
             && delSimple<Texte>(id);}
 
 /*template<> bool BddPredef::del<TypeEnt>(int id)
@@ -73,7 +73,7 @@ void BddPredef::delEntityInDonnee(int idCible, int cible, int num)
             QPair<int, int> interval(intervalEntityInDonnee(idCible,cible,num));
             delList(getList<CibleDonnee>(QList<CibleDonnee::Position>()<<CibleDonnee::Num
                                                                  <<CibleDonnee::Num
-                                                                 <<CibleDonnee::IdDn
+                                                                 <<CibleDonnee::IdDonnee
                                                                  <<CibleDonnee::IdCible
                                                                  <<CibleDonnee::Cible,
                                                                  QList<QVariant>()<<interval.first
@@ -84,7 +84,7 @@ void BddPredef::delEntityInDonnee(int idCible, int cible, int num)
                                                                  QList<CibleDonnee::Position>()<<CibleDonnee::Num,
                                                                  QList<bdd::Condition>()<<bdd::SupEgal<<bdd::Inf));
             ListPtr<CibleDonnee> liste (getList<CibleDonnee>(QList<CibleDonnee::Position>()<<CibleDonnee::Num
-                                                             <<CibleDonnee::IdDn
+                                                             <<CibleDonnee::IdDonnee
                                                              <<CibleDonnee::IdCible
                                                              <<CibleDonnee::Cible,
                                                              QList<QVariant>()<<interval.second
@@ -115,7 +115,7 @@ QPair<int, int> BddPredef::intervalEntityInDonnee(int idCible, int cible, int nu
     if(num < 0)
         return QPair<int, int>(-1,-1);
     ListPtr<CibleDonnee> listeNum (getList<CibleDonnee>(QList<CibleDonnee::Position>()<<CibleDonnee::Num
-                                                         <<CibleDonnee::IdDn
+                                                         <<CibleDonnee::IdDonnee
                                                          <<CibleDonnee::IdCible
                                                          <<CibleDonnee::Cible,
                                                          QList<QVariant>()<<num

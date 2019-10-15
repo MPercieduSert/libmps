@@ -6,59 +6,40 @@
 
 #include "ManagerSql.h"
 
-// Macro pour manageur.
-//! \ingroup groupeManager
-//! Coprs des deux methodes add.
-#define ADD_PERMISSION if(entity.num() != NoExists) addParent(entity);
-
 /*! \ingroup groupeManager
- * \brief Classe template mère des différents manageurs de permissions.
+ * \brief Classe template mère des différents manageurs de permissions code.
  */
-template<class Ent> class ManagerOfPermission : virtual public ManagerSql<Ent>
+template<class Ent> class AbstractManagerOfPermission : virtual public ManagerSql<Ent>
 {
-public:
-    enum {NoExists = 0};
-
 protected:
     using ManagerSqlEnt = ManagerSql<Ent>;
     using ManagerSqlEnt::del;
 public:
+    using ManagerSqlEnt::ManagerSql;
     using ManagerSqlEnt::exists;
     using ManagerSqlEnt::get;
+    using EntType = Ent;
 
-    //! Constructeur
-    ManagerOfPermission (const InfoBdd & info, AbstractUniqueSqlTemp<Ent> * unique = new NoUniqueSql<Ent>())
-        : ManagerSql<Ent>(info, unique)
-    {}
 
     //! Destructeur.
-    ~ManagerOfPermission() override = default;
+    ~AbstractManagerOfPermission() override = default;
 
     //! Teste s'il y a dans la base de donnée une entité ayant exactement les mêmes attributs (identifiant compris).
     bool sameInBdd(const Ent & entity)
     {
-        if(entity.num() == NoExists)
+        if(isVirtual(entity))
             return !exists(entity);
         else
-        {
-            Ent entityT(entity.id());
-            return get(entityT) ? entityT == entity : false;
-        }
+            return ManagerSqlEnt::sameInBdd(entity);
     }
 
     //! Teste s'il y a dans la base de donnée une entité d'identifiant id ayant exactement les mêmes attributs.
     bool sameInBdd(const Ent & entity, int id)
     {
-        if(entity.num() == NoExists)
+        if(isVirtual(entity))
             return !exists(Ent(id));
         else
-        {
-            Ent entityT(id);
-            if(!get(entityT))
-                return false;
-            entityT.setId(entity.id());
-            return entityT == entity;
-        }
+            return ManagerSqlEnt::sameInBdd(entity,id);
     }
 
 protected:
@@ -68,11 +49,17 @@ protected:
     //! Insert la nouvelle entité entity dans la base de donnée
     //! et assigne l'identifiant de l'entité insérée en base de donnée à entity.
     void add(Ent & entity) override
-        {ADD_PERMISSION}
+    {
+        if(!isVirtual(entity))
+            addParent(entity);
+    }
 
     //! Insert la nouvelle entité entity dans la base de donnée.
     void add(const Ent & entity) override
-        {ADD_PERMISSION}
+    {
+        if(!isVirtual(entity))
+            addParent(entity);
+    }
 
     //! Appelle la fonction d'insertion parent souhaitée.
     virtual void addParent(Ent & entity)
@@ -82,22 +69,25 @@ protected:
     virtual void addParent(const Ent & entity)
         {ManagerSqlEnt::add(entity);}
 
+    //! Test si l'entité doit exister dans la base de donnée.
+    virtual bool isVirtual(const Ent entity) const = 0;
+
     //! Met à jour l'entité entity en base de donnée.
     void modify(const Ent & entity) override
     {
-        if(entity.num() != NoExists)
-            modifyParent(entity);
-        else
+        if(isVirtual(entity))
             del(entity.id());
+        else
+            modifyParent(entity);
     }
 
     //! Met à jour l'entité entity en base de donnée d'identifiant id avec les valeurs d'entity.
     void modify(const Ent & entity, int id) override
     {
-        if(entity.num() != NoExists)
-            modifyParent(entity, id);
-        else
+        if(isVirtual(entity))
             del(id);
+        else
+            modifyParent(entity,id);
     }
 
     //! Appelle la fonction de modification parent souhaitée.
@@ -109,4 +99,39 @@ protected:
         {ManagerSqlEnt::modify(entity,id);}
 };
 
+/*! \ingroup groupeManager
+ * \brief Classe template mère des différents manageurs de permissions num.
+ */
+template<class Ent> class ManagerOfPermissionNum : virtual public AbstractManagerOfPermission<Ent>
+{
+public:
+    enum {NoExists = 0};
+    using AbstractManagerOfPermission<Ent>::AbstractManagerOfPermission;
+
+    //! Destructeur.
+    ~ManagerOfPermissionNum() override = default;
+
+protected:
+    //! Test si l'entité doit exister dans la base de donnée.
+    bool isVirtual(const Ent entity) const override
+        {return entity.num() == NoExists;}
+};
+
+/*! \ingroup groupeManager
+ * \brief Classe template mère des différents manageurs de permissions code.
+ */
+template<class Ent> class ManagerOfPermissionCode : virtual public AbstractManagerOfPermission<Ent>
+{
+public:
+    enum {NoExists = bdd::Autorisation::Toute};
+    using AbstractManagerOfPermission<Ent>::AbstractManagerOfPermission;
+
+    //! Destructeur.
+    ~ManagerOfPermissionCode() override = default;
+
+protected:
+    //! Test si l'entité doit exister dans la base de donnée.
+    bool isVirtual(const Ent entity) const override
+        {return entity.code() == NoExists;}
+};
 #endif // MANAGEROFPERMISSION_H
