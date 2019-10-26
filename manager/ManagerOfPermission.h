@@ -34,7 +34,7 @@ public:
     }
 
     //! Teste s'il y a dans la base de donnée une entité d'identifiant id ayant exactement les mêmes attributs.
-    bool sameInBdd(const Ent & entity, int id)
+    bool sameInBdd(const Ent & entity, idt id)
     {
         if(isVirtual(entity))
             return !exists(Ent(id));
@@ -82,7 +82,7 @@ protected:
     }
 
     //! Met à jour l'entité entity en base de donnée d'identifiant id avec les valeurs d'entity.
-    void modify(const Ent & entity, int id) override
+    void modify(const Ent & entity, idt id) override
     {
         if(isVirtual(entity))
             del(id);
@@ -95,7 +95,7 @@ protected:
         {ManagerSqlEnt::modify(entity);}
 
     //! Appelle la fonction de modification parent souhaitée.
-    virtual void modifyParent(const Ent & entity, int id)
+    virtual void modifyParent(const Ent & entity, idt id)
         {ManagerSqlEnt::modify(entity,id);}
 };
 

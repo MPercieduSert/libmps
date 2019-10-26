@@ -174,12 +174,12 @@ public:
 
     //! Teste s'il existe une entité ayant les mêmes valeurs d'attributs uniques que l'entité entity en base de donnée
     //! et renvoie l'identifiant du premier trouver.
-    QPair<bdd::ExisteUni,int> existsUniqueId(const Ent & entity) override
+    QPair<bdd::ExisteUni,idt> existsUniqueId(const Ent & entity) override
         {return m_unique->existsUniqueId(entity);}
 
 
     //! Supprime de la table en base de donnée l'entité d'identifiant id.
-    bool del(int id) override
+    bool del(idt id) override
     {
         prepare(m_sqlDelete);
         bindValue(0,id);
@@ -387,7 +387,7 @@ public:
 
     //! Renvoie la liste des identifiants de la table vérifiant la condition,
     //! valeur de la colonne d'identifiant cle = value, ordonnée suivant la colonne d'identifiant ordre.
-    QList<int> getListId(typename Ent::Position cle, const QVariant & value,
+    QList<idt> getListId(typename Ent::Position cle, const QVariant & value,
                          typename Ent::Position ordre = Ent::Id,
                          bdd::Condition cond = bdd::Condition::Egal, bool crois = true) override
     {
@@ -399,7 +399,7 @@ public:
 
     //! Renvoie la liste des identifiants de la table vérifiant la condition,
     //! valeur de la colonne d'identifiant cle = value, ordonnée suivant les colonnes d'identifiant ordre1 puis ordre2.
-    QList<int> getListId(typename Ent::Position cle, const QVariant & value,
+    QList<idt> getListId(typename Ent::Position cle, const QVariant & value,
                          typename Ent::Position ordre1, typename Ent::Position ordre2,
                          bdd::Condition cond = bdd::Condition::Egal,
                          bool crois1 = true, bool crois2 = true) override
@@ -413,7 +413,7 @@ public:
 
     //! Renvoie la liste des identifiants de la table vérifiant la condition,
     //! valeur de la colonne d'identifiant cle = value, ordonnée suivant les colonnes d'identifiant ordre1, ordre2 puis ordre3.
-    QList<int> getListId(typename Ent::Position cle, const QVariant & value,
+    QList<idt> getListId(typename Ent::Position cle, const QVariant & value,
                            typename Ent::Position ordre1, typename Ent::Position ordre2, typename Ent::Position ordre3,
                            bdd::Condition cond = bdd::Condition::Egal,
                            bool crois1 = true, bool crois2 = true, bool crois3 = true) override
@@ -429,7 +429,7 @@ public:
     //! Renvoie la liste des identifiants de la table vérifiant les deux conditions,
     //! valeur de la colonne d'identifiant cle1 = value1 et valeur de la colonne d'identifiant cle2 = value2,
     //! ordonnée suivant la colonne d'identifiant ordre.
-    QList<int> getListId(typename Ent::Position cle1, const QVariant & value1,
+    QList<idt> getListId(typename Ent::Position cle1, const QVariant & value1,
                            typename Ent::Position cle2,  const QVariant & value2,
                            typename Ent::Position ordre = Ent::Id,
                            bdd::Condition cond1 = bdd::Condition::Egal, bdd::Condition cond2 = bdd::Condition::Egal,
@@ -447,7 +447,7 @@ public:
     //! valeur de la colonne d'identifiant cle1 = value1, valeur de la colonne d'identifiant cle2 = value2
     //! et valeur de la colonne d'identifiant cle3 = value3,
     //! ordonnée suivant la colonne d'identifiant ordre.
-    QList<int> getListId(typename Ent::Position cle1, const QVariant & value1,
+    QList<idt> getListId(typename Ent::Position cle1, const QVariant & value1,
                          typename Ent::Position cle2, const QVariant & value2,
                          typename Ent::Position cle3, const QVariant & value3,
                          typename Ent::Position ordre = Ent::Id,
@@ -469,7 +469,7 @@ public:
     //! valeur de la colonne d'identifiant cle[i] condition[i] value[i],
     //! ordonnée suivant les colonnes d'identifiant contenue dans ordre,
     //! croissante (crois[i]=true) ou décroissante (croiss[i]=false).
-    QList<int> getListId(const QList<typename Ent::Position> & cle, const QList<QVariant> & value,
+    QList<idt> getListId(const QList<typename Ent::Position> & cle, const QList<QVariant> & value,
                            const QList<typename Ent::Position> & ordre = QList<typename Ent::Position>(),
                            const QList<bdd::Condition> & condition = QList<bdd::Condition>(),
                            const QList<bool> & crois = QList<bool>()) override
@@ -523,7 +523,7 @@ public:
             sqlWhere.append("J.").append(i.key()).append("=? AND ");
         sqlWhere.chop(5);
         QString sqlOrder;
-        for(QList<QPair<int,bool>>::const_iterator i = orderMapTable.cbegin(); i != orderMapTable.cend(); ++i)
+        for(auto i = orderMapTable.cbegin(); i != orderMapTable.cend(); ++i)
             sqlOrder.append(" T.").append(attribut((*i).first)).append(" ").append(croissant((*i).second)).append(",");
         sqlOrder.chop(1);
         prepare(m_sqlGetListJoin.arg(tableJoin,
@@ -726,7 +726,7 @@ public:
     }
 
     //! Teste s'il y a dans la base de donnée une entité d'identifiant id ayant exactement les mêmes attributs que entity.
-    bool sameInBdd(const Ent & entity, int id) override
+    bool sameInBdd(const Ent & entity, idt id) override
     {
         Ent entityT(id);
         if(!get(entityT))
@@ -754,7 +754,7 @@ public:
     {
         if(entity.isValid())
         {
-            int id = entity.id();
+            auto id = entity.id();
             bdd::ExisteUni n = existsUnique(entity);
             if(n <= bdd::ExisteUni::Meme)
             {
@@ -784,7 +784,7 @@ public:
     {
         if(entity.isValid())
         {
-            QPair<bdd::ExisteUni,int> pairExists = existsUniqueId(entity);
+            QPair<bdd::ExisteUni,idt> pairExists = existsUniqueId(entity);
             if(pairExists.first <= bdd::ExisteUni::Meme)
             {
                 if(entity.isNew())
@@ -857,12 +857,12 @@ protected:
     }
 
     //! Construit la liste des entités correspondant une requète de type sqlGetList.
-    QList<int> listIdFromRequete()
+    QList<idt> listIdFromRequete()
     {
         exec();
-        QList<int> liste;
+        QList<idt> liste;
         while(next())
-            liste.append(value<int>());
+            liste.append(value<idt>());
         finish();
         return liste;
     }
@@ -894,7 +894,7 @@ protected:
     }
 
     //! Met à jour l'entité entity en base de donnée d'identifiant id avec les valeurs d'entity.
-    virtual void modify(const Ent & entity, int id)
+    virtual void modify(const Ent & entity, idt id)
     {
         prepare(m_sqlModify);
         m_link.bindValues(entity);

@@ -46,14 +46,14 @@ protected:
         {ManagerMC::add(entity);}
 
     //! Supprime de la table en base de donnée l'entité d'identifiant id.
-    bool del(int id) override;
+    bool del(idt id) override;
 
     //! Réimplemente modify.
     void modify(const Ent & entity) override
         {ManagerOfPerm::modify(entity);}
 
     //! Réimplemente modify.
-    void modify(const Ent & entity, int id) override
+    void modify(const Ent & entity, idt id) override
         {ManagerOfPerm::modify(entity,id);}
 
     //! Appelle la fonction de modification parent souhaitée.
@@ -61,11 +61,11 @@ protected:
         {ManagerMC::modify(entity);}
 
     //! Appelle la fonction de modification parent souhaitée.
-    void modifyParent(const Ent & entity, int id) override
+    void modifyParent(const Ent & entity, idt id) override
         {ManagerMC::modify(entity,id);}
 };
 
-template<class Ent> bool ManagerOfModifControlePermission<Ent>::del(int id)
+template<class Ent> bool ManagerOfModifControlePermission<Ent>::del(idt id)
     {return ManagerMC::del(id);}
 
 //! Manager de permission de type num à modification controlé.

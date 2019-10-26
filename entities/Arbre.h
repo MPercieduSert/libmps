@@ -6,7 +6,7 @@
 
 #include "Entity.h"
 
-SINGLE_ATTRIBUT(FeuilleAttribut,AttributBool,AttributBool,Feuille,feuille,bool)
+SINGLE_ATTRIBUT(FeuilleAttribut,AttributBool,Feuille,feuille)
 
 /*! \ingroup groupeEntity
  * \brief Classe mère des entités de type arbre simple.
@@ -45,16 +45,16 @@ public:
     using EAID = EntityAttributsID<ArbreAttribut,InfoEntity::ArbreId>;
     //! Positions des attributs.
     enum Position {Id = PositionEnum<IdAttribut,Arbre>::Position,
-                   Parent = PositionEnum<ParentAttribut,Arbre>::Position,
                    Feuille = PositionEnum<FeuilleAttribut,Arbre>::Position,
                    Num = PositionEnum<NumAttribut,Arbre>::Position,
+                   Parent = PositionEnum<ParentAttribut,Arbre>::Position,
                    NbrAtt = EAID::NbrAtt};
 
     using EntityAttributsID<ArbreAttribut,InfoEntity::ArbreId>::EntityAttributsID;
     BASE_ENTITY(Arbre)
 
     //! Constructeur à partir des valeurs d'un ensemble d'attributs unique.
-    Arbre(int num, int parent, int id = 0)
+    Arbre(int num, idt parent, idt id = 0)
         : EAID(id)
     {
         setNum(num);
@@ -62,7 +62,7 @@ public:
     }
 
     //! Constructeur à partir des valeurs attributs.
-    Arbre(bool feuille, int num, int parent, int id = 0)
+    Arbre(bool feuille, int num, idt parent, idt id = 0)
         : Arbre(num,parent,id)
         {setFeuille(feuille);}
 };

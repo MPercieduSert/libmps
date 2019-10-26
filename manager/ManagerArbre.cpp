@@ -197,7 +197,7 @@ void ManagerArbre::addUnstable(const Arbre &node)
         throw std::invalid_argument("Le nouveau noeud ajouté doit être une feuille.");
 }
 
-bool ManagerArbre::del(int id)
+bool ManagerArbre::del(idt id)
 {
     Arbre node(id);
     if(!get(node))
@@ -259,7 +259,7 @@ void ManagerArbre::modify(const Arbre & node)
 {
     Arbre nodeBdd(node.id());
     get(nodeBdd);
-    int idParentBdd = nodeBdd.parent();
+    idt idParentBdd = nodeBdd.parent();
     int numBdd = nodeBdd.num();
     if(node.parent())
     { 

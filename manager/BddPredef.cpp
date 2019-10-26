@@ -1,12 +1,12 @@
 #include "BddPredef.h"
 
-template<> bool BddPredef::del<Commentaire>(int id)
+template<> bool BddPredef::del<Commentaire>(idt id)
     {return delList(getList<CibleCommentaire>(CibleCommentaire::IdCommentaire,id)) && delSimple<Commentaire>(id);}
 
-template<> bool BddPredef::del<Donnee>(int id)
+template<> bool BddPredef::del<Donnee>(idt id)
 {
     return foreachBeginChild<Donnee>(id,
-                                     [this](int id)->bool
+                                     [this](idt id)->bool
     {
             return delList(getList<CibleDonnee>(CibleDonnee::IdDonnee,id))
                     && delList(getList<DonneeCard>(DonneeCard::IdDonnee,id))
@@ -15,10 +15,10 @@ template<> bool BddPredef::del<Donnee>(int id)
     ,false);
 }
 
-template<> bool BddPredef::del<MotCle>(int id)
+template<> bool BddPredef::del<MotCle>(idt id)
 {
     return foreachBeginChild<MotCle>(id,
-                                     [this](int id)->bool
+                                     [this](idt id)->bool
     {
             return delList(getList<CibleMotCle>(CibleMotCle::IdMotCle,id))
                     && delList(getList<MotClePermission>(MotClePermission::IdMotCle,id))
@@ -27,18 +27,18 @@ template<> bool BddPredef::del<MotCle>(int id)
     ,false);
 }
 
-template<> bool BddPredef::del<Source>(int id)
+template<> bool BddPredef::del<Source>(idt id)
     {return delList(getList<TexteSource>(TexteSource::IdSource,id)) && delSimple<Source>(id);}
 
-template<> bool BddPredef::del<Texte>(int id)
+template<> bool BddPredef::del<Texte>(idt id)
     {return delList(getList<TexteSource>(TexteSource::IdTexte,id))
             && delList(getList<CibleTexte>(CibleTexte::IdTexte,id))
             && delSimple<Texte>(id);}
 
-/*template<> bool BddPredef::del<TypeEnt>(int id)
+/*template<> bool BddPredef::del<TypeEnt>(idt id)
 {
     return foreachBeginChild<TypeEnt>(id,
-                                     [this](int id)->bool
+                                     [this](idt id)->bool
     {
             return delList(getList<Utilisation>(Utilisation::IdTp,id))
                     && delSimple<TypeEnt>(id);
@@ -46,7 +46,7 @@ template<> bool BddPredef::del<Texte>(int id)
     ,false);
 }*/
 
-bool BddPredef::delCible(int idCible, int cible)
+bool BddPredef::delCible(idt idCible, int cible)
 {
     return (!managers()->commentaireIsEnabled() || delList(getList<CibleCommentaire>(CibleCommentaire::Cible,cible,CibleCommentaire::IdCible,idCible)))
             && (!managers()->donneeIsEnabled() || delList(getList<CibleDonnee>(CibleDonnee::Cible,cible,CibleDonnee::IdCible,idCible)))
@@ -60,7 +60,7 @@ bool BddPredef::delCible(int idCible, int cible)
                                        && delList(getList<Utilisation>(Utilisation::Etat,cible,Utilisation::IdEtat))));
 }
 
-void BddPredef::delEntityInDonnee(int idCible, int cible, int num)
+void BddPredef::delEntityInDonnee(idt idCible, int cible, int num)
 {
     if(num < 0)
         throw std::invalid_argument("L'argument num doit être positif");
@@ -104,13 +104,13 @@ void BddPredef::delEntityInDonnee(int idCible, int cible, int num)
     }
 }
 
- int BddPredef::idDonnee(int idP)
- {
+idt BddPredef::idDonnee(idt idP)
+{
      Donnee dn(idP,0);
-     return existsUnique(dn) ? dn.id() : -1;
- }
+     return existsUnique(dn) ? dn.id() : 0;
+}
 
-QPair<int, int> BddPredef::intervalEntityInDonnee(int idCible, int cible, int num)
+QPair<int, int> BddPredef::intervalEntityInDonnee(idt idCible, int cible, int num)
 {
     if(num < 0)
         return QPair<int, int>(-1,-1);

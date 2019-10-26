@@ -46,7 +46,7 @@ protected:
     BddPredef * m_bdd;                              //!< Pointeur vers la base de donnée.
     QVector<int> m_cibleList;                       //!< Liste des valeurs de cible associé à chaque index de colonnes.
     QStringList m_headerPerm;                       //!< Noms des colonnes.
-    QMap<int,QVector<int>> m_permission;            //!< Map des permitions indexé par l'identifiant du mot clé associé.
+    QMap<idt,QVector<codeType>> m_permission;            //!< Map des permitions indexé par l'identifiant du mot clé associé.
 
     using TreeModelEditEntity<MotCle>::m_tree;
     using TreeModelEditEntity<MotCle>::getItem;
@@ -88,7 +88,7 @@ public:
     virtual bool hydrateNewEntity(MotCle &entity, int row = 0, const QModelIndex &parent = QModelIndex()) override;
 
     //! Renvoie l'identifiant de l'entité associée à la donnée.
-    int id(const QModelIndex & index) const;
+    idt id(const QModelIndex & index) const;
 
     //! Accesseur du nombre de type.
     int nbrIndex() const;

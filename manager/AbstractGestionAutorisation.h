@@ -24,7 +24,7 @@ public:
     virtual bool getAutorisation(const Ent & entity, bdd::Autorisation autorisation) = 0;
 
     //! Demande l'autorisation de modification pour une entité d'identifiant id avec les valeur de entity.
-    virtual bool getAutorisation(const Ent & entity, int id, bdd::Autorisation autorisation) = 0;
+    virtual bool getAutorisation(const Ent & entity, unsigned id, bdd::Autorisation autorisation) = 0;
 
     //! Demande la liste des restrictions de modification pour une entité donnée.
     virtual QList<int> getRestriction(const Ent & entity) = 0;

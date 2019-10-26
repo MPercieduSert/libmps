@@ -67,7 +67,6 @@ public:
             throw std::invalid_argument("Identifiant d'entité invalide dans la fonction get.");
     }
 
-
     //! Méthode template permettant d'obtenir le manager correspondant à l'entité.
     template<class Ent> AbstractManagerTemp<Ent> * get() const
         {return static_cast<AbstractManagerTemp<Ent> *>(m_managers[Ent::ID]);}

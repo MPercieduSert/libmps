@@ -56,9 +56,10 @@ public:
     QString uniqueCreerString(const InfoBdd & info, int num = 0, bool numero = false) const;
 
 protected:
+    using ReqSql::id;
     //! Accesseur de l'identifiant.
-    int id(int pos = idUnique) const
-        {return value<int>(pos);}
+    unsigned id() const
+        {return id(idUnique);}
 };
 
 /*! \ingroup groupeUniqueSql
@@ -79,7 +80,7 @@ public:
 
     //! Teste s'il existe une entité ayant les mêmes valeurs d'attributs uniques que l'entité entity en base de donnée
     //! et renvoie l'identifiant du premier trouver.
-    virtual QPair<bdd::ExisteUni,int> existsUniqueId(const Ent & entity) = 0;
+    virtual QPair<bdd::ExisteUni,idt> existsUniqueId(const Ent & entity) = 0;
 };
 
 template<class Ent> AbstractUniqueSqlTemp<Ent>::~AbstractUniqueSqlTemp() {}
@@ -107,8 +108,8 @@ public:
         {return bdd::ExisteUni::Aucun;}
 
     //! L'attribut ne possède pas d'ensemble de valeur unique.
-    QPair<bdd::ExisteUni,int> existsUniqueId(const Ent & /*entity*/) override
-        {return QPair<bdd::ExisteUni,int>();}
+    QPair<bdd::ExisteUni,idt> existsUniqueId(const Ent & /*entity*/) override
+        {return QPair<bdd::ExisteUni,idt>();}
 };
 
 template<class Ent> void NoUniqueSql<Ent>::initialise(const InfoBdd & /*info*/) {}
@@ -147,7 +148,7 @@ public:
 
     //! Teste s'il existe une entité ayant les mêmes valeurs d'attributs uniques que l'entité entity en base de donnée,
     //! dans le cas particulier où il y a un seul ensemble de valeurs unique.
-    QPair<bdd::ExisteUni,int> existsUniqueId(const Ent & entity) override;
+    QPair<bdd::ExisteUni,idt> existsUniqueId(const Ent & entity) override;
 
     //! Ecrit les requètes d'unicité.
     void initialise(const InfoBdd & info) override;
@@ -181,9 +182,9 @@ template<class Ent> bdd::ExisteUni SimpleUniqueSql<Ent>::existsUnique(Ent & enti
     }
 }
 
-template<class Ent> QPair<bdd::ExisteUni,int> SimpleUniqueSql<Ent>::existsUniqueId(const Ent & entity)
+template<class Ent> QPair<bdd::ExisteUni,idt> SimpleUniqueSql<Ent>::existsUniqueId(const Ent & entity)
 {
-    QPair<bdd::ExisteUni,int> resultat(bdd::ExisteUni::Aucun,0);
+    QPair<bdd::ExisteUni,idt> resultat(bdd::ExisteUni::Aucun,0);
     prepare(m_unique);
     bindValuesUnique(entity);
     exec();
@@ -243,7 +244,7 @@ public:
 
     //! Teste s'il existe une entité ayant les mêmes valeurs d'attributs uniques que l'entité entity en base de donnée,
     //! dans le cas particulier où il y a exactement deux ensembles de valeurs uniques.
-    QPair<bdd::ExisteUni,int> existsUniqueId(const Ent & entity) override;
+    QPair<bdd::ExisteUni,idt> existsUniqueId(const Ent & entity) override;
 
     //! Ecrit les requètes d'unicité.
     void initialise(const InfoBdd & info) override;
@@ -258,14 +259,14 @@ protected:
 
 template<class Ent> bdd::ExisteUni DoubleUniqueSql<Ent>::existsUnique(Ent & entity)
 {
-    int idUni1 = 0;
+    unsigned idUni1 = 0;
     prepare(m_unique_1);
     bindValuesUnique_1(entity);
     exec();
     if(next())
         idUni1 = id();
 
-    int idUni2 = 0;
+    unsigned idUni2 = 0;
     prepare(m_unique_2);
     bindValuesUnique_2(entity);
     exec();
@@ -312,17 +313,17 @@ template<class Ent> bdd::ExisteUni DoubleUniqueSql<Ent>::existsUnique(Ent & enti
     }
 }
 
-template<class Ent> QPair<bdd::ExisteUni,int> DoubleUniqueSql<Ent>::existsUniqueId(const Ent & entity)
+template<class Ent> QPair<bdd::ExisteUni,idt> DoubleUniqueSql<Ent>::existsUniqueId(const Ent & entity)
 {
-    QPair<bdd::ExisteUni,int> resultat(bdd::ExisteUni::Aucun,0);
-    int idUni1 = 0;
+    QPair<bdd::ExisteUni,idt> resultat(bdd::ExisteUni::Aucun,0);
+    unsigned idUni1 = 0;
     prepare(m_unique_1);
     bindValuesUnique_1(entity);
     exec();
     if(next())
         idUni1 = id();
 
-    int idUni2 = 0;
+    unsigned idUni2 = 0;
     prepare(m_unique_2);
     bindValuesUnique_2(entity);
     exec();
@@ -414,7 +415,7 @@ public:
 
     //! Teste s'il existe une entité ayant les mêmes valeurs d'attributs uniques que l'entité entity en base de donnée,
     //! dans le cas particulier où il y a exactement deux ensembles de valeurs uniques.
-    QPair<bdd::ExisteUni,int> existsUniqueId(const Ent & entity) override;
+    QPair<bdd::ExisteUni,idt> existsUniqueId(const Ent & entity) override;
 
 protected:
     //! Transmet les valeurs des attributs uniques à la requète SQL préparée 1.
@@ -466,9 +467,9 @@ template<class Ent> bdd::ExisteUni RelationExactOneNotNullUniqueSql<Ent>::exists
     return bdd::Conflit;
 }
 
-template<class Ent> QPair<bdd::ExisteUni,int> RelationExactOneNotNullUniqueSql<Ent>::existsUniqueId(const Ent & entity)
+template<class Ent> QPair<bdd::ExisteUni,idt> RelationExactOneNotNullUniqueSql<Ent>::existsUniqueId(const Ent & entity)
 {
-    QPair<bdd::ExisteUni,int> resultat(bdd::ExisteUni::Aucun,0);
+    QPair<bdd::ExisteUni,idt> resultat(bdd::ExisteUni::Aucun,0);
     if(entity.id1() != 0 && entity.id2() == 0)
     {
         prepare(m_unique_1);

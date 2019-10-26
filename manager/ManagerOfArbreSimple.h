@@ -41,7 +41,7 @@ public:
     ~ManagerOfArbreSimple() override = default;
 
     //! Supprime de la base de donnée le noeud d'identifiant id ainsi que tous ses déscendants (opération stable).
-    bool del(int id) override;
+    bool del(idt id) override;
 
     //! Renvoie l'arbre de toutes les entités.
     Tree<Ent> getArbre() override
@@ -68,7 +68,7 @@ public:
     }
 
     //! Renvoie l'arbre l'entity d'identifiant.
-    Tree<Ent> getArbre(int id) override
+    Tree<Ent> getArbre(idt id) override
         {return getArbre(Ent(id));}
 
     //! Renvoie le liste des descendant direct d'entity.
@@ -76,15 +76,15 @@ public:
         {return getList(Ent::Parent,entity.id(),Ent::Ordre);}
 
     //! Renvoie le liste des identifiants des descendant direct de l'entité d'identifiant id.
-    QList<int> getListChildsId(int id) override
+    QList<idt> getListChildsId(idt id) override
         {return getListId(Ent::Parent,id,Ent::Ordre);}
 
     //! Renvoie le liste des identifiants des descendant direct de l'entité d'identifiant id
     //! ainsi que si ce descendant est une feuille ou non.
-    QList<QPair<int,bool>> getListChildsIdLeaf(int id, bool ordre = true) override
+    QList<QPair<idt,bool>> getListChildsIdLeaf(idt id, bool ordre = true) override
     {
         auto childs = getListId(Ent::Parent,id,Ent::Ordre,ordre);
-        QList<QPair<int,bool>> liste;
+        QList<QPair<idt,bool>> liste;
         for(auto i = childs.begin(); i != childs.end(); ++i)
             liste.append(QPair<int,bool>(*i, !exists(Ent::Parent,*i)));
         return liste;
@@ -135,7 +135,7 @@ protected:
     void saveWithoutDelete(TreeItem<Ent> * tree);
 };
 
-template<class Ent> bool ManagerOfArbreSimple<Ent>::del(int id)
+template<class Ent> bool ManagerOfArbreSimple<Ent>::del(idt id)
 {
     if(!exists(Ent::Parent,id))
         return ManagerSqlEnt::del(id);

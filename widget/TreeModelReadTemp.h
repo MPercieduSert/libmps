@@ -4,10 +4,13 @@
 #ifndef TREEMODELREADTEMP_H
 #define TREEMODELREADTEMP_H
 
+#include <QItemSelection>
+#include <QMessageBox>
+
 #include "MAbstractTreeModel.h"
 #include "Tree.h"
-#include <QMessageBox>
-#include <QItemSelection>
+
+
 
 /*! \ingroup groupeModel
  * \brief Classe template des models de type arbre non-modifiable.

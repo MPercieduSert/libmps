@@ -108,7 +108,7 @@ using NcNomTypeAttribut = Attributs<NcNomAttribut, TypeAttribut>;
 using TexteAttributs = Attributs<CreationAttribut,ModificationAttribut,TexteAttribut>;
 
 /*! \ingroup groupeAttributEntity
- * \brief Attributs contenant deux identifiant dont exactement un est non nul pour être valide.
+ * \brief Attributs contenant deux identifiants dont exactement un est non nul pour être valide.
  */
 class RelationExactOneNotNullAttribut : public Attributs<Id1NullAttribut,Id2NullAttribut>
 {
@@ -119,5 +119,21 @@ public:
     //! Teste si l'entité est valide.
     bool isValid() const override
         {return (Id1NullAttribut::isValid() && id2() == 0) || (id1() == 0 && Id2NullAttribut::isValid());}
+};
+
+/*! \ingroup groupeAttributEntity
+ * \brief Attributs contenant trois identifiants dont exactement un est non nul pour être valide.
+ */
+class RelationTroisExactOneNotNullAttribut : public Attributs<Id1NullAttribut,Id2NullAttribut,Id3NullAttribut>
+{
+public:
+    CONSTR_DEFAUT(RelationTroisExactOneNotNullAttribut)
+    CONSTR_AFFECT_DEFAUT(RelationTroisExactOneNotNullAttribut)
+
+    //! Teste si l'entité est valide.
+    bool isValid() const override
+        {return (Id1NullAttribut::isValid() && id2() == 0 && id3() == 0)
+                || (Id2NullAttribut::isValid() && id1() == 0 && id3() == 0)
+                || (Id3NullAttribut::isValid() && id1() == 0 && id2() == 0);}
 };
 #endif // ENTITYATTRIBUT_H

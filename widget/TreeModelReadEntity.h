@@ -4,6 +4,7 @@
 #ifndef TREEMODELREADENTITY_H
 #define TREEMODELREADENTITY_H
 
+#include "Entity.h"
 #include "TreeModelReadTemp.h"
 
 /*! \ingroup groupeModel
@@ -33,7 +34,7 @@ public:
     QVariant data(const QModelIndex &index, int role) const override;
 
     //! Renvoie un index sur le premier (dans le sens de parcourt) noeud de l'arbre ayant pour donnée un entité d'identifiant id.
-    QItemSelection foundId(int id) const;
+    QItemSelection foundId(idt id) const;
 
     //! Renvoie les labels des colonnes
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
@@ -51,7 +52,7 @@ template<class Ent> QVariant TreeModelReadEntity<Ent>::data(const QModelIndex &i
     return m_atts.isEmpty() ? item->data().data(index.column()) : item->data().data(m_atts.at(index.column()));
 }
 
-template<class Ent> QItemSelection TreeModelReadEntity<Ent>::foundId(int id) const
+template<class Ent> QItemSelection TreeModelReadEntity<Ent>::foundId(idt id) const
 {
     typename TreeItem<Ent>::iterator i = m_tree.begin();
     while(i != m_tree.end() && (*i)->data().id() != id )

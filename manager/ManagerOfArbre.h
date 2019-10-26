@@ -52,7 +52,7 @@ public:
     }
 
     //! Supprime de la table en base de donnée l'entité d'identifiant id.
-    bool del(int id) override
+    bool del(idt id) override
     {
         Arbre node(id);
         if(m_managerArbre.get(node))
@@ -66,21 +66,21 @@ public:
             return ManagerSqlEnt::del(id);
     }
 
-    //! Applique la fonction fonction bool fct(int id) à chaque noeud descendant de celui
+    //! Applique la fonction fonction bool fct(idt id) à chaque noeud descendant de celui
     //! d'identifiant id en commençant par les descendants.
-    template<class Fct> bool foreachBeginChild(int id, const Fct & fct, bool ordre = true)
+    template<class Fct> bool foreachBeginChild(idt id, const Fct & fct, bool ordre = true)
         {return m_managerArbre.foreachBeginChild(id,fct,ordre);}
 
-    //! Applique la fonction fonction bool fct(int id) à chaque noeud descendant celui d'identifiant id.
-    template<class Fct> bool foreachNode(int id, const Fct & fct, bool ordre = true)
+    //! Applique la fonction fonction bool fct(idt id) à chaque noeud descendant celui d'identifiant id.
+    template<class Fct> bool foreachNode(idt id, const Fct & fct, bool ordre = true)
         {return m_managerArbre.foreachNode(id,fct,ordre);}
 
     //! Renvoie l'arbre de toutes les entités.
     Tree<Ent> getArbre() override
     {
-        QList<int> racines = m_managerArbre.getListId(Arbre::Parent,QVariant(QVariant::Int),Arbre::Id,bdd::Condition::Is);
+        auto racines = m_managerArbre.getListId(Arbre::Parent,QVariant(QVariant::Int),Arbre::Id,bdd::Condition::Is);
         Tree<Ent> tree;
-        for(QList<int>::const_iterator i = racines.cbegin(); i != racines.cend(); ++i)
+        for(auto i = racines.cbegin(); i != racines.cend(); ++i)
             tree<<getArbre(*i);
         return tree;
     }
@@ -100,15 +100,15 @@ public:
     }
 
     //! Renvoie l'arbre l'entity d'identifiant.
-    Tree<Ent> getArbre(int id) override
+    Tree<Ent> getArbre(idt id) override
         {return getArbre(Ent(id));}
 
     //! Renvoie le liste des descendant direct d'entity.
     ListPtr<Ent> getListChilds(const Ent & entity) override
     {
-        QList<int> nodeChilds = m_managerArbre.getListId(Arbre::Parent,entity.id(),Arbre::Num);
+        auto nodeChilds = m_managerArbre.getListId(Arbre::Parent,entity.id(),Arbre::Num);
         ListPtr<Ent> entChilds;
-        for(QList<int>::const_iterator i = nodeChilds.cbegin(); i != nodeChilds.cend(); ++i)
+        for(auto i = nodeChilds.cbegin(); i != nodeChilds.cend(); ++i)
          {
             Ent * entPtr = new Ent(*i);
             get(*entPtr);
@@ -118,17 +118,17 @@ public:
     }
 
     //! Renvoie le liste des identifiants des descendant direct de l'entité d'identifiant id.
-    QList<int> getListChildsId(int id) override
+    QList<idt> getListChildsId(idt id) override
         {return m_managerArbre.getListId(Arbre::Parent,id,Arbre::Num);}
 
     //! Renvoie le liste des identifiants des descendant direct de l'entité d'identifiant id
     //! ainsi que si ce descendant est une feuille ou non.
-    QList<QPair<int,bool>> getListChildsIdLeaf(int id, bool ordre = true) override
+    QList<QPair<idt,bool>> getListChildsIdLeaf(idt id, bool ordre = true) override
     {
         ListPtr<Arbre> childs = m_managerArbre.getList(Arbre::Parent,id,Arbre::Num,ordre);
-        QList<QPair<int,bool>> liste;
+        QList<QPair<idt,bool>> liste;
         for(ListPtr<Arbre>::iterator i = childs.begin(); i != childs.end(); ++i)
-            liste.append(QPair<int,bool>((*i).id(),(*i).feuille()));
+            liste.append(QPair<idt,bool>((*i).id(),(*i).feuille()));
         return liste;
     }
 
@@ -136,10 +136,10 @@ public:
     //! Renvoie le vecteur des descendant direct d'entity.
     VectorPtr<Ent> getVectorChilds(const Ent & entity) override
     {
-        QList<int> nodeChilds = m_managerArbre.getListId(Arbre::Parent,entity.id(),Arbre::Num);
+        auto nodeChilds = m_managerArbre.getListId(Arbre::Parent,entity.id(),Arbre::Num);
         VectorPtr<Ent> entChilds(nodeChilds.count());
         typename VectorPtr<Ent>::iterator j = entChilds.begin();
-        for(QList<int>::const_iterator i = nodeChilds.cbegin(); i != nodeChilds.cend(); ++i, ++j)
+        for(auto i = nodeChilds.cbegin(); i != nodeChilds.cend(); ++i, ++j)
          {
             (*j).setId(*i);
             get(*j);
@@ -212,7 +212,7 @@ protected:
 
     //! Sauve un arbre où le changement de structure consite en l'ajout de nouveaux noeuds,
     //! des permutations à l'interieur de l'arbre et le déplasement de noeuds extérieur à l'arbre.
-    void saveExt(TreeItem<Ent> * tree, int idRoot);
+    void saveExt(TreeItem<Ent> * tree, idt idRoot);
 
     //! Enregistre l'entité valide entity en base de donnée et assigne l'identifiant de l'entité insérée en base de donnée à entity.
     void saveValide(Ent & entity)
@@ -283,8 +283,8 @@ template<class Ent> void ManagerOfArbre<Ent>::deleteLeafOutOf(TreeItem<Ent> * tr
     }
     else
     {
-        QList<int> childs = m_managerArbre.getListId(Arbre::Parent,tree->data().id());
-        for(QList<int>::const_iterator i = childs.cbegin(); i != childs.cend(); ++i)
+        auto childs = m_managerArbre.getListId(Arbre::Parent,tree->data().id());
+        for(auto i = childs.cbegin(); i != childs.cend(); ++i)
             del(*i);
     }
 }
@@ -428,7 +428,7 @@ template<class Ent> void ManagerOfArbre<Ent>::saveAddLeaf(TreeItem<Ent> * tree)
 template<class Ent> void ManagerOfArbre<Ent>::saveWithoutDelete(TreeItem<Ent> * tree)
 {
     int i = 0;
-    int idParent = tree->data().id();
+    auto idParent = tree->data().id();
     for(typename QList<TreeItem<Ent>*>::const_iterator child = tree->childs().cbegin(); child != tree->childs().cend(); ++i, ++child)
     {
         if((*child)->data().isValid())
@@ -446,10 +446,10 @@ template<class Ent> void ManagerOfArbre<Ent>::saveWithoutDelete(TreeItem<Ent> * 
     }
 }
 
-template<class Ent> void ManagerOfArbre<Ent>::saveExt(TreeItem<Ent> * tree, int idRoot)
+template<class Ent> void ManagerOfArbre<Ent>::saveExt(TreeItem<Ent> * tree, idt idRoot)
 {
     int i = 0;
-    int idParent = tree->data().id();
+    auto idParent = tree->data().id();
     for(typename QList<TreeItem<Ent>*>::const_iterator child = tree->childs().cbegin(); child != tree->childs().cend(); ++i, ++child)
     {
         if((*child)->data().isValid())

@@ -468,6 +468,30 @@ protected:
     }
 };
 
+/*! \ingroup groupeUniqueSql
+ * \brief Classe condition d'unicité pour les entités possédant une seule condition d'unicité sur le quadruplet (id1,id2,id3,num).
+ */
+template<class Ent> class RelationTroisNumUniqueSql : public RelationNumUniqueSql<Ent>
+{
+protected:
+    using RelationNumUniqueSql<Ent>::bindValue;
+
+public:
+    enum {Id3Unique = RelationNumUniqueSql<Ent>::NbrUnique,NbrUnique};
+    CONSTR_DEFAUT(RelationTroisNumUniqueSql)
+
+    //! Destructeur.
+    ~RelationTroisNumUniqueSql() override = default;
+
+protected:
+    //! Transmet les valeurs des attributs uniques à la requète SQL préparée.
+    void bindValuesUnique(const Ent &entity) override
+    {
+        RelationNumUniqueSql<Ent>::bindValuesUnique(entity);
+        bindValue(Id3Unique,entity.id3());
+    }
+};
+
 // Unique Divers
 
 /*! \ingroup groupeUniqueSql

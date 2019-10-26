@@ -27,17 +27,17 @@
     /*! se termine au premièr échec et renvoye false et true si tout les éléments ont été supprimés.*/ \
     template<class Ent> bool delList(const ListPtr<Ent> & liste);
     //*! \brief Méthode de suppression pour les entité de type arbre. */ \
-    template<class Ent, class U> bool delArbre(int id, U delFonction); \
+    template<class Ent, class U> bool delArbre(idt id, U delFonction); \
     /*! \brief Méthode de suppression pour les entité de type arbre à modification controlée. */ \
-    template<class Ent, class U> bool delArbreModifControle(int id, U delFonction); \
+    template<class Ent, class U> bool delArbreModifControle(idt id, U delFonction); \
     /*! \brief Méthode de suppression pour les entité à modification controlée. */ \
-    template<class Ent, class U> bool delModifControle(int id, U delFonction); \
+    template<class Ent, class U> bool delModifControle(idt id, U delFonction); \
 
 /*! \ingroup groupeFile
  * \brief Corps des deux méthodes delArbre.
  */
 //#define DEL_ARBRE {return foreachBeginChild(id, \
-    [this,&delFonction(int id)->bool{return delFonction(id) && del<Ent>(id);}] \
+    [this,&delFonction(idt id)->bool{return delFonction(id) && del<Ent>(id);}] \
     ,false);}
 
 
@@ -178,11 +178,11 @@ public:
                                                   const QVariant & value1, typename Ent::Position cle2,  const QVariant & value2,
                                                   bdd::Condition cond1 = bdd::Condition::Egal, bdd::Condition cond2 = bdd::Condition::Egal);
 
-    //! Applique la fonction fonction bool fct(int id) à chaque noeud descendant de celui d'identifiant id en commençant par les descendants.
-    template<class Ent, class Fct> bool foreachBeginChild(int id, const Fct & fct, bool ordre = true);
+    //! Applique la fonction fonction bool fct(idt id) à chaque noeud descendant de celui d'identifiant id en commençant par les descendants.
+    template<class Ent, class Fct> bool foreachBeginChild(idt id, const Fct & fct, bool ordre = true);
 
-    //! Applique la fonction fonction bool fct(int id) à chaque noeud descendant celui d'identifiant id.
-    template<class Ent, class Fct> bool foreachNode(int id, const Fct & fct, bool ordre = true);
+    //! Applique la fonction fonction bool fct(idt id) à chaque noeud descendant celui d'identifiant id.
+    template<class Ent, class Fct> bool foreachNode(idt id, const Fct & fct, bool ordre = true);
 
     //! Hydrate l'entité entity avec les valeurs des attributs de l'entité enregistrées en base de donnée
     //! ayant le même identifiant que entity.
@@ -196,7 +196,7 @@ public:
     template<class Ent> Tree<Ent> getArbre();
 
     //! Renvoie l'arbre de racine d'identifiant id pour une entité de type arbre.
-    template<class Ent> Tree<Ent> getArbre(int id);
+    template<class Ent> Tree<Ent> getArbre(idt id);
 
     //! Renvoie la liste des entités de la table des entités Ent ordonnée suivant la colonne d'identifiant ordre.
     template<class Ent> ListPtr<Ent> getList(typename Ent::Position ordre = Ent::Id, bool croissant = true);
@@ -204,6 +204,11 @@ public:
     //! Renvoie la liste des entités de la table des entités Ent vérifiant la condition,
     //! valeur de la colonne d'identifiant cle = value, ordonnée suivant la colonne d'identifiant ordre.
     template<class Ent> ListPtr<Ent> getList(typename Ent::Position cle, int value, typename Ent::Position ordre = Ent::Id,
+                                             bdd::Condition cond = bdd::Condition::Egal, bool crois = true);
+
+    //! Renvoie la liste des entités de la table des entités Ent vérifiant la condition,
+    //! valeur de la colonne d'identifiant cle = value, ordonnée suivant la colonne d'identifiant ordre.
+    template<class Ent> ListPtr<Ent> getList(typename Ent::Position cle, idt value, typename Ent::Position ordre = Ent::Id,
                                              bdd::Condition cond = bdd::Condition::Egal, bool crois = true);
 
     //! Renvoie la liste des entités de la table des entités Ent vérifiant la condition,
@@ -272,6 +277,72 @@ public:
 
     //! Renvoie le liste des descendant direct d'entity.
     template<class Ent> ListPtr<Ent> getListChilds(const Ent & entity);
+
+    //! Renvoie le liste des identifiants des descendant direct de l'entité d'identifiant id.
+    template<class Ent> QList<idt> getListChildsId(idt id);
+
+    //! Renvoie le liste des identifiants des descendant direct de l'entité d'identifiant id
+    //! ainsi que si ce descendant est une feuille ou non.
+    template<class Ent> QList<QPair<idt,bool>> getListChildsIdLeaf(int id, bool ordre = true);
+
+    //! Renvoie la liste des identifiants de la table des entités Ent vérifiant la condition,
+    //! valeur de la colonne d'identifiant cle = value, ordonnée suivant la colonne d'identifiant ordre.
+    template<class Ent> QList<idt> getListId(typename Ent::Position cle, int value, typename Ent::Position ordre = Ent::Id,
+                                 bdd::Condition cond = bdd::Condition::Egal, bool crois = true);
+
+    //! Renvoie la liste des identifiants de la table des entités Ent vérifiant la condition,
+    //! valeur de la colonne d'identifiant cle = value, ordonnée suivant la colonne d'identifiant ordre.
+    template<class Ent> QList<idt> getListId(typename Ent::Position cle, idt value, typename Ent::Position ordre = Ent::Id,
+                                 bdd::Condition cond = bdd::Condition::Egal, bool crois = true);
+
+    //! Renvoie la liste des identifiants de la table des entités Ent vérifiant la condition,
+    //! valeur de la colonne d'identifiant cle = value, ordonnée suivant la colonne d'identifiant ordre.
+    template<class Ent> QList<idt> getListId(typename Ent::Position cle, const QVariant & value,
+                                 typename Ent::Position ordre = Ent::Id,
+                                 bdd::Condition cond = bdd::Condition::Egal, bool crois = true);
+
+    //! Renvoie la liste des identifiants de la table des entités Ent vérifiant la condition,
+    //! valeur de la colonne d'identifiant cle = value, ordonnée suivant les colonnes d'identifiant ordre1 puis ordre2.
+    template<class Ent> QList<idt> getListId(typename Ent::Position cle, const QVariant & value,
+                                 typename Ent::Position ordre1, typename Ent::Position ordre2,
+                                 bdd::Condition cond = bdd::Condition::Egal,
+                                 bool croissant1 = true, bool croissant2 = true);
+
+    //! Renvoie la liste des identifiants de la table des entités Ent vérifiant la condition,
+    //! valeur de la colonne d'identifiant cle = value, ordonnée suivant les colonnes d'identifiant ordre1, ordre2 puis ordre3.
+    template<class Ent> QList<idt> getListId(typename Ent::Position cle, const QVariant & value,
+                                 typename Ent::Position ordre1, typename Ent::Position ordre2, typename Ent::Position ordre3,
+                                 bdd::Condition cond = bdd::Condition::Egal,
+                                 bool crois1 = true, bool crois2 = true, bool crois3 = true);
+
+    //! Renvoie la liste des entités de la table des entités Ent vérifiant les deux conditions,
+    //! valeur de la colonne d'identifiant cle1 = value1 et valeur de la colonne d'identifiant cle2 = value2,
+    //! ordonnée suivant la colonne d'identifiant ordre.
+    template<class Ent> QList<idt> getListId(typename Ent::Position cle1, const QVariant & value1,
+                                 typename Ent::Position cle2, const QVariant & value2,
+                                 typename Ent::Position ordre = Ent::Id,
+                                 bdd::Condition cond1 = bdd::Condition::Egal, bdd::Condition cond2 = bdd::Condition::Egal,
+                                 bool crois = true);
+
+    //! Renvoie la liste des identifiants de la table des entités Ent vérifiant les deux conditions,
+    //! valeur de la colonne d'identifiant cle1 = value1, valeur de la colonne d'identifiant cle2 = value2,
+    //! et valeur de la colonne d'identifiant cle3 = value3,
+    //! ordonnée suivant la colonne d'identifiant ordre.
+    template<class Ent> QList<idt> getListId(typename Ent::Position cle1, const QVariant & value1,
+                                 typename Ent::Position cle2, const QVariant & value2,
+                                 typename Ent::Position cle3, const QVariant & value3,
+                                 typename Ent::Position ordre = Ent::Id,
+                                 bdd::Condition cond1 = bdd::Condition::Egal, bdd::Condition cond2 = bdd::Condition::Egal,
+                                 bdd::Condition cond3 = bdd::Condition::Egal,
+                                 bool crois = true);
+
+    //! Renvoie la liste des identifiants de la table vérifiant les conditions, pour tout i,
+    //! valeur de la colonne d'identifiant cle[i] condition[i] value[i],
+    //! ordonnée suivant les colonnes d'identifiant contenue dans ordre, croissante (crois[i]=true) ou décroissante (croiss[i]=false).
+    template<class Ent> QList<idt> getListId(const QList<typename Ent::Position> & cle, const QList<QVariant> & value,
+                         const QList<typename Ent::Position> & ordre = QList<typename Ent::Position>(),
+                         const QList<bdd::Condition> & condition = QList<bdd::Condition>(),
+                         const QList<bool> & crois = QList<bool>());
 
     //! Renvoie la map des entités de la table des entités Ent.
     template<class Ent> MapPtr<Ent> getMap(typename Ent::Position cleMap = Ent::Id);
@@ -516,7 +587,7 @@ public:
 
 protected:
     //! Suppresseur d'une entité à partir de son identifiant.
-    template<class Ent> bool del(int id);
+    template<class Ent> bool del(idt id);
 
     //! Mise à jour de la base de donnée.
     virtual void listeMiseAJourBdd(int /*version*/) {}
@@ -546,7 +617,7 @@ template<class Ent> bdd::ExisteUni Bdd::existsUniqueEnsemble(Ent & entity)
 template<class Ent> bdd::ExisteUni Bdd::existsUniqueEnsemble(const Ent & entity)
     {return m_manager->get<Ent>()->existsUnique(entity);}
 
-template<class Ent> bool Bdd::del(int id)
+template<class Ent> bool Bdd::del(idt id)
     {return m_manager->get<Ent>()->del(id);}
 
 template<class Ent, class T> T Bdd::fonctionAgrega(bdd::Agrega fonc, typename Ent::Position att)
@@ -562,10 +633,10 @@ template<class Ent, class T> T Bdd::fonctionAgrega(bdd::Agrega fonc, typename En
                                                    bdd::Condition cond1, bdd::Condition cond2)
     {return m_manager->get<Ent>()->template fonctionAgrega<T>(fonc, att, cle1, value1, cle2, value2, cond1, cond2);}
 
-template<class Ent, class Fct> bool Bdd::foreachBeginChild(int id, const Fct & fct, bool ordre)
+template<class Ent, class Fct> bool Bdd::foreachBeginChild(idt id, const Fct & fct, bool ordre)
 {
-    QList<QPair<int,bool>> childs = m_manager->get<Ent>()->getListChildsIdLeaf(id,ordre);
-    QList<QPair<int,bool>>::const_iterator i = childs.cbegin();
+    auto childs = m_manager->get<Ent>()->getListChildsIdLeaf(id,ordre);
+    auto i = childs.cbegin();
     while (i != childs.cend() && (
                ((*i).second && fct((*i).first))
                || foreachBeginChild<Ent>((*i).first,fct,ordre)
@@ -574,12 +645,12 @@ template<class Ent, class Fct> bool Bdd::foreachBeginChild(int id, const Fct & f
     return i == childs.cend() && fct(id);
 }
 
-template<class Ent, class Fct> bool Bdd::foreachNode(int id, const Fct & fct, bool ordre)
+template<class Ent, class Fct> bool Bdd::foreachNode(idt id, const Fct & fct, bool ordre)
 {
     if(fct(id))
     {
-        QList<QPair<int,bool>> childs = m_manager->get<Ent>()->getListChildsIdLeaf(id,ordre);
-        QList<QPair<int,bool>>::const_iterator i = childs.cbegin();
+        auto childs = m_manager->get<Ent>()->getListChildsIdLeaf(id,ordre);
+        auto i = childs.cbegin();
         while (i != childs.cend()  && (
                    ((*i).second && fct((*i).first))
                    ||foreachNode<Ent>((*i).first,fct,ordre)
@@ -599,13 +670,17 @@ template<class Ent> bool Bdd::getAutorisation(const Ent & entity, bdd::Autorisat
 template<class Ent> Tree<Ent> Bdd::getArbre()
     {return m_manager->get<Ent>()->getArbre();}
 
-template<class Ent> Tree<Ent> Bdd::getArbre(int id)
+template<class Ent> Tree<Ent> Bdd::getArbre(idt id)
     {return m_manager->get<Ent>()->getArbre(id);}
 
 template<class Ent> ListPtr<Ent> Bdd::getList(typename Ent::Position ordre, bool croissant)
     {return m_manager->get<Ent>()->getList(ordre, croissant);}
 
 template<class Ent> ListPtr<Ent> Bdd::getList(typename Ent::Position cle, int value, typename Ent::Position ordre,
+                                              bdd::Condition cond, bool crois)
+    {return m_manager->get<Ent>()->getList(cle, QVariant(value), ordre, cond, crois);}
+
+template<class Ent> ListPtr<Ent> Bdd::getList(typename Ent::Position cle, idt value, typename Ent::Position ordre,
                                               bdd::Condition cond, bool crois)
     {return m_manager->get<Ent>()->getList(cle, QVariant(value), ordre, cond, crois);}
 
@@ -663,6 +738,53 @@ template<class Ent, class Join> ListPtr<Ent> Bdd::getList(typename Join::Positio
 
 template<class Ent> ListPtr<Ent> Bdd::getListChilds(const Ent & entity)
     {return m_manager->get<Ent>()->getListChilds(entity);}
+
+template<class Ent> QList<idt> Bdd::getListChildsId(idt id)
+    {return m_manager->get<Ent>()->getListChildsId(id);}
+
+template<class Ent> QList<QPair<idt,bool>> Bdd::getListChildsIdLeaf(int id, bool ordre)
+    {return m_manager->get<Ent>()->getListChildsIdLeaf(id, ordre);}
+
+template<class Ent> QList<idt> Bdd::getListId(typename Ent::Position cle, int value, typename Ent::Position ordre,
+                                              bdd::Condition cond, bool crois)
+    {return m_manager->get<Ent>()->getListId(cle,value,ordre,cond,crois);}
+
+template<class Ent> QList<idt> Bdd::getListId(typename Ent::Position cle, idt value, typename Ent::Position ordre,
+                                 bdd::Condition cond, bool crois)
+    {return m_manager->get<Ent>()->getListId(cle,value,ordre,cond,crois);}
+
+template<class Ent> QList<idt> Bdd::getListId(typename Ent::Position cle, const QVariant & value,
+                                 typename Ent::Position ordre, bdd::Condition cond, bool crois)
+    {return m_manager->get<Ent>()->getListId(cle,value,ordre,cond,crois);}
+
+template<class Ent> QList<idt> Bdd::getListId(typename Ent::Position cle, const QVariant & value,
+                                 typename Ent::Position ordre1, typename Ent::Position ordre2,
+                                 bdd::Condition cond, bool croissant1, bool croissant2)
+    {return m_manager->get<Ent>()->getListId(cle,value,ordre1,ordre2,cond,croissant1,croissant2);}
+
+template<class Ent> QList<idt> Bdd::getListId(typename Ent::Position cle, const QVariant & value,
+                                 typename Ent::Position ordre1, typename Ent::Position ordre2, typename Ent::Position ordre3,
+                                 bdd::Condition cond, bool crois1, bool crois2, bool crois3)
+    {return m_manager->get<Ent>()->getListId(cle,value,ordre1,ordre2,ordre3,cond,crois1,crois2,crois3);}
+
+template<class Ent> QList<idt> Bdd::getListId(typename Ent::Position cle1, const QVariant & value1,
+                                 typename Ent::Position cle2, const QVariant & value2,
+                                 typename Ent::Position ordre, bdd::Condition cond1, bdd::Condition cond2, bool crois)
+    {return m_manager->get<Ent>()->getListId(cle1,value1,cle2,value2,ordre,cond1,cond2,crois);}
+
+template<class Ent> QList<idt> Bdd::getListId(typename Ent::Position cle1, const QVariant & value1,
+                                 typename Ent::Position cle2, const QVariant & value2,
+                                 typename Ent::Position cle3, const QVariant & value3,
+                                 typename Ent::Position ordre,
+                                 bdd::Condition cond1, bdd::Condition cond2,bdd::Condition cond3,
+                                 bool crois)
+    {return m_manager->get<Ent>()->getListId(cle1,value1,cle2,value2,cle3,value3,ordre,cond1,cond2,cond3,crois);}
+
+template<class Ent> QList<idt> Bdd::getListId(const QList<typename Ent::Position> & cle, const QList<QVariant> & value,
+                         const QList<typename Ent::Position> & ordre,
+                         const QList<bdd::Condition> & condition,
+                         const QList<bool> & crois)
+    {return m_manager->get<Ent>()->getListId(cle, value,ordre, condition, crois);}
 
 template<class Ent> MapPtr<Ent> Bdd::getMap(typename Ent::Position cleMap)
     {return m_manager->get<Ent>()->getMap(cleMap);}

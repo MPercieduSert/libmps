@@ -120,7 +120,7 @@ public:
     CONSTR_AFFECT_DEFAUT(EntityAttributs)
 
     //!Constructeur.
-    EntityAttributs<Attribut>(int id = 0)
+    EntityAttributs<Attribut>(idt id = 0)
         {setId(id);}
 
     //! Renvoie le nombre d'attribut de l'entité.

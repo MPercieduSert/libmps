@@ -57,7 +57,7 @@ public:
         {return !m_managerRestriction->existsUnique(Restrict(entity.id(), m_cible, autorisation));}
 
     //! Demande l'autorisation de modification pour une entité d'identifiant id avec les valeurs de entity.
-    bool getAutorisation(const Ent & /*entity*/, int id, bdd::Autorisation autorisation) override
+    bool getAutorisation(const Ent & /*entity*/, idt id, bdd::Autorisation autorisation) override
         {return !m_managerRestriction->existsUnique(Restrict(id, m_cible, autorisation));}
 
     //! Demande la liste des restrictions de modification pour une entité donnée.
@@ -116,7 +116,7 @@ public:
     }
 
     //! Demande l'autorisation de modification pour une entité d'identifiant id avec les valeurs de entity.
-    bool getAutorisation(const Ent & /*entity*/, int id, bdd::Autorisation autorisation) override
+    bool getAutorisation(const Ent & /*entity*/, idt id, bdd::Autorisation autorisation) override
         {return getAutorisation(Ent(id),autorisation);}
 
     //! Demande la liste des restrictions de modification pour une entité donnée.

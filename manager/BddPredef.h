@@ -67,10 +67,10 @@ public:
     DECL_DEL_METHODE
 
     //! Suppresseur d'une entité enregistrée comme donnée.
-    void delEntityInDonnee(int idCible, int cible, int num = 0);
+    void delEntityInDonnee(idt idCible, int cible, int num = 0);
 
     //! Accesseur d'une entité enregistrée comme donnée.
-    template<class Ent> Ent getEntityInDonnee(int idCible, int cible, int num = 0);
+    template<class Ent> Ent getEntityInDonnee(idt idCible, int cible, int num = 0);
 
     //! Renvoie le nombre des entités liées à la cible.
     virtual int nbrEntityCible(int /*cible*/) const
@@ -80,11 +80,11 @@ public:
     virtual QMap<int,QString> nomsEntityCible(int /*cible*/) const
         {return QMap<int,QString>();}//à finir
 
-    //! Renvoie l'identifiant de la donnée d'idProg idP fourni ou -1 si elle n'existe pas.
-    int idDonnee(int idP);
+    //! Renvoie l'identifiant de la donnée d'idProg idP fourni ou 0 si elle n'existe pas.
+    idt idDonnee(idt idP);
 
     //! Mutateur d'une entité enregistrée comme donnée.
-    template<class Ent> void setEntityInDonnee(const Ent & entity, int idCible, int cible, int num = 0);
+    template<class Ent> void setEntityInDonnee(const Ent & entity, idt idCible, int cible, int num = 0);
 
 protected:
     //! Création de la table de l'entité en base de donnée.
@@ -92,19 +92,19 @@ protected:
         {m_manager->get<Ent>()->creer();}
 
     //! Suppresseur d'une entité à partir de son identifiant.
-    template<class Ent> bool del(int id);
+    template<class Ent> bool del(idt id);
 
     //! Suppresseur d'un entité à partir de son identitiant et de ses dépendance de type cible.
-    template<class Ent> bool delSimple(int id);
+    template<class Ent> bool delSimple(idt id);
 
     //! Suppresseur des entités de dont idCible est l'identifiant de type cible.
-    bool delCible(int idCible, int Cible);
+    bool delCible(idt idCible, int Cible);
 
     //! Mise à jour de la base de donnée.
     void listeMiseAJourBdd(int version) override;
 
     //! Renvoie le numero de début d'enregistrement d'une entité.
-    QPair<int, int> intervalEntityInDonnee(int idCible, int cible, int num);
+    QPair<int, int> intervalEntityInDonnee(idt idCible, int cible, int num);
 
     //! Acceseur du manageur.
     ManagersPredef * managers() const
@@ -113,13 +113,13 @@ protected:
 
 DEF_DEL_METHODE(BddPredef)
 
-template<class Ent> bool BddPredef::del(int id)
+template<class Ent> bool BddPredef::del(idt id)
     {return delSimple<Ent>(id);}
 
-template<class Ent> bool BddPredef::delSimple(int id)
+template<class Ent> bool BddPredef::delSimple(idt id)
     {return getAutorisation(Ent(id),bdd::Suppr) && delCible(id, cible<Ent>()) && Bdd::del<Ent>(id);}
 
-template<class Ent> Ent BddPredef::getEntityInDonnee(int idCible, int Cible, int num)
+template<class Ent> Ent BddPredef::getEntityInDonnee(idt idCible, int Cible, int num)
 {
     CibleDonnee nature(Donnee::EntityNatureIdND,idCible,Cible,num);
     if(!get(nature) || nature.valeur().toInt() == bdd::cibleId::Vide || nature.valeur().toInt() != cible<Ent>())
@@ -145,7 +145,7 @@ template<class Ent> Ent BddPredef::getEntityInDonnee(int idCible, int Cible, int
     return entity;
 }
 
-template<class Ent> void BddPredef::setEntityInDonnee(const Ent & entity, int idCible, int Cible, int num)
+template<class Ent> void BddPredef::setEntityInDonnee(const Ent & entity, idt idCible, int Cible, int num)
 {
     if(num < 0)
         throw std::invalid_argument("L'argument num doit être positif");

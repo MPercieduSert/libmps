@@ -138,8 +138,7 @@ protected:
     void enableHistorique(const QString & historique);
 
     //! Mise en place de la prise en charge des mots Clé.
-    void enableMotCle(const QString & motCle, const QString & motCleArbre, const QString & cibleMotCle,
-                      const QString & permissionMotCle,
+    void enableMotCle(const QString & motCle, const QString & motCleArbre, const QString & cibleMotCle,const QString & permissionMotCle,
                       AbstractGestionAutorisation<MotCle> * gestionMotCle = nullptr,
                       AbstractGestionAutorisation<MotClePermission> * gestionPermission = nullptr);
 

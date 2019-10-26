@@ -57,7 +57,7 @@ public:
     ~ManagerArbre() override = default;
 
     //! Teste si le noeud d'identifiant idNode est un descendant du noeud d'identifiant idAncestry.
-    bool areRelated(int idNode, int idAncestry)
+    bool areRelated(idt idNode, idt idAncestry)
     {
         while(idNode != 0 && idNode != idAncestry)
             idNode = getParent(idNode);
@@ -65,25 +65,25 @@ public:
     }
 
     //! Supprime de la base de donnée le noeud d'identifiant id seulement si c'est une feuille (opération stable).
-    bool del(int id) override;
+    bool del(idt id) override;
 
-    //! Applique la fonction fonction bool fct(int id) à chaque noeud descendant de celui d'identifiant id en
+    //! Applique la fonction fonction bool fct(idt id) à chaque noeud descendant de celui d'identifiant id en
     //! commençant par les descendants.
-    template<class Fct> bool foreachBeginChild(int id, const Fct & fct, bool ordre = true);
+    template<class Fct> bool foreachBeginChild(idt id, const Fct & fct, bool ordre = true);
 
-    //! Applique la fonction fonction bool fct(int id) à chaque noeud descendant celui d'identifiant id.
-    template<class Fct> bool foreachNode(int id, const Fct & fct, bool ordre = true);
+    //! Applique la fonction fonction bool fct(idt id) à chaque noeud descendant celui d'identifiant id.
+    template<class Fct> bool foreachNode(idt id, const Fct & fct, bool ordre = true);
 
     //! Returne l'identifiant du parent du noeud d'identifiant id.
-    int getParent(int id)
+    idt getParent(idt id)
     {
         prepare(m_sqlGetParent);
         bindValue(0,id);
         exec();
         if(next())
-            return value<int>();
+            return value<idt>();
         else
-            return -1;
+            return 0;
     }
 
     //! Return l'indice maximum dans la fratrie du noeud.
@@ -154,7 +154,7 @@ protected:
     void modifyStableUnstable(const Arbre & node);
 };
 
-template<class Fct> bool ManagerArbre::foreachBeginChild(int id, const Fct &fct, bool ordre)
+template<class Fct> bool ManagerArbre::foreachBeginChild(idt id, const Fct &fct, bool ordre)
 {
     ListPtr<Arbre> childs = getList(Arbre::Parent,id,Arbre::Num,ordre);
     ListPtr<Arbre>::iterator i = childs.begin();
@@ -166,7 +166,7 @@ template<class Fct> bool ManagerArbre::foreachBeginChild(int id, const Fct &fct,
     return i == childs.end() && fct(id);
 }
 
-template<class Fct> bool ManagerArbre::foreachNode(int id, const Fct &fct, bool ordre)
+template<class Fct> bool ManagerArbre::foreachNode(idt id, const Fct &fct, bool ordre)
 {
     if(fct(id))
     {

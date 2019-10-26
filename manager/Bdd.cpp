@@ -64,6 +64,7 @@ bool Bdd::openBdd()
 
 void Bdd::setBdd()
 {
+    m_bdd.exec("PRAGMA foreign_keys = ON;");
     QSqlQuery req = QSqlQuery(m_bdd);
     req.setForwardOnly(true);
     m_manager->setRequete(req);

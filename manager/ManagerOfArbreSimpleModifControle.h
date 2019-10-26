@@ -37,7 +37,7 @@ public:
     ~ManagerOfArbreSimpleModifControle() override = default;
 
     /*//! Supprime de la table en base de donnée l'entité d'identifiant id.
-    bool del(int id) override
+    bool del(idt id) override
         {return getAutorisation(Ent(id), bdd::Suppr) && ManagerArbreEnt::del(id);}*/
 
     //! Enregistre l'entité entity en base de donnée.

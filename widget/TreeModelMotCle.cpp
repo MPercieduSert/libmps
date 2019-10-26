@@ -15,8 +15,8 @@ TreeModelMotCle::TreeModelMotCle(BddPredef * bdd, const QMap<int,QString> & head
     setDataTree(m_bdd->getArbre<MotCle>());
     for(TreeItem<MotCle>::iterator i = m_tree.begin(); i != m_tree.end(); ++i)
     {
-        int id = (*i)->data().id();
-        m_permission[id] = QVector<int>(m_nbrEntity,bdd::motClePermissionNum::InterditMCNum);
+        auto id = (*i)->data().id();
+        m_permission[id] = QVector<codeType>(m_nbrEntity,bdd::motClePermissionNum::InterditMCNum);
         for(int j = 0; j != m_nbrEntity; ++j)
         {
             MotClePermission permission(id, m_cibleList[j]);
@@ -120,7 +120,7 @@ bool TreeModelMotCle::hydrateNewEntity(MotCle & entity, int row, const QModelInd
         return false;
 }
 
-int TreeModelMotCle::id(const QModelIndex & index) const
+idt TreeModelMotCle::id(const QModelIndex & index) const
 {
     if(!index.isValid())
         return 0;

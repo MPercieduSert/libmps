@@ -97,6 +97,10 @@ protected:
     void finish()
         {m_requete->finish();}
 
+    //! Accesseur de l'identifiant.
+    unsigned id(int pos = Entity::Id) const
+        {return value<unsigned>(pos);}
+
     //! Place la requète sur la position suivante.
     bool next()
         {return m_requete->next();}

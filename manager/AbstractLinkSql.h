@@ -8,7 +8,7 @@
 #include <QSqlQuery>
 #include <stdexcept>
 #include "ReqSql.h"
-#include "Entity.h"
+//#include "Entity.h"
 
 /*! \defgroup groupeLinkSql Liens
  * \ingroup groupeManager
@@ -81,9 +81,9 @@ public:
     void fromRequete(Entity & entity) const
         {entity.setId(value<Entity::AttType>(PosPre));}
 
-    //! Accesseur de l'identifiant.
-    int id(int pos = Entity::Id) const
-        {return value<int>(pos);}
+    ////! Accesseur de l'identifiant.
+    //unsigned id(int pos = Entity::Id) const
+    //    {return value<unsigned>(pos);}
 
     //! Mutateur de l'identifiant.
     void setId(const Entity & entity, int pos = 0)

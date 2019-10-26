@@ -28,7 +28,7 @@ public:
         {return static_cast<TreeModelReadEntity<Ent> *>(QTreeView::model());}
 
     //! Selectionne l'item correspondant au première item d'identifiant id dans l'arbre.
-    void select(int id);
+    void select(idt id);
 
     //! Modifie les données affichées par le widget.
     void setDataTree(const Tree<Ent> & tree)
@@ -52,7 +52,7 @@ template<class Ent> ReadTreeWidget<Ent>::ReadTreeWidget(const Tree<Ent> &tree,co
     model()->setDataTree(tree);
 }
 
-template<class Ent> void ReadTreeWidget<Ent>::select(int id)
+template<class Ent> void ReadTreeWidget<Ent>::select(idt id)
     {selectionModel()->select(model()->foundId(id),QItemSelectionModel::Select);}
 
 #endif // READTREEWIDGET_H

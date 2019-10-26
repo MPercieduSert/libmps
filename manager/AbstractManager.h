@@ -117,10 +117,10 @@ public:
 
     //! Teste s'il existe une entité ayant les mêmes valeurs d'attributs uniques que l'entité entity en base de donnée
     //! et renvoie l'identifiant du premier trouver.
-    virtual QPair<bdd::ExisteUni,int> existsUniqueId(const Entity & entity) = 0;
+    virtual QPair<bdd::ExisteUni,idt> existsUniqueId(const Entity & entity) = 0;
 
     //! Supprime de la table en base de donnée l'entité d'identifiant id.
-    virtual bool del(int id) = 0;
+    virtual bool del(unsigned id) = 0;
 
     //! Hydrate l'entité entity avec les valeurs des attributs de l'entité enregistrée en base de donnée
     //! ayant le même identifiant que entity.
@@ -192,11 +192,11 @@ public:
 
     //! Teste s'il existe une entité ayant les mêmes valeurs d'attributs uniques que l'entité entity en base de donnée
     //! et renvoie l'identifiant du premier trouver.
-    virtual QPair<bdd::ExisteUni,int> existsUniqueId(const Ent & entity) = 0;
+    virtual QPair<bdd::ExisteUni,idt> existsUniqueId(const Ent & entity) = 0;
 
     //! Teste s'il existe une entité ayant les mêmes valeurs d'attributs uniques que l'entité entity en base de donnée
     //! et renvoie l'identifiant du premier trouver.
-    QPair<bdd::ExisteUni,int> existsUniqueId(const Entity & entity) override
+    QPair<bdd::ExisteUni,idt> existsUniqueId(const Entity & entity) override
         {return existsUniqueId(Ent::convert(entity));}
 
     // Méthode d'aggrégation
@@ -239,7 +239,7 @@ public:
     virtual Tree<Ent> getArbre(const Ent & entity);
 
     //! Renvoie l'arbre de racine d'identifiant id pour une entité de type arbre.
-    virtual Tree<Ent> getArbre(int id);
+    virtual Tree<Ent> getArbre(unsigned id);
 
     // Obtention d'une liste.
     //! Renvoie la liste des entités de la table des entités Ent ordonnée suivant la colonne d'identifiant ordre.
@@ -248,6 +248,12 @@ public:
     //! Renvoie la liste des entités de la table des entités Ent vérifiant la condition,
     //! valeur de la colonne d'identifiant cle = value, ordonnée suivant la colonne d'identifiant ordre.
     virtual ListPtr<Ent> getList(typename Ent::Position cle, int value, typename Ent::Position ordre = Ent::Id,
+                                 bdd::Condition cond = bdd::Condition::Egal, bool crois = true)
+        {return getList(cle,QVariant(value),ordre,cond,crois);}
+
+    //! Renvoie la liste des entités de la table des entités Ent vérifiant la condition,
+    //! valeur de la colonne d'identifiant cle = value, ordonnée suivant la colonne d'identifiant ordre.
+    virtual ListPtr<Ent> getList(typename Ent::Position cle, idt value, typename Ent::Position ordre = Ent::Id,
                                  bdd::Condition cond = bdd::Condition::Egal, bool crois = true)
         {return getList(cle,QVariant(value),ordre,cond,crois);}
 
@@ -301,28 +307,47 @@ public:
     //! Renvoie la liste des entités de la table vérifiant la condition.
     virtual ListPtr<Ent> getList(const QString & condition) = 0;
 
+    //! Renvoie le liste des descendant direct d'entity.
+    virtual ListPtr<Ent> getListChilds(const Ent & /*entity*/)
+        {return ListPtr<Ent>();}
+
+    //! Renvoie le liste des identifiants des descendant direct de l'entité d'identifiant id.
+    virtual QList<idt> getListChildsId(idt /*id*/)
+        {return QList<idt>();}
+
+    //! Renvoie le liste des identifiants des descendant direct de l'entité d'identifiant id
+    //! ainsi que si ce descendant est une feuille ou non.
+    virtual QList<QPair<idt,bool>> getListChildsIdLeaf(idt /*id*/, bool /*ordre*/ = true)
+        {return QList<QPair<idt,bool>>();}
+
     //! Renvoie la liste des identifiants de la table des entités Ent vérifiant la condition,
     //! valeur de la colonne d'identifiant cle = value, ordonnée suivant la colonne d'identifiant ordre.
-    virtual QList<int> getListId(typename Ent::Position cle, int value, typename Ent::Position ordre = Ent::Id,
+    virtual QList<idt> getListId(typename Ent::Position cle, int value, typename Ent::Position ordre = Ent::Id,
                                  bdd::Condition cond = bdd::Condition::Egal, bool crois = true)
     {return getListId(cle, QVariant(value), ordre, cond, crois);}
 
     //! Renvoie la liste des identifiants de la table des entités Ent vérifiant la condition,
     //! valeur de la colonne d'identifiant cle = value, ordonnée suivant la colonne d'identifiant ordre.
-    virtual QList<int> getListId(typename Ent::Position cle, const QVariant & value,
+    virtual QList<idt> getListId(typename Ent::Position cle, idt value, typename Ent::Position ordre = Ent::Id,
+                                 bdd::Condition cond = bdd::Condition::Egal, bool crois = true)
+    {return getListId(cle, QVariant(value), ordre, cond, crois);}
+
+    //! Renvoie la liste des identifiants de la table des entités Ent vérifiant la condition,
+    //! valeur de la colonne d'identifiant cle = value, ordonnée suivant la colonne d'identifiant ordre.
+    virtual QList<idt> getListId(typename Ent::Position cle, const QVariant & value,
                                  typename Ent::Position ordre = Ent::Id,
                                  bdd::Condition cond = bdd::Condition::Egal, bool crois = true) = 0;
 
     //! Renvoie la liste des identifiants de la table des entités Ent vérifiant la condition,
     //! valeur de la colonne d'identifiant cle = value, ordonnée suivant les colonnes d'identifiant ordre1 puis ordre2.
-    virtual QList<int> getListId(typename Ent::Position cle, const QVariant & value,
+    virtual QList<idt> getListId(typename Ent::Position cle, const QVariant & value,
                                  typename Ent::Position order1, typename Ent::Position order2,
                                  bdd::Condition cond = bdd::Condition::Egal,
                                  bool croissant1 = true, bool croissant2 = true) = 0;
 
     //! Renvoie la liste des identifiants de la table des entités Ent vérifiant la condition,
     //! valeur de la colonne d'identifiant cle = value, ordonnée suivant les colonnes d'identifiant ordre1, ordre2 puis ordre3.
-    virtual QList<int> getListId(typename Ent::Position cle, const QVariant & value,
+    virtual QList<idt> getListId(typename Ent::Position cle, const QVariant & value,
                                  typename Ent::Position ordre1, typename Ent::Position ordre2, typename Ent::Position ordre3,
                                  bdd::Condition cond = bdd::Condition::Egal,
                                  bool crois1 = true, bool crois2 = true, bool crois3 = true) = 0;
@@ -330,7 +355,7 @@ public:
     //! Renvoie la liste des entités de la table des entités Ent vérifiant les deux conditions,
     //! valeur de la colonne d'identifiant cle1 = value1 et valeur de la colonne d'identifiant cle2 = value2,
     //! ordonnée suivant la colonne d'identifiant ordre.
-    virtual QList<int> getListId(typename Ent::Position cle1, const QVariant & value1,
+    virtual QList<idt> getListId(typename Ent::Position cle1, const QVariant & value1,
                                  typename Ent::Position cle2, const QVariant & value2,
                                  typename Ent::Position ordre = Ent::Id,
                                  bdd::Condition cond1 = bdd::Condition::Egal, bdd::Condition cond2 = bdd::Condition::Egal,
@@ -340,7 +365,7 @@ public:
     //! valeur de la colonne d'identifiant cle1 = value1, valeur de la colonne d'identifiant cle2 = value2,
     //! et valeur de la colonne d'identifiant cle3 = value3,
     //! ordonnée suivant la colonne d'identifiant ordre.
-    virtual QList<int> getListId(typename Ent::Position cle1, const QVariant & value1,
+    virtual QList<idt> getListId(typename Ent::Position cle1, const QVariant & value1,
                                  typename Ent::Position cle2, const QVariant & value2,
                                  typename Ent::Position cle3, const QVariant & value3,
                                  typename Ent::Position ordre = Ent::Id,
@@ -351,23 +376,10 @@ public:
     //! Renvoie la liste des identifiants de la table vérifiant les conditions, pour tout i,
     //! valeur de la colonne d'identifiant cle[i] condition[i] value[i],
     //! ordonnée suivant les colonnes d'identifiant contenue dans ordre, croissante (crois[i]=true) ou décroissante (croiss[i]=false).
-    virtual QList<int> getListId(const QList<typename Ent::Position> & cle, const QList<QVariant> & value,
+    virtual QList<idt> getListId(const QList<typename Ent::Position> & cle, const QList<QVariant> & value,
                          const QList<typename Ent::Position> & ordre = QList<typename Ent::Position>(),
                          const QList<bdd::Condition> & condition = QList<bdd::Condition>(),
                          const QList<bool> & crois = QList<bool>()) = 0;
-
-    //! Renvoie le liste des descendant direct d'entity.
-    virtual ListPtr<Ent> getListChilds(const Ent & /*entity*/)
-        {return ListPtr<Ent>();}
-
-    //! Renvoie le liste des identifiants des descendant direct de l'entité d'identifiant id.
-    virtual QList<int> getListChildsId(int /*id*/)
-        {return QList<int>();}
-
-    //! Renvoie le liste des identifiants des descendant direct de l'entité d'identifiant id
-    //! ainsi que si ce descendant est une feuille ou non.
-    virtual QList<QPair<int,bool>> getListChildsIdLeaf(int /*id*/, bool /*ordre*/ = true)
-        {return QList<QPair<int,bool>>();}
 
     // Liste de Jointure
     //! Renvoie la liste des entités de la table vérifiant une condition sur une jointure (colonneTable = colonneJoin),
@@ -472,7 +484,7 @@ public:
         {return sameInBdd(Ent::convert(entity));}
 
     //! Teste s'il y a dans la base de donnée une entité d'identifiant id ayant exactement les mêmes attributs que entity.
-    virtual bool sameInBdd(const Ent & entity, int id) = 0;
+    virtual bool sameInBdd(const Ent & entity, unsigned id) = 0;
 
     // Save
     //! Enregistre l'entity dans la base de donnée.
@@ -594,7 +606,7 @@ template<class Ent> Tree<Ent> AbstractManagerTemp<Ent>::getArbre(const Ent & /*e
     {throw std::invalid_argument(QString("La méthode 'getArbre' n'est pas définie pour le manager des : ")
                                  .append(Ent::Name()).append(".").toStdString());}
 
-template<class Ent> Tree<Ent> AbstractManagerTemp<Ent>::getArbre(int /*id*/)
+template<class Ent> Tree<Ent> AbstractManagerTemp<Ent>::getArbre(unsigned /*id*/)
     {throw std::invalid_argument(QString("La méthode 'getArbre' n'est pas définie pour le manager des : ")
                                  .append(Ent::Name()).append(".").toStdString());}
 

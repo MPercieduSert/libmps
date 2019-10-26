@@ -61,7 +61,7 @@ public:
         {return m_gestionAutorisation->getAutorisation(entity, autorisation) || m_bypass;}
 
     //! Demande l'autorisation de modification pour une entité d'identifiant id avec les valeurs de entity.
-    virtual bool getAutorisation(const Ent & entity, int id, bdd::Autorisation autorisation)
+    virtual bool getAutorisation(const Ent & entity, idt id, bdd::Autorisation autorisation)
         {return m_gestionAutorisation->getAutorisation(entity, id, autorisation) || m_bypass;}
 
     //! Demande la liste des restrictions de modification pour une entité donnée.
@@ -137,7 +137,7 @@ public:
 
 
     /*//! Supprime de la table en base de donnée l'entité d'identifiant id.
-    bool del(int id) override;*/
+    bool del(idt id) override;*/
 
     //! Enregistre l'entité entity en base de donnée ainsi que sa nouvelle autorisation de modification.
     void save(Ent & entity, bdd::Autorisation autorisation, bool bb = false) override
@@ -214,7 +214,7 @@ protected:
     }
 
     //! Met à jour l'entité entity en base de donnée d'identifiant id avec les valeurs d'entity.
-    void modify(const Ent & entity, int id) override
+    void modify(const Ent & entity, idt id) override
     {
         if(getAutorisation(entity, id, bdd::Autorisation::Modif))
             ManagerSqlEnt::modify(entity,id);
@@ -225,7 +225,7 @@ protected:
     }
 };
 
-/*template<class Ent> bool ManagerOfModifControle<Ent>::del(int id)
+/*template<class Ent> bool ManagerOfModifControle<Ent>::del(idt id)
 {
     if(getAutorisation(Ent(id), bdd::Suppr))
         return ManagerSqlEnt::del(id);

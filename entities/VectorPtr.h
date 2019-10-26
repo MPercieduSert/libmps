@@ -142,7 +142,7 @@ public:
         {append(new T(value));}
 
     //! Renvoie une référence sur l'entité d'identifiant id si elle existe.
-    iterator findId(int id);
+    iterator findId(unsigned id);
 
     //! Affectation par copie d'une liste de type ListeEntities.
     VectorPtr<T> &operator =(const ListPtr<T> & liste);
@@ -169,13 +169,11 @@ public:
         {return *(QVector<T*>::operator[](n));}
 };
 
-template<class T> typename VectorPtr<T>::iterator VectorPtr<T>::findId(int id)
+template<class T> typename VectorPtr<T>::iterator VectorPtr<T>::findId(unsigned id)
 {
     iterator i = begin();
     while(i != end() && (*i).id() != id)
-    {
         ++i;
-    }
     return i;
 }
 

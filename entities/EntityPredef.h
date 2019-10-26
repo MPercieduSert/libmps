@@ -64,11 +64,11 @@ namespace donnee {
 
 // Entités de type prédéfinies
 ID1_ENTITY(CibleCommentaire,CibleDateTimeCurrentNum,InfoEntity::CibleCommentaireId,Commentaire)
-ID1_ENTITY(CibleDonnee,CibleNegDateTimeCurrentNumValeurVariant,InfoEntity::CibleDonneeId,Donnee)
+ID1_ENTITY_NEG(CibleDonnee,CibleNegDateTimeCurrentNumValeurVariant,InfoEntity::CibleDonneeId,Donnee)
 ID1_ENTITY(CibleMotCle,Cible,InfoEntity::CibleMotCleId,MotCle)
 ID1_ENTITY(CibleTexte,CibleDateTimeCurrentNumType,InfoEntity::CibleTexteId,Texte)
 ID1_ENTITY(MotClePermission,IdCibleCode,InfoEntity::MotClePermissionId,MotCle)
-ID1_ENTITY(Type,IdArbreSimpleNcNom,InfoEntity::TypeId,Prog);
+ID1_ENTITY(Type,IdNullArbreSimpleNcNom,InfoEntity::TypeId,Prog);
 ID1_ENTITY(TypePermission,IdCibleCode,InfoEntity::TypePermissionId,Type)
 ID1_ENTITY(Utilisation,Utilisation,InfoEntity::UtilisationId,Usage)
 RELATION_ENTITY(TexteSource,,InfoEntity::TexteSourceId,Source,Texte)
@@ -110,15 +110,12 @@ public:
     BASE_ENTITY(Donnee)
 
     //! Constructeur à partir des valeurs d'un ensemble d'attributs unique.
-    /*Donnee(int idProg, int id)
+    Donnee(idt idProg, idt id)
         : EAID(id)
-        {setIdProg(idProg);}*/
-
-    //! Constructeur à partir des valeurs d'un ensemble d'attributs unique.
-    Donnee(int idProg, int id);
+        {setIdProg(idProg);}
 
     //! Constructeur à partir des valeurs attributs.
-    Donnee(const QString & nom, int type, int tpVal, int idProg = prog::NoId, int id = 0)
+    Donnee(const QString & nom, idt type, int tpVal, idt idProg = prog::NoId, idt id = 0)
         : Donnee(idProg,id)
     {
         setNom(nom);
@@ -139,21 +136,21 @@ public:
     enum Position {Id = PositionEnum<IdAttribut,DonneeCard>::Position,
                    Id1 = PositionEnum<Id1NegAttribut,DonneeCard>::Position,
                    Card = PositionEnum<CardAttribut,DonneeCard>::Position,
-                   Exact = PositionEnum<ExactAttribut,DonneeCard>::Position,
                    Cible = PositionEnum<CibleAttribut,DonneeCard>::Position,
+                   Exact = PositionEnum<ExactAttribut,DonneeCard>::Position,
                    NbrAtt = EAID::NbrAtt,
                    IdDonnee = Id1,};
 
     //! Cardinal.
-    enum cardinal {Infini = -1};
+    enum cardinal {Infini = 0};
 
 
     using EAID::EntityAttributsID;
     BASE_ENTITY(DonneeCard)
-    ALIAS_CLE(Donnee,1)
+    ALIAS_CLE_NEG(Donnee,1)
 
     //! Constructeur à partir des valeurs d'un ensemble d'attributs unique.
-    DonneeCard(int idDn, int cible, int id = 0)
+    DonneeCard(int idDn, int cible, idt id = 0)
         : EAID(id)
     {
         setIdDonnee(idDn);
@@ -161,7 +158,7 @@ public:
     }
 
     //! Constructeur à partir des valeurs attributs.
-    DonneeCard(int idDn, int card, bool exact,int cible, int id = 0)
+    DonneeCard(int idDn, int card, int cible, codeType exact = 0, idt id = 0)
         : DonneeCard(idDn, cible, id)
     {
         setCard(card);
