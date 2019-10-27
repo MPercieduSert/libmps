@@ -1254,25 +1254,30 @@ template<int IDM> using IdNumTypeVersionValeurDoubleEntity = IdNumTypeVersionVal
 template<int IDM> using IdNumTypeVersionValeurIntEntity = IdNumTypeVersionValeurEntityTemp<ValeurIntAttribut,Id1Attribut,int,IDM>;
 #define ENUM_IdNumTypeVersionValeurInt(ID1) ENUM_IdNumTypeVersionValeurTemp(ID1)
 
-template<int IDM> using IdNumTypeVersionValeurVariantEntity = IdNumTypeVersionValeurEntityTemp<ValeurVariantAttribut,Id1Attribut,const QVariant &,IDM>;
+template<int IDM> using IdNumTypeVersionValeurVariantEntity
+    = IdNumTypeVersionValeurEntityTemp<ValeurVariantAttribut,Id1Attribut,const QVariant &,IDM>;
 #define ENUM_IdNumTypeVersionValeurVariant(ID1) ENUM_IdNumTypeVersionValeurTemp(ID1)
 
-template<int IDM> using IdNullNumTypeVersionValeurDoubleEntity = IdNumTypeVersionValeurEntityTemp<ValeurDoubleAttribut,Id1NullAttribut,double,IDM>;
+template<int IDM> using IdNullNumTypeVersionValeurDoubleEntity
+    = IdNumTypeVersionValeurEntityTemp<ValeurDoubleAttribut,Id1NullAttribut,double,IDM>;
 #define ENUM_IdNullNumTypeVersionValeurDouble(ID1) ENUM_IdNumTypeVersionValeurTemp(ID1)
 
 template<int IDM> using IdNullNumTypeVersionValeurIntEntity = IdNumTypeVersionValeurEntityTemp<ValeurIntAttribut,Id1NullAttribut,int,IDM>;
 #define ENUM_IdNullNumTypeVersionValeurInt(ID1) ENUM_IdNumTypeVersionValeurTemp(ID1)
 
-template<int IDM> using IdNullNumTypeVersionValeurVariantEntity = IdNumTypeVersionValeurEntityTemp<ValeurVariantAttribut,Id1NullAttribut,const QVariant &,IDM>;
+template<int IDM> using IdNullNumTypeVersionValeurVariantEntity
+    = IdNumTypeVersionValeurEntityTemp<ValeurVariantAttribut,Id1NullAttribut,const QVariant &,IDM>;
 #define ENUM_IdNullNumTypeVersionValeurVariant(ID1) ENUM_IdNumTypeVersionValeurTemp(ID1)
 
-template<int IDM> using IdNegNumTypeVersionValeurDoubleEntity = IdNumTypeVersionValeurEntityTemp<ValeurDoubleAttribut,Id1NegAttribut,double,IDM>;
+template<int IDM> using IdNegNumTypeVersionValeurDoubleEntity
+    = IdNumTypeVersionValeurEntityTemp<ValeurDoubleAttribut,Id1NegAttribut,double,IDM>;
 #define ENUM_IdNegNumTypeVersionValeurDouble(ID1) ENUM_IdNumTypeVersionValeurTemp(ID1)
 
 template<int IDM> using IdNegNumTypeVersionValeurIntEntity = IdNumTypeVersionValeurEntityTemp<ValeurIntAttribut,Id1NegAttribut,int,IDM>;
 #define ENUM_IdNegNumTypeVersionValeurInt(ID1) ENUM_IdNumTypeVersionValeurTemp(ID1)
 
-template<int IDM> using IdNegNumTypeVersionValeurVariantEntity = IdNumTypeVersionValeurEntityTemp<ValeurVariantAttribut,Id1NegAttribut,const QVariant &,IDM>;
+template<int IDM> using IdNegNumTypeVersionValeurVariantEntity
+    = IdNumTypeVersionValeurEntityTemp<ValeurVariantAttribut,Id1NegAttribut,const QVariant &,IDM>;
 #define ENUM_IdNegNumTypeVersionValeurVariant(ID1) ENUM_IdNumTypeVersionValeurTemp(ID1)
 
 //! \ingroup groupeMacroEntity

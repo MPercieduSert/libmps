@@ -44,10 +44,10 @@ class Arbre : public EntityAttributsID<ArbreAttribut,InfoEntity::ArbreId>
 public:
     using EAID = EntityAttributsID<ArbreAttribut,InfoEntity::ArbreId>;
     //! Positions des attributs.
-    enum Position {Id = PositionEnum<IdAttribut,Arbre>::Position,
-                   Feuille = PositionEnum<FeuilleAttribut,Arbre>::Position,
-                   Num = PositionEnum<NumAttribut,Arbre>::Position,
-                   Parent = PositionEnum<ParentAttribut,Arbre>::Position,
+    enum Position {Id = PositionEnum<IdAttribut,EAID>::Position,
+                   Feuille = PositionEnum<FeuilleAttribut,EAID>::Position,
+                   Num = PositionEnum<NumAttribut,EAID>::Position,
+                   Parent = PositionEnum<ParentAttribut,EAID>::Position,
                    NbrAtt = EAID::NbrAtt};
 
     using EntityAttributsID<ArbreAttribut,InfoEntity::ArbreId>::EntityAttributsID;
@@ -66,6 +66,5 @@ public:
         : Arbre(num,parent,id)
         {setFeuille(feuille);}
 };
-
 
 #endif // ARBREENTITY_H

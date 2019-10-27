@@ -15,10 +15,10 @@ template<class DateTimeAtt, int IDM> class DateTimeNomTypeEntityTemp
 public:
     using EAID = EntityAttributsID<Attributs<DateTimeAtt,NomAttribut,TypeAttribut>,IDM>;
     //! Positions des attributs.
-    enum Position {Id = PositionEnum<IdAttribut,DateTimeNomTypeEntityTemp<DateTimeAtt,IDM>>::Position,
-                   DateTime = PositionEnum<DateTimeAtt,DateTimeNomTypeEntityTemp<DateTimeAtt,IDM>>::Position,
-                   Nom = PositionEnum<NomAttribut,DateTimeNomTypeEntityTemp<DateTimeAtt,IDM>>::Position,
-                   Type = PositionEnum<TypeAttribut,DateTimeNomTypeEntityTemp<DateTimeAtt,IDM>>::Position,
+    enum Position {Id = PositionEnum<IdAttribut,EAID>::Position,
+                   DateTime = PositionEnum<DateTimeAtt,EAID>::Position,
+                   Nom = PositionEnum<NomAttribut,EAID>::Position,
+                   Type = PositionEnum<TypeAttribut,EAID>::Position,
                    NbrAtt = EAID::NbrAtt};
 
     using EntityAttributsID<Attributs<DateTimeAtt,NomAttribut,TypeAttribut>,IDM>::EntityAttributsID;
@@ -55,11 +55,11 @@ template<class DateTimeAtt, int IDM> class DateTimeNcNomTypeEntityTemp
 public:
     using EAID = EntityAttributsID<Attributs<DateTimeAtt,NcNomAttribut,TypeAttribut>,IDM>;
     //! Positions des attributs.
-    enum Position {Id = PositionEnum<IdAttribut,DateTimeNcNomTypeEntityTemp<DateTimeAtt,IDM>>::Position,
-                   DateTime = PositionEnum<DateTimeAtt,DateTimeNcNomTypeEntityTemp<DateTimeAtt,IDM>>::Position,
-                   Nc = PositionEnum<NcAttribut,DateTimeNcNomTypeEntityTemp<DateTimeAtt,IDM>>::Position,
-                   Nom = PositionEnum<NomAttribut,DateTimeNcNomTypeEntityTemp<DateTimeAtt,IDM>>::Position,
-                   Type = PositionEnum<TypeAttribut,DateTimeNcNomTypeEntityTemp<DateTimeAtt,IDM>>::Position,
+    enum Position {Id = PositionEnum<IdAttribut,EAID>::Position,
+                   DateTime = PositionEnum<DateTimeAtt,EAID>::Position,
+                   Nc = PositionEnum<NcAttribut,EAID>::Position,
+                   Nom = PositionEnum<NomAttribut,EAID>::Position,
+                   Type = PositionEnum<TypeAttribut,EAID>::Position,
                    NbrAtt = EAID::NbrAtt};
 
     using EntityAttributsID<Attributs<DateTimeAtt,NcNomAttribut,TypeAttribut>,IDM>::EntityAttributsID;
@@ -101,9 +101,9 @@ template<class DateTimeAtt, int IDM> class DateTimeNumEntityTemp : public Entity
 public:
     using EAID = EntityAttributsID<Attributs<DateTimeAtt,NumAttribut>,IDM>;
     //! Positions des attributs.
-    enum Position {Id = PositionEnum<IdAttribut,DateTimeNumEntityTemp<DateTimeAtt,IDM>>::Position,
-                   DateTime = PositionEnum<DateTimeAtt,DateTimeNumEntityTemp<DateTimeAtt,IDM>>::Position,
-                   Num = PositionEnum<NumAttribut,DateTimeNumEntityTemp<DateTimeAtt,IDM>>::Position,
+    enum Position {Id = PositionEnum<IdAttribut,EAID>::Position,
+                   DateTime = PositionEnum<DateTimeAtt,EAID>::Position,
+                   Num = PositionEnum<NumAttribut,EAID>::Position,
                    NbrAtt = EAID::NbrAtt};
     using EntityAttributsID<Attributs<DateTimeAtt,NumAttribut>,IDM>::EntityAttributsID;
     using EAID::setDateTime;
@@ -135,10 +135,10 @@ template<class DateTimeAtt, class ValeurAtt, class T, int IDM> class DateTimeTyp
 public:
     using EAID = EntityAttributsID<Attributs<DateTimeAtt,TypeAttribut,ValeurAtt>,IDM>;
     //! Positions des attributs.
-    enum Position {Id = PositionEnum<IdAttribut,DateTimeTypeValeurEntityTemp<DateTimeAtt,ValeurAtt,T,IDM>>::Position,
-                   DateTime = PositionEnum<DateTimeAtt,DateTimeTypeValeurEntityTemp<DateTimeAtt,ValeurAtt,T,IDM>>::Position,
-                   Type = PositionEnum<TypeAttribut,DateTimeTypeValeurEntityTemp<DateTimeAtt,ValeurAtt,T,IDM>>::Position,
-                   Valeur = PositionEnum<ValeurAtt,DateTimeTypeValeurEntityTemp<DateTimeAtt,ValeurAtt,T,IDM>>::Position,
+    enum Position {Id = PositionEnum<IdAttribut,EAID>::Position,
+                   DateTime = PositionEnum<DateTimeAtt,EAID>::Position,
+                   Type = PositionEnum<TypeAttribut,EAID>::Position,
+                   Valeur = PositionEnum<ValeurAtt,EAID>::Position,
                    NbrAtt = EAID::NbrAtt};
 
     using EntityAttributsID<Attributs<DateTimeAtt,TypeAttribut,ValeurAtt>,IDM>::EntityAttributsID;
@@ -175,10 +175,10 @@ template<int IDM> class ArbreSimpleNcNomEntity : public EntityAttributsID<Attrib
 public:
     using EAID = EntityAttributsID<Attributs<ArbreSimpleAttribut,NcAttribut,NomAttribut>,IDM>;
     //! Positions des attributs.
-    enum Position {Id = PositionEnum<IdAttribut,ArbreSimpleNcNomEntity<IDM>>::Position,
-                   Nc = PositionEnum<NcAttribut,ArbreSimpleNcNomEntity<IDM>>::Position,
-                   Nom = PositionEnum<NomAttribut,ArbreSimpleNcNomEntity<IDM>>::Position,
-                   Parent = PositionEnum<ArbreSimpleAttribut,ArbreSimpleNcNomEntity<IDM>>::Position,
+    enum Position {Id = PositionEnum<IdAttribut,EAID>::Position,
+                   Nc = PositionEnum<NcAttribut,EAID>::Position,
+                   Nom = PositionEnum<NomAttribut,EAID>::Position,
+                   Parent = PositionEnum<ArbreSimpleAttribut,EAID>::Position,
                    NbrAtt = EAID::NbrAtt,
                    Ordre = Nom};
 
@@ -212,9 +212,9 @@ template<int IDM> class NcNomEntity : public EntityAttributsID<NcNomAttribut,IDM
 public:
     using EAID = EntityAttributsID<NcNomAttribut,IDM>;
     //! Positions des attributs.
-    enum Position {Id = PositionEnum<IdAttribut,NcNomEntity<IDM>>::Position,
-                   Nc = PositionEnum<NcAttribut,NcNomEntity<IDM>>::Position,
-                   Nom = PositionEnum<NomAttribut,NcNomEntity<IDM>>::Position,
+    enum Position {Id = PositionEnum<IdAttribut,EAID>::Position,
+                   Nc = PositionEnum<NcAttribut,EAID>::Position,
+                   Nom = PositionEnum<NomAttribut,EAID>::Position,
                    NbrAtt = EAID::NbrAtt};
 
     using EntityAttributsID<NcNomAttribut,IDM>::EntityAttributsID;
@@ -243,10 +243,10 @@ template<int IDM> class NcNomTypeEntity : public EntityAttributsID<NcNomTypeAttr
 public:
     using EAID = EntityAttributsID<NcNomTypeAttribut,IDM>;
     //! Positions des attributs.
-    enum Position {Id = PositionEnum<IdAttribut,NcNomTypeEntity<IDM>>::Position,
-                   Nc = PositionEnum<NcAttribut,NcNomTypeEntity<IDM>>::Position,
-                   Nom = PositionEnum<NomAttribut,NcNomTypeEntity<IDM>>::Position,
-                   Type = PositionEnum<TypeAttribut,NcNomTypeEntity<IDM>>::Position,
+    enum Position {Id = PositionEnum<IdAttribut,EAID>::Position,
+                   Nc = PositionEnum<NcAttribut,EAID>::Position,
+                   Nom = PositionEnum<NomAttribut,EAID>::Position,
+                   Type = PositionEnum<TypeAttribut,EAID>::Position,
                    NbrAtt = EAID::NbrAtt};
 
     using EntityAttributsID<NcNomTypeAttribut,IDM>::EntityAttributsID;
@@ -284,8 +284,8 @@ template<int IDM> class NomEntity : public EntityAttributsID<NomAttribut,IDM>
 public:
     using EAID = EntityAttributsID<NomAttribut,IDM>;
     //! Positions des attributs.
-    enum Position {Id = PositionEnum<IdAttribut,NomEntity<IDM>>::Position,
-                   Nom = PositionEnum<NomAttribut,NomEntity<IDM>>::Position,
+    enum Position {Id = PositionEnum<IdAttribut,EAID>::Position,
+                   Nom = PositionEnum<NomAttribut,EAID>::Position,
                    NbrAtt = EAID::NbrAtt};
 
     using EntityAttributsID<NomAttribut,IDM>::EntityAttributsID;
@@ -308,9 +308,9 @@ template<int IDM> class NomTypeEntity : public EntityAttributsID<NomTypeAttribut
 public:
     using EAID = EntityAttributsID<NomTypeAttribut,IDM>;
     //! Positions des attributs.
-    enum Position {Id = PositionEnum<IdAttribut,NomTypeEntity<IDM>>::Position,
-                   Nom = PositionEnum<NomAttribut,NomTypeEntity<IDM>>::Position,
-                   Type = PositionEnum<TypeAttribut,NomTypeEntity<IDM>>::Position,
+    enum Position {Id = PositionEnum<IdAttribut,EAID>::Position,
+                   Nom = PositionEnum<NomAttribut,EAID>::Position,
+                   Type = PositionEnum<TypeAttribut,EAID>::Position,
                    NbrAtt = EAID::NbrAtt};
 
     using EntityAttributsID<NomTypeAttribut,IDM>::EntityAttributsID;
@@ -341,8 +341,8 @@ template<int IDM> class NumEntity : public EntityAttributsID<NumAttribut,IDM>
 public:
     using EAID = EntityAttributsID<NumAttribut,IDM>;
     //! Positions des attributs.
-    enum Position {Id = PositionEnum<IdAttribut,NumEntity<IDM>>::Position,
-                   Num = PositionEnum<NumAttribut,NumEntity<IDM>>::Position,
+    enum Position {Id = PositionEnum<IdAttribut,EAID>::Position,
+                   Num = PositionEnum<NumAttribut,EAID>::Position,
                    NbrAtt = EAID::NbrAtt};
 
     using EntityAttributsID<NumAttribut,IDM>::EntityAttributsID;
@@ -365,10 +365,10 @@ template<int IDM> class TexteEntity : public EntityAttributsID<TexteAttributs,ID
 public:
     using EAID = EntityAttributsID<TexteAttributs,IDM>;
     //! Positions des attributs.
-    enum Position {Id = PositionEnum<IdAttribut,TexteEntity<IDM>>::Position,
-                   Creation = PositionEnum<CreationAttribut,TexteEntity<IDM>>::Position,
-                   Modification = PositionEnum<ModificationAttribut,TexteEntity<IDM>>::Position,
-                   Texte = PositionEnum<TexteAttribut,TexteEntity<IDM>>::Position,
+    enum Position {Id = PositionEnum<IdAttribut,EAID>::Position,
+                   Creation = PositionEnum<CreationAttribut,EAID>::Position,
+                   Modification = PositionEnum<ModificationAttribut,EAID>::Position,
+                   Texte = PositionEnum<TexteAttribut,EAID>::Position,
                    NbrAtt = EAID::NbrAtt};
 
     using EntityAttributsID<TexteAttributs,IDM>::EntityAttributsID;
@@ -401,9 +401,9 @@ template<int IDM> class TypeVersionEntity : public EntityAttributsID<Attributs<T
 public:
     using EAID = EntityAttributsID<Attributs<TypeAttribut,VersionAttribut>,IDM>;
     //! Positions des attributs.
-    enum Position {Id = PositionEnum<IdAttribut,TypeVersionEntity<IDM>>::Position,
-                   Type = PositionEnum<TypeAttribut,TypeVersionEntity<IDM>>::Position,
-                   Version = PositionEnum<VersionAttribut,TypeVersionEntity<IDM>>::Position,
+    enum Position {Id = PositionEnum<IdAttribut,EAID>::Position,
+                   Type = PositionEnum<TypeAttribut,EAID>::Position,
+                   Version = PositionEnum<VersionAttribut,EAID>::Position,
                    NbrAtt = EAID::NbrAtt};
 
     using EntityAttributsID<Attributs<TypeAttribut,VersionAttribut>,IDM>::EntityAttributsID;

@@ -81,13 +81,13 @@ template<class AttFound, class Att, class AttPre, class AttSuiv, int Pos> struct
 };
 
 template<class AttFound, class Att, int Pos> struct PosisionEnumTemp<AttFound,Att,NoAttribut,NoAttribut,Pos>
-{enum {Position = 0};};
+    {enum {Position = 0};};
 
 template<class AttFound, int Pos> struct PosisionEnumTemp<AttFound,AttFound,NoAttribut,NoAttribut,Pos>
-{enum {Position = Pos};};
+    {enum {Position = Pos};};
 
 template<class AttFound, int Pos> struct PosisionEnumTemp<AttFound,Attributs<AttFound>,NoAttribut,NoAttribut,Pos>
-{enum {Position = Pos};};
+    {enum {Position = Pos};};
 
 template<class AttFound, class Ent> using PositionEnum = PosisionEnumTemp<AttFound,Ent,typename Ent::AttPre,typename Ent::AttSuiv,0>;
 
@@ -118,7 +118,7 @@ public:
 
     //! Teste si l'entité est valide.
     bool isValid() const override
-        {return (Id1NullAttribut::isValid() && id2() == 0) || (id1() == 0 && Id2NullAttribut::isValid());}
+        {return (Id1NullAttribut::isValidAttribut() && id2() == 0) || (id1() == 0 && Id2NullAttribut::isValidAttribut());}
 };
 
 /*! \ingroup groupeAttributEntity
@@ -132,8 +132,8 @@ public:
 
     //! Teste si l'entité est valide.
     bool isValid() const override
-        {return (Id1NullAttribut::isValid() && id2() == 0 && id3() == 0)
-                || (Id2NullAttribut::isValid() && id1() == 0 && id3() == 0)
-                || (Id3NullAttribut::isValid() && id1() == 0 && id2() == 0);}
+        {return (Id1NullAttribut::isValidAttribut() && id2() == 0 && id3() == 0)
+                || (Id2NullAttribut::isValidAttribut() && id1() == 0 && id3() == 0)
+                || (Id3NullAttribut::isValidAttribut() && id1() == 0 && id2() == 0);}
 };
 #endif // ENTITYATTRIBUT_H

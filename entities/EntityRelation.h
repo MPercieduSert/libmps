@@ -34,9 +34,9 @@ template<int IDM> class RelationEntity : public EntityAttributsID<RelationAttrib
 public:
     using EAID = EntityAttributsID<RelationAttribut,IDM>;
     //! Positions des attributs.
-    enum Position {Id = PositionEnum<IdAttribut,RelationEntity<IDM>>::Position,
-                   Id1 = PositionEnum<Id1Attribut,RelationEntity<IDM>>::Position,
-                   Id2 = PositionEnum<Id2Attribut,RelationEntity<IDM>>::Position,
+    enum Position {Id = PositionEnum<IdAttribut,EAID>::Position,
+                   Id1 = PositionEnum<Id1Attribut,EAID>::Position,
+                   Id2 = PositionEnum<Id2Attribut,EAID>::Position,
                    NbrAtt = EAID::NbrAtt};
 
     using EntityAttributsID<RelationAttribut,IDM>::EntityAttributsID;
@@ -67,9 +67,9 @@ template<int IDM> class RelationExactOneNotNullEntity : public EntityAttributsID
 public:
     using EAID = EntityAttributsID<RelationExactOneNotNullAttribut,IDM>;
     //! Positions des attributs.
-    enum Position {Id = PositionEnum<IdAttribut,RelationExactOneNotNullEntity<IDM>>::Position,
-                   Id1 = PositionEnum<Id1Attribut,RelationExactOneNotNullEntity<IDM>>::Position,
-                   Id2 = PositionEnum<Id2Attribut,RelationExactOneNotNullEntity<IDM>>::Position,
+    enum Position {Id = PositionEnum<IdAttribut,EAID>::Position,
+                   Id1 = PositionEnum<Id1Attribut,EAID>::Position,
+                   Id2 = PositionEnum<Id2Attribut,EAID>::Position,
                    NbrAtt = EAID::NbrAtt};
 
     using EntityAttributsID<RelationExactOneNotNullAttribut,IDM>::EntityAttributsID;
@@ -101,10 +101,10 @@ template<class DateTimeAtt, int IDM> class RelationDateTimeEntity : public Entit
 public:
     using EAID = EntityAttributsID<Attributs<RelationAttribut,DateTimeAtt>,IDM>;
     //! Positions des attributs.
-    enum Position {Id = PositionEnum<IdAttribut,RelationDateTimeEntity<DateTimeAtt,IDM>>::Position,
-                   Id1 = PositionEnum<Id1Attribut,RelationDateTimeEntity<DateTimeAtt,IDM>>::Position,
-                   Id2 = PositionEnum<Id2Attribut,RelationDateTimeEntity<DateTimeAtt,IDM>>::Position,
-                   DateTime = PositionEnum<DateTimeAtt,RelationDateTimeEntity<DateTimeAtt,IDM>>::Position,
+    enum Position {Id = PositionEnum<IdAttribut,EAID>::Position,
+                   Id1 = PositionEnum<Id1Attribut,EAID>::Position,
+                   Id2 = PositionEnum<Id2Attribut,EAID>::Position,
+                   DateTime = PositionEnum<DateTimeAtt,EAID>::Position,
                    NbrAtt = EAID::NbrAtt};
 
     using EntityAttributsID<Attributs<RelationAttribut,DateTimeAtt>,IDM>::EntityAttributsID;
@@ -148,10 +148,10 @@ template<int IDM> class RelationNumEntity : public EntityAttributsID<Attributs<R
 public:
     using EAID = EntityAttributsID<Attributs<RelationAttribut,NumAttribut>,IDM>;
     //! Positions des attributs.
-    enum Position {Id = PositionEnum<IdAttribut,RelationNumEntity<IDM>>::Position,
-                   Id1 = PositionEnum<Id1Attribut,RelationNumEntity<IDM>>::Position,
-                   Id2 = PositionEnum<Id2Attribut,RelationNumEntity<IDM>>::Position,
-                   Num = PositionEnum<NumAttribut,RelationNumEntity<IDM>>::Position,
+    enum Position {Id = PositionEnum<IdAttribut,EAID>::Position,
+                   Id1 = PositionEnum<Id1Attribut,EAID>::Position,
+                   Id2 = PositionEnum<Id2Attribut,EAID>::Position,
+                   Num = PositionEnum<NumAttribut,EAID>::Position,
                    NbrAtt = EAID::NbrAtt};
 
     using EntityAttributsID<Attributs<RelationAttribut,NumAttribut>,IDM>::EntityAttributsID;
@@ -185,10 +185,10 @@ template<int IDM> class RelationTypeEntity : public EntityAttributsID<Attributs<
 public:
     using EAID = EntityAttributsID<Attributs<RelationAttribut,TypeAttribut>,IDM>;
     //! Positions des attributs.
-    enum Position {Id = PositionEnum<IdAttribut,RelationTypeEntity<IDM>>::Position,
-                   Id1 = PositionEnum<Id1Attribut,RelationTypeEntity<IDM>>::Position,
-                   Id2 = PositionEnum<Id2Attribut,RelationTypeEntity<IDM>>::Position,
-                   Type = PositionEnum<TypeAttribut,RelationTypeEntity<IDM>>::Position,
+    enum Position {Id = PositionEnum<IdAttribut,EAID>::Position,
+                   Id1 = PositionEnum<Id1Attribut,EAID>::Position,
+                   Id2 = PositionEnum<Id2Attribut,EAID>::Position,
+                   Type = PositionEnum<TypeAttribut,EAID>::Position,
                    NbrAtt = EAID::NbrAtt};
 
     using EntityAttributsID<Attributs<RelationAttribut,TypeAttribut>,IDM>::EntityAttributsID;
@@ -218,16 +218,17 @@ template<int IDM> RelationTypeEntity<IDM>::~RelationTypeEntity() {}
 /*! \ingroup groupeBaseEntity
  * \brief Classe de base des entités ayant pour attribut deux clés, une dateTime et un numero.
  */
-template<class DateTimeAtt,int IDM> class RelationDateTimeNumEntity : public EntityAttributsID<Attributs<RelationAttribut,DateTimeAtt,NumAttribut>,IDM>
+template<class DateTimeAtt,int IDM> class RelationDateTimeNumEntity :
+        public EntityAttributsID<Attributs<RelationAttribut,DateTimeAtt,NumAttribut>,IDM>
 {
 public:
     using EAID = EntityAttributsID<Attributs<RelationAttribut,DateTimeAtt,NumAttribut>,IDM>;
     //! Positions des attributs.
-    enum Position {Id = PositionEnum<IdAttribut,RelationDateTimeNumEntity<DateTimeAtt,IDM>>::Position,
-                   Id1 = PositionEnum<Id1Attribut,RelationDateTimeNumEntity<DateTimeAtt,IDM>>::Position,
-                   Id2 = PositionEnum<Id2Attribut,RelationDateTimeNumEntity<DateTimeAtt,IDM>>::Position,
-                   DateTime = PositionEnum<DateTimeAtt,RelationDateTimeNumEntity<DateTimeAtt,IDM>>::Position,
-                   Num = PositionEnum<NumAttribut,RelationDateTimeNumEntity<DateTimeAtt,IDM>>::Position,
+    enum Position {Id = PositionEnum<IdAttribut,EAID>::Position,
+                   Id1 = PositionEnum<Id1Attribut,EAID>::Position,
+                   Id2 = PositionEnum<Id2Attribut,EAID>::Position,
+                   DateTime = PositionEnum<DateTimeAtt,EAID>::Position,
+                   Num = PositionEnum<NumAttribut,EAID>::Position,
                    NbrAtt = EAID::NbrAtt};
 
     using EntityAttributsID<Attributs<RelationAttribut,DateTimeAtt,NumAttribut>,IDM>::EntityAttributsID;
@@ -275,11 +276,11 @@ template<class DateTimeAtt,class ValeurAttribut,class T,int IDM> class RelationD
 public:
     using EAID = EntityAttributsID<Attributs<RelationAttribut,DateTimeAtt,ValeurAttribut>,IDM>;
     //! Positions des attributs.
-    enum Position {Id = PositionEnum<IdAttribut,RelationDateTimeValeurEntity<DateTimeAtt,ValeurAttribut,T,IDM>>::Position,
-                   Id1 = PositionEnum<Id1Attribut,RelationDateTimeValeurEntity<DateTimeAtt,ValeurAttribut,T,IDM>>::Position,
-                   Id2 = PositionEnum<Id2Attribut,RelationDateTimeValeurEntity<DateTimeAtt,ValeurAttribut,T,IDM>>::Position,
-                   DateTime = PositionEnum<DateTimeAtt,RelationDateTimeValeurEntity<DateTimeAtt,ValeurAttribut,T,IDM>>::Position,
-                   Valeur = PositionEnum<ValeurAttribut,RelationDateTimeValeurEntity<DateTimeAtt,ValeurAttribut,T,IDM>>::Position,
+    enum Position {Id = PositionEnum<IdAttribut,EAID>::Position,
+                   Id1 = PositionEnum<Id1Attribut,EAID>::Position,
+                   Id2 = PositionEnum<Id2Attribut,EAID>::Position,
+                   DateTime = PositionEnum<DateTimeAtt,EAID>::Position,
+                   Valeur = PositionEnum<ValeurAttribut,EAID>::Position,
                    NbrAtt = EAID::NbrAtt};
 
     using EntityAttributsID<Attributs<RelationAttribut,DateTimeAtt,ValeurAttribut>,IDM>::EntityAttributsID;
@@ -311,20 +312,24 @@ public:
 template<class DateTimeAtt,class ValeurAttribut,class T,int IDM>
     RelationDateTimeValeurEntity<DateTimeAtt, ValeurAttribut, T, IDM>::~RelationDateTimeValeurEntity() {}
 
-template<int IDM> using RelationDateTimeCurrentValeurDoubleEntity = RelationDateTimeValeurEntity<DateTimeCurrentAttribut,ValeurDoubleAttribut,double,IDM>;
+template<int IDM> using RelationDateTimeCurrentValeurDoubleEntity
+    = RelationDateTimeValeurEntity<DateTimeCurrentAttribut,ValeurDoubleAttribut,double,IDM>;
 #define ENUM_RelationDateTimeCurrentValeurDouble(ID1,ID2) ENUM_RelationDateTimeValeur(ID1,ID2)
 
-template<int IDM> using RelationDateTimeCurrentValeurIntEntity = RelationDateTimeValeurEntity<DateTimeCurrentAttribut,ValeurIntAttribut,int,IDM>;
+template<int IDM> using RelationDateTimeCurrentValeurIntEntity
+    = RelationDateTimeValeurEntity<DateTimeCurrentAttribut,ValeurIntAttribut,int,IDM>;
 #define ENUM_RelationDateTimeCurrentValeurInt(ID1,ID2) ENUM_RelationDateTimeValeur(ID1,ID2)
 
 template<int IDM> using RelationDateTimeCurrentValeurVariantEntity
     = RelationDateTimeValeurEntity<DateTimeCurrentAttribut,ValeurVariantAttribut,const QVariant &,IDM>;
 #define ENUM_RelationDateTimeCurrentValeurVariant(ID1,ID2) ENUM_RelationDateTimeValeur(ID1,ID2)
 
-template<int IDM> using RelationDateTimeValideValeurDoubleEntity = RelationDateTimeValeurEntity<DateTimeValideAttribut,ValeurDoubleAttribut,double,IDM>;
+template<int IDM> using RelationDateTimeValideValeurDoubleEntity
+    = RelationDateTimeValeurEntity<DateTimeValideAttribut,ValeurDoubleAttribut,double,IDM>;
 #define ENUM_RelationDateTimeValideValeurDouble(ID1,ID2) ENUM_RelationDateTimeValeur(ID1,ID2)
 
-template<int IDM> using RelationDateTimeValideValeurIntEntity = RelationDateTimeValeurEntity<DateTimeValideAttribut,ValeurIntAttribut,int,IDM>;
+template<int IDM> using RelationDateTimeValideValeurIntEntity
+    = RelationDateTimeValeurEntity<DateTimeValideAttribut,ValeurIntAttribut,int,IDM>;
 #define ENUM_RelationDateTimeValideValeurInt(ID1,ID2) ENUM_RelationDateTimeValeur(ID1,ID2)
 
 template<int IDM> using RelationDateTimeValideValeurVariantEntity
@@ -346,12 +351,12 @@ template<class DateTimeAtt,class ValeurAttribut,class T,int IDM> class RelationD
 public:
     using EAID = EntityAttributsID<Attributs<RelationAttribut,DateTimeAtt,NumAttribut,ValeurAttribut>,IDM>;
     //! Positions des attributs.
-    enum Position {Id = PositionEnum<IdAttribut,RelationDateTimeNumValeurEntity<DateTimeAtt,ValeurAttribut,T,IDM>>::Position,
-                   Id1 = PositionEnum<Id1Attribut,RelationDateTimeNumValeurEntity<DateTimeAtt,ValeurAttribut,T,IDM>>::Position,
-                   Id2 = PositionEnum<Id2Attribut,RelationDateTimeNumValeurEntity<DateTimeAtt,ValeurAttribut,T,IDM>>::Position,
-                   DateTime = PositionEnum<DateTimeAtt,RelationDateTimeNumValeurEntity<DateTimeAtt,ValeurAttribut,T,IDM>>::Position,
-                   Num = PositionEnum<NumAttribut,RelationDateTimeNumValeurEntity<DateTimeAtt,ValeurAttribut,T,IDM>>::Position,
-                   Valeur = PositionEnum<ValeurAttribut,RelationDateTimeNumValeurEntity<DateTimeAtt,ValeurAttribut,T,IDM>>::Position,
+    enum Position {Id = PositionEnum<IdAttribut,EAID>::Position,
+                   Id1 = PositionEnum<Id1Attribut,EAID>::Position,
+                   Id2 = PositionEnum<Id2Attribut,EAID>::Position,
+                   DateTime = PositionEnum<DateTimeAtt,EAID>::Position,
+                   Num = PositionEnum<NumAttribut,EAID>::Position,
+                   Valeur = PositionEnum<ValeurAttribut,EAID>::Position,
                    NbrAtt = EAID::NbrAtt};
 
     using EntityAttributsID<Attributs<RelationAttribut,DateTimeAtt,NumAttribut,ValeurAttribut>,IDM>::EntityAttributsID;
@@ -385,20 +390,24 @@ public:
 template<class DateTimeAtt,class ValeurAttribut,class T,int IDM>
     RelationDateTimeNumValeurEntity<DateTimeAtt, ValeurAttribut, T, IDM>::~RelationDateTimeNumValeurEntity() {}
 
-template<int IDM> using RelationDateTimeCurrentNumValeurDoubleEntity = RelationDateTimeNumValeurEntity<DateTimeCurrentAttribut,ValeurDoubleAttribut,double,IDM>;
+template<int IDM> using RelationDateTimeCurrentNumValeurDoubleEntity
+    = RelationDateTimeNumValeurEntity<DateTimeCurrentAttribut,ValeurDoubleAttribut,double,IDM>;
 #define ENUM_RelationDateTimeCurrentNumValeurDouble(ID1,ID2) ENUM_RelationDateTimeNumValeur(ID1,ID2)
 
-template<int IDM> using RelationDateTimeCurrentNumValeurIntEntity = RelationDateTimeNumValeurEntity<DateTimeCurrentAttribut,ValeurIntAttribut,int,IDM>;
+template<int IDM> using RelationDateTimeCurrentNumValeurIntEntity
+    = RelationDateTimeNumValeurEntity<DateTimeCurrentAttribut,ValeurIntAttribut,int,IDM>;
 #define ENUM_RelationDateTimeCurrentNumValeurInt(ID1,ID2) ENUM_RelationDateTimeNumValeur(ID1,ID2)
 
 template<int IDM> using RelationDateTimeCurrentNumValeurVariantEntity
     = RelationDateTimeNumValeurEntity<DateTimeCurrentAttribut,ValeurVariantAttribut,const QVariant &,IDM>;
 #define ENUM_RelationDateTimeCurrentNumValeurVariant(ID1,ID2) ENUM_RelationDateTimeNumValeur(ID1,ID2)
 
-template<int IDM> using RelationDateTimeValideNumValeurDoubleEntity = RelationDateTimeNumValeurEntity<DateTimeValideAttribut,ValeurDoubleAttribut,double,IDM>;
+template<int IDM> using RelationDateTimeValideNumValeurDoubleEntity
+    = RelationDateTimeNumValeurEntity<DateTimeValideAttribut,ValeurDoubleAttribut,double,IDM>;
 #define ENUM_RelationDateTimeValideNumValeurDouble(ID1,ID2) ENUM_RelationDateTimeNumValeur(ID1,ID2)
 
-template<int IDM> using RelationDateTimeValideNumValeurIntEntity = RelationDateTimeNumValeurEntity<DateTimeValideAttribut,ValeurIntAttribut,int,IDM>;
+template<int IDM> using RelationDateTimeValideNumValeurIntEntity
+    = RelationDateTimeNumValeurEntity<DateTimeValideAttribut,ValeurIntAttribut,int,IDM>;
 #define ENUM_RelationDateTimeValideNumValeurInt(ID1,ID2) ENUM_RelationDateTimeNumValeur(ID1,ID2)
 
 template<int IDM> using RelationDateTimeValideNumValeurVariantEntity
@@ -408,8 +417,8 @@ template<int IDM> using RelationDateTimeValideNumValeurVariantEntity
 //! \ingroup groupeMacroEntity
 //! Macro définissant les positions des attributs pour une relation avec un attribut code, dateTime, num et Valeur.
 #define ENUM_RelationCodeDateTimeNumValeur(ID1,ID2) /*! \brief Positions des attributs */ \
-    enum Position {Id, Id1 = mere::Id1, Id2 = mere::Id2, Code = mere::Code, DateTime = mere::DateTime, Num = mere::Num, Valeur = mere::Valeur,\
-                    NbrAtt = mere::NbrAtt, Id ## ID1 = Id1, Id ## ID2 = Id2};
+    enum Position {Id, Id1 = mere::Id1, Id2 = mere::Id2, Code = mere::Code, DateTime = mere::DateTime, Num = mere::Num,\
+                    Valeur = mere::Valeur,nNbrAtt = mere::NbrAtt, Id ## ID1 = Id1, Id ## ID2 = Id2};
 
 /*! \ingroup groupeBaseEntity
  * \brief Classe de base des entités ayant pour attribut deux clés, un code, une dateTime et un numero.
@@ -420,13 +429,13 @@ template<class DateTimeAtt,class ValeurAttribut,class T,int IDM> class RelationC
 public:
     using EAID = EntityAttributsID<Attributs<RelationAttribut,CodeAttribut,DateTimeAtt,NumAttribut,ValeurAttribut>,IDM>;
     //! Positions des attributs.
-    enum Position {Id = PositionEnum<IdAttribut,RelationDateTimeNumValeurEntity<DateTimeAtt,ValeurAttribut,T,IDM>>::Position,
-                    Id1 = PositionEnum<Id1Attribut,RelationDateTimeNumValeurEntity<DateTimeAtt,ValeurAttribut,T,IDM>>::Position,
-                    Id2 = PositionEnum<Id2Attribut,RelationDateTimeNumValeurEntity<DateTimeAtt,ValeurAttribut,T,IDM>>::Position,
-                    Code = PositionEnum<CodeAttribut,RelationDateTimeNumValeurEntity<DateTimeAtt,ValeurAttribut,T,IDM>>::Position,
-                    DateTime = PositionEnum<DateTimeAtt,RelationDateTimeNumValeurEntity<DateTimeAtt,ValeurAttribut,T,IDM>>::Position,
-                    Num = PositionEnum<NumAttribut,RelationDateTimeNumValeurEntity<DateTimeAtt,ValeurAttribut,T,IDM>>::Position,
-                    Valeur = PositionEnum<ValeurAttribut,RelationDateTimeNumValeurEntity<DateTimeAtt,ValeurAttribut,T,IDM>>::Position,
+    enum Position {Id = PositionEnum<IdAttribut,EAID>::Position,
+                    Id1 = PositionEnum<Id1Attribut,EAID>::Position,
+                    Id2 = PositionEnum<Id2Attribut,EAID>::Position,
+                    Code = PositionEnum<CodeAttribut,EAID>::Position,
+                    DateTime = PositionEnum<DateTimeAtt,EAID>::Position,
+                    Num = PositionEnum<NumAttribut,EAID>::Position,
+                    Valeur = PositionEnum<ValeurAttribut,EAID>::Position,
                     NbrAtt = EAID::NbrAtt};
 
     using EntityAttributsID<Attributs<RelationAttribut,CodeAttribut,DateTimeAtt,NumAttribut,ValeurAttribut>,IDM>
@@ -504,12 +513,12 @@ template<class ValeurAttribut,class T,int IDM> class RelationNumTypeValeurEntity
 public:
     using EAID = EntityAttributsID<Attributs<RelationAttribut,NumAttribut,TypeAttribut,ValeurAttribut>,IDM>;
     //! Positions des attributs.
-    enum Position {Id = PositionEnum<IdAttribut,RelationNumTypeValeurEntity<ValeurAttribut,T,IDM>>::Position,
-                   Id1 = PositionEnum<Id1Attribut,RelationNumTypeValeurEntity<ValeurAttribut,T,IDM>>::Position,
-                   Id2 = PositionEnum<Id2Attribut,RelationNumTypeValeurEntity<ValeurAttribut,T,IDM>>::Position,
-                   Num = PositionEnum<NumAttribut,RelationNumTypeValeurEntity<ValeurAttribut,T,IDM>>::Position,
-                   Type = PositionEnum<TypeAttribut,RelationNumTypeValeurEntity<ValeurAttribut,T,IDM>>::Position,
-                   Valeur = PositionEnum<ValeurAttribut,RelationNumTypeValeurEntity<ValeurAttribut,T,IDM>>::Position,
+    enum Position {Id = PositionEnum<IdAttribut,EAID>::Position,
+                   Id1 = PositionEnum<Id1Attribut,EAID>::Position,
+                   Id2 = PositionEnum<Id2Attribut,EAID>::Position,
+                   Num = PositionEnum<NumAttribut,EAID>::Position,
+                   Type = PositionEnum<TypeAttribut,EAID>::Position,
+                   Valeur = PositionEnum<ValeurAttribut,EAID>::Position,
                    NbrAtt = EAID::NbrAtt};
 
     using EntityAttributsID<Attributs<RelationAttribut,NumAttribut,TypeAttribut,ValeurAttribut>,IDM>::EntityAttributsID;

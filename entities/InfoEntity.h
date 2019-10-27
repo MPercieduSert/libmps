@@ -62,6 +62,8 @@ namespace InfoEntity
                     UtilisationId,
                     UsageId,
                     NbrEntityPredefinie};
+
+    enum decimale{NbrDecimales = 16};
 };
 
 #endif // INFOENTITY_H
