@@ -27,7 +27,7 @@ QVariant MotCleModel::data(const QModelIndex &index, int role) const
 QString MotCleModel::dataListeNomMotCle() const
 {
     QString str;
-    for(QMap<int,bool>::const_iterator i = m_idMotCle.cbegin(); i != m_idMotCle.cend(); ++i)
+    for(auto i = m_idMotCle.cbegin(); i != m_idMotCle.cend(); ++i)
     {
         MotCle mot(i.key());
         m_bdd->get(mot);
@@ -59,16 +59,16 @@ void MotCleModel::setIdSet(const QSet<int> & idSet)
     int newValue = Tous;
     for(QSet<int>::const_iterator i = m_idSet.cbegin(); i != m_idSet.cend(); ++i)
     {
-        ListPtr<CibleMotCle> cibleMotcleList(m_bdd->getList<CibleMotCle>(CibleMotCle::Cible,m_cible,CibleMotCle::IdCible,*i));
-        for(ListPtr<CibleMotCle>::iterator j = cibleMotcleList.begin(); j != cibleMotcleList.end(); ++j)
+        ListPtr<MotCleCible> cibleMotcleList(m_bdd->getList<MotCleCible>(MotCleCible::Cible,m_cible,MotCleCible::IdCible,*i));
+        for(ListPtr<MotCleCible>::iterator j = cibleMotcleList.begin(); j != cibleMotcleList.end(); ++j)
         {
-            QMap<int,bool>::iterator k = m_idMotCle.find((*j).idMotCle());
+            auto k = m_idMotCle.find((*j).idMotCle());
             if(k == m_idMotCle.end())
                 m_idMotCle[(*j).idMotCle()] = newValue;
             else if(*k == TousJusquaPresent)
                 *k = Tous;
         }
-        for(QMap<int,bool>::iterator k = m_idMotCle.begin(); k != m_idMotCle.end(); ++k)
+        for(auto k = m_idMotCle.begin(); k != m_idMotCle.end(); ++k)
         {
             if(*k == TousJusquaPresent)
                 *k = PasTous;

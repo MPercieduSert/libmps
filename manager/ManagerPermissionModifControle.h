@@ -1,16 +1,16 @@
 /*Auteur: PERCIE DU SERT Maxime
  *Date: 05/08/2018
  */
-#ifndef MANAGEROFMODIFCONTROLEPERMISSION_H
-#define MANAGEROFMODIFCONTROLEPERMISSION_H
+#ifndef MANAGERPERMISSIONMODIFCONTROLE_H
+#define MANAGERPERMISSIONMODIFCONTROLE_H
 
-#include "ManagerOfModifControle.h"
-#include "ManagerOfPermission.h"
+#include "ManagerModifControle.h"
+#include "ManagerPermission.h"
 
 /*! \ingroup groupeManager
  * \brief Classe template des différents manageurs à modification controlée de permission.
  */
-template<class ManagerOfPerm> class ManagerOfModifControlePermission : public ManagerOfPerm,
+template<class ManagerOfPerm> class ManagerOfPermissionModifControle : public ManagerOfPerm,
                                                                            public ManagerOfModifControle<typename ManagerOfPerm::EntType>
 {
 protected:
@@ -23,7 +23,7 @@ public:
     using ManagerMC::del;
 
     //! Constructeur
-    ManagerOfModifControlePermission (const InfoBdd & info,
+    ManagerOfPermissionModifControle (const InfoBdd & info,
                                       AbstractGestionAutorisation<Ent> * gestionAutorisation = new GestionAutorisationNoRestrictif<Ent>(),
                                       AbstractUniqueSqlTemp<Ent> * unique = new NoUniqueSql<Ent>())
         : ManagerSql<Ent>(info, unique), ManagerOfPerm(info,unique),
@@ -31,11 +31,11 @@ public:
     {}
 
     //! Destructeur.
-    ~ManagerOfModifControlePermission() override = default;
+    ~ManagerOfPermissionModifControle() override = default;
 
 protected:
     /*//! Constructeur.
-    ManagerOfModifControlePermission() = default;*/
+    ManagerOfPermissionModifControle() = default;*/
 
     //! Appelle la fonction d'insertion parent souhaitée.
     void addParent(Ent & entity) override
@@ -65,11 +65,11 @@ protected:
         {ManagerMC::modify(entity,id);}
 };
 
-template<class Ent> bool ManagerOfModifControlePermission<Ent>::del(idt id)
+template<class Ent> bool ManagerOfPermissionModifControle<Ent>::del(idt id)
     {return ManagerMC::del(id);}
 
 //! Manager de permission de type num à modification controlé.
-template<class Ent> using ManagerOfModifControlePermissionNum = ManagerOfModifControlePermission<ManagerOfPermissionNum<Ent>>;
+template<class Ent> using ManagerOfPermissionNumModifControle = ManagerOfPermissionModifControle<ManagerOfPermissionNum<Ent>>;
 //! Manager de permission de type code à modification controlé.
-template<class Ent> using ManagerOfModifControlePermissionCode = ManagerOfModifControlePermission<ManagerOfPermissionCode<Ent>>;
-#endif // MANAGEROFMODIFCONTROLEPERMISSION_H
+template<class Ent> using ManagerOfPermissionCodeModifControle = ManagerOfPermissionModifControle<ManagerOfPermissionCode<Ent>>;
+#endif // MANAGERPERMISSIONMODIFCONTROLE_H

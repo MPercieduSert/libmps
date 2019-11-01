@@ -421,6 +421,30 @@ protected:
 };
 
 /*! \ingroup groupeUniqueSql
+ * \brief Classe condition d'unicité pour les entités possédant une seule condition d'unicité sur le triplet (id1,id2,cible).
+ */
+template<class Ent> class RelationCibleUniqueSql : public RelationUniqueSql<Ent>
+{
+protected:
+    using RelationUniqueSql<Ent>::bindValue;
+
+public:
+    enum {CibleUnique = RelationUniqueSql<Ent>::NbrUnique,NbrUnique};
+    CONSTR_DEFAUT(RelationCibleUniqueSql)
+
+    //! Destructeur.
+    ~RelationCibleUniqueSql() override = default;
+
+protected:
+    //! Transmet les valeurs des attributs uniques à la requète SQL préparée.
+    void bindValuesUnique(const Ent &entity) override
+    {
+        RelationUniqueSql<Ent>::bindValuesUnique(entity);
+        bindValue(CibleUnique,entity.cible());
+    }
+};
+
+/*! \ingroup groupeUniqueSql
  * \brief Classe condition d'unicité pour les entités possédant une seule condition d'unicité sur le triplet (id1,id2,date).
  */
 template<class Ent> class RelationDateTimeUniqueSql : public RelationUniqueSql<Ent>

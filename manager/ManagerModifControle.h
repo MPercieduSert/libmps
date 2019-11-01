@@ -1,8 +1,8 @@
 /*Auteur: PERCIE DU SERT Maxime
  *Date: 05/08/2018
  */
-#ifndef MANAGEROFMODIFCONTROLE_H
-#define MANAGEROFMODIFCONTROLE_H
+#ifndef MANAGERMODIFCONTROLE_H
+#define MANAGERMODIFCONTROLE_H
 
 #include "AbstractGestionAutorisation.h"
 #include "ManagerSql.h"
@@ -232,4 +232,4 @@ protected:
     else
         return false;
 }*/
-#endif // MANAGEROFMODIFCONTROLE_H
+#endif // MANAGERMODIFCONTROLE_H

@@ -7,7 +7,75 @@
 #include<QMap>
 #include<QString>
 #include<QVector>
-#include"AbstractManager.h"
+#include "Entity.h"
+
+/*! \defgroup groupeManager Manageurs
+ * \brief Ensemble de classes représentant les managers des entités de la base de donnée.
+ */
+
+/*! \ingroup groupeManager
+ * \brief Espace de nom pour la base de donnée.
+ */
+namespace bdd {
+    //! Autorisation de modification d'une entité.
+    enum Autorisation{Toute = 1,
+                      Modif = 2,
+                      Suppr = 3};
+    //! Identifiant pour les fonctions d'agrega.
+    enum Agrega {Max,
+                Min,
+                Moyenne,
+                Nombre,
+                Somme,
+                NbrAgrega};
+
+    //! Les différents types de conditions
+    enum Condition {Egal,
+                   Is,
+                   Inf,
+                   Sup,
+                   InfEgal,
+                   SupEgal,
+                   Different,
+                   IsNot};
+
+    //! Type de donnée pour la base de donnée
+    enum TypeAttributBdd{Blob,
+                   Bool,
+                   Date,
+                   DateTime,
+                   Double,
+                   Integer,
+                   Numeric,
+                   Primary,
+                   Real,
+                   Text,
+                   Variant,
+                   NbrType};
+
+    /*! \brief Les différents cas des résultats des tests d'existence d'unicité.
+     * (concordance d'indentifiant: ou bien l'identifiant en base de donnée et le même celui de l'entité testée ou bien ce dernier est nul.)
+     *
+     */
+    enum ExisteUni {Aucun = 0,  //!< Aucun des ensembles d'unicité n'existent en base de donnée.
+            Tous = 1,   //!< Tous les ensembles d'unicité existent en base de donnée dans la même entité avec concordance d'identifiant.
+            Meme = 2,   //!< Certains mais pas tous les ensembles d'unicité existent en base de donnée dans la même entité avec concordance d'identifiant.
+            Autre = 3,  //!< Certains des ensembles d'unicité existent en base de donnée dans la même entité avec un autre identifiant.
+            Conflit = 4 //!< Certains des ensembles d'unicité existent en base de donnée dans des entités différentes.
+            };
+
+    //! Enumeration des différent type de sauvegarde d'un arbre.
+    enum TreeSave {EntityOnly,
+                   AddLeaf,
+                   WithoutDelete,
+                   InternalChange,
+                   ExternalChange,
+                   EntityOnlyWhitoutRoot,
+                   AddLeafWhitoutRoot,
+                   WithoutDeleteWhitoutRoot,
+                   InternalChangeWhitoutRoot,
+                   ExternalChangeWhitoutRoot};
+}
 
 /*! \ingroup groupeManager
  * \brief Classe des informations d'une entité sur sa table dans la base de données.

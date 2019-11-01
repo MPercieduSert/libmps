@@ -108,6 +108,8 @@
 	}{#2}
 }
 \newcommand{\lkeyArbre}[1]{\lkeyloop{Arbre#1}}
+\newcommand{\ent}{purple}
+\newcommand{\bdd}{blue}
 \begin{document}
 \section{Predef}
 \subsection{Commentaire}
@@ -140,7 +142,7 @@
 		creation & dateTime&dtValide&crea & \\
 		modification & dateTime&dtCurrent& modif  & \\
 		texte & text &string& text & NULL
-	}{ }	
+	}{ }[\bdd]	
 	\&	
 	\tableEntity{CibleCommentaire}{
 		idCommentaire & uint&idSup1 & idCm &\\
@@ -151,7 +153,7 @@
 	}{
 		\fkey{idCommentaire}{Commentaire}\\
 		\unique{idCible, cible, num}
-	}\\
+	}[\bdd]\\
 	\hline\\
 };
 \lkey{Commentaire}{CibleCommentaire}
@@ -178,7 +180,7 @@
 		\&
 		\relation{ciblageDonnee}
 		\&
-		\entity{CibleDonnee}{
+		\entity{DonneeCible}{
 			idCible\\
 			cible\\
 			dateTime\\
@@ -191,7 +193,7 @@
 	\lienArbreERD{Donnee}
 	\lien{filiationDonnee}{Donnee}{$0-1$}
 	\lien{Donnee}{ciblageDonnee}{$0-N$}
-	\lien{ciblageDonnee}{CibleDonnee}{$1$}
+	\lien{ciblageDonnee}{DonneeCible}{$1$}
 	\lien{Donnee}{calibrageDonnee}{$0-N$}
 	\lien{calibrageDonnee}{DonneeCard}{$1$}
 	\end{tikzpicture}
@@ -208,8 +210,9 @@
 		exact&uint&code&ex&
 	}{
 		%\fkey{idDonnee}{Donnee}\\
-		\unique{idDonnee, cible}
-	}\\
+		\unique{idDonnee, cible}\\
+		ModifControle*
+	}[\bdd]\\
 	\tableEntity{Donnee}{
 		nom&text&stringNotEmpty&nm&\\
 		type&uint&idSup1&tp&\\
@@ -217,10 +220,12 @@
 		idProg&uint&idSup1NULL&idPg&NULL\\
 	}{
 		\fkey{id}{ArbreDonnee}\\
-		\unique{idProg}
-	}
+		\fkey{type}{Type}*\\
+		\unique{idProg}\\
+		ArbreModifControle*
+	}[\bdd]
 	\&
-	\tableEntity{CibleDonnee}{
+	\tableEntity{DonneeCible}{
 		idDonnee&int&int&idDn&\\
 		idCible&uint&idSup1&idCb&\\
 		cible&int&int&cb&\\
@@ -228,13 +233,14 @@
 		num&int&intSup0&num&\\
 		valeur&blod&variant&val&NULL
 	}{
-		\unique{idDonnee, idCible, cible, num}
-	}\\
+		\unique{idDonnee, idCible, cible, num}\\
+		ModifControle*
+	}[\bdd]\\
 	\hline\\
 };
 \lkeyArbre{Donnee}
 \lkey{ArbreDonnee}{Donnee}
-\path[<-] (Donnee) edge[dashed] (CibleDonnee);
+\path[<-] (Donnee) edge[dashed] (DonneeCible);
 \path[<-] (Donnee) edge[dashed] (DonneeCard);
 \end{tikzpicture}
 
@@ -289,8 +295,10 @@
 			type&uint&idSup1&tp&
 		}{
 			\fkey{id}{ArbreUsage}\\
-			\unique{nom, type}
-		}
+			\fkey{type}{Type}*\\
+			\unique{nom, type}\\
+			ArbreModifControle*
+		}[\bdd]
 		\\
 		\tableEntity{Historique}{
 			idCible&uint&idSup1&idCb&\\
@@ -301,7 +309,7 @@
 			num&int&intSup0&num&
 		}{
 			\unique{idCible, cible, num}
-		}
+		}[\bdd]
 		\&
 		\tableEntity{Utilisation}{
 			idUsage&uint&idSup1&idUs&\\
@@ -314,7 +322,7 @@
 		}{
 			\fkey{idUsage}{Usage}\\
 			\unique{idCible, cible, num}
-		}\\
+		}[\bdd]\\
 		\hline\\
 	};
 	\lkeyArbre{Usage}
@@ -326,7 +334,7 @@
 	\subsubsection{ERD}
 	\begin{tikzpicture}[thick]
 	\matrix[ampersand replacement=\&,column sep =.5cm, row sep =1cm]{
-		\entity{PermissionMotCleProg}{
+		\entity{MotProgPermission}{
 			cible\\
 			idProg\\
 			code
@@ -338,11 +346,11 @@
 		\&
 		\relation{controleMotCle}
 		\&
-		\entity{PermissionMotCle}{
+		\entity{MotClePermission}{
 			cible\\
 			code
 		}\\
-		\entity{CibleMotCleProg}{
+		\entity{MotProgCible}{
 			idCible\\
 			cible\\
 			idProg
@@ -357,7 +365,7 @@
 		\&
 		\relation{ciblageMotCle}
 		\&
-		\entity{CibleMotCle}{
+		\entity{MotCleCible}{
 			idCible\\
 			cible
 		}\\
@@ -366,71 +374,73 @@
 	\lienArbreERD{MotCle}
 	\lien{filiationMotCle}{MotCle}{$1$}
 	\lien{MotCle}{ciblageMotCle}{$0-N$}
-	\lien{ciblageMotCle}{CibleMotCle}{$1$}
+	\lien{ciblageMotCle}{MotCleCible}{$1$}
 	\lien{MotCle}{controleMotCle}{$0-N$}
-	\lien{controleMotCle}{PermissionMotCle}{$1$}
+	\lien{controleMotCle}{MotClePermission}{$1$}
 	\lien{MotCle}{ciblageProg}{$0-N$}
-	\lien{ciblageProg}{CibleMotCleProg}{$1$}
+	\lien{ciblageProg}{MotProgCible}{$1$}
 	\lien{MotCle}{controleProg}{$0-N$}
-	\lien{controleProg}{PermissionMotCleProg}{$1$}  
+	\lien{controleProg}{MotProgPermission}{$1$}  
 	\end{tikzpicture}
 	
 	\subsubsection{Tables}
 	\begin{tikzpicture}[thick]
 	\matrix[ampersand replacement=\&,column sep =.25cm, row sep =0.25cm]{
-		\tableEntity{PermissionMotCleProg}{
+		\tableEntity{MotProgPermission}{
+			idProg&int&int&idPg\\
 			idMotCle& uint &idSup1& idMC &\\
 			cible&int&int&cb&\\
 			code& uint &code& cd \\
-			idProg&uint&unsigned&idPg
 		}{
 			\fkey{idMotCle}{MotCle}\\
-			\unique{idMotCle, cible, idProg}
-		}
+			\unique{idProg, idMotCle, cible}
+		}[\bdd]
 		\&
 		\arbreTable{MotCle}	
 		\&
-		\tableEntity{PermissionMotCle}{
+		\tableEntity{MotClePermission}{
 			idMotCle& uint &idSup1& idMC &\\
 			cible&int&int&cb&\\
 			code& uint &code& cd &
 		}{
 			\fkey{idMotCle}{MotCle}\\
-			\unique{idMotCle, cible}
-		}\\
-		\tableEntity{CibleMotCleProg}{
+			\unique{idMotCle, cible}\\
+			ModifControlePermissionCode*
+		}[\bdd]\\
+		\tableEntity{MotProgCible}{
+			idProg&int&int&idPg&\\
 			idMotCle&uint&idSup1&idMC&\\
 			idCible&uint&idSup1&idCb&\\
-			cible&int&int&cb&\\
-			idProg&uint&unsigned&idPg&
+			cible&int&int&cb&
 		}{
 			\fkey{idMotCle}{MotCle}\\
-			\unique{idCible, cible, idProg}
-		}
+			\unique{idProg, idCible, cible}
+		}[\bdd]
 		\&
 		\tableEntity{MotCle}{
 			nc&text&stringNotEmpty&nc&\\
 			nom&text&stringNotEmpty&nm&
 		}{
 			\fkey{id}{ArbreMotCle}\\
-		}
+			ArbreModifControle*
+		}[\bdd]
 		\&
-		\tableEntity{CibleMotCle}{
+		\tableEntity{MotCleCible}{
 			idMotCle&uint&idSup1&idMC&\\
 			idCible&uint&idSup1&idCb&\\
 			cible&int&int&cb&
 		}{
 			\fkey{idMotCle}{MotCle}\\
 			\unique{idMotCle, idCible, cible}
-		}\\
+		}[\bdd]\\
 		\hline\\
 	};
 	\lkeyArbre{MotCle}
 	\lkey{ArbreMotCle}{MotCle}
-	\lkey{MotCle}{PermissionMotCle}
-	\lkey{MotCle}{CibleMotCle}
-	\lkey{MotCle}{CibleMotCleProg}
-	\lkey{MotCle}{PermissionMotCleProg}  
+	\lkey{MotCle}{MotClePermission}
+	\lkey{MotCle}{MotCleCible}
+	\lkey{MotCle}{MotProgCible}
+	\lkey{MotCle}{MotProgPermission}  
 	\end{tikzpicture}
 	\subsection{Restriction et Version}
 	\subsubsection{ERD}
@@ -457,22 +467,23 @@
 			cible&int&int&cb&\\
 			code&uint&code&cd&	
 		}{
-			\unique{idCible,cible}
-		}
+			\unique{idCible,cible}\\
+			PermissionCode
+		}[\bdd]
 		\&
 		\tableEntity{Version}{
 			dateTime&dateTime&dtCurrent&dt&\\
 			num&int&intSup0&num&
 		}{
 			\unique{num}
-		}\\
+		}[\bdd]\\
 		\hline\\
 	};
 	\end{tikzpicture}
 	\subsection{Texte}
 	\subsubsection{ERD}
 	\begin{tikzpicture}[thick]
-	\matrix[ampersand replacement=\&,column sep =3cm, row sep =0.5cm]{
+	\matrix[ampersand replacement=\&,column sep =3cm, row sep =0.25cm]{
 		\entity{Texte}{
 			creation\\
 			modification\\
@@ -481,7 +492,7 @@
 		\&
 		\relationWithAttribut{ciblageTexte}{num}
 		\&
-		\entity{CibleTexte}{
+		\entity{TexteCible}{
 			idCible\\
 			cible\\
 			type\\
@@ -498,8 +509,8 @@
 		\hline\\
 	};
 	\lien{Texte}{ciblageTexte}{$0-N$}
-	\lien{ciblageTexte}{CibleTexte}{$1$}
-	\lien{Texte}{sourceTexte}{$0-N$}
+	\lien{ciblageTexte}{TexteCible}{$1$}
+	\lien{Texte}{sourceTexte}{$1-N$}
 	\lien{sourceTexte}{Source}{$0-N$}
 	\end{tikzpicture}
 	\subsubsection{Tables}
@@ -509,38 +520,40 @@
 			creation&dateTime&dtValide&crea&\\
 			modification&dateTime&dtCurrent&modif&\\
 			texte&text&string&txt&NULL
-		}{}
+		}{}[\bdd]
 		\&
-		\tableEntity{CibleTexte}{
+		\tableEntity{TexteCible}{
 			idTexte&uint&idSup1&idTxt&\\
 			idCible&uint&idSup1&idCb&\\
 			cible&int&int&cb&\\
 			dateTime&dateTime&dtCurrent&dt\\
-			type&uint&idSup1&tp&\\
-			num&int&intSup0&num&
+			num&int&intSup0&num&\\
+			type&uint&idSup1&tp&
 		}{
 			\fkey{idTexte}{Texte}\\
+			\fkey{type}{Type}*\\
 			\unique{idCible, cible, type, num}
-		}\\
+		}[\bdd]\\
 		\tableEntity{SourceTexte}{
-			idTexte&uint&idSup1&idTxt&\\
-			idSource&uint&idSup1&idSr&
+			idSource&uint&idSup1&idSr&\\
+			idTexte&uint&idSup1&idTxt&
 		}{
 			\fkey{idTexte}{Texte}\\
 			\fkey{idSource}{Source}\\
 			\unique{idTexte, idSource}
-		}
+		}[\bdd]
 		\&
 		\tableEntity{Source}{
 			nc&text&stringNotEmpty&nc&\\
 			nom&text&stringNotEmpty&nm&\\
 			type&uint&idSup1&tp	
 		}{
+			\fkey{type}{Type}*\\
 			\unique{nom}
-		}\\
+		}[\bdd]\\
 		\hline\\
 	};
-	\lkey{Texte}{CibleTexte}
+	\lkey{Texte}{TexteCible}
 	\lkey{Texte}{SourceTexte}
 	\lkey{Source}{SourceTexte}
 	\end{tikzpicture}
@@ -557,14 +570,14 @@
 		\&
 		\relation{controleType}
 		\&
-		\entity{PermissionType}{
+		\entity{TypePermission}{
 			cible\\
 			code
 		}\\
 		\hline\\
 	};
-	\lien{Type}{controleType}{$0-1$}
-	\lien{controleType}{PermissionType}{$1$}
+	\lien{Type}{controleType}{$0-N$}
+	\lien{controleType}{TypePermission}{$1$}
 	\lien{Type.north west}{parentType.west}{\begin{tabular}{c}fils\\$0-N$\end{tabular}}
 	\lien{Type.north east}{parentType.east}{\begin{tabular}{c}parent\\$0-1$\end{tabular}}
 	\end{tikzpicture}
@@ -581,21 +594,23 @@
 	}{
 		\fkey{parent}{Type}\\
 		\unique{idProg}\\
-		\unique{nom, parent}
+		\unique{nom, parent}\\
+		ArbreSimpleModifControle*
 		
-	}
+	}[\bdd]
 	\&
-	\tableEntity{PermissionType}{
+	\tableEntity{TypePermission}{
 		idType&uint&idSup1& idTp &\\
 		cible&int&int&cb&\\
 		code&uint&code& cd &
 	}{
 		\fkey{idType}{Type}\\
-		\unique{idType, cible}
-	}\\
+		\unique{idType, cible}\\
+		ModifControle
+	}[\bdd]\\
 	\hline\\
 };
-\lkey{Type}{PermissionType}
+\lkey{Type}{TypePermission}
 \lkeyloop{Type}
 \end{tikzpicture}
 \subsection{Calendrier}
@@ -1101,38 +1116,52 @@
 		code
 	}[below=0.75cm of typageControle]
 	
-	\arbreERD{Enonce}[below=4.85cm of Controle]
 	
-	\relation{obtenue}[below=0.65cm of Eleve]
 	
-	\relationWithAttribut{dansControle}{num}[right=1cm of Controle]
+	\relation{obtenue}[below=0.75cm of Eleve]
+	
+	\relationWithAttributs{dansControle}{numGroupe\\version}[right=1cm of Controle]
 	
 	\entity{Note}{
 		num\\
 		dateTime\\
 		code\\
 		valeur
-	}[below=0.65cm of obtenue]
-	\relation{auControle}[left=5.5cm of Note]
+	}[below=0.75cm of obtenue]
+
+	\relation{auControle}[left=5cm of Note]
+	
 	\relationWithAttributs{valide}{dateTime\\valeur}[below=1cm of Note]
-	\entity{Enonce}{
-		type\\
-		version
-	}[right=1.5cm of ArbreEnonce]
-	
-	
-	\relation{ventile}[right=1.5cm of Enonce]
-	\arbreERD{Bareme}[below=5cm of ventile]
 	
 	\entity{Point}{
-		num\\
 		type\\
 		valeur\\
 		version
-	}[right=1.75cm of ventile]
+	}[left=1.5cm of valide]
 	
-	\relation{priseEnCompte}[below=1.6cm of Point]
-	\entity{Bareme}{type\\valeur}[below=1.4cm of priseEnCompte]
+	\relation{priseEnCompte}[below=3cm of Point]
+	
+	\relationWithAttributs{ventile}{
+		num\\
+		numEpreuve}[left=1.5cm of Point]
+	
+	\arbreERD{Enonce}[below=5.5cm of ventile]
+	
+	\entity{Enonce}{
+		type\\
+		version
+	}[left=3cm of filiationEnonce]
+	
+	
+	\arbreERD{Bareme}[below=6.55cm of valide]
+	
+	\entity{Bareme}{type\\valeur}[below=3cm of priseEnCompte]
+	
+	\relation{sommetSujet}[above=2.5cm of Enonce]
+
+	\relation{sommetBareme}[left=9.5cm of Bareme]
+	
+	\entity{Epreuve}{version}[above=5cm of sommetBareme]
 	
 \lien{typageEtablissement}{TypeEtablissement}{$0-N$}
 \lien{typageEtablissement}{Etablissement}{$1$}
@@ -1165,14 +1194,14 @@
 \lien{Note}{auControle}{$1$}
 \lien{Note}{obtenue}{$1$}
 \lien{obtenue}{Eleve}{$0-N$}
-\lien{Enonce}{filiationEnonce.east}{$1$}
-\lien{Enonce}{dansControle}{$0-N$}
+\lien{Enonce}{filiationEnonce}{$1$}
+\lien{Epreuve}{dansControle}{$0-N$}
 \lien{Controle}{dansControle}{$0-N$}
 \lienArbreERD{Enonce}
 \lien{Point}{valide}{$0-N$}
 \lien{Note}{valide}{$0-N$}
 \lien{Enonce}{ventile}{$0-N$}
-\lien{Point}{ventile}{$1$}
+\lien{Point}{ventile}{$0-N$}
 \lienArbreERD{Bareme}
 \lien{Bareme}{filiationBareme}{$1$}
 \lien{Bareme}{priseEnCompte}{$0-1$}
@@ -1182,11 +1211,17 @@
 \lien{dansControle}{Classe}{$0-N$}
 \lien{TypeControle.north east}{filiationTypeControle.north}{\begin{tabular}{c}pere\\$0-1$\end{tabular}}
 \lien{TypeControle.south east}{filiationTypeControle.south}{\begin{tabular}{c}fils\\$0-N$\end{tabular}}  
+\lien{Epreuve}{sommetSujet}{$1$}
+\lien{sommetSujet}{Enonce}{$0-N$}  
+\lien{Enonce}{ventile}{$0-N$}
+\lien{sommetBareme}{Bareme}{$0-1$}
+\lien{sommetBareme}{Epreuve}{$1$} 
+\lien{ventile}{Epreuve}{$0-N$}
 \end{tikzpicture}
 \subsection{Tables}
 
 \begin{tikzpicture}[thick]
-\footnotesize
+\scriptsize
 
 	\tableEntity{TypeEtablissement}{
 		nc&text&stringNotEmpty&nc&\\
@@ -1200,7 +1235,7 @@
 		\fkey{idNiveau}{Niveau}\\
 		\fkey{idTpEtab}{TypeEtablissement}\\
 		\unique{idTpEtab, idNiveau}
-	}[right=.8cm of TypeEtablissement]
+	}[right=1.2cm of TypeEtablissement]
 	
 	\tableEntity{FiliationNiveau}{
 	idPrecedent&uint&idSup1&idP\\
@@ -1209,7 +1244,7 @@
 		\fkey{idPrecedent}{Niveau}\\
 		\fkey{idSuivant}{Niveau}\\
 		\unique{idPrecedent, idSuivant}
-	}[right=.8cm of NiveauTypeEtablissament]
+	}[right=1.2cm of NiveauTypeEtablissament]
 	
 	\tableEntity{Etablissement}{
 		idTpEtab&uint&idSup1&idTE\\
@@ -1326,7 +1361,8 @@
 		idEleve&uint&idSup1&idEl&NULL\\
 		idEnonce&uint&idSup1&idEn\\
 		idGroupe&uint&idSup1&idGr&NULL\\
-		num&int&intSup0&num
+		numGroupe&int&intSup1NULL&num&NULL\\
+		version&int&intSup0		
 	}{
 		\fkey{idClasse}{Classe}\\
 		\fkey{idControle}{Controle}\\

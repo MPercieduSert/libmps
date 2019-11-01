@@ -22,10 +22,10 @@ namespace bdd {
  * \brief Gestionnaire de la base de donnée pour les entités prédéfinie.
  *
  * Gestionnaire de la base de donnée pour les entités prédéfinie:
- *      - CibleCommentaire,
- *      - CibleDonnee,
- *      - CibleMotCle,
- *      - CibleTexte,
+ *      - CommentaireCible,
+ *      - DonneeCible,
+ *      - MotCleCible,
+ *      - TexteCible,
  *      - Commentaire,
  *      - Donnee,
  *      - DonneeCard,
@@ -35,7 +35,7 @@ namespace bdd {
  *      - Restriction,
  *      - Source,
  *      - Texte,
- *      - TexteSource,
+ *      - SourceTexte,
  *      - TypeEnt,
  *      - TypePermission,
  *      - Utilisation
@@ -121,25 +121,25 @@ template<class Ent> bool BddPredef::delSimple(idt id)
 
 template<class Ent> Ent BddPredef::getEntityInDonnee(idt idCible, int Cible, int num)
 {
-    CibleDonnee nature(Donnee::EntityNatureIdND,idCible,Cible,num);
+    DonneeCible nature(Donnee::EntityNatureIdND,idCible,Cible,num);
     if(!get(nature) || nature.valeur().toInt() == bdd::cibleId::Vide || nature.valeur().toInt() != cible<Ent>())
         return Ent();
 
     QPair<int,int> interval(intervalEntityInDonnee(idCible,Cible,num));
-    ListPtr<CibleDonnee> liste (getList<CibleDonnee>(QList<CibleDonnee::Position>()<<CibleDonnee::Num
-                                                     <<CibleDonnee::Num
-                                                     <<CibleDonnee::IdDonnee
-                                                     <<CibleDonnee::IdCible
-                                                     <<CibleDonnee::Cible,
+    ListPtr<DonneeCible> liste (getList<DonneeCible>(QList<DonneeCible::Position>()<<DonneeCible::Num
+                                                     <<DonneeCible::Num
+                                                     <<DonneeCible::IdDonnee
+                                                     <<DonneeCible::IdCible
+                                                     <<DonneeCible::Cible,
                                                      QList<QVariant>()<<interval.first
                                                      <<interval.second
                                                      <<Donnee::EntityIdND
                                                      <<idCible
                                                      <<Cible,
-                                                     QList<CibleDonnee::Position>()<<CibleDonnee::Num,
+                                                     QList<DonneeCible::Position>()<<DonneeCible::Num,
                                                      QList<bdd::Condition>()<<bdd::SupEgal<<bdd::Inf));
     Ent entity;
-    ListPtr<CibleDonnee>::iterator j = liste.begin();
+    ListPtr<DonneeCible>::iterator j = liste.begin();
     for(int i = 0; i != Ent::NbrAtt; ++i, ++j)
         entity.setData((*j).valeur(),i);
     return entity;
@@ -150,7 +150,7 @@ template<class Ent> void BddPredef::setEntityInDonnee(const Ent & entity, idt id
     if(num < 0)
         throw std::invalid_argument("L'argument num doit être positif");
 
-    CibleDonnee nature(Donnee::EntityNatureIdND, idCible, Cible, num);
+    DonneeCible nature(Donnee::EntityNatureIdND, idCible, Cible, num);
     if(get(nature))
     {
         if(nature.valeur().toInt() != cible<Ent>())
@@ -159,18 +159,18 @@ template<class Ent> void BddPredef::setEntityInDonnee(const Ent & entity, idt id
             int offset(Ent::NbrAtt - (intervalOld.second - intervalOld.first));
             if(offset != 0)
             {
-                ListPtr<CibleDonnee> liste (getList<CibleDonnee>(QList<CibleDonnee::Position>()<<CibleDonnee::Num
-                                                                 <<CibleDonnee::IdDonnee
-                                                                 <<CibleDonnee::IdCible
-                                                                 <<CibleDonnee::Cible,
+                ListPtr<DonneeCible> liste (getList<DonneeCible>(QList<DonneeCible::Position>()<<DonneeCible::Num
+                                                                 <<DonneeCible::IdDonnee
+                                                                 <<DonneeCible::IdCible
+                                                                 <<DonneeCible::Cible,
                                                                  QList<QVariant>()<<intervalOld.second
                                                                  <<Donnee::EntityIdND
                                                                  <<idCible
                                                                  <<Cible,
-                                                                 QList<CibleDonnee::Position>()<<CibleDonnee::Num,
+                                                                 QList<DonneeCible::Position>()<<DonneeCible::Num,
                                                                  QList<bdd::Condition>()<<bdd::SupEgal,
                                                                  QList<bool>()<< (offset < 0)));
-                for(ListPtr<CibleDonnee>::iterator i = liste.begin(); i != liste.end(); ++i)
+                for(ListPtr<DonneeCible>::iterator i = liste.begin(); i != liste.end(); ++i)
                 {
                     (*i).setNum((*i).num() + offset);
                     save(*i);
@@ -184,7 +184,7 @@ template<class Ent> void BddPredef::setEntityInDonnee(const Ent & entity, idt id
     {
         if(num != 0)
         {
-            CibleDonnee natureNumPrec(Donnee::EntityNatureIdND, idCible, Cible, num - 1);
+            DonneeCible natureNumPrec(Donnee::EntityNatureIdND, idCible, Cible, num - 1);
             natureNumPrec.setValeur(bdd::cibleId::Vide);
             while(natureNumPrec.num() >= 0 && !existsUnique(natureNumPrec))
             {
@@ -197,7 +197,7 @@ template<class Ent> void BddPredef::setEntityInDonnee(const Ent & entity, idt id
     }
 
     QPair<int, int> interval(intervalEntityInDonnee(idCible,Cible,num));
-    CibleDonnee cd;
+    DonneeCible cd;
     cd.setId1(Donnee::EntityIdND);
     cd.setIdCible(idCible);
     cd.setCible(Cible);

@@ -62,7 +62,12 @@ public:
     AbstractManager * get(int id) const
     {
         if(id >= 0 and id < m_nbrEntity)
-            return m_managers[id];
+        {
+            if(m_managers[id])
+                return m_managers[id];
+            else
+                throw std::invalid_argument(QString("Manager non initialisé: id : ").append(QString::number(id)).toStdString());
+        }
         else
             throw std::invalid_argument("Identifiant d'entité invalide dans la fonction get.");
     }

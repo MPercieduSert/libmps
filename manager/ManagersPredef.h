@@ -4,9 +4,9 @@
 #ifndef MANAGERSPREDEF_H
 #define MANAGERSPREDEF_H
 
-#include "ManagerOfArbreModifControle.h"
-#include "ManagerOfArbreSimpleModifControle.h"
-#include "ManagerOfModifControlePermission.h"
+#include "ManagerArbreModifControle.h"
+#include "ManagerArbreSimpleModifControle.h"
+#include "ManagerPermissionModifControle.h"
 #include "Managers.h"
 #include "EntityPredef.h"
 
@@ -25,20 +25,22 @@ namespace bdd {
               Variant = -9};
 
         //! Numéro de cible des entités prédéfinies.
-        enum EntityPredef{CibleCommentaire,
-                          CibleDonnee,
-                          CibleMotCle,
-                          CibleTexte,
-                          Commentaire,
+        enum EntityPredef{Commentaire,
+                          CommentaireCible,
                           Donnee,
                           DonneeCard,
+                          DonneeCible,
                           Historique,
                           MotCle,
+                          MotCleCible,
                           MotClePermission,
+                          MotProgCible,
+                          MotProgPermission,
                           Restriction,
                           Source,
                           Texte,
-                          TexteSource,
+                          TexteCible,
+                          SourceTexte,
                           Type,
                           TypePermission,
                           Utilisation,
@@ -131,16 +133,18 @@ protected:
     //! Mise en place de la prise en charge des donnees.
     void enableDonnee(const QString & donnee, const QString & arbreDonnee, const QString & cibleDonnee, const QString & cardDonnee,
                       AbstractGestionAutorisation<Donnee> * gestionDonnee = nullptr,
-                      AbstractGestionAutorisation<CibleDonnee> * gestionCilbeDonnee = nullptr,
+                      AbstractGestionAutorisation<DonneeCible> * gestionCilbeDonnee = nullptr,
                       AbstractGestionAutorisation<DonneeCard> * gestionCardDonnee = nullptr);
 
     //! Mise en place de la prise en charge des historiques.
     void enableHistorique(const QString & historique);
 
     //! Mise en place de la prise en charge des mots Clé.
-    void enableMotCle(const QString & motCle, const QString & motCleArbre, const QString & cibleMotCle,const QString & permissionMotCle,
+    void enableMotCle(const QString & motCle, const QString & motCleArbre, const QString & cibleMotCle,
+                      const QString & cibleProg, const QString & permissionMotCle, const QString & permissionProg,
                       AbstractGestionAutorisation<MotCle> * gestionMotCle = nullptr,
-                      AbstractGestionAutorisation<MotClePermission> * gestionPermission = nullptr);
+                      AbstractGestionAutorisation<MotClePermission> * gestionPermission = nullptr,
+                      AbstractGestionAutorisation<MotProgPermission> * gestionProgPermission = nullptr);
 
     //! Mise en place de la prise en charge des restrictions de modification.
     void enableRestriction(const QString & restrictModification);
@@ -163,6 +167,9 @@ protected:
         m_cibleArray[Ent::ID] = cible;
         m_cibleNbrAttArray[cible] = Ent::NbrAtt;
     }
+
+    //! Si les types sont pris en charge, déclare l'attribut type comme clé étrangère sur la table Type.
+    template<class Ent> void setTypeForeignKey(InfoBdd & info);
 };
 
 template<> inline int ManagersPredef::cible<int>() const
@@ -188,18 +195,24 @@ template<> inline int ManagersPredef::cible<QDateTime>() const
 
 template<> inline int ManagersPredef::cible<QVariant>() const
     {return bdd::cibleId::Variant;}
+
+template<class Ent> void ManagersPredef::setTypeForeignKey(InfoBdd & info)
+{
+    if(typeIsEnabled())
+        info.setForeignKey(Ent::Type,get(Type::ID)->info());
+}
 /*
-template<> inline int ManagersPredef::cible<CibleCommentaire>() const
-    {return bdd::cibleId::CibleCommentaire;}
+template<> inline int ManagersPredef::cible<CommentaireCible>() const
+    {return bdd::cibleId::CommentaireCible;}
 
-template<> inline int ManagersPredef::cible<CibleDonnee>() const
-    {return bdd::cibleId::CibleDonnee;}
+template<> inline int ManagersPredef::cible<DonneeCible>() const
+    {return bdd::cibleId::DonneeCible;}
 
-template<> inline int ManagersPredef::cible<CibleMotCle>() const
-    {return bdd::cibleId::CibleMotCle;}
+template<> inline int ManagersPredef::cible<MotCleCible>() const
+    {return bdd::cibleId::MotCleCible;}
 
-template<> inline int ManagersPredef::cible<CibleTexte>() const
-    {return bdd::cibleId::CibleTexte;}
+template<> inline int ManagersPredef::cible<TexteCible>() const
+    {return bdd::cibleId::TexteCible;}
 
 template<> inline int ManagersPredef::cible<Commentaire>() const
     {return bdd::cibleId::Commentaire;}
@@ -228,8 +241,8 @@ template<> inline int ManagersPredef::cible<Source>() const
 template<> inline int ManagersPredef::cible<Texte>() const
     {return bdd::cibleId::Texte;}
 
-template<> inline int ManagersPredef::cible<TexteSource>() const
-    {return bdd::cibleId::TexteSource;}
+template<> inline int ManagersPredef::cible<SourceTexte>() const
+    {return bdd::cibleId::SourceTexte;}
 
 template<> inline int ManagersPredef::cible<Type>() const
     {return bdd::cibleId::Type;}

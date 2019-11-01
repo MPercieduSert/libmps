@@ -1,17 +1,17 @@
 /*Auteur: PERCIE DU SERT Maxime
  *Date: 05/08/2018
  */
-#ifndef MANAGEROFARBRESIMPLE_H
-#define MANAGEROFARBRESIMPLE_H
+#ifndef MANAGERARBRESIMPLE_H
+#define MANAGERARBRESIMPLE_H
 
-#include "ManagerOfArbre.h"
+#include "ManagerArbre.h"
 #include "ManagerSql.h"
 #include "Tree.h"
 
 /*! \ingroup groupeManager
  * \brief Classe template mère des différents manageurs pour les entités de type arbreSimple.
  */
-template<class Ent> class ManagerOfArbreSimple : public virtual ManagerSql<Ent>
+template<class Ent> class ManagerArbreSimple : public virtual ManagerSql<Ent>
 {
 protected:
     using ManagerSqlEnt = ManagerSql<Ent>;
@@ -38,7 +38,7 @@ public:
     using ManagerSqlEnt::save;
 
     //! Destructeur.
-    ~ManagerOfArbreSimple() override = default;
+    ~ManagerArbreSimple() override = default;
 
     //! Supprime de la base de donnée le noeud d'identifiant id ainsi que tous ses déscendants (opération stable).
     bool del(idt id) override;
@@ -135,7 +135,7 @@ protected:
     void saveWithoutDelete(TreeItem<Ent> * tree);
 };
 
-template<class Ent> bool ManagerOfArbreSimple<Ent>::del(idt id)
+template<class Ent> bool ManagerArbreSimple<Ent>::del(idt id)
 {
     if(!exists(Ent::Parent,id))
         return ManagerSqlEnt::del(id);
@@ -151,7 +151,7 @@ template<class Ent> bool ManagerOfArbreSimple<Ent>::del(idt id)
         return false;*/
 }
 
-template<class Ent> void ManagerOfArbreSimple<Ent>::deleteLeafOutOf(TreeItem<Ent> * tree)
+template<class Ent> void ManagerArbreSimple<Ent>::deleteLeafOutOf(TreeItem<Ent> * tree)
 {
     if(tree->hasChild())
     {
@@ -175,7 +175,7 @@ template<class Ent> void ManagerOfArbreSimple<Ent>::deleteLeafOutOf(TreeItem<Ent
     }
 }
 
-template<class Ent> void ManagerOfArbreSimple<Ent>::getArbreRec(TreeItem<Ent> * tree)
+template<class Ent> void ManagerArbreSimple<Ent>::getArbreRec(TreeItem<Ent> * tree)
 {
     ListPtr<Ent> childs = getList(Ent::Parent,tree->data().id(),Ent::Ordre);
     if(!childs.isEmpty())
@@ -189,7 +189,7 @@ template<class Ent> void ManagerOfArbreSimple<Ent>::getArbreRec(TreeItem<Ent> * 
     }
 }
 
-template<class Ent> void ManagerOfArbreSimple<Ent>::save(Tree<Ent> & tree, bdd::TreeSave n)
+template<class Ent> void ManagerArbreSimple<Ent>::save(Tree<Ent> & tree, bdd::TreeSave n)
 {
     using namespace bdd;
     if(n == TreeSave::EntityOnly)
@@ -231,7 +231,7 @@ template<class Ent> void ManagerOfArbreSimple<Ent>::save(Tree<Ent> & tree, bdd::
     }
 }
 
-template<class Ent> void ManagerOfArbreSimple<Ent>::saveWithoutDelete(TreeItem<Ent> * tree)
+template<class Ent> void ManagerArbreSimple<Ent>::saveWithoutDelete(TreeItem<Ent> * tree)
 {
     for(typename QList<TreeItem<Ent>*>::const_iterator child = tree->childs().cbegin(); child != tree->childs().cend(); ++child)
     {
@@ -241,4 +241,4 @@ template<class Ent> void ManagerOfArbreSimple<Ent>::saveWithoutDelete(TreeItem<E
             saveWithoutDelete(*child);
     }
 }
-#endif // MANAGEROFARBRESIMPLE_H
+#endif // MANAGERARBRESIMPLE_H

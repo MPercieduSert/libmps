@@ -1,58 +1,58 @@
 /*Auteur: PERCIE DU SERT Maxime
  *Date: 14/08/2017
  */
-#ifndef MANAGEROFARBRESIMPLEMODIFCONTROLE_H
-#define MANAGEROFARBRESIMPLEMODIFCONTROLE_H
+#ifndef MANAGERARBRESIMPLEMODIFCONTROLE_H
+#define MANAGERARBRESIMPLEMODIFCONTROLE_H
 
-#include "ManagerOfModifControle.h"
-#include "ManagerOfArbreSimple.h"
+#include "ManagerModifControle.h"
+#include "ManagerArbreSimple.h"
 
 /*! \ingroup groupeManager
  * \brief Classe template mère des différents manageurs pour les entités de type arbre simple avec un controle de modification.
  */
-template<class Ent> class ManagerOfArbreSimpleModifControle : public ManagerOfArbreSimple<Ent>,
+template<class Ent> class ManagerArbreSimpleModifControle : public ManagerArbreSimple<Ent>,
                                                                       public ManagerOfModifControle<Ent>
 {
 protected:
-    using ManagerArbreEnt = ManagerOfArbreSimple<Ent>;
+    using ManagerForArbreEnt = ManagerArbreSimple<Ent>;
     using ManagerMC = ManagerOfModifControle<Ent>;
 
     using ManagerMC::modify;
 
 public:
-    using ManagerArbreEnt::get;
+    using ManagerForArbreEnt::get;
     using ManagerMC::save;
     using ManagerMC::getAutorisation;
 
     //! Constructeur.
-    ManagerOfArbreSimpleModifControle(const InfoBdd & info,
+    ManagerArbreSimpleModifControle(const InfoBdd & info,
                                       AbstractGestionAutorisation<Ent> * gestionAutorisation
                                                         = new GestionAutorisationNoRestrictif<Ent>(),
                                       AbstractUniqueSqlTemp<Ent> * unique = new NoUniqueSql<Ent>())
-        : ManagerSql<Ent>(info,unique), ManagerOfArbreSimple<Ent> (info, unique),
+        : ManagerSql<Ent>(info,unique), ManagerArbreSimple<Ent> (info, unique),
           ManagerOfModifControle<Ent>(info, gestionAutorisation, unique)
     {}
 
     //! Destructeur.
-    ~ManagerOfArbreSimpleModifControle() override = default;
+    ~ManagerArbreSimpleModifControle() override = default;
 
     /*//! Supprime de la table en base de donnée l'entité d'identifiant id.
     bool del(idt id) override
-        {return getAutorisation(Ent(id), bdd::Suppr) && ManagerArbreEnt::del(id);}*/
+        {return getAutorisation(Ent(id), bdd::Suppr) && ManagerForArbreEnt::del(id);}*/
 
     //! Enregistre l'entité entity en base de donnée.
     void save(Ent & entity) override
-        {ManagerArbreEnt::save(entity);}
+        {ManagerForArbreEnt::save(entity);}
 
     //! Enregistre l'entité entity en base de donnée.
     void save(const Ent & entity) override
-        {ManagerArbreEnt::save(entity);}
+        {ManagerForArbreEnt::save(entity);}
 
 protected:
     /*//! Constructeur.
-    ManagerOfArbreSimpleModifControle(AbstractGestionAutorisation<Ent> *gestionAutorisation)
+    ManagerArbreSimpleModifControle(AbstractGestionAutorisation<Ent> *gestionAutorisation)
         : ManagerOfModifControle<Ent>(gestionAutorisation)
     {}*/
 };
 
-#endif // MANAGEROFARBRESIMPLEMODIFCONTROLE_H
+#endif // MANAGERARBRESIMPLEMODIFCONTROLE_H

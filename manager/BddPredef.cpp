@@ -1,14 +1,14 @@
 #include "BddPredef.h"
 
 template<> bool BddPredef::del<Commentaire>(idt id)
-    {return delList(getList<CibleCommentaire>(CibleCommentaire::IdCommentaire,id)) && delSimple<Commentaire>(id);}
+    {return delList(getList<CommentaireCible>(CommentaireCible::IdCommentaire,id)) && delSimple<Commentaire>(id);}
 
 template<> bool BddPredef::del<Donnee>(idt id)
 {
     return foreachBeginChild<Donnee>(id,
                                      [this](idt id)->bool
     {
-            return delList(getList<CibleDonnee>(CibleDonnee::IdDonnee,id))
+            return delList(getList<DonneeCible>(DonneeCible::IdDonnee,id))
                     && delList(getList<DonneeCard>(DonneeCard::IdDonnee,id))
                     && delSimple<Donnee>(id);
     }
@@ -20,7 +20,7 @@ template<> bool BddPredef::del<MotCle>(idt id)
     return foreachBeginChild<MotCle>(id,
                                      [this](idt id)->bool
     {
-            return delList(getList<CibleMotCle>(CibleMotCle::IdMotCle,id))
+            return delList(getList<MotCleCible>(MotCleCible::IdMotCle,id))
                     && delList(getList<MotClePermission>(MotClePermission::IdMotCle,id))
                     && delSimple<MotCle>(id);
     }
@@ -28,11 +28,11 @@ template<> bool BddPredef::del<MotCle>(idt id)
 }
 
 template<> bool BddPredef::del<Source>(idt id)
-    {return delList(getList<TexteSource>(TexteSource::IdSource,id)) && delSimple<Source>(id);}
+    {return delList(getList<SourceTexte>(SourceTexte::IdSource,id)) && delSimple<Source>(id);}
 
 template<> bool BddPredef::del<Texte>(idt id)
-    {return delList(getList<TexteSource>(TexteSource::IdTexte,id))
-            && delList(getList<CibleTexte>(CibleTexte::IdTexte,id))
+    {return delList(getList<SourceTexte>(SourceTexte::IdTexte,id))
+            && delList(getList<TexteCible>(TexteCible::IdTexte,id))
             && delSimple<Texte>(id);}
 
 /*template<> bool BddPredef::del<TypeEnt>(idt id)
@@ -48,10 +48,10 @@ template<> bool BddPredef::del<Texte>(idt id)
 
 bool BddPredef::delCible(idt idCible, int cible)
 {
-    return (!managers()->commentaireIsEnabled() || delList(getList<CibleCommentaire>(CibleCommentaire::Cible,cible,CibleCommentaire::IdCible,idCible)))
-            && (!managers()->donneeIsEnabled() || delList(getList<CibleDonnee>(CibleDonnee::Cible,cible,CibleDonnee::IdCible,idCible)))
-            && (!managers()->motCleIsEnabled() || delList(getList<CibleMotCle>(CibleMotCle::Cible,cible,CibleMotCle::IdCible,idCible)))
-            && (!managers()->texteIsEnabled()|| delList(getList<CibleTexte>(CibleTexte::Cible,cible,CibleTexte::IdCible,idCible)))
+    return (!managers()->commentaireIsEnabled() || delList(getList<CommentaireCible>(CommentaireCible::Cible,cible,CommentaireCible::IdCible,idCible)))
+            && (!managers()->donneeIsEnabled() || delList(getList<DonneeCible>(DonneeCible::Cible,cible,DonneeCible::IdCible,idCible)))
+            && (!managers()->motCleIsEnabled() || delList(getList<MotCleCible>(MotCleCible::Cible,cible,MotCleCible::IdCible,idCible)))
+            && (!managers()->texteIsEnabled()|| delList(getList<TexteCible>(TexteCible::Cible,cible,TexteCible::IdCible,idCible)))
             && (!managers()->restrictionModificationIsEnabled() || delList(getList<Restriction>(Restriction::Cible,
                                                                cible,Restriction::IdCible)))
             && (!managers()->historiqueIsEnabled() || (delList(getList<Historique>(Historique::Cible,cible,Historique::IdCible))
@@ -65,35 +65,35 @@ void BddPredef::delEntityInDonnee(idt idCible, int cible, int num)
     if(num < 0)
         throw std::invalid_argument("L'argument num doit être positif");
 
-    CibleDonnee nature(Donnee::EntityNatureIdND, idCible, cible, num);
+    DonneeCible nature(Donnee::EntityNatureIdND, idCible, cible, num);
     if(get(nature))
     {
         if(nature.valeur().toInt() != bdd::cibleId::Vide)
         {
             QPair<int, int> interval(intervalEntityInDonnee(idCible,cible,num));
-            delList(getList<CibleDonnee>(QList<CibleDonnee::Position>()<<CibleDonnee::Num
-                                                                 <<CibleDonnee::Num
-                                                                 <<CibleDonnee::IdDonnee
-                                                                 <<CibleDonnee::IdCible
-                                                                 <<CibleDonnee::Cible,
+            delList(getList<DonneeCible>(QList<DonneeCible::Position>()<<DonneeCible::Num
+                                                                 <<DonneeCible::Num
+                                                                 <<DonneeCible::IdDonnee
+                                                                 <<DonneeCible::IdCible
+                                                                 <<DonneeCible::Cible,
                                                                  QList<QVariant>()<<interval.first
                                                                  <<interval.second
                                                                  <<Donnee::EntityIdND
                                                                  <<idCible
                                                                  <<cible,
-                                                                 QList<CibleDonnee::Position>()<<CibleDonnee::Num,
+                                                                 QList<DonneeCible::Position>()<<DonneeCible::Num,
                                                                  QList<bdd::Condition>()<<bdd::SupEgal<<bdd::Inf));
-            ListPtr<CibleDonnee> liste (getList<CibleDonnee>(QList<CibleDonnee::Position>()<<CibleDonnee::Num
-                                                             <<CibleDonnee::IdDonnee
-                                                             <<CibleDonnee::IdCible
-                                                             <<CibleDonnee::Cible,
+            ListPtr<DonneeCible> liste (getList<DonneeCible>(QList<DonneeCible::Position>()<<DonneeCible::Num
+                                                             <<DonneeCible::IdDonnee
+                                                             <<DonneeCible::IdCible
+                                                             <<DonneeCible::Cible,
                                                              QList<QVariant>()<<interval.second
                                                              <<Donnee::EntityIdND
                                                              <<idCible
                                                              <<cible,
-                                                             QList<CibleDonnee::Position>()<<CibleDonnee::Num,
+                                                             QList<DonneeCible::Position>()<<DonneeCible::Num,
                                                              QList<bdd::Condition>()<<bdd::SupEgal));
-            for(ListPtr<CibleDonnee>::iterator i = liste.begin(); i != liste.end(); ++i)
+            for(ListPtr<DonneeCible>::iterator i = liste.begin(); i != liste.end(); ++i)
             {
                 (*i).setNum((*i).num() - (interval.second - interval.first));
                 save(*i);
@@ -114,15 +114,15 @@ QPair<int, int> BddPredef::intervalEntityInDonnee(idt idCible, int cible, int nu
 {
     if(num < 0)
         return QPair<int, int>(-1,-1);
-    ListPtr<CibleDonnee> listeNum (getList<CibleDonnee>(QList<CibleDonnee::Position>()<<CibleDonnee::Num
-                                                         <<CibleDonnee::IdDonnee
-                                                         <<CibleDonnee::IdCible
-                                                         <<CibleDonnee::Cible,
+    ListPtr<DonneeCible> listeNum (getList<DonneeCible>(QList<DonneeCible::Position>()<<DonneeCible::Num
+                                                         <<DonneeCible::IdDonnee
+                                                         <<DonneeCible::IdCible
+                                                         <<DonneeCible::Cible,
                                                          QList<QVariant>()<<num
                                                          <<Donnee::EntityNatureIdND
                                                          <<idCible
                                                          <<cible,
-                                                         QList<CibleDonnee::Position>()<<CibleDonnee::Num,
+                                                         QList<DonneeCible::Position>()<<DonneeCible::Num,
                                                          QList<bdd::Condition>()<<bdd::InfEgal));
     QPair<int, int> interval(0,0);
     for(auto i = listeNum.begin(); i != listeNum.end(); ++i)
@@ -141,13 +141,13 @@ void BddPredef::listeMiseAJourBdd(int version)
         if(managers()->commentaireIsEnabled())
         {
             creerTable<Commentaire>();
-            creerTable<CibleCommentaire>();
+            creerTable<CommentaireCible>();
         }
         //Donnee
         if(managers()->donneeIsEnabled())
         {
             creerTable<Donnee>();
-            creerTable<CibleDonnee>();
+            creerTable<DonneeCible>();
             creerTable<DonneeCard>();
         }
         //Historique
@@ -157,7 +157,7 @@ void BddPredef::listeMiseAJourBdd(int version)
         if(managers()->motCleIsEnabled())
         {
             creerTable<MotCle>();
-            creerTable<CibleMotCle>();
+            creerTable<MotCleCible>();
             creerTable<MotClePermission>();
         }
         //Restriction Modification
@@ -167,9 +167,9 @@ void BddPredef::listeMiseAJourBdd(int version)
         if(managers()->texteIsEnabled())
         {
             creerTable<Texte>();
-            creerTable<CibleTexte>();
+            creerTable<TexteCible>();
             creerTable<Source>();
-            creerTable<TexteSource>();
+            creerTable<SourceTexte>();
         }
         //Type
         if(managers()->typeIsEnabled())

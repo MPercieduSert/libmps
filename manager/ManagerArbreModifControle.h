@@ -1,47 +1,47 @@
 /*Auteur: PERCIE DU SERT Maxime
  *Date: 04/08/2018
  */
-#ifndef MANAGEROFARBREMODIFCONTROLE_H
-#define MANAGEROFARBREMODIFCONTROLE_H
+#ifndef MANAGERARBREMODIFCONTROLE_H
+#define MANAGERARBREMODIFCONTROLE_H
 
-#include "ManagerOfModifControle.h"
-#include "ManagerOfArbre.h"
+#include "ManagerModifControle.h"
+#include "ManagerArbre.h"
 
 /*! \ingroup groupeManager
  * \brief Classe template mère des différents manageurs pour les entités de type arbre avec un controle de modification.
  */
-template<class Ent> class ManagerOfArbreModifControle : public ManagerOfArbre<Ent>,
+template<class Ent> class ManagerArbreModifControle : public ManagerArbre<Ent>,
                                                         public ManagerOfModifControle<Ent>
 {
 protected:
-    using ManagerArbreEnt = ManagerOfArbre<Ent>;
+    using ManagerForArbreEnt = ManagerArbre<Ent>;
     using ManagerMC = ManagerOfModifControle<Ent>;
 
-    using ManagerArbreEnt::add;
+    using ManagerForArbreEnt::add;
     using ManagerMC::fermer;
     using ManagerMC::modify;
     using ManagerMC::ouvrir;
 
 public:
-    using ManagerArbreEnt::del;
-    using ManagerArbreEnt::get;
-    using ManagerArbreEnt::save;
+    using ManagerForArbreEnt::del;
+    using ManagerForArbreEnt::get;
+    using ManagerForArbreEnt::save;
     using ManagerMC::getAutorisation;
     using ManagerMC::getRestriction;
     using ManagerMC::setAutorisation;
     using ManagerMC::setRestriction;
 
     //! Constructeur.
-    ManagerOfArbreModifControle(const InfoBdd & info, const InfoBdd & infoArbre,
+    ManagerArbreModifControle(const InfoBdd & info, const InfoBdd & infoArbre,
                                 AbstractGestionAutorisation<Ent> * gestionAutorisation = new GestionAutorisationNoRestrictif<Ent>(),
                                 AbstractUniqueSqlTemp<Ent> * unique = new NoUniqueSql<Ent>());
 
     //! Destructeur.
-    ~ManagerOfArbreModifControle() override = default;
+    ~ManagerArbreModifControle() override = default;
 
     /*//! Supprime de la table en base de donnée l'entité d'identifiant id.
     bool del(idt id)
-        {return getAutorisation(Ent(id), bdd::Suppr) && ManagerArbreEnt::del(id);}*/
+        {return getAutorisation(Ent(id), bdd::Suppr) && ManagerForArbreEnt::del(id);}*/
 
     //! Enregistre l'entité entity en base de donnée ainsi que sa nouvelle autorisation de modification.
     void save(Ent & entity, bdd::Autorisation autorisation, bool bb = false) override
@@ -90,20 +90,20 @@ public:
 
 protected:
     //! Constructeur.
-    ManagerOfArbreModifControle(const InfoBdd & InfoArbre,
+    ManagerArbreModifControle(const InfoBdd & InfoArbre,
                                 AbstractGestionAutorisation<Ent> * gestionAutorisation = new GestionAutorisationNoRestrictif<Ent>());
 };
 
-template<class Ent> ManagerOfArbreModifControle<Ent>::ManagerOfArbreModifControle(const InfoBdd & info, const InfoBdd & infoArbre,
+template<class Ent> ManagerArbreModifControle<Ent>::ManagerArbreModifControle(const InfoBdd & info, const InfoBdd & infoArbre,
                                                                                   AbstractGestionAutorisation<Ent> * gestionAutorisation,
                                                                                   AbstractUniqueSqlTemp<Ent> * unique)
-    : ManagerSql<Ent>(info,unique), ManagerOfArbre<Ent>(info, infoArbre, unique),
+    : ManagerSql<Ent>(info,unique), ManagerArbre<Ent>(info, infoArbre, unique),
       ManagerOfModifControle<Ent>(info, gestionAutorisation, unique)
     {}
 
-template<class Ent> ManagerOfArbreModifControle<Ent>::ManagerOfArbreModifControle(const InfoBdd & infoArbre,
+template<class Ent> ManagerArbreModifControle<Ent>::ManagerArbreModifControle(const InfoBdd & infoArbre,
                                                                                   AbstractGestionAutorisation<Ent> * gestionAutorisation)
-    : ManagerOfArbre<Ent>(infoArbre), ManagerOfModifControle<Ent>(gestionAutorisation)
+    : ManagerArbre<Ent>(infoArbre), ManagerOfModifControle<Ent>(gestionAutorisation)
     {}
 
-#endif // MANAGEROFARBREMODIFCONTROLE_H
+#endif // MANAGERARBREMODIFCONTROLE_H

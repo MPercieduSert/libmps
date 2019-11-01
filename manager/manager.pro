@@ -33,19 +33,19 @@ SOURCES += \
     GestionAutorisationCible.cpp \
     InfoBdd.cpp \
     InfoBddBase.cpp \
-    ManagerArbre.cpp \
-    ManagerOfArbre.cpp \
-    ManagerOfArbreModifControle.cpp \
-    ManagerOfArbreSimple.cpp \
-    ManagerOfArbreSimpleModifControle.cpp \
-    ManagerOfModifControle.cpp \
-    ManagerOfModifControlePermission.cpp \
-    ManagerOfPermission.cpp \
+    ManagerForArbre.cpp \
     Managers.cpp \
     ManagersPredef.cpp \
     ManagerSql.cpp \
     ReqSql.cpp \
-    UniqueSqlBase.cpp
+    UniqueSqlBase.cpp \
+    ManagerArbre.cpp \
+    ManagerArbreModifControle.cpp \
+    ManagerArbreSimple.cpp \
+    ManagerArbreSimpleModifControle.cpp \
+    ManagerModifControle.cpp \
+    ManagerPermission.cpp \
+    ManagerPermissionModifControle.cpp
 
 HEADERS += \
     AbstractGestionAutorisation.h \
@@ -57,19 +57,19 @@ HEADERS += \
     GestionAutorisationCible.h \
     InfoBdd.h \
     InfoBddBase.h \
-    ManagerArbre.h \
-    ManagerOfArbre.h \
-    ManagerOfArbreModifControle.h \
-    ManagerOfArbreSimple.h \
-    ManagerOfArbreSimpleModifControle.h \
-    ManagerOfModifControle.h \
-    ManagerOfModifControlePermission.h \
-    ManagerOfPermission.h \
+    ManagerForArbre.h \
     Managers.h \
     ManagersPredef.h \
     ManagerSql.h \
     ReqSql.h \
-    UniqueSqlBase.h
+    UniqueSqlBase.h \
+    ManagerArbre.h \
+    ManagerArbreModifControle.h \
+    ManagerArbreSimple.h \
+    ManagerArbreSimpleModifControle.h \
+    ManagerModifControle.h \
+    ManagerPermission.h \
+    ManagerPermissionModifControle.h
 unix {
     target.path = /usr/lib
     INSTALLS += target

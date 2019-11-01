@@ -19,7 +19,7 @@ protected:
     BddPredef * m_bdd;          //!< Pointeur vers la base de donnée.
     const int m_cible;          //!< Numero de cible du type d'entité pour les quels on souhaite gérer les mots clés.
     QSet<int> m_idSet;          //!< Ensemble des identifiants des entités dont les mots clés sont affichés.
-    QMap<int,bool> m_idMotCle;  //!< Map dont les clés sont les identifiants des mots clés associés aux entités d'identifiant contenus dans m_idSet et de valeur true si le mot clé est associé à toutes les entités dont les identifiants sont contenus dans m_idSet et false sinon..
+    QMap<idt,bool> m_idMotCle;  //!< Map dont les clés sont les identifiants des mots clés associés aux entités d'identifiant contenus dans m_idSet et de valeur true si le mot clé est associé à toutes les entités dont les identifiants sont contenus dans m_idSet et false sinon..
 
 public:
     enum ColumnIndex{CheckColumn, NomColumn, NbrColumn, Aucun};

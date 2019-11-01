@@ -10,20 +10,20 @@ void ManagersPredef::enableCommentaire(const QString & commentaire, const QStrin
     setManager(new ManagerSql<Commentaire>(infoCommentaire));
     setCible<Commentaire>(bdd::cibleId::Commentaire);
 
-    //CibleCommentaire
-    using Unique = CibleSimpleNumUniqueSql<CibleCommentaire>;
-    InfoBdd infoCibleCom(cibleCommentaire,CibleCommentaire::NbrAtt,{Unique::NbrUnique});
-    infoCibleCom.setAttribut(CibleCommentaire::IdCommentaire,"idCm");
-    infoCibleCom.setAttribut(CibleCommentaire::IdCible,"idCb");
-    infoCibleCom.setAttribut(CibleCommentaire::Cible,"cb");
-    infoCibleCom.setAttribut(CibleCommentaire::DateTime,"dt",bdd::TypeAttributBdd::DateTime);
-    infoCibleCom.setAttribut(CibleCommentaire::Num,"num");
-    infoCibleCom.setUnique(CibleCommentaire::IdCible,Unique::IdCibleUnique);
-    infoCibleCom.setUnique(CibleCommentaire::Cible,Unique::CibleUnique);
-    infoCibleCom.setUnique(CibleCommentaire::Num,Unique::NumUnique);
-    infoCibleCom.setForeignKey(CibleCommentaire::IdCommentaire,infoCommentaire);
-    setManager(new ManagerSql<CibleCommentaire>(infoCibleCom,new Unique));
-    setCible<CibleCommentaire>(bdd::cibleId::CibleCommentaire);
+    //CommentaireCible
+    using Unique = CibleSimpleNumUniqueSql<CommentaireCible>;
+    InfoBdd infoCibleCom(cibleCommentaire,CommentaireCible::NbrAtt,{Unique::NbrUnique});
+    infoCibleCom.setAttribut(CommentaireCible::IdCommentaire,"idCm");
+    infoCibleCom.setAttribut(CommentaireCible::IdCible,"idCb");
+    infoCibleCom.setAttribut(CommentaireCible::Cible,"cb");
+    infoCibleCom.setAttribut(CommentaireCible::DateTime,"dt",bdd::TypeAttributBdd::DateTime);
+    infoCibleCom.setAttribut(CommentaireCible::Num,"num");
+    infoCibleCom.setUnique(CommentaireCible::IdCible,Unique::IdCibleUnique);
+    infoCibleCom.setUnique(CommentaireCible::Cible,Unique::CibleUnique);
+    infoCibleCom.setUnique(CommentaireCible::Num,Unique::NumUnique);
+    infoCibleCom.setForeignKey(CommentaireCible::IdCommentaire,infoCommentaire);
+    setManager(new ManagerSql<CommentaireCible>(infoCibleCom,new Unique));
+    setCible<CommentaireCible>(bdd::cibleId::CommentaireCible);
 
     m_commentaireEnabled = true;
 }
@@ -31,7 +31,7 @@ void ManagersPredef::enableCommentaire(const QString & commentaire, const QStrin
 void ManagersPredef::enableDonnee(const QString & donnee, const QString & arbreDonnee, const QString & cibleDonnee,
                                   const QString & cardDonnee,
                                   AbstractGestionAutorisation<Donnee> * gestion,
-                                  AbstractGestionAutorisation<CibleDonnee> *gestionCilbeDonnee,
+                                  AbstractGestionAutorisation<DonneeCible> *gestionCilbeDonnee,
                                   AbstractGestionAutorisation<DonneeCard> *gestionCardDonnee)
 {
     //Donnee
@@ -40,42 +40,43 @@ void ManagersPredef::enableDonnee(const QString & donnee, const QString & arbreD
     InfoBdd infoDonnee(donnee,Donnee::NbrAtt,{UniqueDonnee::NbrUnique});
     infoDonnee.setAttribut(Donnee::Nom,"nom",bdd::TypeAttributBdd::Text);
     infoDonnee.setAttribut(Donnee::Type,"tp");
-    infoDonnee.setAttribut(Donnee::IdProg,"idPg",bdd::TypeAttributBdd::Integer,false);
     infoDonnee.setAttribut(Donnee::TpVal,"tpV");
+    infoDonnee.setAttribut(Donnee::IdProg,"idPg",bdd::TypeAttributBdd::Integer,false);
     infoDonnee.setUnique(Donnee::IdProg,UniqueDonnee::IdProgUnique);
     infoDonnee.setForeignKey(Donnee::Id,infoArbre);
+    setTypeForeignKey<Donnee>(infoDonnee);
     if(gestion)
-        setManager(new ManagerOfArbreModifControle<Donnee>(infoDonnee,infoArbre,gestion, new UniqueDonnee));
+        setManager(new ManagerArbreModifControle<Donnee>(infoDonnee,infoArbre,gestion, new UniqueDonnee));
     else
-        setManager(new ManagerOfArbre<Donnee>(infoDonnee,infoArbre, new UniqueDonnee));
+        setManager(new ManagerArbre<Donnee>(infoDonnee,infoArbre, new UniqueDonnee));
     setCible<Donnee>(bdd::cibleId::Donnee);
 
-    //CibleDonnee
-    using UniqueCD = CibleNumUniqueSql<CibleDonnee>;
-    InfoBdd infoCD(cibleDonnee,CibleDonnee::NbrAtt,{UniqueCD::NbrUnique});
-    infoCD.setAttribut(CibleDonnee::IdDonnee,"idDn");
-    infoCD.setAttribut(CibleDonnee::IdCible,"idCb");
-    infoCD.setAttribut(CibleDonnee::Cible,"cb");
-    infoCD.setAttribut(CibleDonnee::DateTime,"dt",bdd::TypeAttributBdd::DateTime);
-    infoCD.setAttribut(CibleDonnee::Num,"num");
-    infoCD.setAttribut(CibleDonnee::Valeur,"val",bdd::TypeAttributBdd::Blob,false);
-    infoCD.setUnique(CibleDonnee::IdDonnee,UniqueCD::Id1Unique);
-    infoCD.setUnique(CibleDonnee::IdCible,UniqueCD::IdCibleUnique);
-    infoCD.setUnique(CibleDonnee::Cible,UniqueCD::CibleUnique);
-    infoCD.setUnique(CibleDonnee::Num,UniqueCD::NumUnique);
+    //DonneeCible
+    using UniqueCD = CibleNumUniqueSql<DonneeCible>;
+    InfoBdd infoCD(cibleDonnee,DonneeCible::NbrAtt,{UniqueCD::NbrUnique});
+    infoCD.setAttribut(DonneeCible::IdDonnee,"idDn");
+    infoCD.setAttribut(DonneeCible::IdCible,"idCb");
+    infoCD.setAttribut(DonneeCible::Cible,"cb");
+    infoCD.setAttribut(DonneeCible::DateTime,"dt",bdd::TypeAttributBdd::DateTime);
+    infoCD.setAttribut(DonneeCible::Num,"num");
+    infoCD.setAttribut(DonneeCible::Valeur,"val",bdd::TypeAttributBdd::Blob,false);
+    infoCD.setUnique(DonneeCible::IdDonnee,UniqueCD::Id1Unique);
+    infoCD.setUnique(DonneeCible::IdCible,UniqueCD::IdCibleUnique);
+    infoCD.setUnique(DonneeCible::Cible,UniqueCD::CibleUnique);
+    infoCD.setUnique(DonneeCible::Num,UniqueCD::NumUnique);
     if(gestionCilbeDonnee)
-        setManager(new ManagerOfModifControle<CibleDonnee>(infoCD,gestionCilbeDonnee, new UniqueCD));
+        setManager(new ManagerOfModifControle<DonneeCible>(infoCD,gestionCilbeDonnee, new UniqueCD));
     else
-        setManager(new ManagerSql<CibleDonnee>(infoCD, new UniqueCD));
-    setCible<CibleDonnee>(bdd::cibleId::CibleDonnee);
+        setManager(new ManagerSql<DonneeCible>(infoCD, new UniqueCD));
+    setCible<DonneeCible>(bdd::cibleId::DonneeCible);
 
     //DonneeCard
     using UniqueCard = IdCibleUniqueSql<DonneeCard>;
     InfoBdd infoCard(cardDonnee,DonneeCard::NbrAtt,{UniqueCard::NbrUnique});
     infoCard.setAttribut(DonneeCard::IdDonnee,"idDn");
     infoCard.setAttribut(DonneeCard::Card,"cd");
-    infoCard.setAttribut(DonneeCard::Exact,"ex",bdd::TypeAttributBdd::Bool);
     infoCard.setAttribut(DonneeCard::Cible,"cb");
+    infoCard.setAttribut(DonneeCard::Exact,"ex");
     infoCard.setUnique(DonneeCard::IdDonnee,UniqueCard::Id1Unique);
     infoCard.setUnique(DonneeCard::Cible,UniqueCard::CibleUnique);
     infoCard.setForeignKey(DonneeCard::IdDonnee,infoDonnee);
@@ -93,11 +94,11 @@ void ManagersPredef::enableHistorique(const QString & historique)
     using Unique = CibleSimpleNumUniqueSql<Historique>;
     InfoBdd info(historique,Historique::NbrAtt,{Unique::NbrUnique});
     info.setAttribut(Historique::IdCible,"idCb");
-    info.setAttribut(Historique::Cible,"cb");
     info.setAttribut(Historique::IdEtat,"idEt");
+    info.setAttribut(Historique::Cible,"cb");
+    info.setAttribut(Historique::DateTime,"dt",bdd::TypeAttributBdd::DateTime);
     info.setAttribut(Historique::Etat,"et");
     info.setAttribut(Historique::Num,"num");
-    info.setAttribut(Historique::DateTime,"dt",bdd::TypeAttributBdd::DateTime);
     info.setUnique(Historique::IdCible,Unique::IdCibleUnique);
     info.setUnique(Historique::Cible,Unique::CibleUnique);
     info.setUnique(Historique::Num,Unique::NumUnique);
@@ -108,9 +109,10 @@ void ManagersPredef::enableHistorique(const QString & historique)
 }
 
 void ManagersPredef::enableMotCle(const QString & motCle, const QString & motCleArbre, const QString & cibleMotCle,
-                  const QString & permissionMotCle,
-                  AbstractGestionAutorisation<MotCle> * gestionMotCle,
-                  AbstractGestionAutorisation<MotClePermission> * gestionPermission)
+                                  const QString & cibleProg, const QString & permissionMotCle, const QString & permissionProg,
+                                  AbstractGestionAutorisation<MotCle> * gestionMotCle,
+                                  AbstractGestionAutorisation<MotClePermission> * gestionPermission,
+                                  AbstractGestionAutorisation<MotProgPermission> * gestionProgPermission)
 {
     //Mot Clé
     auto infoArbre = infoBddArbre(motCleArbre);
@@ -119,25 +121,25 @@ void ManagersPredef::enableMotCle(const QString & motCle, const QString & motCle
     infoMC.setAttribut(MotCle::Nom,"nm",bdd::TypeAttributBdd::Text);
     infoMC.setForeignKey(MotCle::Id,infoArbre);
     if(gestionMotCle)
-        setManager(new ManagerOfArbreModifControle<MotCle>(infoMC,infoArbre,gestionMotCle));
+        setManager(new ManagerArbreModifControle<MotCle>(infoMC,infoArbre,gestionMotCle));
     else
-        setManager(new ManagerOfArbre<MotCle>(infoMC,infoArbre));
+        setManager(new ManagerArbre<MotCle>(infoMC,infoArbre));
     setCible<MotCle>(bdd::cibleId::MotCle);
 
     // Cible Mot Clé
-    using UniqueCible = CibleUniqueSql<CibleMotCle>;
-    InfoBdd infoCible(cibleMotCle,CibleMotCle::NbrAtt,{UniqueCible::NbrUnique});
-    infoCible.setAttribut(CibleMotCle::IdMotCle,"idMC");
-    infoCible.setAttribut(CibleMotCle::IdCible,"idCb");
-    infoCible.setAttribut(CibleMotCle::Cible,"cb");
-    infoCible.setUnique(CibleMotCle::IdMotCle,UniqueCible::Id1Unique);
-    infoCible.setUnique(CibleMotCle::IdCible,UniqueCible::IdCibleUnique);
-    infoCible.setUnique(CibleMotCle::Cible,UniqueCible::CibleUnique);
-    infoCible.setForeignKey(CibleMotCle::IdMotCle,infoMC);
-    setManager(new ManagerSql<CibleMotCle>(infoCible, new UniqueCible));
-    setCible<MotCle>(bdd::cibleId::CibleMotCle);
+    using UniqueCible = CibleUniqueSql<MotCleCible>;
+    InfoBdd infoCible(cibleMotCle,MotCleCible::NbrAtt,{UniqueCible::NbrUnique});
+    infoCible.setAttribut(MotCleCible::IdMotCle,"idMC");
+    infoCible.setAttribut(MotCleCible::IdCible,"idCb");
+    infoCible.setAttribut(MotCleCible::Cible,"cb");
+    infoCible.setUnique(MotCleCible::IdMotCle,UniqueCible::Id1Unique);
+    infoCible.setUnique(MotCleCible::IdCible,UniqueCible::IdCibleUnique);
+    infoCible.setUnique(MotCleCible::Cible,UniqueCible::CibleUnique);
+    infoCible.setForeignKey(MotCleCible::IdMotCle,infoMC);
+    setManager(new ManagerSql<MotCleCible>(infoCible, new UniqueCible));
+    setCible<MotCleCible>(bdd::cibleId::MotCleCible);
 
-    // Permission
+    // Permission Mot Clé
     using UniquePermission = IdCibleUniqueSql<MotClePermission>;
     InfoBdd infoPermission(permissionMotCle,MotClePermission::NbrAtt,{UniquePermission::NbrUnique});
     infoPermission.setAttribut(MotClePermission::IdMotCle,"idMC");
@@ -147,10 +149,42 @@ void ManagersPredef::enableMotCle(const QString & motCle, const QString & motCle
     infoPermission.setUnique(MotClePermission::Cible,UniquePermission::CibleUnique);
     infoPermission.setForeignKey(MotClePermission::IdMotCle,infoMC);
     if(gestionPermission)
-        setManager(new ManagerOfModifControlePermissionCode<MotClePermission>(infoPermission,gestionPermission, new UniquePermission));
+        setManager(new ManagerOfPermissionCodeModifControle<MotClePermission>(infoPermission,gestionPermission, new UniquePermission));
     else
         setManager(new ManagerOfPermissionCode<MotClePermission>(infoPermission, new UniquePermission));
     setCible<MotClePermission>(bdd::cibleId::MotClePermission);
+
+    // Cible Mot Prog
+    using UniqueProgCible = CibleUniqueSql<MotProgCible>;
+    InfoBdd infoProgCible(cibleProg,MotProgCible::NbrAtt,{UniqueProgCible::NbrUnique});
+    infoProgCible.setAttribut(MotProgCible::IdProg,"idPg");
+    infoProgCible.setAttribut(MotProgCible::IdMotCle,"idMC");
+    infoProgCible.setAttribut(MotProgCible::IdCible,"idCb");
+    infoProgCible.setAttribut(MotProgCible::Cible,"cb");
+    infoProgCible.setUnique(MotProgCible::IdProg,UniqueProgCible::Id1Unique);
+    infoProgCible.setUnique(MotProgCible::IdCible,UniqueProgCible::IdCibleUnique);
+    infoProgCible.setUnique(MotProgCible::Cible,UniqueProgCible::CibleUnique);
+    infoProgCible.setForeignKey(MotProgCible::IdMotCle,infoMC);
+    setManager(new ManagerSql<MotProgCible>(infoProgCible, new UniqueProgCible));
+    setCible<MotProgCible>(bdd::cibleId::MotProgCible);
+
+    // Permission Mot Prog
+    using UniqueProgPermission = RelationCibleUniqueSql<MotProgPermission>;
+    InfoBdd infoProgPermission(permissionProg,MotProgPermission::NbrAtt,{UniqueProgPermission::NbrUnique});
+    infoProgPermission.setAttribut(MotProgPermission::IdProg,"idPg");
+    infoProgPermission.setAttribut(MotProgPermission::IdMotCle,"idMC");
+    infoProgPermission.setAttribut(MotProgPermission::Cible,"cb");
+    infoProgPermission.setAttribut(MotProgPermission::Code,"cd");
+    infoProgPermission.setUnique(MotProgPermission::IdProg,UniqueProgPermission::Id1Unique);
+    infoProgPermission.setUnique(MotProgPermission::IdMotCle,UniqueProgPermission::Id2Unique);
+    infoProgPermission.setUnique(MotProgPermission::Cible,UniqueProgPermission::CibleUnique);
+    infoProgPermission.setForeignKey(MotProgPermission::IdMotCle,infoMC);
+    if(gestionProgPermission)
+        setManager(new ManagerOfPermissionCodeModifControle<MotProgPermission>(infoProgPermission,gestionProgPermission,
+                                                                               new UniqueProgPermission));
+    else
+        setManager(new ManagerOfPermissionCode<MotProgPermission>(infoProgPermission, new UniqueProgPermission));
+    setCible<MotProgPermission>(bdd::cibleId::MotProgPermission);
 
     m_motCleEnabled = true;
 }
@@ -181,22 +215,23 @@ void ManagersPredef::enableTexte(const QString & texte, const QString & cibleTex
     setManager(new ManagerSql<Texte>(infoTexte));
     setCible<Texte>(bdd::cibleId::Texte);
 
-    //CibleTexte
-    using UniqueCible = CibleSimpleNumTypeUniqueSql<CibleTexte>;
-    InfoBdd infoCible(cibleTexte,CibleTexte::NbrAtt,{UniqueCible::NbrUnique});
-    infoCible.setAttribut(CibleTexte::IdTexte,"IdTxt");
-    infoCible.setAttribut(CibleTexte::IdCible,"IdCb");
-    infoCible.setAttribut(CibleTexte::Cible,"cb");
-    infoCible.setAttribut(CibleTexte::Num,"num");
-    infoCible.setAttribut(CibleTexte::Type,"tp");
-    infoCible.setAttribut(CibleTexte::DateTime,"dt",bdd::TypeAttributBdd::DateTime);
-    infoCible.setUnique(CibleTexte::IdCible,UniqueCible::IdCibleUnique);
-    infoCible.setUnique(CibleTexte::Cible,UniqueCible::CibleUnique);
-    infoCible.setUnique(CibleTexte::Num,UniqueCible::NumUnique);
-    infoCible.setUnique(CibleTexte::Type,UniqueCible::TypeUnique);
-    infoCible.setForeignKey(CibleTexte::IdTexte,infoTexte);
-    setManager(new ManagerSql<CibleTexte>(infoCible, new UniqueCible));
-    setCible<CibleTexte>(bdd::cibleId::CibleTexte);
+    //TexteCible
+    using UniqueCible = CibleSimpleNumTypeUniqueSql<TexteCible>;
+    InfoBdd infoCible(cibleTexte,TexteCible::NbrAtt,{UniqueCible::NbrUnique});
+    infoCible.setAttribut(TexteCible::IdTexte,"IdTxt");
+    infoCible.setAttribut(TexteCible::IdCible,"IdCb");
+    infoCible.setAttribut(TexteCible::Cible,"cb");
+    infoCible.setAttribut(TexteCible::DateTime,"dt",bdd::TypeAttributBdd::DateTime);
+    infoCible.setAttribut(TexteCible::Num,"num");
+    infoCible.setAttribut(TexteCible::Type,"tp");
+    infoCible.setUnique(TexteCible::IdCible,UniqueCible::IdCibleUnique);
+    infoCible.setUnique(TexteCible::Cible,UniqueCible::CibleUnique);
+    infoCible.setUnique(TexteCible::Num,UniqueCible::NumUnique);
+    infoCible.setUnique(TexteCible::Type,UniqueCible::TypeUnique);
+    infoCible.setForeignKey(TexteCible::IdTexte,infoTexte);
+    setTypeForeignKey<TexteCible>(infoCible);
+    setManager(new ManagerSql<TexteCible>(infoCible, new UniqueCible));
+    setCible<TexteCible>(bdd::cibleId::TexteCible);
 
     //Source
     using UniqueSource = NomUniqueSql<Source>;
@@ -205,20 +240,21 @@ void ManagersPredef::enableTexte(const QString & texte, const QString & cibleTex
     infoSource.setAttribut(Source::Nom,"nm",bdd::TypeAttributBdd::Text);
     infoSource.setAttribut(Source::Type,"tp");
     infoSource.setUnique(Source::Nom,UniqueSource::NomUnique);
+    setTypeForeignKey<Source>(infoSource);
     setManager(new ManagerSql<Source>(infoSource, new UniqueSource));
     setCible<Source>(bdd::cibleId::Source);
 
     //SourceTexte
-    using UniqueTS = RelationUniqueSql<TexteSource>;
-    InfoBdd infoTS(texteSource,TexteSource::NbrAtt,{UniqueTS::NbrUnique});
-    infoTS.setAttribut(TexteSource::IdSource,"idSr");
-    infoTS.setAttribut(TexteSource::IdTexte,"idTxt");
-    infoTS.setUnique(TexteSource::IdSource,UniqueTS::Id1Unique);
-    infoTS.setUnique(TexteSource::IdTexte,UniqueTS::Id2Unique);
-    infoTS.setForeignKey(TexteSource::IdSource,infoSource);
-    infoTS.setForeignKey(TexteSource::IdTexte,infoTexte);
-    setManager(new ManagerSql<TexteSource>(infoTS, new UniqueTS));
-    setCible<TexteSource>(bdd::cibleId::TexteSource);
+    using UniqueTS = RelationUniqueSql<SourceTexte>;
+    InfoBdd infoTS(texteSource,SourceTexte::NbrAtt,{UniqueTS::NbrUnique});
+    infoTS.setAttribut(SourceTexte::IdSource,"idSr");
+    infoTS.setAttribut(SourceTexte::IdTexte,"idTxt");
+    infoTS.setUnique(SourceTexte::IdSource,UniqueTS::Id1Unique);
+    infoTS.setUnique(SourceTexte::IdTexte,UniqueTS::Id2Unique);
+    infoTS.setForeignKey(SourceTexte::IdSource,infoSource);
+    infoTS.setForeignKey(SourceTexte::IdTexte,infoTexte);
+    setManager(new ManagerSql<SourceTexte>(infoTS, new UniqueTS));
+    setCible<SourceTexte>(bdd::cibleId::SourceTexte);
 
     m_texteEnabled = true;
 }
@@ -239,9 +275,9 @@ void  ManagersPredef::enableType(const QString & typeEnt, const QString & permis
     infoType.setUnique(Type::Parent,UniqueType::ParentUnique,UniqueType::ParentUniqueSet);
     infoType.setForeignKey(Type::Parent,infoType);
     if(gestionType)
-        setManager(new ManagerOfArbreSimpleModifControle<Type>(infoType,gestionType,new UniqueType));
+        setManager(new ManagerArbreSimpleModifControle<Type>(infoType,gestionType,new UniqueType));
     else
-        setManager(new ManagerOfArbreSimple<Type>(infoType,new UniqueType));
+        setManager(new ManagerArbreSimple<Type>(infoType,new UniqueType));
     setCible<Type>(bdd::cibleId::Type);
 
     //Permission
@@ -254,7 +290,7 @@ void  ManagersPredef::enableType(const QString & typeEnt, const QString & permis
     infoPermission.setUnique(TypePermission::Cible,UniquePermission::CibleUnique);
     infoPermission.setForeignKey(TypePermission::IdType,infoType);
     if(gestionPermission)
-        setManager(new ManagerOfModifControlePermissionCode<TypePermission>(infoPermission,gestionPermission, new UniquePermission));
+        setManager(new ManagerOfPermissionCodeModifControle<TypePermission>(infoPermission,gestionPermission, new UniquePermission));
     else
         setManager(new ManagerOfPermissionCode<TypePermission>(infoPermission, new UniquePermission));
     setCible<TypePermission>(bdd::cibleId::TypePermission);
@@ -274,22 +310,24 @@ void ManagersPredef::enableUtilisation(const QString &utilisation, const QString
     infoN.setAttribut(Usage::Type,"tp");
     infoN.setUnique(Usage::Nom,UniqueN::NomUnique);
     infoN.setUnique(Usage::Type,UniqueN::TypeUnique);
+    infoN.setForeignKey(Usage::Id,infoArbre);
+    setTypeForeignKey<Usage>(infoN);
     if(gestionUsage)
-        setManager(new ManagerOfArbreModifControle<Usage>(infoN, infoArbre, gestionUsage, new UniqueN));
+        setManager(new ManagerArbreModifControle<Usage>(infoN, infoArbre, gestionUsage, new UniqueN));
     else
-        setManager(new ManagerOfArbre<Usage>(infoN,infoArbre, new UniqueN));
+        setManager(new ManagerArbre<Usage>(infoN,infoArbre, new UniqueN));
     setCible<Usage>(bdd::cibleId::Usage);
 
     //Utilisation
     using UniqueU = CibleSimpleNumUniqueSql<Utilisation>;
     InfoBdd infoU(utilisation,Utilisation::NbrAtt,{UniqueU::NbrUnique});
-    infoU.setAttribut(Utilisation::IdUsage,"idUs",bdd::TypeAttributBdd::Integer,false);
+    infoU.setAttribut(Utilisation::IdUsage,"idUs",bdd::TypeAttributBdd::Integer);
     infoU.setAttribut(Utilisation::IdCible,"idCb");
-    infoU.setAttribut(Utilisation::Cible,"cb");
     infoU.setAttribut(Utilisation::IdEtat,"idEt");
+    infoU.setAttribut(Utilisation::Cible,"cb");
+    infoU.setAttribut(Utilisation::DateTime,"dt",bdd::TypeAttributBdd::DateTime);
     infoU.setAttribut(Utilisation::Etat,"et");
     infoU.setAttribut(Utilisation::Num,"num");
-    infoU.setAttribut(Utilisation::DateTime,"dt",bdd::TypeAttributBdd::DateTime);
     infoU.setUnique(Utilisation::IdCible,UniqueU::IdCibleUnique);
     infoU.setUnique(Utilisation::Cible,UniqueU::CibleUnique);
     infoU.setUnique(Utilisation::Num,UniqueU::NumUnique);

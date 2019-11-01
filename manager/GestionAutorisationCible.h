@@ -6,7 +6,7 @@
 
 #include <QList>
 #include "AbstractGestionAutorisation.h"
-#include "ManagerOfPermission.h"
+#include "ManagerPermission.h"
 
 /*! \ingroup groupeManager
  * \brief Classe template d'une classe abstraite de gestionnaire d'autorisation de type cible.

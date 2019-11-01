@@ -1,8 +1,8 @@
 /*Auteur: PERCIE DU SERT Maxime
  *Date: 05/08/2018
  */
-#ifndef MANAGEROFPERMISSION_H
-#define MANAGEROFPERMISSION_H
+#ifndef MANAGERPERMISSION_H
+#define MANAGERPERMISSION_H
 
 #include "ManagerSql.h"
 
@@ -134,4 +134,4 @@ protected:
     bool isVirtual(const Ent entity) const override
         {return entity.code() == NoExists;}
 };
-#endif // MANAGEROFPERMISSION_H
+#endif // MANAGERPERMISSION_H

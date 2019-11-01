@@ -129,10 +129,11 @@ template<int IDM> using DateTimeValideNumEntity = DateTimeNumEntityTemp<DateTime
 /*! \ingroup groupeBaseEntity
  * \brief Classe de base des entités ayant un attribut dateTime et Num.
  */
-template<class DateTimeAtt, class ValeurAtt, class T, int IDM> class DateTimeTypeValeurEntityTemp
+template<class DateTimeAtt, class ValeurAtt, int IDM> class DateTimeTypeValeurEntityTemp
         : public EntityAttributsID<Attributs<DateTimeAtt,TypeAttribut,ValeurAtt>,IDM>
 {
 public:
+    using ValTrans = typename ValeurAtt::AttTrans;
     using EAID = EntityAttributsID<Attributs<DateTimeAtt,TypeAttribut,ValeurAtt>,IDM>;
     //! Positions des attributs.
     enum Position {Id = PositionEnum<IdAttribut,EAID>::Position,
@@ -148,7 +149,7 @@ public:
     BASE_ENTITY(DateTimeTypeValeurEntityTemp)
 
     //! Constructeur à partir d'un jeux de valeurs attributs unique.
-    DateTimeTypeValeurEntityTemp(idt type, T valeur, idt id = 0)
+    DateTimeTypeValeurEntityTemp(idt type, ValTrans valeur, idt id = 0)
         : EAID(id)
     {
         setType(type);
@@ -156,16 +157,20 @@ public:
     }
 
     //! Constructeur à partir des valeurs attributs.
-    DateTimeTypeValeurEntityTemp(const QDateTime & dateTime, idt type, T valeur, idt id = 0)
+    DateTimeTypeValeurEntityTemp(const QDateTime & dateTime, idt type, ValTrans valeur, idt id = 0)
         : DateTimeTypeValeurEntityTemp(type, valeur, id)
         {setDateTime(dateTime);}
 };
 
-template<class DateTimeAtt, class ValeurAtt, class T, int IDM> DateTimeTypeValeurEntityTemp<DateTimeAtt, ValeurAtt, T, IDM>
+template<class DateTimeAtt, class ValeurAtt, int IDM> DateTimeTypeValeurEntityTemp<DateTimeAtt, ValeurAtt, IDM>
                                                                     ::~DateTimeTypeValeurEntityTemp() {}
 
-template<int IDM> using DateTimeCurrentTypeValeurIntEntity = DateTimeTypeValeurEntityTemp<DateTimeCurrentAttribut,ValeurIntAttribut,int,IDM>;
-template<int IDM> using DateTimeValideTypeValeurIntEntity = DateTimeTypeValeurEntityTemp<DateTimeValideAttribut,ValeurIntAttribut,int,IDM>;
+template<int IDM> using DateTimeCurrentTypeValeurDoubleEntity = DateTimeTypeValeurEntityTemp<DateTimeCurrentAttribut,ValeurDoubleAttribut,IDM>;
+template<int IDM> using DateTimeCurrentTypeValeurIntEntity = DateTimeTypeValeurEntityTemp<DateTimeCurrentAttribut,ValeurIntAttribut,IDM>;
+template<int IDM> using DateTimeCurrentTypeValeurVariantEntity = DateTimeTypeValeurEntityTemp<DateTimeCurrentAttribut,ValeurVariantAttribut,IDM>;
+template<int IDM> using DateTimeValideTypeValeurDoubleEntity = DateTimeTypeValeurEntityTemp<DateTimeValideAttribut,ValeurDoubleAttribut,IDM>;
+template<int IDM> using DateTimeValideTypeValeurIntEntity = DateTimeTypeValeurEntityTemp<DateTimeValideAttribut,ValeurIntAttribut,IDM>;
+template<int IDM> using DateTimeValideTypeValeurVariantEntity = DateTimeTypeValeurEntityTemp<DateTimeValideAttribut,ValeurVariantAttribut,IDM>;
 
 /*! \ingroup groupeBaseEntity
  * \brief Classe de base des entités ayant des attributs parent, nc et nom.

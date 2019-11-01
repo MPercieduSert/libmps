@@ -7,7 +7,6 @@
 #include "AbstractLinkSql.h"
 #include "AbstractManager.h"
 #include "AbstractUniqueSql.h"
-#include "InfoBdd.h"
 #include <iostream>
 
 // Macro pour manageur.
@@ -713,6 +712,10 @@ public:
         bdd::ExisteUni n = existsUnique(entity);
         return (n == bdd::Tous || n == bdd::Meme) ? get(entity) : false;
     }
+
+    //! Renvoie les info de la table associée au manager.
+    const InfoBdd & info() const
+        {return m_info;}
 
     //! Renvoie le nombre d'attribut de l'entité dans la base de donnée.
     int nbrAtt() const

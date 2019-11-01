@@ -63,15 +63,17 @@ namespace donnee {
 }
 
 // Entités de type prédéfinies
-ID1_ENTITY(CibleCommentaire,CibleDateTimeCurrentNum,InfoEntity::CibleCommentaireId,Commentaire)
-ID1_ENTITY_NEG(CibleDonnee,CibleNegDateTimeCurrentNumValeurVariant,InfoEntity::CibleDonneeId,Donnee)
-ID1_ENTITY(CibleMotCle,Cible,InfoEntity::CibleMotCleId,MotCle)
-ID1_ENTITY(CibleTexte,CibleDateTimeCurrentNumType,InfoEntity::CibleTexteId,Texte)
+ID1_ENTITY(CommentaireCible,CibleDateTimeCurrentNum,InfoEntity::CommentaireCibleId,Commentaire)
+ID1_ENTITY_NEG(DonneeCible,CibleNegDateTimeCurrentNumValeurVariant,InfoEntity::DonneeCibleId,Donnee)
+ID1_ENTITY(MotCleCible,Cible,InfoEntity::MotCleCibleId,MotCle)
 ID1_ENTITY(MotClePermission,IdCibleCode,InfoEntity::MotClePermissionId,MotCle)
+RELATION_ENTITY_NEG(MotProgCible,CibleNeg,InfoEntity::MotProgCibleId,MotCle,Prog)
+RELATION_ENTITY_NEG(MotProgPermission,CibleAttCodeNeg,InfoEntity::MotProgPermissionId,MotCle,Prog)
+ID1_ENTITY(TexteCible,CibleDateTimeCurrentNumType,InfoEntity::TexteCibleId,Texte)
 ID1_ENTITY(Type,IdNullArbreSimpleNcNom,InfoEntity::TypeId,Prog);
 ID1_ENTITY(TypePermission,IdCibleCode,InfoEntity::TypePermissionId,Type)
 ID1_ENTITY(Utilisation,Utilisation,InfoEntity::UtilisationId,Usage)
-RELATION_ENTITY(TexteSource,,InfoEntity::TexteSourceId,Source,Texte)
+RELATION_ENTITY(SourceTexte,,InfoEntity::SourceTexteId,Source,Texte)
 using Commentaire = TexteEntity<InfoEntity::CommentaireId>;
 using MotCle = NcNomEntity<InfoEntity::MotCleId>;
 using Texte = TexteEntity<InfoEntity::TexteId>;
