@@ -5,14 +5,13 @@
 #define TREEMODELEDITENTITY_H
 
 #include <QStack>
-#include "AbstractManager.h"
 #include "TreeModelReadEntity.h"
 
+namespace modelMPS {
 /*! \ingroup groupeModel
  * \brief Classe template des models de type arbre modifiable.
  */
-template<class Ent> class TreeModelEditEntity : public TreeModelReadEntity<Ent>
-{
+template<class Ent> class TreeModelEditEntity : public TreeModelReadEntity<Ent> {
 public:
     using TreeModelReadEntity<Ent>::TreeModelReadEntity;
 
@@ -20,13 +19,13 @@ public:
     ~TreeModelEditEntity() override = default;
 
     //! Renvoie les autorisations de modification pour un index donné.
-    virtual bool autorisation(const QModelIndex & /*index*/, bdd::Autorisation /*role*/) const
+    virtual bool autorisation(const QModelIndex & /*index*/, bmps::autorisation /*role*/) const
         {return true;}
 
     //! Renvoie les drapeaux de l'index spécifié.
     Qt::ItemFlags flags(const QModelIndex &index) const override;
 
-    //! Créer une nouvelle entité
+    //! Remplit une nouvelle entité
     virtual bool hydrateNewEntity(Ent & /*entity*/, int /*row*/ = 0, const QModelIndex &/*parent*/ = QModelIndex())
         {return true;}
 
@@ -41,6 +40,7 @@ public:
     bool removeRows(int row, int count, const QModelIndex &parent) override;
 
 protected:
+    using TreeModelReadEntity<Ent>::m_tree;
     using TreeModelReadEntity<Ent>::beginInsertRows;
     using TreeModelReadEntity<Ent>::beginRemoveRows;
     using TreeModelReadEntity<Ent>::beginResetModel;
@@ -48,29 +48,27 @@ protected:
     using TreeModelReadEntity<Ent>::endInsertRows;
     using TreeModelReadEntity<Ent>::endRemoveRows;
     using TreeModelReadEntity<Ent>::endResetModel;
-    using TreeModelReadEntity<Ent>::getItem;
+    using TreeModelReadEntity<Ent>::getIter;
     using TreeModelReadEntity<Ent>::parent;
 };
 
-template<class Ent> Qt::ItemFlags TreeModelEditEntity<Ent>::flags(const QModelIndex &index) const
-{
+template<class Ent> Qt::ItemFlags TreeModelEditEntity<Ent>::flags(const QModelIndex &index) const {
     if(!index.isValid())
         return Qt::NoItemFlags;
     return QAbstractItemModel::flags(index) | Qt::ItemIsEditable;
 }
 
-template<class Ent> bool TreeModelEditEntity<Ent>::insertRows(int row, int count, const QModelIndex &parent)
-{
+template<class Ent> bool TreeModelEditEntity<Ent>::insertRows(int row, int count, const QModelIndex &parent) {
     if(!parent.isValid())
         return false;
     int comp = 0;
-    for(int i = 0; i != count; ++i)
-    {
+    for(int i = 0; i != count; ++i) {
         Ent entity;
-        if(hydrateNewEntity(entity, row, parent))
-        {
+        if(hydrateNewEntity(entity, row, parent)) {
             beginInsertRows(parent,row,row);
-                getItem(parent)->insert(row, entity);
+                typename cmps::tree<Ent>::iterator iter = getIter(parent);
+                iter.toChild(row);
+                m_tree.insert(iter,entity);
             endInsertRows();
             ++row;
             ++comp;
@@ -79,37 +77,33 @@ template<class Ent> bool TreeModelEditEntity<Ent>::insertRows(int row, int count
     return comp == count;
 }
 
-template<class Ent> bool TreeModelEditEntity<Ent>::removeRows(int row, int count, const QModelIndex &parentIndex)
-{
+template<class Ent> bool TreeModelEditEntity<Ent>::removeRows(int row, int count, const QModelIndex &parentIndex) {
     if(!parentIndex.isValid())
         return false;
     int comp = 0;
-    for(int i = 0; i != count; ++i)
-    {
-        QStack<TreeItem<Ent> *> pile;
-        pile.push(getItem(parentIndex)->child(row));
+    for(int i = 0; i != count; ++i) {
+        std::forward_list<typename cmps::tree<Ent>::iterator> pile;
+        pile.push_front(getIter(parentIndex).toChild(row));
         bool remove = true;
-        while(!pile.isEmpty() && remove)
-        {
-            if(pile.top()->hasChild())
-                pile.push(pile.top()->lastChild());
-            else
-            {
-                int n = pile.top()->position();
-                remove = removeEntity(pile.top()->data());
-                if(remove)
-                {
-                    beginRemoveRows(parent(createIndex(0,0,pile.top())),n,n);
-                        delete pile.pop();
+        while(!pile.empty() && remove) {
+            if(!pile.front().leaf())
+                pile.push_front(pile.front().crbeginChild());
+            else {
+                int n = pile.front().indexBrother();
+                remove = removeEntity(*pile.front());
+                if(remove) {
+                    beginRemoveRows(parent(createIndex(0,0,pile.front())),n,n);
+                        m_tree.erase(pile.front());
+                        pile.pop_front();
                     endRemoveRows();
                 }
             }
         }
-        if(pile.isEmpty())
+        if(pile.empty())
             ++comp;
         ++row;
     }
     return comp == count;
 }
-
+}
 #endif // TREEMODELEDITENTITY_H

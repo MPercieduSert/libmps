@@ -13,13 +13,17 @@
  */
 
 /*! \ingroup groupeFile
+ * \brief Espace de noms de gestion des fichiers.
+ */
+namespace fichierMPS {
+
+/*! \ingroup groupeFile
  * \brief Interface pour la gestion des fichiers.
  *
  * Interface pour la gestion des fichiers, cette interface est utilisée par la classe FenFoundFile
  * pour la vérifiaction des chemins des fichiers et leur création s'il sont introuvables.
  */
-class FileInterface
-{
+class FileInterface {
 protected:
     QString m_fileName;         //!< Chemin du fichier.
     QString m_fileExtension;    //!< Entension du fichier.
@@ -28,8 +32,7 @@ public:
     //! Constructeur. Demande en argument le chemin du fichier et son extension.
     explicit FileInterface(const QString & fileName, const QString & fileExtension)
         : m_fileName(fileName),
-          m_fileExtension(fileExtension)
-        {}
+          m_fileExtension(fileExtension) {}
 
     //! Destructeur.
     virtual ~FileInterface();
@@ -65,5 +68,5 @@ public:
     virtual void setFileName(const QString & fileName)
         {m_fileName = fileName;}
 };
-
+}
 #endif // FILEINTERFACE_H

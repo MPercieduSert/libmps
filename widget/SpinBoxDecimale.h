@@ -10,6 +10,7 @@
 
 #include "AttributSimple.h"
 
+namespace widgetMPS {
 /*! \ingroup groupeWidget
  * \brief Spin Box pour les décimales d'une épreuve.
  */
@@ -17,6 +18,7 @@ class SpinBoxDecimale : public QAbstractSpinBox
 {
     Q_OBJECT
 protected:
+    using AttributDecimale = attributMPS::AttributDecimale;
     int m_indice;       //! Indice de la valeur courante.
 public:
 
@@ -45,5 +47,5 @@ public slots:
     //! Affiche la valeur.
     void printValue();
 };
-
+}
 #endif // SPINBOXDECIMALE_H

@@ -7,18 +7,18 @@
 #include <QObject>
 #include <QAbstractItemModel>
 
+namespace modelMPS {
 /*! \ingroup groupeModel
  * \brief Classe mère des models de type arbre.
  */
-class MAbstractTreeModel : public QAbstractItemModel
-{
+class AbstractTreeModel : public QAbstractItemModel {
     Q_OBJECT
 public:
     //! Constructeur.
-    explicit MAbstractTreeModel(QObject *parent = nullptr) : QAbstractItemModel(parent) {}
+    explicit AbstractTreeModel(QObject *parent = nullptr) : QAbstractItemModel(parent) {}
 
     //! Destructeur par defaut.
-    virtual ~MAbstractTreeModel() override = default;
+    virtual ~AbstractTreeModel() override = default;
 
     /*
     //! Effectue l'action coller.
@@ -36,5 +36,5 @@ public:
     //! Enregistre les données du model dans la base de donnée.
     virtual void save() = 0;*/
 };
-
+}
 #endif // MABSTRACTTREEMODEL_H

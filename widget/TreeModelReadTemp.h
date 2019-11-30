@@ -7,30 +7,37 @@
 #include <QItemSelection>
 #include <QMessageBox>
 
-#include "MAbstractTreeModel.h"
+#include "AbstractTreeModel.h"
 #include "Tree.h"
 
-
-
+namespace modelMPS {
+namespace cmps = conteneurMPS;
 /*! \ingroup groupeModel
  * \brief Classe template des models de type arbre non-modifiable.
  */
-template<class T> class TreeModelReadTemp : public MAbstractTreeModel
-{
+template<class T> class TreeModelReadTemp : public AbstractTreeModel {
 protected:
     QStringList m_header;   //!< Liste des noms des colonnes.
-    Tree<T> m_tree;       //!< Arbre de donnée.
+    cmps::tree<T> m_tree;       //!< Arbre de donnée.
 
 public:
-    using MAbstractTreeModel::MAbstractTreeModel;
-    using MAbstractTreeModel::setHeaderData;
+    using AbstractTreeModel::AbstractTreeModel;
+    using AbstractTreeModel::setHeaderData;
 
     //! Constructeur.
     explicit TreeModelReadTemp(QObject *parent = nullptr)
-        : MAbstractTreeModel(parent) {}
+        : AbstractTreeModel(parent) {}
 
     //! Destructeur par defaut.
     ~TreeModelReadTemp() override = default;
+
+    //! Renvoie une référence sur la donné coorespondant à l'index (en supposant la validité).
+    const T & getData(const QModelIndex &index) const
+        {return *getIter(index);}
+
+    //! Renvoie une référence sur la donné coorespondant à l'index (en supposant la validité).
+    T & getData(const QModelIndex &index)
+        {return *static_cast<typename conteneurMPS::tree<T>::iterator>(getIter(index));}
 
     //! Renvoie l'index correxpondant à la ligne et au parent.
     QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const override;
@@ -40,19 +47,17 @@ public:
 
     //! Renvoie le nombre de d'enfants.
     int rowCount(const QModelIndex &parent = QModelIndex()) const override
-        {return getItem(parent)->childCount();}
+        {return getIter(parent).sizeChild();}
 
     //! Modifie l'arbre de donnée.
-    void setDataTree(const Tree<T> & tree)
-    {
+    void setDataTree(const cmps::tree<T> & tree) {
         beginResetModel();
         m_tree = tree;
         endResetModel();
     }
 
     //! Modifie l'arbre de donnée.
-    void setDataTree(Tree<T> && tree)
-    {
+    void setDataTree(cmps::tree<T> && tree) {
         beginResetModel();
         m_tree = std::move(tree);
         endResetModel();
@@ -62,48 +67,43 @@ public:
     virtual void setHeaderData(const QStringList & listeHeader);
 
 protected:
-    TreeItem<T> *getItem(const QModelIndex &index) const;
+    typename cmps::tree<T>::const_iterator getIter(const QModelIndex &index) const;
 };
 
-template<class T> TreeItem<T>* TreeModelReadTemp<T>::getItem(const QModelIndex & index) const
-{
-    if (index.isValid())
-    {
-        TreeItem<T> *item = static_cast<TreeItem<T>*>(index.internalPointer());
-        if (item)
-            return item;
+template<class T> typename cmps::tree<T>::const_iterator TreeModelReadTemp<T>::getIter(const QModelIndex & index) const {
+    if (index.isValid()) {
+        typename cmps::tree<T>::iterator iter = index.internalPointer();
+        if (iter)
+            return iter;
     }
-    return m_tree.root();
+    return m_tree.cbegin();
 }
 
-template<class T> QModelIndex TreeModelReadTemp<T>::index(int row, int column, const QModelIndex &parent) const
-{  
+template<class T> QModelIndex TreeModelReadTemp<T>::index(int row, int column, const QModelIndex &parent) const {
     if (parent.isValid() && parent.column() != 0)
         return QModelIndex();
 
-    TreeItem<T> *parentItem = getItem(parent);
-    TreeItem<T> *childItem = parentItem->child(row);
-    if (childItem)
-        return createIndex(row, column, childItem);
+    auto iter = getIter(parent);
+    iter.toChild(row);
+    if (iter)
+        return createIndex(row, column, iter.ptr());
     else
         return QModelIndex();
 }
 
-template<class T> QModelIndex TreeModelReadTemp<T>::parent(const QModelIndex &index) const
-{
-    if (index.isValid())
-    {
-        TreeItem<T> * child = getItem(index);
-        TreeItem<T> * parent = child->parent();
-        if(parent)
-            return createIndex(parent->position(), 0, parent);
+template<class T> QModelIndex TreeModelReadTemp<T>::parent(const QModelIndex &index) const {
+    if (index.isValid()) {
+        auto iter = getIter(index);
+        iter.toParent();
+        if(iter)
+            return createIndex(iter.indexBrother(), 0, iter.ptr());
     }
     return QModelIndex();
 }
 
-template<class T> void TreeModelReadTemp<T>::setHeaderData(const QStringList & listeHeader)
-{
+template<class T> void TreeModelReadTemp<T>::setHeaderData(const QStringList & listeHeader) {
     for(int i = 0; i < listeHeader.count(); ++i)
         setHeaderData(i,Qt::Horizontal,listeHeader.at(i),Qt::DisplayRole);
+}
 }
 #endif // TREEMODELREADTEMP_H

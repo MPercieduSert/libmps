@@ -13,7 +13,7 @@
 #include "FenFoundFile.h"
 
 
-/*! \defgroup groupeNoyau Fenêtre
+/*! \defgroup groupeNoyau Noyau
  * \brief Ensemble de classes regroupant les différentes fenêtres de l'application.
  */
 
@@ -32,26 +32,26 @@
  */
 #define DEFAULT_ANNEE "conf/parametre/initialisation/anneeDefaut"
 
+namespace fenMPS {
+namespace bmps = bddMPS;
 /*! \ingroup groupeNoyau
  * \brief Noyau de l'application.
  *
  * Noyau de l'application:
  *
  */
-class AbstractNoyau : public QObject
-{
+class AbstractNoyau : public QObject {
     Q_OBJECT
 protected:
-     Bdd  * m_bdd;                 //!< Gestionnaire de la Base de donnée.
-     Config * m_config;           //!< Gestionnaire de la configuration.
+     bmps::Bdd  * m_bdd;                 //!< Gestionnaire de la Base de donnée.
+     fimps::Config * m_config;           //!< Gestionnaire de la configuration.
 
 public:
     //! Constructeur.
     AbstractNoyau() = default;
 
     //! Destructeur.
-    ~AbstractNoyau()
-    {
+    ~AbstractNoyau() {
         delete m_bdd;
         delete m_config;
     }
@@ -60,18 +60,18 @@ public:
     //TabAbstractModule * activeTab() const;
 
     //! Renvoie un pointeur sur le gestionnaire de Base de donnée.
-    Bdd * bdd()
+    bmps::Bdd * bdd()
         {return m_bdd;}
 
     //! Renvoie un pointeur sur le gestionnaire de configuration.
-    Config * config()
+    fimps::Config * config()
         {return m_config;}
 
     //!Ouvre le gestionnaire de Base de données.
-    void setBdd(Bdd * bdd, const QString & pathXML, QWidget * modalParent = nullptr);
+    void setBdd(bmps::Bdd * bdd, const QString & pathXML, QWidget * modalParent = nullptr);
 
     //!Ouvre le gestionnaire de configuration.
-    void setConfig(Config * config, QWidget * modalParent = nullptr);
+    void setConfig(fimps::Config * config, QWidget * modalParent = nullptr);
 
     //!Ouvre le gestionnaire de configuration au chemin indiquer.
     virtual void setConfigByPath(const QString & configPath, QWidget * modalParent = nullptr) = 0;
@@ -92,5 +92,5 @@ signals:
     //! Signal d'activation/désactivation de l'action saugarder.
     void savePermis(bool);
 };
-
+}
 #endif // ABSTRACTNOYAU_H

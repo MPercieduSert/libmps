@@ -1,43 +1,43 @@
 #include "Managers.h"
 
-Managers::Managers(const int nbrEntity, const QString & versionTable,
-                   const QMap<int,AbstractManager *> & managers,
+using namespace managerMPS;
+
+Managers::Managers(const szt nbrEntity, const QString & versionTable,
+                   const std::map<szt,AbstractManager *> & managers,
                    const QSqlQuery & req)
       : m_nbrEntity(nbrEntity),
         m_requete(req),
-        m_managers(nbrEntity,nullptr)
-{
+        m_managers(nbrEntity,nullptr) {
       using UniqueVersion = NumUniqueSql<VersionBdd>;
       InfoBdd infoVersion(versionTable,VersionBdd::NbrAtt,{UniqueVersion::NbrUnique});
       infoVersion.setAttribut(VersionBdd::Num,"num");
-      infoVersion.setAttribut(VersionBdd::DateTime,"dt",bdd::TypeAttributBdd::DateTime);
+      infoVersion.setAttribut(VersionBdd::DateTime,"dt",bmps::typeAttributBdd::DateTime);
       infoVersion.setUnique(VersionBdd::Num,UniqueVersion::NumUnique);
       m_managerVersion = new ManagerSql<VersionBdd>(infoVersion, new UniqueVersion());
 
-      for(QMap<int, AbstractManager *>::const_iterator i = managers.cbegin(); i != managers.cend(); ++i)
-          m_managers[i.key()]=i.value();
-}
-void Managers::creerVersion()
-{
-    m_managerVersion->creer();
-    saveVersion(bdd::bddVersion::initiale);
+      for(auto i = managers.cbegin(); i != managers.cend(); ++i)
+          m_managers[i->first]=i->second;
 }
 
-VersionBdd Managers::getVersion()
-{
-    int max = m_managerVersion->fonctionAgrega(bdd::Max,VersionBdd::Num).toInt();
+void Managers::creerVersion() {
+    m_managerVersion->creer();
+    saveVersion(bmps::bddVersion::initiale);
+}
+
+entityBaseMPS::VersionBdd Managers::getVersion() {
+    int max = m_managerVersion->fonctionAgrega(bmps::Max,VersionBdd::Num).toInt();
     VersionBdd ver(QDateTime(),max);
     m_managerVersion->getUnique(ver);
     return ver;
 }
 
-InfoBdd Managers::infoBddArbre(const QString & table) const
-{
+InfoBdd Managers::infoBddArbre(const QString & table) const {
+    using Arbre = entityBaseMPS::Arbre;
     using UniqueArbre = ArbreUniqueSql<Arbre>;
     InfoBdd infoArbre(table, Arbre::NbrAtt,{UniqueArbre::NbrUnique});
-    infoArbre.setAttribut(Arbre::Parent,"pt",bdd::TypeAttributBdd::Integer,false);
-    infoArbre.setAttribut(Arbre::Feuille,"fl",bdd::TypeAttributBdd::Bool,true);
-    infoArbre.setAttribut(Arbre::Num,"num",bdd::TypeAttributBdd::Integer,true);
+    infoArbre.setAttribut(Arbre::Parent,"pt",bmps::typeAttributBdd::Integer,false);
+    infoArbre.setAttribut(Arbre::Feuille,"fl",bmps::typeAttributBdd::Bool,true);
+    infoArbre.setAttribut(Arbre::Num,"num",bmps::typeAttributBdd::Integer,true);
     infoArbre.setUnique(Arbre::Parent,UniqueArbre::ParentUnique);
     infoArbre.setUnique(Arbre::Num,UniqueArbre::NumUnique);
     infoArbre.setForeignKey(Arbre::Parent,infoArbre);
@@ -45,13 +45,12 @@ InfoBdd Managers::infoBddArbre(const QString & table) const
 }
 
 int Managers::numVersion()
-    {return m_managerVersion->fonctionAgrega(bdd::Max,VersionBdd::Num).toInt();}
+    {return m_managerVersion->fonctionAgrega(bmps::Max,VersionBdd::Num).toInt();}
 
 void Managers::saveVersion(int num)
     {m_managerVersion->save(VersionBdd(QDateTime::currentDateTime(), num));}
 
-void Managers::setRequete(const QSqlQuery & req)
-{
+void Managers::setRequete(const QSqlQuery & req) {
     m_requete = req;
     AbstractManagerSql::setRequete(&m_requete);
 }

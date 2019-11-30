@@ -1,5 +1,7 @@
 #include "SpinBoxDecimale.h"
 
+using namespace widgetMPS;
+
 SpinBoxDecimale::SpinBoxDecimale(int value, QWidget *parent): QAbstractSpinBox(parent)
 {
     setReadOnly(true);

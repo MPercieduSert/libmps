@@ -1,23 +1,24 @@
 #include "SelectInListBox.h"
 
+using namespace widgetMPS;
+
 SelectInListBox::SelectInListBox(const QString & titreGauche,
                                  const QString & titreDroite,
                                  bool ordre, bool repetition,
-                                 const QMap<int,QString> & choicesGauche,
-                                 const QMap<int, QString> &choicesDroite,
+                                 const std::map<int,QString> & choicesGauche,
+                                 const std::map<int, QString> &choicesDroite,
                                  QWidget *parent)
     : QWidget(parent),
       m_ordre(ordre),
-      m_repetition(repetition)
-{    
+      m_repetition(repetition) {
     // Liste Droite
     m_labelTitreDroite = new QLabel(titreDroite);
     m_listeDroite = new QListWidget();
     if(!m_ordre)
         m_listeDroite->setSelectionMode(QAbstractItemView::ExtendedSelection);
 
-    for(QMap<int,QString>::const_iterator i = choicesDroite.cbegin(); i != choicesDroite.cend(); ++i)
-        {append(i.key(),i.value(),true);}
+    for(auto i = choicesDroite.cbegin(); i != choicesDroite.cend(); ++i)
+        {append(i->first, i->second, true);}
 
     m_layoutListeDroite = new QVBoxLayout();
     m_layoutListeDroite->addWidget(m_labelTitreDroite);
@@ -29,8 +30,8 @@ SelectInListBox::SelectInListBox(const QString & titreGauche,
     if(!m_ordre)
         m_listeGauche->setSelectionMode(QAbstractItemView::ExtendedSelection);
 
-    for(QMap<int,QString>::const_iterator i = choicesGauche.cbegin(); i != choicesGauche.cend(); ++i)
-        {append(i.key(),i.value(),false);}
+    for(auto i = choicesGauche.cbegin(); i != choicesGauche.cend(); ++i)
+        {append(i->first, i->second, false);}
 
     m_layoutListeGauche = new QVBoxLayout();
     m_layoutListeGauche->addWidget(m_labelTitreGauche);
@@ -48,8 +49,7 @@ SelectInListBox::SelectInListBox(const QString & titreGauche,
     m_layoutCentre->addWidget(m_buttonDeplaceGauche);
 
     // Ordre
-    if(ordre)
-    {
+    if(ordre) {
         // Ordre Droite
 
         m_boutonPremierDroite = new QPushButton(tr("Premier"));
@@ -102,11 +102,9 @@ SelectInListBox::SelectInListBox(const QString & titreGauche,
         m_layoutMain->addLayout(m_layoutOrdreDroite);
 }
 
-void SelectInListBox::append(int n, const QString & txt, bool droite)
-{
+void SelectInListBox::append(int n, const QString & txt, bool droite) {
     if(m_repetition || (m_listeDroite->findItems(txt, Qt::MatchFixedString).isEmpty()
-                        && m_listeGauche ->findItems(txt, Qt::MatchFixedString).isEmpty()))
-    {
+                        && m_listeGauche ->findItems(txt, Qt::MatchFixedString).isEmpty())) {
         QListWidgetItem *item = new QListWidgetItem(txt);
         item->setData(Qt::UserRole,n);
 
@@ -117,17 +115,14 @@ void SelectInListBox::append(int n, const QString & txt, bool droite)
     }
 }
 
-void SelectInListBox::append(QListWidget * list, QListWidgetItem * item, bool end)
-{
-    if(m_ordre)
-    {
+void SelectInListBox::append(QListWidget * list, QListWidgetItem * item, bool end) {
+    if(m_ordre) {
         if(end)
             list->addItem(item);
         else
             list->insertItem(list->currentRow()+1,item);
     }
-    else
-    {
+    else {
         int i = 0;
         while(i < list->count() && list->item(i)->data(Qt::UserRole) < item->data(Qt::UserRole))
             i += 1;
@@ -135,15 +130,13 @@ void SelectInListBox::append(QListWidget * list, QListWidgetItem * item, bool en
     }
 }
 
-void SelectInListBox::dernier(QListWidget * list)
-{
+void SelectInListBox::dernier(QListWidget * list) {
     QListWidgetItem * item = list->takeItem(list->currentRow());
     list->insertItem(list->count(),item);
     list->setCurrentRow(list->count()-1);
 }
 
-void SelectInListBox::moveSelectedADroite()
-{
+void SelectInListBox::moveSelectedADroite() {
     int j = 0;
     QList<QListWidgetItem *> list = m_listeGauche->selectedItems();
     if(list.count() == 1)
@@ -154,8 +147,7 @@ void SelectInListBox::moveSelectedADroite()
         m_listeGauche->setCurrentRow(j);
 }
 
-void SelectInListBox::moveSelectedAGauche()
-{
+void SelectInListBox::moveSelectedAGauche() {
     int j = 0;
     QList<QListWidgetItem *> list = m_listeDroite->selectedItems();
     if(list.count() == 1)
@@ -167,11 +159,9 @@ void SelectInListBox::moveSelectedAGauche()
 
 }
 
-void SelectInListBox::precedent(QListWidget * list)
-{
+void SelectInListBox::precedent(QListWidget * list) {
     int i = list->currentRow();
-    if(i > 0)
-    {
+    if(i > 0) {
         QListWidgetItem * item = list->takeItem(i);
         list->insertItem(i-1,item);
         list->setCurrentRow(i-1);
@@ -179,15 +169,13 @@ void SelectInListBox::precedent(QListWidget * list)
 
 }
 
-void SelectInListBox::premier(QListWidget * list)
-{
+void SelectInListBox::premier(QListWidget * list) {
     QListWidgetItem * item = list->takeItem(list->currentRow());
     list->insertItem(0,item);
     list->setCurrentRow(0);
 }
 
-void SelectInListBox::suivant(QListWidget * list)
-{
+void SelectInListBox::suivant(QListWidget * list) {
     int i = list->currentRow();
     if(i < list->count()-1)
     {
@@ -197,11 +185,9 @@ void SelectInListBox::suivant(QListWidget * list)
     }
 }
 
-void SelectInListBox::remove(int n, const QString & txt)
-{
+void SelectInListBox::remove(int n, const QString & txt) {
     QList<QListWidgetItem *> list = m_listeDroite->findItems(txt, Qt::MatchExactly);
-    for(QList<QListWidgetItem *>::const_iterator i = list.cbegin(); i != list.cend(); ++i)
-    {
+    for(QList<QListWidgetItem *>::const_iterator i = list.cbegin(); i != list.cend(); ++i) {
 
         if((**i).data(Qt::UserRole) == n)
         {delete m_listeDroite->takeItem(m_listeDroite->row(*i));}
@@ -209,22 +195,20 @@ void SelectInListBox::remove(int n, const QString & txt)
 
 
     list = m_listeGauche->findItems(txt, Qt::MatchExactly);
-    for(QList<QListWidgetItem *>::const_iterator i = list.cbegin(); i != list.cend(); ++i)
-    {
-        if((**i).data(Qt::UserRole) == n)
+    for(QList<QListWidgetItem *>::const_iterator i = list.cbegin(); i != list.cend(); ++i) {
+        if((*i)->data(Qt::UserRole) == n)
         {delete m_listeGauche->takeItem(m_listeGauche->row(*i));}
     }
 }
 
-QPair<QVector<int>,QVector<int>> SelectInListBox::value() const
-{
-    QVector<int> listeDroite;
+std::pair<std::vector<int>, std::vector<int> > SelectInListBox::value() const {
+    std::vector<int> listeDroite;
     for(int i = 0; i != m_listeDroite->count(); ++i)
-        listeDroite.append(m_listeDroite->item(i)->data(Qt::UserRole).toInt());
+        listeDroite.push_back(m_listeDroite->item(i)->data(Qt::UserRole).toInt());
 
-    QVector<int> listeGauche;
+    std::vector<int> listeGauche;
     for(int i = 0; i != m_listeGauche->count(); ++i)
-        listeGauche.append(m_listeGauche->item(i)->data(Qt::UserRole).toInt());
+        listeGauche.push_back(m_listeGauche->item(i)->data(Qt::UserRole).toInt());
 
-    return QPair<QVector<int>,QVector<int>>(listeGauche,listeDroite);
+    return std::pair<std::vector<int>,std::vector<int>>(listeGauche,listeDroite);
 }

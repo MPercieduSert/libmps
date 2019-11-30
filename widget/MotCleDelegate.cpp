@@ -1,12 +1,14 @@
 #include "MotCleDelegate.h"
 
+using namespace modelMPS;
+
 QWidget * MotCleDelegate::createEditor(QWidget * parent, const QStyleOptionViewItem & option, const QModelIndex & index) const
 {
     if(TreeModelMotCle::NbrColumnMotCle <= index.column() && index.column() < TreeModelMotCle::NbrColumnMotCle + m_nbrEntity)
     {
         QComboBox * editor = new QComboBox(parent);
-        editor->addItem("Interdit",bdd::motClePermissionNum::InterditMCNum);
-        editor->addItem("Permis",bdd::motClePermissionNum::PermisMCNum);
+        editor->addItem("Interdit",bmps::motClePermissionNum::InterditMCNum);
+        editor->addItem("Permis",bmps::motClePermissionNum::PermisMCNum);
         editor->setAutoFillBackground(true);
         return editor;
     }
@@ -33,10 +35,10 @@ bool MotCleDelegate::editorEvent(QEvent *event, QAbstractItemModel *model, const
     {
         painter->save();
         switch (index.data().toInt()) {
-        case bdd::motClePermissionNum::InterditMCNum:
+        case bmps::motClePermissionNum::InterditMCNum:
             painter->fillRect(option.rect, QColor(Qt::red));
             break;
-        case bdd::motClePermissionNum::PermisMCNum:
+        case bmps::motClePermissionNum::PermisMCNum:
             painter->fillRect(option.rect, QColor(Qt::green));
         default:
             break;
@@ -80,7 +82,7 @@ void MotCleDelegate::showContextMenu(QAbstractItemModel *model, const QModelInde
 
     connect(addSon,&QAction::triggered,[model,&index]{static_cast<TreeModelMotCle *>(model)->insertRow(0,index);});
     connect(addBro,&QAction::triggered,[model,&index]{static_cast<TreeModelMotCle *>(model)->insertRow(index.row()+1,index.parent());});
-    if(static_cast<TreeModelMotCle *>(model)->autorisation(index,bdd::Autorisation::Suppr))
+    if(static_cast<TreeModelMotCle *>(model)->autorisation(index,bmps::autorisation::Suppr))
     {
         menu.addSeparator();
         QAction * delMotCle = menu.addAction(QString(tr("Supprimer le mot clé "))
@@ -89,6 +91,5 @@ void MotCleDelegate::showContextMenu(QAbstractItemModel *model, const QModelInde
         connect(delMotCle,&QAction::triggered,[model,&index]{static_cast<TreeModelMotCle *>(model)->removeRow(index.row()
                                                                                                               ,index.parent());});
     }
-
     menu.exec(globalPos);
 }

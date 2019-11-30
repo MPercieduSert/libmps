@@ -10,7 +10,7 @@
 #include "Managers.h"
 #include "EntityPredef.h"
 
-namespace bdd {
+namespace bddMPS {
     //! Associe un numéro de cible.
     namespace cibleId  {
         //! Numéro de cible des types de base.
@@ -48,11 +48,12 @@ namespace bdd {
                           NbrCibleEntPredef};
 }}
 
+namespace managerMPS {
+namespace emps = entityMPS;
 /*! \ingroup groupeFile
  *  \brief Classe mère des managers utilisant des entités prédéfinies.
  */
-class ManagersPredef : public Managers
-{
+class ManagersPredef : public Managers {
 protected:
     bool m_commentaireEnabled = false;                   //!< Prise en charge des commentaire.
     bool m_donneeEnabled = false;                        //!< Prise en charge des donnée.
@@ -62,18 +63,17 @@ protected:
     bool m_texteEnabled = false;                         //!< Prise en charge des Texte.
     bool m_typeEnabled = false;                          //!< Prise en charge des Type.
     bool m_utilisationEnabled = false;                   //!< Prise en charge des Uitilisation.
-    QVector<int> m_cibleArray;                           //!< Tableau de correspondance ID -> Cible.
-    QVector<int> m_cibleNbrAttArray;                     //!< Tableau de correspondance cible -> nombre d'attributs.
+    std::vector<int> m_cibleArray;                           //!< Tableau de correspondance ID -> Cible.
+    std::vector<int> m_cibleNbrAttArray;                     //!< Tableau de correspondance cible -> nombre d'attributs.
 
 public:
     //! Constructeur.
-    ManagersPredef(const int NbrEntity, const int nbrCible, const QString & versionTable,
-                     const QMap<int,AbstractManager *> & managers = QMap<int,AbstractManager *>(),
+    ManagersPredef(szt NbrEntity, szt nbrCible, const QString & versionTable,
+                     const std::map<szt,AbstractManager *> & managers = std::map<szt,AbstractManager *>(),
                      const QSqlQuery & req = QSqlQuery())
         : Managers (NbrEntity, versionTable, managers, req),
-          m_cibleArray(nbrEntity(),bdd::cibleId::Vide),
-          m_cibleNbrAttArray(nbrCible,0)
-    {}
+          m_cibleArray(nbrEntity(),bmps::cibleId::Vide),
+          m_cibleNbrAttArray(nbrCible,0) {}
 
     //! Destructeur.
     ~ManagersPredef() = default;
@@ -82,16 +82,15 @@ public:
         {return m_cibleArray[Ent::ID];}
 
     int cible(int id) const
-        {return id >= 0 && id < m_nbrEntity ? m_cibleArray[id] : bdd::cibleId::Vide;}
+        {return id >= 0 && id < m_nbrEntity ? m_cibleArray[id] : bmps::cibleId::Vide;}
 
     //! Renvoie le nombre d'attributs d'une entité à partir du numéro de cible.
-    int nombreAttributCible(int cible) const
-    {
-        if(cible == bdd::cibleId::Vide || cible >= m_cibleNbrAttArray.size())
+    int nombreAttributCible(int cible) const {
+        if(cible == bmps::cibleId::Vide || cible >= m_cibleNbrAttArray.size())
             return 0;
-        if(cible < bdd::cibleId::Vide)
+        if(cible < bmps::cibleId::Vide)
             return 1;
-        return m_cibleNbrAttArray.at(cible);
+        return m_cibleNbrAttArray[(cible)];
     }
 
     //! Prise en charge des commentaires?
@@ -132,9 +131,9 @@ protected:
     
     //! Mise en place de la prise en charge des donnees.
     void enableDonnee(const QString & donnee, const QString & arbreDonnee, const QString & cibleDonnee, const QString & cardDonnee,
-                      AbstractGestionAutorisation<Donnee> * gestionDonnee = nullptr,
-                      AbstractGestionAutorisation<DonneeCible> * gestionCilbeDonnee = nullptr,
-                      AbstractGestionAutorisation<DonneeCard> * gestionCardDonnee = nullptr);
+                      AbstractGestionAutorisation<emps::Donnee> * gestionDonnee = nullptr,
+                      AbstractGestionAutorisation<emps::DonneeCible> * gestionCilbeDonnee = nullptr,
+                      AbstractGestionAutorisation<emps::DonneeCard> * gestionCardDonnee = nullptr);
 
     //! Mise en place de la prise en charge des historiques.
     void enableHistorique(const QString & historique);
@@ -142,9 +141,9 @@ protected:
     //! Mise en place de la prise en charge des mots Clé.
     void enableMotCle(const QString & motCle, const QString & motCleArbre, const QString & cibleMotCle,
                       const QString & cibleProg, const QString & permissionMotCle, const QString & permissionProg,
-                      AbstractGestionAutorisation<MotCle> * gestionMotCle = nullptr,
-                      AbstractGestionAutorisation<MotClePermission> * gestionPermission = nullptr,
-                      AbstractGestionAutorisation<MotProgPermission> * gestionProgPermission = nullptr);
+                      AbstractGestionAutorisation<emps::MotCle> * gestionMotCle = nullptr,
+                      AbstractGestionAutorisation<emps::MotClePermission> * gestionPermission = nullptr,
+                      AbstractGestionAutorisation<emps::MotProgPermission> * gestionProgPermission = nullptr);
 
     //! Mise en place de la prise en charge des restrictions de modification.
     void enableRestriction(const QString & restrictModification);
@@ -154,12 +153,12 @@ protected:
 
     //! Mise en place de la prise en charge des types.
     void enableType(const QString & type, const QString & permissionType,
-                    AbstractGestionAutorisation<Type> * gestionType = nullptr,
-                    AbstractGestionAutorisation<TypePermission> * gestionPermission = nullptr);
+                    AbstractGestionAutorisation<emps::Type> * gestionType = nullptr,
+                    AbstractGestionAutorisation<emps::TypePermission> * gestionPermission = nullptr);
 
     //! Mise en place de la prise en charge des utilisations.
     void enableUtilisation(const QString & utilisation, const QString & usage, const QString &usageArbre,
-                           AbstractGestionAutorisation<Usage> *gestionUsage = nullptr);
+                           AbstractGestionAutorisation<emps::Usage> *gestionUsage = nullptr);
 
     //! Mutateur du tableau de correspondance ID -> Cible.
     template<class Ent> void setCible(int cible)
@@ -173,87 +172,88 @@ protected:
 };
 
 template<> inline int ManagersPredef::cible<int>() const
-    {return bdd::cibleId::Int;}
+    {return bmps::cibleId::Int;}
 
 template<> inline int ManagersPredef::cible<QString>() const
-    {return bdd::cibleId::String;}
+    {return bmps::cibleId::String;}
 
 template<> inline int ManagersPredef::cible<bool>() const
-    {return bdd::cibleId::Bool;}
+    {return bmps::cibleId::Bool;}
 
 template<> inline int ManagersPredef::cible<float>() const
-    {return bdd::cibleId::Float;}
+    {return bmps::cibleId::Float;}
 
 template<> inline int ManagersPredef::cible<double>() const
-    {return bdd::cibleId::Double;}
+    {return bmps::cibleId::Double;}
 
 template<> inline int ManagersPredef::cible<QDate>() const
-    {return bdd::cibleId::Date;}
+    {return bmps::cibleId::Date;}
 
 template<> inline int ManagersPredef::cible<QDateTime>() const
-    {return bdd::cibleId::DateTime;}
+    {return bmps::cibleId::DateTime;}
 
 template<> inline int ManagersPredef::cible<QVariant>() const
-    {return bdd::cibleId::Variant;}
+    {return bmps::cibleId::Variant;}
 
 template<class Ent> void ManagersPredef::setTypeForeignKey(InfoBdd & info)
 {
     if(typeIsEnabled())
-        info.setForeignKey(Ent::Type,get(Type::ID)->info());
+        info.setForeignKey(Ent::Type,get(emps::Type::ID)->info());
 }
 /*
 template<> inline int ManagersPredef::cible<CommentaireCible>() const
-    {return bdd::cibleId::CommentaireCible;}
+    {return bmps::cibleId::CommentaireCible;}
 
 template<> inline int ManagersPredef::cible<DonneeCible>() const
-    {return bdd::cibleId::DonneeCible;}
+    {return bmps::cibleId::DonneeCible;}
 
 template<> inline int ManagersPredef::cible<MotCleCible>() const
-    {return bdd::cibleId::MotCleCible;}
+    {return bmps::cibleId::MotCleCible;}
 
 template<> inline int ManagersPredef::cible<TexteCible>() const
-    {return bdd::cibleId::TexteCible;}
+    {return bmps::cibleId::TexteCible;}
 
 template<> inline int ManagersPredef::cible<Commentaire>() const
-    {return bdd::cibleId::Commentaire;}
+    {return bmps::cibleId::Commentaire;}
 
 template<> inline int ManagersPredef::cible<Donnee>() const
-    {return bdd::cibleId::Donnee;}
+    {return bmps::cibleId::Donnee;}
 
 template<> inline int ManagersPredef::cible<DonneeCard>() const
-    {return bdd::cibleId::DonneeCard;}
+    {return bmps::cibleId::DonneeCard;}
 
 template<> inline int ManagersPredef::cible<Historique>() const
-    {return bdd::cibleId::Historique;}
+    {return bmps::cibleId::Historique;}
 
 template<> inline int ManagersPredef::cible<MotCle>() const
-    {return bdd::cibleId::MotCle;}
+    {return bmps::cibleId::MotCle;}
 
 template<> inline int ManagersPredef::cible<MotClePermission>() const
-    {return bdd::cibleId::MotClePermission;}
+    {return bmps::cibleId::MotClePermission;}
 
 template<> inline int ManagersPredef::cible<Restriction>() const
-    {return bdd::cibleId::Restriction;}
+    {return bmps::cibleId::Restriction;}
 
 template<> inline int ManagersPredef::cible<Source>() const
-    {return bdd::cibleId::Source;}
+    {return bmps::cibleId::Source;}
 
 template<> inline int ManagersPredef::cible<Texte>() const
-    {return bdd::cibleId::Texte;}
+    {return bmps::cibleId::Texte;}
 
 template<> inline int ManagersPredef::cible<SourceTexte>() const
-    {return bdd::cibleId::SourceTexte;}
+    {return bmps::cibleId::SourceTexte;}
 
 template<> inline int ManagersPredef::cible<Type>() const
-    {return bdd::cibleId::Type;}
+    {return bmps::cibleId::Type;}
 
 template<> inline int ManagersPredef::cible<TypePermission>() const
-    {return bdd::cibleId::TypePermission;}
+    {return bmps::cibleId::TypePermission;}
 
 template<> inline int ManagersPredef::cible<Utilisation>() const
-    {return bdd::cibleId::Utilisation;}
+    {return bmps::cibleId::Utilisation;}
 
 template<> inline int ManagersPredef::cible<Usage>() const
-    {return bdd::cibleId::Usage;}
+    {return bmps::cibleId::Usage;}
 */
+}
 #endif // MANAGERSPREDEF_H

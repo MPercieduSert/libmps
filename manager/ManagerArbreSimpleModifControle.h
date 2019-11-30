@@ -7,15 +7,15 @@
 #include "ManagerModifControle.h"
 #include "ManagerArbreSimple.h"
 
+namespace managerMPS {
 /*! \ingroup groupeManager
  * \brief Classe template mère des différents manageurs pour les entités de type arbre simple avec un controle de modification.
  */
 template<class Ent> class ManagerArbreSimpleModifControle : public ManagerArbreSimple<Ent>,
-                                                                      public ManagerOfModifControle<Ent>
-{
+                                                                      public ManagerModifControle<Ent> {
 protected:
     using ManagerForArbreEnt = ManagerArbreSimple<Ent>;
-    using ManagerMC = ManagerOfModifControle<Ent>;
+    using ManagerMC = ManagerModifControle<Ent>;
 
     using ManagerMC::modify;
 
@@ -30,15 +30,14 @@ public:
                                                         = new GestionAutorisationNoRestrictif<Ent>(),
                                       AbstractUniqueSqlTemp<Ent> * unique = new NoUniqueSql<Ent>())
         : ManagerSql<Ent>(info,unique), ManagerArbreSimple<Ent> (info, unique),
-          ManagerOfModifControle<Ent>(info, gestionAutorisation, unique)
-    {}
+          ManagerModifControle<Ent>(info, gestionAutorisation, unique) {}
 
     //! Destructeur.
     ~ManagerArbreSimpleModifControle() override = default;
 
     /*//! Supprime de la table en base de donnée l'entité d'identifiant id.
     bool del(idt id) override
-        {return getAutorisation(Ent(id), bdd::Suppr) && ManagerForArbreEnt::del(id);}*/
+        {return getAutorisation(Ent(id), bmps::Suppr) && ManagerForArbreEnt::del(id);}*/
 
     //! Enregistre l'entité entity en base de donnée.
     void save(Ent & entity) override
@@ -51,8 +50,8 @@ public:
 protected:
     /*//! Constructeur.
     ManagerArbreSimpleModifControle(AbstractGestionAutorisation<Ent> *gestionAutorisation)
-        : ManagerOfModifControle<Ent>(gestionAutorisation)
+        : ManagerModifControle<Ent>(gestionAutorisation)
     {}*/
 };
-
+}
 #endif // MANAGERARBRESIMPLEMODIFCONTROLE_H

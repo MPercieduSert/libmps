@@ -25,8 +25,7 @@ SOURCES += \
     BarPlotter.cpp \
     EditTreeWidget.cpp \
     Histogramme.cpp \
-    MAbstractTableModel.cpp \
-    MAbstractTreeModel.cpp \
+    AbstractTableModel.cpp \
     MotCleDelegate.cpp \
     MotCleModel.cpp \
     MotCleWidget.cpp \
@@ -42,14 +41,14 @@ SOURCES += \
     TreeModelMotCle.cpp \
     TreeModelReadEntity.cpp \
     TreeModelReadTemp.cpp \
-    TreeModelTemp.cpp
+    TreeModelTemp.cpp \
+    AbstractTreeModel.cpp
 
 HEADERS += \
     BarPlotter.h \
     EditTreeWidget.h \
     Histogramme.h \
-    MAbstractTableModel.h \
-    MAbstractTreeModel.h \
+    AbstractTableModel.h \
     MotCleDelegate.h \
     MotCleModel.h \
     MotCleWidget.h \
@@ -65,7 +64,8 @@ HEADERS += \
     TreeModelMotCle.h \
     TreeModelReadEntity.h \
     TreeModelReadTemp.h \
-    TreeModelTemp.h
+    TreeModelTemp.h \
+    AbstractTreeModel.h
 unix {
     target.path = /usr/lib
     INSTALLS += target

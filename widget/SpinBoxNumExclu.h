@@ -8,6 +8,7 @@
 #include <QLineEdit>
 #include <QList>
 
+namespace widgetMPS {
 /*! \ingroup groupeWidget
  * \brief Spin Box affichant des entier strictement positif n'étant pas dans la liste transmise.
  */
@@ -42,5 +43,5 @@ public slots:
     //! Slot d'affichage des valeurs.
     void printValue();
 };
-
+}
 #endif // SPINBOXNUMEXCLU_H

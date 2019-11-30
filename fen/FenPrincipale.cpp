@@ -1,9 +1,10 @@
 #include "FenPrincipale.h"
 
-FenPrincipale::FenPrincipale(AbstractNoyau * noyau, Bdd * bdd, AbstractZoneCentrale * zoneCentrale,
+using namespace fenMPS;
+
+FenPrincipale::FenPrincipale(AbstractNoyau * noyau, bmps::Bdd * bdd, AbstractZoneCentrale * zoneCentrale,
                              const QString &bddPathXML, const QString & configPath, QWidget *parent) :
-    QMainWindow(parent), m_zoneCentrale(zoneCentrale), m_noyau(noyau)
-{
+    QMainWindow(parent), m_zoneCentrale(zoneCentrale), m_noyau(noyau) {
     m_noyau->setParent(this);
     m_noyau->setConfigByPath(configPath,this);
     m_noyau->setBdd(bdd,bddPathXML,this);
@@ -21,8 +22,7 @@ FenPrincipale::FenPrincipale(AbstractNoyau * noyau, Bdd * bdd, AbstractZoneCentr
     //createToolBar();
 }
 
-void FenPrincipale::createAction()
-{
+void FenPrincipale::createAction() {
     // Coller
     m_actionEditColler = new QAction(tr("Coller"),this);
     m_actionEditColler->setShortcut(QKeySequence::Paste);
@@ -59,8 +59,7 @@ void FenPrincipale::createAction()
     connect(m_noyau,&AbstractNoyau::savePermis,m_actionSave,&QAction::setEnabled);
 }
 
-void FenPrincipale::createMenu()
-{
+void FenPrincipale::createMenu() {
     m_menuFichier = menuBar()->addMenu(tr("&Fichier"));
     m_menuNew = m_menuFichier->addMenu(tr("&Nouveau"));
     m_menuFichier->addAction(m_actionSave );

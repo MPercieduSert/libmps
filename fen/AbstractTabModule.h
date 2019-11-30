@@ -6,12 +6,14 @@
 
 #include <QVBoxLayout>
 #include <QWidget>
+#include "typemps.h"
 
+namespace fenMPS {
+using namespace typeMPS;
 /*! \ingroup groupeFen
  * \brief Classe mère des onglets.
  */
-class AbstractTabModule : public QWidget
-{
+class AbstractTabModule : public QWidget {
     Q_OBJECT
 protected:
 
@@ -42,7 +44,7 @@ signals:
     void savePermis(bool);
 
     //! Demande l'ouverture d'un onglet.
-    void openTabRequested(const QPair<int,int> &);
+    void openTabRequested(const std::pair<int,int> &);
 
 public slots:
     //! Action à effectuer lorsque l'onglet devient actif.
@@ -66,5 +68,5 @@ public slots:
     //! A réimplémenter pour effectuer l'action sauvegarder comme.
     virtual void saveAs()   {}
 };
-
+}
 #endif // ABSTRACTTABMODULE_H

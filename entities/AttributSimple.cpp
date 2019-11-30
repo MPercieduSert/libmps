@@ -1,4 +1,6 @@
 #include "AttributSimple.h"
+
+using namespace attributMPS;
 constexpr std::array<int, AttributDecimale::NbrValues> AttributDecimale::Decimale{{1,2,3,4,5,6,8,10,20,25,50,100,200,250,500,1000}};
 
 QString AttributEntity::affiche() const
@@ -26,6 +28,7 @@ DESTR_VIDE_DEF(DateTimeValideAttribut)
 DESTR_VIDE_DEF(DecimaleAttribut)
 DESTR_VIDE_DEF(EtatAttribut)
 DESTR_VIDE_DEF(ExactAttribut)
+DESTR_VIDE_DEF(FeuilleAttribut)
 DESTR_VIDE_DEF(IdAttribut)
 DESTR_VIDE_DEF(IdCibleAttribut)
 DESTR_VIDE_DEF(IdEtatAttribut)
@@ -54,3 +57,4 @@ DESTR_VIDE_DEF(TypeAttribut)
 DESTR_VIDE_DEF(ValeurDoubleAttribut)
 DESTR_VIDE_DEF(ValeurIntAttribut)
 DESTR_VIDE_DEF(ValeurVariantAttribut)
+DESTR_VIDE_DEF(VersionAttribut)

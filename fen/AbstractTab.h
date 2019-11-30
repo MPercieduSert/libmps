@@ -4,18 +4,17 @@
 #ifndef ABSTRACTTAB_H
 #define ABSTRACTTAB_H
 
-#include <QMap>
 #include <QTabWidget>
 #include "AbstractTabModule.h"
 
+namespace fenMPS {
 /*! \ingroup groupeFen
  * \brief Fenêtre à onglet.
  */
-class AbstractTab : public QTabWidget
-{
+class AbstractTab : public QTabWidget {
     Q_OBJECT
 protected:
-    QMap<QPair<int,int>,AbstractTabModule *> m_mapTab;       //!< Tableau par type des onglets ouverts
+    std::map<std::pair<int,int>,AbstractTabModule *> m_mapTab;       //!< Tableau par type des onglets ouverts
 
 public:
     //! Constructeur
@@ -30,7 +29,7 @@ public:
     virtual void connectTab(AbstractTabModule * tab) const;
 
     //! Créateur d'onglet.
-    virtual AbstractTabModule *createTab(QPair<int,int> pair) const = 0;
+    virtual AbstractTabModule *createTab(std::pair<int,int> pair) const = 0;
 
 signals:
     //! Signal d'activation/désactivation de l'action effacer.
@@ -65,13 +64,13 @@ public slots:
     void effacer()  {static_cast<AbstractTabModule*>(currentWidget())->effacer();}
 
     //! Ouvre un nouvel onglet et le crée si celui-ci n'existe pas.
-    bool openTab(const QPair<int,int> & pair);
+    bool openTab(const std::pair<int,int> & pair);
 
     //! Supprime un onglet.
-    void removeTab(const QPair<int, int> &pair);
+    void removeTab(const std::pair<int, int> &pair);
 
     //! Demande à l'onglet actif de sauvegarder.
     void save()     {static_cast<AbstractTabModule*>(currentWidget())->save();}
 };
-
+}
 #endif // TABMODULE_H

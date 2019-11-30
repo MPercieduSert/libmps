@@ -9,23 +9,28 @@
 
 #include "ListPtr.h"
 
-/*! \ingroup groupeDivers
+namespace conteneurMPS {
+
+/*! \ingroup groupeConteneur
  * \brief Classe patron des vector de pointeurs.
  */
-template<class T> class VectorPtr : public QVector<T*>
+template<class T> class VectorPtr : public QVector<std::unique_ptr<T>>
 {
+protected:
+    using Luptr = QList<std::unique_ptr<T>>;
+    using Vuptr = QVector<std::unique_ptr<T>>;
 public:
     //! Itérateur.
     class iterator
     {
     protected:
         //! Type de l'itérateur sur un pointeur.
-        typedef T * const * iter;
+        using iter = std::unique_ptr<T> const *;
         iter m_ptr;     //!< Pointeur de l'itérateur.
 
     public:
         //! Constructeur.
-        iterator(iter ptr = 0)
+        iterator(iter ptr = nullptr)
             : m_ptr(ptr)
         {}
 
@@ -93,13 +98,13 @@ public:
         }
     };
 
-    using QVector<T*>::append;
-    using QVector<T*>::begin;
-    using QVector<T*>::cbegin;
-    using QVector<T*>::cend;
-    using QVector<T*>::end;
-    using QVector<T*>::resize;
-    using QVector<T*>::size;
+    using Vuptr::append;
+    using Vuptr::begin;
+    using Vuptr::cbegin;
+    using Vuptr::cend;
+    using Vuptr::end;
+    using Vuptr::resize;
+    using Vuptr::size;
 
 
     //! Constructeur par defaut.
@@ -107,11 +112,11 @@ public:
 
     //! Constructeur de recopie.
     VectorPtr(const VectorPtr<T> & vect)
-        : QVector<T*>(vect.size())
+        : Vuptr(vect.size())
     {
-        typename QVector<T*>::iterator j = begin();
-        for(typename QVector<T*>::const_iterator i = vect.cbegin(); i != vect.cend(); ++i, ++j)
-            *j = new T(**i);
+        auto j = begin();
+        for(auto i = vect.cbegin(); i != vect.cend(); ++i, ++j)
+            *j = std::make_unique<T>(**i);
     }
 
     //! Constructeur de déplacement
@@ -124,22 +129,22 @@ public:
     VectorPtr(ListPtr<T> && liste);
 
     //! Constructeur
-    VectorPtr(int n,const T & value = T()) : QVector<T*>(n)
+    VectorPtr(int n,const T & value = T()) : Vuptr(n)
     {
-        for(typename QVector<T*>::iterator i = begin(); i != end(); ++i)
-            *i = new T(value);
+        for(auto i = begin(); i != end(); ++i)
+            *i = std::make_unique<T>(value);
     }
 
-    //! Destructeur.
-    ~VectorPtr()
-    {
-        for(typename QVector<T*>::const_iterator i = cbegin(); i != cend(); ++i)
-            delete *i;
-    }
+//    //! Destructeur.
+//    ~VectorPtr()
+//    {
+//        for(typename Vuptr::const_iterator i = cbegin(); i != cend(); ++i)
+//            delete *i;
+//    }
 
     //! Ajoute un élément à la liste.
     void append(const T & value)
-        {append(new T(value));}
+        {append(std::make_unique<T>(value));}
 
     //! Renvoie une référence sur l'entité d'identifiant id si elle existe.
     iterator findId(unsigned id);
@@ -163,10 +168,10 @@ public:
     VectorPtr<T> &operator <<(ListPtr<T> && liste);
 
     T & operator[](int n)
-        {return *(QVector<T*>::operator[](n));}
+        {return *(Vuptr::operator[](n));}
 
     const T & operator[](int n) const
-        {return *(QVector<T*>::operator[](n));}
+        {return *(Vuptr::operator[](n));}
 };
 
 template<class T> typename VectorPtr<T>::iterator VectorPtr<T>::findId(unsigned id)
@@ -178,85 +183,77 @@ template<class T> typename VectorPtr<T>::iterator VectorPtr<T>::findId(unsigned 
 }
 
 template<class T> VectorPtr<T>::VectorPtr(const ListPtr<T> & liste)
-    : QVector<T*>(liste.size())
+    : Vuptr(liste.size())
 {
     if(!liste.isEmpty())
     {
-        typename QVector<T*>::iterator i = begin();
-        for(typename QList<T*>::const_iterator j = liste.cbegin(); j != liste.cend(); ++i, ++j)
-            *i = new T(**j);
+        auto i = begin();
+        for(auto j = liste.cbegin(); j != liste.cend(); ++i, ++j)
+            *i = std::make_unique<T>(**j);
     }
 }
 
 template<class T> VectorPtr<T>::VectorPtr(ListPtr<T> && liste)
-    : QVector<T*>(liste.size())
+    : Vuptr(liste.size())
 {
     if(!liste.isEmpty())
     {
-        typename QVector<T*>::iterator i = begin();
-        for(typename QList<T*>::const_iterator j = liste.cbegin(); j != liste.cend(); ++i, ++j)
-            *i = *j;
+        auto i = begin();
+        for(auto j = liste.Luptr::begin(); j != liste.Luptr::end(); ++i, ++j)
+            *i = std::move(*j);
+        liste.clear();
     }
-    liste.clearList();
 }
 
 template<class T> VectorPtr<T> & VectorPtr<T>::operator =(const ListPtr<T> & liste)
 {
-    for(typename QVector<T*>::const_iterator i = cbegin(); i != cend(); ++i)
-        delete *i;
-    QVector<T*>::clear();
     if(!liste.isEmpty())
     {
         resize(liste.size());
-        typename QVector<T*>::iterator i = begin();
-        for(typename QList<T*>::const_iterator j = liste.cbegin(); j != liste.cend(); ++i, ++j)
-            *i = new T(**j);
+        Vuptr::squeeze();
+        auto i = begin();
+        for(auto j = liste.cbegin(); j != liste.cend(); ++i, ++j)
+            *i = std::make_unique<T>(**j);
     }
     return *this;
 }
 
 template<class T> VectorPtr<T> & VectorPtr<T>::operator =(ListPtr<T> && liste)
 {
-    for(typename QVector<T*>::const_iterator i = cbegin(); i != cend(); ++i)
-        delete *i;
-    QVector<T*>::clear();
     if(!liste.isEmpty())
     {
         resize(liste.size());
-        typename QVector<T*>::iterator i = begin();
-        for(typename QList<T*>::const_iterator j = liste.cbegin(); j != liste.cend(); ++i, ++j)
-            *i = *j;
+        Vuptr::squeeze();
+        auto i = begin();
+        for(auto j = liste.Luptr::begin(); j != liste.Luptr::end(); ++i, ++j)
+            *i = std::move(*j);
+        liste.clear();
     }
-    liste.clearList();
     return *this;
 }
 
 template<class T> VectorPtr<T> & VectorPtr<T>::operator =(const VectorPtr<T> & vector)
 {
-    for(typename QVector<T*>::const_iterator i = cbegin(); i != cend(); ++i)
-        delete *i;
-    QVector<T*>::clear();
     if(!vector.isEmpty())
     {
         resize(vector.size());
-        typename QVector<T*>::iterator i = begin();
-        for(typename QVector<T*>::const_iterator j = vector.cbegin(); j != vector.cend(); ++j, ++i)
-            *i = new T(**j);
+        Vuptr::squeeze();
+        auto i = begin();
+        for(auto j = vector.cbegin(); j != vector.cend(); ++j, ++i)
+            *i = std::make_unique<T>(**j);
     }
     return *this;
 }
 
 template<class T> VectorPtr<T> & VectorPtr<T>::operator =(VectorPtr<T> && vector)
 {
-    for(typename QVector<T*>::const_iterator i = cbegin(); i != cend(); ++i)
-        delete *i;
-    QVector<T*>::clear();
     if(!vector.isEmpty())
     {
         resize(vector.size());
-        typename QVector<T*>::iterator i = begin();
-        for(typename QVector<T*>::const_iterator j = vector.cbegin(); j != vector.cend(); ++j, ++i)
-            *i = *j;
+        Vuptr::squeeze();
+        auto i = begin();
+        for(auto j = vector.begin(); j != vector.end(); ++j, ++i)
+            *i = std::move(*j);
         vector.clear();
     }
     return *this;
@@ -268,9 +265,9 @@ template<class T> VectorPtr<T> & VectorPtr<T>::operator << (const ListPtr<T> & l
     {
         int n = size();
         resize(n + liste.size());
-        typename QVector<T*>::iterator i = begin() + n;
-        for(typename QList<T*>::const_iterator j = liste.cbegin(); j != liste.cend(); ++i, ++j)
-            *i = new T(**j);
+        auto i = begin() + n;
+        for(auto j = liste.cbegin(); j != liste.cend(); ++i, ++j)
+            *i = std::make_unique<T>(**j);
     }
     return *this;
 }
@@ -281,11 +278,12 @@ template<class T> VectorPtr<T> &VectorPtr<T>::operator <<(ListPtr<T> && liste)
     {
         int n = size();
         resize(n + liste.size());
-        typename QVector<T*>::iterator i = begin() + n;
-        for(typename QList<T*>::const_iterator j = liste.cbegin(); j != liste.cend(); ++i, ++j)
+        auto i = begin() + n;
+        for(auto j = liste.cbegin(); j != liste.cend(); ++i, ++j)
             *i = *j;
+        liste.clear();
     }
-    liste.clearList();
     return *this;
+}
 }
 #endif // VECTORPTR_H

@@ -1,7 +1,9 @@
 #include "AbstractTabTableau.h"
 
-AbstractTabTableau::AbstractTabTableau(QWidget *parent): AbstractTabModule(parent)
-    {}
+using namespace fenMPS;
+
+AbstractTabTableau::AbstractTabTableau(QWidget *parent)
+    : AbstractTabModule(parent) {}
 
 void AbstractTabTableau::coller()
     {m_model->coller(m_view->selectionModel()->selectedIndexes());}

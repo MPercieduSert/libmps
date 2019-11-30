@@ -1,5 +1,7 @@
 #include "EntityPredef.h"
 
+using namespace entityMPS;
+
 DESTR_VIDE_DEF(CommentaireCible)
 DESTR_VIDE_DEF(DonneeCible)
 DESTR_VIDE_DEF(Donnee)

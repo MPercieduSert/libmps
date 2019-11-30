@@ -12,6 +12,7 @@
 #include <QPushButton>
 #include <QVBoxLayout>
 
+namespace dialogMPS {
 /*! \ingroup groupeDialogue
  * \brief Fenêtre de dialogue de création d'un mot clé.
  */
@@ -54,5 +55,5 @@ public slots:
     //! Surdéfinition.
     void accept() override;
 };
-
+}
 #endif // NEWMOTCLEDIALOG_H

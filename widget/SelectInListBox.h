@@ -8,17 +8,16 @@
 #include <QHBoxLayout>
 #include <QListWidget>
 #include <QLabel>
-#include <QMap>
+#include <map>
 #include <QMessageBox>
-#include <QPair>
 #include <QVBoxLayout>
 #include <QWidget>
 
+namespace widgetMPS {
 /*! \ingroup groupeWidget
  * \brief Widget permettant de répartir des éléments entre deux listes, avec une possible mise en ordre.
  */
-class SelectInListBox : public QWidget
-{
+class SelectInListBox : public QWidget {
     Q_OBJECT
 protected:
     bool m_ordre;                       //! Permet ou non d'ordonner la liste.
@@ -52,8 +51,8 @@ public:
     //!Constructeur
     explicit SelectInListBox(const QString & titreGauche = QString(), const QString & titreDroite = QString(),
                              bool ordre = false, bool repetition = false,
-                             const QMap<int,QString> & choicesGauche = QMap<int,QString>(),
-                             const QMap<int,QString> & choicesDroite = QMap<int,QString>(), QWidget *parent = nullptr);
+                             const std::map<int,QString> & choicesGauche = std::map<int,QString>(),
+                             const std::map<int,QString> & choicesDroite = std::map<int,QString>(), QWidget *parent = nullptr);
 
     //! Destructeur par default.
     ~ SelectInListBox() override = default;
@@ -66,7 +65,7 @@ public:
 
     //! Retourne une paire contenant deux listes d'entiters, la liste des données (Qt::UserData) de la liste gauche
     //! et celles de la liste de droite.
-    QPair<QVector<int>,QVector<int>> value() const;
+    std::pair<std::vector<int>,std::vector<int>> value() const;
 signals:
 
 public slots:
@@ -99,5 +98,5 @@ protected:
     //! Place l'élément selectionner à la ligne suivante de list.
     void suivant(QListWidget * list);
 };
-
+}
 #endif // SELECTINLISTBOX_H

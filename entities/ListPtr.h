@@ -4,121 +4,127 @@
 #ifndef LISTPTR_H
 #define LISTPTR_H
 
-#include <QList>
-#include <QVector>
 
 #include "macrolibmps.h"
 
 
-/*! \defgroup groupeDivers Divers
- * \brief Ensemble de classes diverses.
- */
 
-/*! \ingroup groupeDivers
- * \brief Classe patron des listes de pointeurs.
- */
-template<class T> class ListPtr : public QList<T*>
-{
-public:
-    //! Itérateur.
-    class iterator : public QList<T*>::const_iterator
-    {
-    public:
-        using QList<T*>::const_iterator::const_iterator;
 
-        //! Constructeur de recopie.
-        iterator(const typename QList<T*>::const_iterator & i) : QList<T*>::const_iterator(i) {}
 
-        //! Constructeur.
-        iterator(const typename QList<T*>::const_iterator && i) : QList<T*>::const_iterator(i) {}
+//template<class T> class ListPtr : protected std::forward_list<T*>
+//{
+//public:
+//    //! Itérateur.
+//    class iterator : public std::forward_list<T*>::const_iterator
+//    {
+//    public:
+//        using std::forward_list<T*>::const_iterator::const_iterator;
 
-        //! Opérateur *.
-        T & operator *() const
-            {return *(QList<T*>::const_iterator::operator *());}
+//        //! Constructeur de recopie.
+//        iterator(const typename std::forward_list<T*>::const_iterator & i) : std::forward_list<T*>::const_iterator(i) {}
 
-        //! Opérateur [].
-        T & operator [](int n) const
-            {return *(QList<T*>::const_iterator::operator [](n));}
-    };
+////        //! Constructeur.
+////        iterator(const typename Luptr::const_iterator && i) : Luptr::const_iterator(i) {}
 
-public:
-    using QList<T*>::append;
-    using QList<T*>::cbegin;
-    using QList<T*>::cend;
-    using QList<T*>::operator <<;
+//        //! Opérateur *.
+//        T & operator *() const
+//            {return *(std::forward_list<T*>::const_iterator::operator *());}
 
-    CONSTR_DEFAUT(ListPtr)
+//        //! Opérateur [].
+//        T & operator [](int n) const
+//            {return *(Luptr::const_iterator::operator [](n));}
+//    };
 
-    //! Constructeur de recopie.
-    ListPtr(const ListPtr<T> & liste)
-    {
-        reserve(liste.size());
-        for(typename QList<T*>::const_iterator i = liste->cbegin(); i != liste->cend(); ++i)
-            append(new T(**i));
-    }
+//public:
+//    using Luptr::append;
+//    using Luptr::cbegin;
+//    using Luptr::cend;
+//    using Luptr::last;
+//    using Luptr::operator <<;
 
-    //! Constructeur de déplacement.
-    ListPtr(ListPtr<T> && ) = default;
+//    CONSTR_DEFAUT(ListPtr)
 
-    //! Destructeur.
-    ~ListPtr()
-    {
-        for(typename QList<T*>::const_iterator i = cbegin(); i != cend(); ++i)
-            delete *i;
-    }
+//    //! Constructeur de recopie.
+//    ListPtr(const ListPtr<T> & liste)
+//    {
+//        reserve(liste.size());
+//        for(auto i = liste->cbegin(); i != liste->cend(); ++i)
+//            append(std::make_unique<T>(**i));
+//    }
 
-    //! Ajoute un pointeur à la fin de la liste.
-    void append(const T & entity)
-        {append(new T(entity));}
+//    //! Constructeur de déplacement.
+//    ListPtr(ListPtr<T> && ) = default;
 
-    //! Retourne une référence constante sur la n-ième entité de la listes.
-    const T & at(int n) const
-        {return *(at(n));}
+////    //! Destructeur.
+////    ~ListPtr()
+////    {
+////        for(typename Luptr::const_iterator i = cbegin(); i != cend(); ++i)
+////            delete *i;
+////    }
 
-    //! Renvoie un itérateur sur le début de la liste.
-    iterator begin() const
-        {return QList<T*>::cbegin();}
+//    //! Ajoute un pointeur à la fin de la liste.
+//    void append(const T & entity)
+//        {Luptr::append(std::make_unique<T>(entity));}
 
-    //! Renvoie un itérateur sur la fin de la liste.
-    iterator end() const
-        {return QList<T*>::cend();}
+//    //! Ajoute un pointeur à la fin de la liste.
+//    void append(const std::unique_ptr<T> & ptr)
+//        {Luptr::append(std::make_unique<T>(*ptr));}
 
-    //! Supprime toutes les entités pointées par les pointeurs de la liste.
-    void clear()
-    {
-        for(typename QList<T*>::const_iterator i = cbegin(); i != cend(); ++i)
-            delete *i;
-        QList<T*>::clear();
-    }
+//    //! Ajoute un pointeur à la fin de la liste.
+//    void append(std::unique_ptr<T> && ptr)
+//    {
+//        Luptr::append(std::unique_ptr<T>());
+//        last() = std::move(ptr);
+//    }
 
-    //! Supprime la liste des pointeurs, sans supprimer les entités pointés par les pointeurs composants cette liste.
-    void clearList()
-        {QList<T*>::clear();}
+//    //! Retourne une référence constante sur la n-ième entité de la listes.
+//    const T & at(int n) const
+//        {return *(at(n));}
 
-    //! Affectation par copie
-    ListPtr<T> & operator = (const ListPtr<T> & liste)
-    {
-        clear();
-        if(!liste.isEmpty())
-        {
-            reserve(liste.size());
-            for(typename QList<T*>::const_iterator i = liste->cbegin(); i != liste->cend(); ++i)
-                append(new T(**i));
-        }
-        return *this;
-    }
+//    //! Renvoie un itérateur sur le début de la liste.
+//    iterator begin() const
+//        {return Luptr::cbegin();}
 
-    //! Affectation par déplacement
-    ListPtr<T> & operator = (ListPtr<T> && liste)
-    {
-        QList<T*>::operator =(liste);
-        liste.clearList();
-        return *this;
-    }
+//    //! Renvoie un itérateur sur la fin de la liste.
+//    iterator end() const
+//        {return Luptr::cend();}
 
-    //! Ajoute un pointeur sur une entité à la liste (ce pointeur doit être créer dynamiquement).
-    ListPtr<T> & operator << (T * entity)
-        {append(entity); return *this;}
-};
+////    //! Supprime toutes les entités pointées par les pointeurs de la liste.
+////    void clear()
+////    {
+////        for(auto i = cbegin(); i != cend(); ++i)
+////            delete *i;
+////        Luptr::clear();
+////    }
 
+////    //! Supprime la liste des pointeurs, sans supprimer les entités pointés par les pointeurs composants cette liste.
+////    void clearList()
+////        {Luptr::clear();}
+
+//    //! Affectation par copie
+//    ListPtr<T> & operator = (const ListPtr<T> & liste)
+//    {
+//        Luptr::clear();
+//        if(!liste.isEmpty())
+//        {
+//            reserve(liste.size());
+//            for(auto i = liste->cbegin(); i != liste->cend(); ++i)
+//                append(std::make_unique<T>(**i));
+//        }
+//        return *this;
+//    }
+
+//    //! Affectation par déplacement
+//    ListPtr<T> & operator = (ListPtr<T> && liste) = default;
+////    {
+////        Luptr::operator =(liste);
+////        liste.clearList();
+////        return *this;
+////    }
+
+//    //! Ajoute un pointeur sur une entité à la liste (ce pointeur doit être créer dynamiquement).
+//    ListPtr<T> & operator << (std::unique_ptr<T> entity)
+//        {append(entity); return *this;}
+//};
+}
 #endif // LISTPTR_H

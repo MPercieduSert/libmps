@@ -1,46 +1,43 @@
 #include "ReqSql.h"
 
+using namespace managerMPS;
+
 QSqlQuery * ReqSql::m_requete = nullptr;
 
-void ReqSql::affError() const
-{
+void ReqSql::affError() const {
     QSqlError err(m_requete->lastError());
     if(err.isValid())
         throw std::invalid_argument(err.text().append("\n"+err.nativeErrorCode()+m_requete->lastQuery()).toStdString());
 }
 
-QString ReqSql::typeAttributSqlString(bdd::TypeAttributBdd n)
-{
-    using namespace bdd;
-    switch (n)
-    {
-    case TypeAttributBdd::Primary:
+QString ReqSql::typeAttributSqlString(bmps::typeAttributBdd n) {
+    using namespace bmps;
+    switch (n) {
+    case typeAttributBdd::Primary:
         return "integer primary key";
-    case TypeAttributBdd::Bool:
-    case TypeAttributBdd::Integer:
+    case typeAttributBdd::Bool:
+    case typeAttributBdd::Integer:
         return "integer";
-    case TypeAttributBdd::DateTime:
-    case TypeAttributBdd::Date:
-    case TypeAttributBdd::Text:
+    case typeAttributBdd::DateTime:
+    case typeAttributBdd::Date:
+    case typeAttributBdd::Text:
         return "text";
-    case TypeAttributBdd::Variant:
-    case TypeAttributBdd::Blob:
+    case typeAttributBdd::Variant:
+    case typeAttributBdd::Blob:
         return "blob";
-    case TypeAttributBdd::Double:
-    case TypeAttributBdd::Real:
+    case typeAttributBdd::Double:
+    case typeAttributBdd::Real:
         return "real";
-    case TypeAttributBdd::Numeric:
+    case typeAttributBdd::Numeric:
         return "numeric";
     default:
         throw std::invalid_argument("Invalid argument dans typeAttributSqlString");
     }
 }
 
-QString ReqSql::wordSqlString(bdd::wordSql n)
-{
-    using namespace bdd;
-    switch (n)
-    {
+QString ReqSql::wordSqlString(bmps::wordSql n) {
+    using namespace bmps;
+    switch (n) {
     case wordSql::Create:
         return "CREATE TABLE";
     case wordSql::NotNull:

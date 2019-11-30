@@ -6,22 +6,18 @@
 
 #include <array>
 #include <QDate>
+#include <QDateTime>
 #include <QString>
 #include <QVariant>
 #include <utility>
 #include <cmath>
-#include "InfoEntity.h"
+#include "infoEntity.h"
 #include "macrolibmps.h"
 
 /*! \defgroup groupeAttributEntity Attributs des entités
  * \ingroup groupeEntity
  * \brief Ensemble de classes représentant les attributs des entités de la base de donnée.
  */
-
-//! \ingroup groupeAttributEntity
-//! Type des attributs
-using idt = unsigned;
-using codeType = unsigned;
 
 //! \ingroup groupeAttributEntity
 //! Macro définisant les alias de l'accesseur et du mutateurs d'une clé numéroté.
@@ -54,7 +50,7 @@ using codeType = unsigned;
     /*! Nom de la classe de l'attribut.*/ \
     QString nameAttribut() const override {return #ATTRIBUT;} \
     /*! Nom de l'attribut.*/ \
-    static QString nomAttribut(int /*pos*/=0) {return #NOM;} \
+    static QString nomAttribut(szt /*pos*/=0) {return #NOM;} \
     /*! Accesseur de l'attribut nom.*/ \
     ATTRIBUT::AttTrans nom() const {return get();} \
     /*! Mutateur de l'attribut.*/ \
@@ -65,6 +61,13 @@ using codeType = unsigned;
     bool operator ==(const ATTRIBUT & entity) const {return MERE::operator ==(entity);}};
 
 /*! \ingroup groupeAttributEntity
+ * \brief Espace de nom des attributs des entités.
+ */
+namespace attributMPS {
+
+using namespace typeMPS;
+
+/*! \ingroup groupeAttributEntity
  * \brief Classe signalant la fin d'une branche d'attribut.
  */
 class NoAttribut;
@@ -72,8 +75,7 @@ class NoAttribut;
 /*! \ingroup groupeAttributEntity
  * \brief Classe mère des attributs (simple) des entités.
  */
-class AttributEntity
-{
+class AttributEntity {
 public:
     using AttPre = NoAttribut;
     using AttSuiv = NoAttribut;
@@ -86,7 +88,7 @@ public:
     virtual QString affiche() const;
 
     //! Retourne un QVariant contenant la donnée souhaitée, pos doit être valide.
-    virtual QVariant dataP(int /*pos*/) const = 0;
+    virtual QVariant dataP(szt /*pos*/) const = 0;
 
     //! Renvoie la validité de la valeur.
     virtual bool isValid() const
@@ -100,7 +102,7 @@ public:
     virtual QString nameAttribut() const = 0;
 
     //! Modifie la donnée à partir d'un QVariant.
-    virtual void setDataP(const QVariant & value, int /*pos*/) = 0;
+    virtual void setDataP(const QVariant & value, szt /*pos*/) = 0;
 
     //! Renvoie une chaine de caractère contenant la valeur de l'attribut.
     virtual QString toString() const
@@ -117,8 +119,7 @@ public:
 /*! \ingroup groupeAttributEntity
  * \brief Classe patron des attribut avec une transimision par reférence dans les accesseurs et mutateurs.
  */
-template<class Var, class Trans> class AttributEntityTemp : public AttributEntity
-{
+template<class Var, class Trans> class AttributEntityTemp : public AttributEntity {
 public:
     using AttType = Var;
     using AttTrans = Trans;
@@ -131,14 +132,13 @@ public:
 
     //! Constructeur, donner la valeur de l'attribut en argument.
     AttributEntityTemp(AttTrans valeur)
-        : m_valeur(valeur)
-        {}
+        : m_valeur(valeur) {}
 
     //! Destructeur.
     ~AttributEntityTemp() override;
 
     //! Retourne un QVariant contenant la donnée souhaitée, pos doit être valide.
-    QVariant dataP(int /*pos*/) const override
+    QVariant dataP(szt /*pos*/) const override
         {return m_valeur;}
 
     //! Accesseur de l'attribut.
@@ -154,7 +154,7 @@ public:
         {m_valeur = valeur;}
 
     //! Modifie la donnée à partir d'un QVariant.
-    void setDataP(const QVariant & value, int /*pos*/) override
+    void setDataP(const QVariant & value, szt /*pos*/) override
         {set(value.value<AttType>());}
 
     //! Renvoie une chaine de caractère contenant la valeur de l'attribut.
@@ -184,7 +184,7 @@ template<> inline AttributEntityVal<int>::AttributEntityTemp() : m_valeur(0) {}
 template<> inline AttributEntityVal<idt>::AttributEntityTemp() : m_valeur(0) {}
 
 // Spécilisation du setDatat pour les Variants.
-template<> inline void AttributEntityRef<QVariant>::setDataP(const QVariant & value, int /*pos*/) {set(value);}
+template<> inline void AttributEntityRef<QVariant>::setDataP(const QVariant & value, szt /*pos*/) {set(value);}
 
 // Alis de spécialiations totales.
 using AttributBool = AttributEntityVal<bool>;
@@ -202,8 +202,7 @@ using AttributVariant = AttributEntityRef<QVariant>;
 /*! \ingroup groupeAttributEntity
  * \brief Classe mère des attributs de type date current.
  */
-class AttributDateCurrent: public AttributDate
-{
+class AttributDateCurrent: public AttributDate {
 public:
     CONSTR_DEFAUT(AttributDateCurrent)
     CONSTR_AFFECT_DEFAUT(AttributDateCurrent)
@@ -223,8 +222,7 @@ public:
 /*! \ingroup groupeAttributEntity
  * \brief Classe mère des attributs de type date pouvant être nulle.
  */
-class AttributDateNull : public AttributDate
-{
+class AttributDateNull : public AttributDate {
 public:
     CONSTR_DEFAUT(AttributDateNull)
     CONSTR_AFFECT_DEFAUT(AttributDateNull)
@@ -240,8 +238,7 @@ public:
 /*! \ingroup groupeAttributEntity
  * \brief Classe mère des attributs de type date valide.
  */
-class AttributDateValide : public AttributDate
-{
+class AttributDateValide : public AttributDate {
 public:
     CONSTR_DEFAUT(AttributDateValide)
     CONSTR_AFFECT_DEFAUT(AttributDateValide)
@@ -257,8 +254,7 @@ public:
 /*! \ingroup groupeAttributEntity
  * \brief Classe mère des attributs de type datetime current.
  */
-class AttributDateTimeCurrent: public AttributDateTime
-{
+class AttributDateTimeCurrent: public AttributDateTime {
 public:
     CONSTR_DEFAUT(AttributDateTimeCurrent)
     CONSTR_AFFECT_DEFAUT(AttributDateTimeCurrent)
@@ -278,8 +274,7 @@ public:
 /*! \ingroup groupeAttributEntity
  * \brief Classe mère des attributs de type datetime nulle.
  */
-class AttributDateTimeNull : public AttributDateTime
-{
+class AttributDateTimeNull : public AttributDateTime {
 public:
     CONSTR_DEFAUT(AttributDateTimeNull)
     CONSTR_AFFECT_DEFAUT(AttributDateTimeNull)
@@ -295,8 +290,7 @@ public:
 /*! \ingroup groupeAttributEntity
  * \brief Classe mère des attributs de type datetime valide.
  */
-class AttributDateTimeValide : public AttributDateTime
-{
+class AttributDateTimeValide : public AttributDateTime {
 public:
     CONSTR_DEFAUT(AttributDateTimeValide)
     CONSTR_AFFECT_DEFAUT(AttributDateTimeValide)
@@ -312,8 +306,7 @@ public:
 /*! \ingroup groupeAttributEntity
  * \brief Classe mère des attributs de type entier positif renvoyant Null pour zéro dans la base de données.
  */
-template<class T> class AttributZeroNull : public AttributEntityVal<T>
-{
+template<class T> class AttributZeroNull : public AttributEntityVal<T> {
 protected:
     using AttributEntityVal<T>::m_valeur;
 public:
@@ -337,8 +330,7 @@ using AttributUnsignedNull = AttributZeroNull<unsigned>;
 /*! \ingroup groupeAttributEntity
  * \brief Template des attributs de type entier supérieur ou égal à N.
  */
-template<class T, int N> class AttributSup : public AttributEntityVal<T>
-{
+template<class T, int N> class AttributSup : public AttributEntityVal<T> {
 protected:
     using AttributEntityVal<T>::m_valeur;
 public:
@@ -364,8 +356,7 @@ template<int N> using AttributUnsignedSup = AttributSup<unsigned, N>;
 /*! \ingroup groupeAttributEntity
  * \brief Template des attributs de type entier inférieur ou égal à N.
  */
-template<int N> class AttributIntInf : public AttributInt
-{
+template<int N> class AttributIntInf : public AttributInt {
 public:
     CONSTR_DEFAUT(AttributIntInf)
     CONSTR_AFFECT_DEFAUT(AttributIntInf)
@@ -383,8 +374,7 @@ template<int N> AttributIntInf<N>::~AttributIntInf() = default;
 /*! \ingroup groupeAttributEntity
  * \brief Template des attributs de type entier compris entre M (inclus) et N (exclut).
  */
-template<int M, int N> class AttributEncadre : public AttributInt
-{
+template<int M, int N> class AttributEncadre : public AttributInt {
 public:
     CONSTR_DEFAUT(AttributEncadre)
     CONSTR_AFFECT_DEFAUT(AttributEncadre)
@@ -402,11 +392,10 @@ template<int M, int N> AttributEncadre<M,N>::~AttributEncadre() = default;
 /*! \ingroup groupeAttributEntity
  * \brief Classe mère des attributs de type decimale.
  */
-class AttributDecimale : public AttributEncadre<0,InfoEntity::decimale::NbrDecimales>
-{
+class AttributDecimale : public AttributEncadre<0,infoEntity::decimale::NbrDecimales> {
 public:
     enum {NotFind = -1,
-         NbrValues = InfoEntity::decimale::NbrDecimales};
+         NbrValues = infoEntity::decimale::NbrDecimales};
 
     static const std::array<int, NbrValues> Decimale;   //! Liste des inverses des décimales permises.
     CONSTR_DEFAUT(AttributDecimale)
@@ -424,8 +413,7 @@ public:
         {return 1.0 / m_valeur;}
 
     //! Renvoie l'indice de valeur dans la list Decimale.
-    static int indice(int valeur)
-    {
+    static int indice(int valeur) {
         auto i = 0;
         while(i != NbrValues && Decimale[static_cast<uint>(i)] != valeur)
             ++i;
@@ -440,8 +428,7 @@ public:
 /*! \ingroup groupeAttributEntity
  * \brief Classe mère des attributs de type code.
  */
-class AttributCode : public AttributEntityVal<codeType>
-{
+class AttributCode : public AttributEntityVal<codeType> {
 public:
     CONSTR_DEFAUT(AttributCode)
     CONSTR_AFFECT_DEFAUT(AttributCode)
@@ -461,12 +448,11 @@ public:
     bool in(unsigned valeur) const
         {return !(m_valeur & valeur);}
 
-    QList<int> list() const
-    {
-        QList<int> L;
+    std::vector<int> list() const {
+        std::vector<int> L;
         for(unsigned i = 0, j = 1; i < sizeof (unsigned) - 1; ++i, j *= 2)
             if(in(j))
-                L.append(static_cast<int>(i));
+                L.push_back(static_cast<int>(i));
         return L;
     }
 };
@@ -474,8 +460,7 @@ public:
 /*! \ingroup groupeAttributEntity
  * \brief Classe mère des attributs de type QString non vide.
  */
-class AttributStringNotEmpty : public AttributString
-{
+class AttributStringNotEmpty : public AttributString {
 public:
     CONSTR_DEFAUT(AttributStringNotEmpty)
     CONSTR_AFFECT_DEFAUT(AttributStringNotEmpty)
@@ -499,6 +484,7 @@ SINGLE_ATTRIBUT(DateTimeValideAttribut,AttributDateTimeValide,DateTime,dateTime)
 SINGLE_ATTRIBUT(DecimaleAttribut,AttributDecimale,Decimale,decimale)
 SINGLE_ATTRIBUT(EtatAttribut,AttributInt,Etat,etat)
 SINGLE_ATTRIBUT(ExactAttribut,AttributCode,Exact,exact)
+SINGLE_ATTRIBUT(FeuilleAttribut,AttributBool,Feuille,feuille)
 SINGLE_ATTRIBUT(IdAttribut,AttributId,Id,id)
 SINGLE_ATTRIBUT(IdCibleAttribut,AttributIdSup<1>,IdCible,idCible)
 SINGLE_ATTRIBUT(IdEtatAttribut,AttributIdSup<1>,IdEtat,idEtat)
@@ -528,4 +514,6 @@ SINGLE_ATTRIBUT(ValeurDoubleAttribut,AttributDouble,Valeur,valeur)
 SINGLE_ATTRIBUT(ValeurIntAttribut,AttributInt,Valeur,valeur)
 SINGLE_ATTRIBUT(ValeurVariantAttribut,AttributVariant,Valeur,valeur)
 SINGLE_ATTRIBUT(VersionAttribut,AttributIntSup<0>,Version,version)
+}
+
 #endif // ATTRIBUTSIMPLE_H

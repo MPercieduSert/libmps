@@ -1,5 +1,7 @@
 #include "SpinBoxNumExclu.h"
 
+using namespace widgetMPS;
+
 SpinBoxNumExclu::SpinBoxNumExclu(const QList<int> & liste, QWidget *parent)
     : QAbstractSpinBox(parent), m_value(-1), m_liste(liste)
 {

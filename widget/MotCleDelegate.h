@@ -12,8 +12,8 @@
 #include <QStyledItemDelegate>
 #include "TreeModelMotCle.h"
 
-
-/*! \ingroup groupeDelegate
+namespace modelMPS {
+/*! \ingroup groupeModel
  * \brief Délégué pour le model TreeModelMotCle.
  */
 class MotCleDelegate: public QStyledItemDelegate
@@ -43,5 +43,5 @@ protected:
     //! Affiche un menu contextuel
     void showContextMenu(QAbstractItemModel *model, const QModelIndex &index, const QPoint& globalPos);
 };
-
+}
 #endif // MOTCLEDELEGATE_H

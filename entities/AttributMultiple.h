@@ -6,21 +6,33 @@
 
 #include "AttributSimple.h"
 
-/*! \ingroup groupeAttributEntity
+/*! \defgroup groupeEntity Entités
+ * \brief Ensemble de classes représentant les entités de la base de donnée.
+ */
+
+/*! \ingroup groupeEntity
+ * \brief Espace de nom des entités.
+ */
+namespace entityMPS {
+
+namespace amps = attributMPS;
+
+using namespace typeMPS;
+using NoAttribut = amps::NoAttribut;
+
+/*! \ingroup groupeEntity
  * \brief Classe template des attributs multiple.
  */
 template<class... Attribut> class Attributs;
 
-template<class Attribut> class Attributs<Attribut> : public Attribut
-{
+template<class Attribut> class Attributs<Attribut> : public Attribut {
 public:
     CONSTR_DEFAUT(Attributs)
     CONSTR_AFFECT_DEFAUT(Attributs)
 };
 
 template <class AttributPremier, class... AttributSuivant> class Attributs<AttributPremier, AttributSuivant...>
-        : public AttributPremier, public Attributs<AttributSuivant...>
-{
+        : public AttributPremier, public Attributs<AttributSuivant...> {
 public:
     //! Nombre d'attribut de l'entité.
     enum {NbrAtt = AttributPremier::NbrAtt + Attributs<AttributSuivant...>::NbrAtt};
@@ -35,7 +47,7 @@ public:
         {return AttributPremier::affiche().append("\n").append(Attributs<AttributSuivant...>::affiche());}
 
     //! Retourne un QVariant contenant la donnée souhaitée ou un QVariant nulle si num est invalide.
-    QVariant data(int num) const
+    QVariant data(szt num) const
         {return num < NbrAtt ? dataP(num) : QVariant();}
 
     //! Teste si l'entité est valide.
@@ -43,7 +55,7 @@ public:
         {return AttributPremier::isValid() && Attributs<AttributSuivant...>::isValid();}
 
     //! Retourne le nom de l'attribut donnée souhaitée, pos doit être valide.
-    static QString nomAttribut(int pos)
+    static QString nomAttribut(szt pos)
         {return pos < AttributPremier::NbrAtt ? AttributPremier::nomAttribut(pos)
                                               : Attributs<AttributSuivant...>::nomAttribut(pos - AttributPremier::NbrAtt);}
 
@@ -57,61 +69,80 @@ public:
 
 protected:
     //! Retourne un QVariant contenant la donnée souhaitée, pos doit être valide.
-    QVariant dataP(int pos) const override
+    QVariant dataP(szt pos) const override
         {return pos < AttributPremier::NbrAtt ? AttributPremier::dataP(pos)
                                               : Attributs<AttributSuivant...>::dataP(pos - AttributPremier::NbrAtt);}
 
     //! Remplace les attributs de l'entité par celle de l'entité transmise.
-    void set(const  Attributs<AttributPremier, AttributSuivant...> & entity)
-    {
+    void set(const  Attributs<AttributPremier, AttributSuivant...> & entity) {
         AttributPremier::set(entity);
         Attributs<AttributSuivant...>::set(entity);
     }
 
     //! Modifie la donnée à partir d'un QVariant, pos doit être valide.
-   void setDataP(const QVariant & value, int pos) override
+   void setDataP(const QVariant & value, szt pos) override
         {return pos < AttributPremier::NbrAtt ? AttributPremier::setDataP(value, pos)
                                               : Attributs<AttributSuivant...>::setDataP(value, pos - AttributPremier::NbrAtt);}
 };
 
-template<class AttFound, class Att, class AttPre, class AttSuiv, int Pos> struct PosisionEnumTemp
-{
+/*! \ingroup groupeEntity
+ * \brief Structure template de calcul des positions des attributs multiple.
+ */
+template<class AttFound, class Att, class AttPre, class AttSuiv, szt Pos> struct PosisionEnumTemp {
     enum {Position = PosisionEnumTemp<AttFound,AttPre,typename AttPre::AttPre,typename AttPre::AttSuiv,Pos>::Position
           + PosisionEnumTemp<AttFound,AttSuiv,typename AttSuiv::AttPre,typename AttSuiv::AttSuiv,AttPre::NbrAtt + Pos>::Position};
 };
 
-template<class AttFound, class Att, int Pos> struct PosisionEnumTemp<AttFound,Att,NoAttribut,NoAttribut,Pos>
+template<class AttFound, class Att, szt Pos> struct PosisionEnumTemp<AttFound,Att,NoAttribut,NoAttribut,Pos>
     {enum {Position = 0};};
 
-template<class AttFound, int Pos> struct PosisionEnumTemp<AttFound,AttFound,NoAttribut,NoAttribut,Pos>
+template<class AttFound, szt Pos> struct PosisionEnumTemp<AttFound,AttFound,NoAttribut,NoAttribut,Pos>
     {enum {Position = Pos};};
 
-template<class AttFound, int Pos> struct PosisionEnumTemp<AttFound,Attributs<AttFound>,NoAttribut,NoAttribut,Pos>
+template<class AttFound, szt Pos> struct PosisionEnumTemp<AttFound,Attributs<AttFound>,NoAttribut,NoAttribut,Pos>
     {enum {Position = Pos};};
 
 template<class AttFound, class Ent> using PositionEnum = PosisionEnumTemp<AttFound,Ent,typename Ent::AttPre,typename Ent::AttSuiv,0>;
+}
 
-using CibleAttributs = Attributs<IdCibleAttribut, CibleAttribut>;
-using CibleDateTimeAttribut = Attributs<CibleAttributs, DateTimeValideAttribut>;
-using CibleDateTimeNumAttribut = Attributs<CibleDateTimeAttribut, NumAttribut>;
-using EtatAttributs = Attributs<IdEtatAttribut, EtatAttribut>;
-template<class ValeurAttribut> using CibleDateTimeNumValeurAttribut = Attributs<CibleDateTimeNumAttribut, ValeurAttribut>;
-using RelationAttribut = Attributs<Id1Attribut, Id2Attribut>;
-using RelationDateTimeAttribut = Attributs<RelationAttribut, DateTimeValideAttribut>;
-using RelationNumAttribut = Attributs<RelationAttribut, NumAttribut>;
-using IdNumAttribut = Attributs<Id1Attribut, NumAttribut>;
-using IdProgNomAttribut = Attributs<IdProgAttribut,NomAttribut>;
-template<class ValeurAttribut> using IdNumValeurAttribut = Attributs<IdNumAttribut, ValeurAttribut>;
-using NomTypeAttribut = Attributs<NomAttribut, TypeAttribut>;
-using NcNomAttribut = Attributs<NcAttribut, NomAttribut>;
-using NcNomTypeAttribut = Attributs<NcNomAttribut, TypeAttribut>;
-using TexteAttributs = Attributs<CreationAttribut,ModificationAttribut,TexteAttribut>;
+namespace attributMPS {
+namespace emps = entityMPS;
+
+// Attributs Multiples Prédéfinies
+using CibleAttributs = emps::Attributs<IdCibleAttribut, CibleAttribut>;
+using CibleDateTimeAttribut = emps::Attributs<CibleAttributs, DateTimeValideAttribut>;
+using CibleDateTimeNumAttribut = emps::Attributs<CibleDateTimeAttribut, NumAttribut>;
+using EtatAttributs = emps::Attributs<IdEtatAttribut, EtatAttribut>;
+template<class ValeurAttribut> using CibleDateTimeNumValeurAttribut = emps::Attributs<CibleDateTimeNumAttribut, ValeurAttribut>;
+using RelationAttribut = emps::Attributs<Id1Attribut, Id2Attribut>;
+using RelationDateTimeAttribut = emps::Attributs<RelationAttribut, DateTimeValideAttribut>;
+using RelationNumAttribut = emps::Attributs<RelationAttribut, NumAttribut>;
+using IdNumAttribut = emps::Attributs<Id1Attribut, NumAttribut>;
+using IdProgNomAttribut = emps::Attributs<IdProgAttribut,NomAttribut>;
+template<class ValeurAttribut> using IdNumValeurAttribut = emps::Attributs<IdNumAttribut, ValeurAttribut>;
+using NomTypeAttribut = emps::Attributs<NomAttribut, TypeAttribut>;
+using NcNomAttribut = emps::Attributs<NcAttribut, NomAttribut>;
+using NcNomTypeAttribut = emps::Attributs<NcNomAttribut, TypeAttribut>;
+using TexteAttributs = emps::Attributs<CreationAttribut,ModificationAttribut,TexteAttribut>;
+
+/*! \ingroup groupeEntity
+ * \brief Attributs des entités de type arbre.
+ */
+class ArbreAttribut : public emps::Attributs<ParentAttribut,FeuilleAttribut,NumAttribut> {
+public:
+    enum {Ordre = emps::PositionEnum<NumAttribut,ArbreAttribut>::Position};
+    //using Attributs<ArbreSimpleAttribut,FeuilleAttribut,NumAttribut>::Attributs;
+    CONSTR_DEFAUT(ArbreAttribut)
+    CONSTR_AFFECT_DEFAUT(ArbreAttribut)
+
+    //! Destructeur.
+    //~ArbreAttribut() override;
+};
 
 /*! \ingroup groupeAttributEntity
  * \brief Attributs contenant deux identifiants dont exactement un est non nul pour être valide.
  */
-class RelationExactOneNotNullAttribut : public Attributs<Id1NullAttribut,Id2NullAttribut>
-{
+class RelationExactOneNotNullAttribut : public emps::Attributs<Id1NullAttribut,Id2NullAttribut> {
 public:
     CONSTR_DEFAUT(RelationExactOneNotNullAttribut)
     CONSTR_AFFECT_DEFAUT(RelationExactOneNotNullAttribut)
@@ -124,8 +155,7 @@ public:
 /*! \ingroup groupeAttributEntity
  * \brief Attributs contenant trois identifiants dont exactement un est non nul pour être valide.
  */
-class RelationTroisExactOneNotNullAttribut : public Attributs<Id1NullAttribut,Id2NullAttribut,Id3NullAttribut>
-{
+class RelationTroisExactOneNotNullAttribut : public emps::Attributs<Id1NullAttribut,Id2NullAttribut,Id3NullAttribut> {
 public:
     CONSTR_DEFAUT(RelationTroisExactOneNotNullAttribut)
     CONSTR_AFFECT_DEFAUT(RelationTroisExactOneNotNullAttribut)
@@ -136,4 +166,5 @@ public:
                 || (Id2NullAttribut::isValidAttribut() && id1() == 0 && id3() == 0)
                 || (Id3NullAttribut::isValidAttribut() && id1() == 0 && id2() == 0);}
 };
+}
 #endif // ENTITYATTRIBUT_H

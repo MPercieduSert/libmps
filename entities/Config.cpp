@@ -1,23 +1,22 @@
 #include "Config.h"
 
-Config::~Config()
-{
+using namespace fichierMPS;
+
+Config::~Config() {
     if(m_confFile.isOpen())
         m_confFile.close();
 }
 
-void Config::add(const QString & path, const QString & value, const QMap<QString, QString> & attributes)
-{
+void Config::add(const QString & path, const QString & value, const std::map<QString, QString> & attributes) {
     XmlDoc doc;
     readConfIn(doc);
-    doc.seek(path, true);
-    doc.setText(value);
-    doc.setAttributes(attributes);
+    auto iter = doc.seek(path);
+    iter->setText(value);
+    iter->setAttributes(attributes);
     writeConf(doc);
 }
 
-bool Config::copy(const QString &name)
-{
+bool Config::copy(const QString &name) {
     Config file(name);
     if(file.exists() && file.isValid())
         return file.m_confFile.copy(m_fileName);
@@ -48,11 +47,10 @@ bool Config::copy(const QString &name)
 //    return true;
 //}
 
-QString Config::getVars(const QString & name)
-{
+QString Config::getVars(const QString & name) {
     openRead();
     XmlReader xml(&m_confFile);
-    QString result = xml.getVars(name).first();
+    auto result = xml.getVars(name).front();
     close();
     return result;
 }
@@ -67,7 +65,7 @@ QStringList Config::getVars(const QString & name, const QString & attName, const
     return result;
 }
 
-QStringList Config::getVars(const QString & name, const QMap<QString,QString> & atts)
+QStringList Config::getVars(const QString & name, const std::map<QString,QString> & atts)
 {
     openRead();
     XmlReader xml(&m_confFile);
@@ -76,86 +74,77 @@ QStringList Config::getVars(const QString & name, const QMap<QString,QString> & 
     return result;
 }
 
-QVector<varAtts> Config::getVarsAtts(const QString & name, const QString & attName, const QString & attValue)
+std::vector<varAtts> Config::getVarsAtts(const QString & name, const QString & attName, const QString & attValue)
 {
     openRead();
     XmlReader xml(&m_confFile);
-    QVector<varAtts> result = xml.getVarsAtts(name, attName, attValue);
+    std::vector<varAtts> result = xml.getVarsAtts(name, attName, attValue);
     close();
     return result;
 }
 
-QVector<varAtts> Config::getVarsAtts(const QString & name, const QMap<QString,QString> & atts)
+std::vector<varAtts> Config::getVarsAtts(const QString & name, const std::map<QString,QString> & atts)
 {
     openRead();
     XmlReader xml(&m_confFile);
-    QVector<varAtts> result = xml.getVarsAtts(name, atts);
+    std::vector<varAtts> result = xml.getVarsAtts(name, atts);
     close();
     return result;
 }
 */
 
-QVector<varAtts> Config::getVarsAtts(const QString & name)
-{
+std::vector<varAtts> Config::getVarsAtts(const QString & name) {
     openRead();
     XmlReader xml(&m_confFile);
-    QVector<varAtts> result = xml.getVarsAtts(name);
+    auto result = xml.getVarsAtts(name);
     close();
     return result;
 }
 
-bool Config::isValid()
-{
+bool Config::isValid() {
     openRead();
     QXmlStreamReader xml(&m_confFile);
     if (xml.readNextStartElement())
-    {
         if (xml.name() != "conf")
                 xml.raiseError(QObject::tr("Le fichier config.xml n'est pas valide"));
-    }
     close();
     return !xml.error();
 
 }
 
-void Config::modify(const QString &path, const QString &value, const QMap<QString, QString> &attributes)
-{
+void Config::modify(const QString &path, const QString &value, const std::map<QString, QString> &attributes) {
     XmlDoc doc;
     readConfIn(doc);
-    doc.seek(path, false);
-    doc.setText(value);
-    doc.setAttributes(attributes);
+    auto iter = doc.seek(path);
+    iter->setText(value);
+    iter->setAttributes(attributes);
     writeConf(doc);
 }
 
-bool Config::open()
-{
+bool Config::open() {
     bool test = m_confFile.open(QFile::ReadWrite);
     m_confFile.close();
     return test;
 }
 
-void Config::readConfIn(XmlDoc & doc)
-{
+void Config::readConfIn(XmlDoc & doc) {
     openRead();
     XmlReader xmlR(&m_confFile);
     xmlR.readIn(doc);
     close();
 }
 
-void Config::setFileName(const QString & fileName)
-{
+void Config::setFileName(const QString & fileName) {
     FileInterface::setFileName(fileName);
     if(m_confFile.isOpen())
         m_confFile.close();
     m_confFile.setFileName(fileName);
 }
 
-bool Config::varExists(const QString & name)
-{
+bool Config::varExists(const QString & name) {
     openRead();
     XmlReader xml(&m_confFile);
-    bool result = xml.exists(name);
+    auto result = xml.exists(name);
     close();
     return result;
 }
@@ -170,7 +159,7 @@ bool Config::varExists(const QString & name, const QString & attName, const QStr
     return result;
 }
 
-bool Config::varExists(const QString &name, const QMap<QString, QString> &atts)
+bool Config::varExists(const QString &name, const std::map<QString, QString> &atts)
 {
     openRead();
     XmlReader xml(&m_confFile);
@@ -181,8 +170,7 @@ bool Config::varExists(const QString &name, const QMap<QString, QString> &atts)
 }
 */
 
-void Config::recopie(const QString & path)
-{
+void Config::recopie(const QString & path) {
     openRead();
     XmlReader xmlR(&m_confFile);
     XmlDoc doc(xmlR.read());
@@ -194,8 +182,7 @@ void Config::recopie(const QString & path)
     output.close();
 }
 
-void Config::writeConf(XmlDoc & doc)
-{
+void Config::writeConf(XmlDoc & doc) {
     openWrite();
     XmlWriter xmlW(&m_confFile);
     xmlW.write(doc);

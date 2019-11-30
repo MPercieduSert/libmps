@@ -7,11 +7,11 @@
 #include "AbstractZoneCentrale.h"
 #include "AbstractTab.h"
 
+namespace fenMPS {
 /*! \ingroup groupeFen
  * \brief Zone centrale de type porte onglets.
  */
-class AbstractTabZoneCentrale : public AbstractZoneCentrale
-{
+class AbstractTabZoneCentrale : public AbstractZoneCentrale {
     Q_OBJECT
 protected:
     AbstractTab * m_tab;            //!< Porte onglet.
@@ -42,5 +42,5 @@ public slots:
     //! Demande à l'onglet actif de sauvegarder.
     void save() override    {m_tab->save();}
 };
-
+}
 #endif // ABSTRACTTABZONECENTRALE_H

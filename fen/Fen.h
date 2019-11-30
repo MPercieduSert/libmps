@@ -2,28 +2,35 @@
  *Date: 18/09/2018
  */
 
-/*! \ingroup groupeFen
- *
- * \brief Classe parente des fenêtres autre que la fenêtre principale.
- */
-
 #ifndef FEN_H
 #define FEN_H
 
 #include <QWidget>
 
-class FenPrincipale;
+/*! \defgroup groupeFen Fenêtre
+ * \brief Ensemble de classes des fenêtres.
+ */
 
-class Fen : public QWidget
-{
+/*! \ingroup groupeFen
+ * \brief Espace de noms des fenêtres.
+ */
+
+namespace fenMPS {
+/*! \ingroup groupeFen
+ *
+ * \brief Classe parente des fenêtres autre que la fenêtre principale.
+ */
+class Fen : public QWidget {
     Q_OBJECT
 public:
     //! Constructeur.
-    explicit Fen(QWidget *parent = nullptr);
+    explicit Fen(QWidget *parent = nullptr)
+        : QWidget(parent)
+    {}
 
 signals:
 
 public slots:
 };
-
+}
 #endif // FEN_H

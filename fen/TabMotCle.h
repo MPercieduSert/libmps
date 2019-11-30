@@ -14,17 +14,18 @@
 #include "TreeModelMotCle.h"
 #include "MotCleWidget.h"
 
+namespace fenMPS {
+using namespace typeMPS;
 /*! \ingroup groupeFen
  * \brief Classe de l'onglet de gestion des mots clés.
  */
-class TabMotCle : public AbstractTabModuleWithBdd
-{
+class TabMotCle : public AbstractTabModuleWithBdd {
     Q_OBJECT
 protected:
 
     QTreeView * m_treeWidget;       //!< Affichage de l'arbre des mots clés.
-    TreeModelMotCle * m_treeModel;  //!< Model de l'arbre des mots clés.
-    MotCleWidget * m_motCleWidget;      //!< Widget d'attribution des mot clés.
+    modelMPS::TreeModelMotCle * m_treeModel;  //!< Model de l'arbre des mots clés.
+    widgetMPS::MotCleWidget * m_motCleWidget;      //!< Widget d'attribution des mot clés.
     QSplitter * m_horizontalSplitter;     //!< Splitter horizontale.
     QHBoxLayout * m_mainLayout;         //!< Calque principal.
 
@@ -36,17 +37,19 @@ public:
     ~TabMotCle() override = default;
 
     //! Acceseur de la base de données.
-    BddPredef * bdd() const
-        {return static_cast<BddPredef *>(AbstractTabModuleWithBdd::bdd());}
+    bmps::BddPredef * bdd() const
+        {return static_cast<bmps::BddPredef *>(AbstractTabModuleWithBdd::bdd());}
 
     //! Titre.
     QString title() const override
         {return QString(tr("Mot-Clés"));}
+
 public slots:
     //! Action à effectuer lorsque l'onglet devient actif.
     void becomeCurrent() override;
+
     //! Transmet la liste des identifiant des mots clés séléctionner dans la séléction à m_motCleWidget.
     void selectionMotcle(const QItemSelection &selected, const QItemSelection &deselected);
 };
-
+}
 #endif // TABMOTCLE_H

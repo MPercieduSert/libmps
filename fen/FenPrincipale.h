@@ -16,6 +16,7 @@
 #include "AbstractNoyau.h"
 #include "AbstractZoneCentrale.h"
 
+namespace fenMPS {
 /*! \ingroup groupeFen
  * \brief Fenêtre principale de l'application.
  *
@@ -23,8 +24,7 @@
  *  + Crée les différents menus.
  *
  */
-class FenPrincipale : public QMainWindow
-{
+class FenPrincipale : public QMainWindow {
     Q_OBJECT
 protected:
     // Action
@@ -49,7 +49,7 @@ protected:
 
 public:
     //! Constructeur.
-    explicit FenPrincipale(AbstractNoyau * noyau, Bdd * bdd, AbstractZoneCentrale * centralZone,
+    explicit FenPrincipale(AbstractNoyau * noyau, bmps::Bdd * bdd, AbstractZoneCentrale * centralZone,
                            const QString & bddPathXML,
                            const QString & configPath = QDir::currentPath().append("/Config.xml"),
                            QWidget *parent = nullptr);
@@ -67,4 +67,5 @@ protected:
     //! Crée les toolbars de la fenêtre principale.
     void createToolBar();
 };
+}
 #endif // FENPRINCIPALE_H

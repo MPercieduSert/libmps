@@ -13,7 +13,7 @@
 //! \ingroup groupeManager
 //! Coprs des deux methodes saveValide.
 #define SAVE_VALIDE if(entity.isNew()) \
-        {if(existsUnique(entity) == bdd::Aucun) \
+        {if(existsUnique(entity) == bmps::Aucun) \
             add(entity); \
          else \
             throw std::invalid_argument(messageErreursUnique(entity) \
@@ -21,7 +21,7 @@
                         "ayant les mêmes valeurs d'attributs unique que cette nouvelle entité.").toStdString());} \
     else \
         {if(!sameInBdd(entity)) \
-            {if(existsUnique(entity) <= bdd::Meme) \
+            {if(existsUnique(entity) <= bmps::Meme) \
                 modify(entity); \
             else \
                 throw std::invalid_argument(messageErreursUnique(entity) \
@@ -36,16 +36,16 @@
 else \
     throw std::invalid_argument(messageErreurs(entity).append("\n Erreur de validité").toStdString());
 
+namespace managerMPS {
 /*! \ingroup groupeManager
  * \brief Classe template mère des différents manageurs de type SQL.
  */
-class AbstractManagerSql :  public ReqSql
-{
+class AbstractManagerSql :  public ReqSql {
 protected:
-    static const QVector<QString> m_fonctionAgregaString;
-    static const QVector<QString> m_conditionString;
-    //static const QVector<QString> m_conditionNullString;
-    //static const std::array<const char *, bdd::Condition> m_fonctionConditionString;
+    static const std::vector<QString> m_fonctionAgregaString;
+    static const std::vector<QString> m_conditionString;
+    //static const std::vector<QString> m_conditionNullString;
+    //static const std::array<const char *, bmps::condition> m_fonctionConditionString;
 
 public:
     CONSTR_DEFAUT(AbstractManagerSql)
@@ -60,8 +60,7 @@ public:
  * La classe Ent est la classe d'entité de programmation
  * et le pointeur unique permet de faire les tests d'unicité.
  */
-template<class Ent> class ManagerSql : public AbstractManagerTemp<Ent>, public AbstractManagerSql
-{
+template<class Ent> class ManagerSql : public AbstractManagerTemp<Ent>, public AbstractManagerSql {
 protected:
     LinkSql<Ent> m_link;            //!< Lien.
     InfoBdd m_info;                 //!< Information sur la table dans la base de donnée.
@@ -88,7 +87,7 @@ protected:
     QString m_sqlGetList2Where1;    //!< Requéte sql de lecture des lignes de la table vérifiant deux conditions triées suivant une colonne.
     QString m_sqlGetListId2Where1;    //!< Requéte sql de lecture des identifiants de la table vérifiant deux conditions triées suivant une colonne.
     QString m_sqlGetList3Where1;    //!< Requéte sql de lecture des lignes de la table vérifiant deux conditions triées suivant une colonne.
-     QString m_sqlGetListId3Where1;    //!< Requéte sql de lecture des identifiants de la table vérifiant deux conditions triées suivant une colonne.
+    QString m_sqlGetListId3Where1;    //!< Requéte sql de lecture des identifiants de la table vérifiant deux conditions triées suivant une colonne.
     QString m_sqlGetListJoin;        //!< Requéte sql de lecture des lignes de la table vérifiant une condition avec une jointure triées jusqu'à trois colonnes.
     QString m_sqlGetListJoin1Where1;        //!< Requéte sql de lecture des lignes de la table vérifiant une condition avec une jointure triées suivant une colonne.
     QString m_sqllastId;    //!< Requéte sql de lecture de l'identifiant de la dernière ligne insérée dans la table.
@@ -113,21 +112,19 @@ public:
     ~ManagerSql() override  {delete m_unique;}
 
     //! Renvoie le nom en base de donnée du i-ème attribut.
-    const QString & attribut(int pos) const
+    const QString & attribut(szt pos) const
         {return m_info.attribut(pos);}
 
     //! Crée dans la base de donnée la table associée l'entité du manageur.
     void creer() override;
 
     /*//! Renvoie le nom en base de donnée du i-ème attribut unique.
-    const QString & attributUnique(int i) const
+    const QString & attributUnique(szt i) const
         {return m_link.attribut(m_unique.attributUnique(i));}*/
 
     //! Teste s'il existe une entité de même identifiant que entity en base de donnée.
-    bool exists(const Entity & entity) override
-    {
-        if(Ent::verifEntity(entity))
-        {
+    bool exists(const Entity & entity) override {
+        if(Ent::verifEntity(entity)) {
             prepare(m_sqlExists);
             m_link.setId(entity);
             exec();
@@ -140,8 +137,7 @@ public:
     }
 
     //! Teste s'il existe une entité de même identifiant que entity en base de donnée.
-    bool exists(const Ent & entity) override
-    {
+    bool exists(const Ent & entity) override {
         prepare(m_sqlExists);
         m_link.setId(entity);
         exec();
@@ -151,8 +147,7 @@ public:
     }
 
     //! Teste s'il existe une entité vérifiant une condition.
-    bool exists(typename Ent::Position cle, const QVariant & value, bdd::Condition cond = bdd::Condition::Egal) override
-    {
+    bool exists(typename Ent::Position cle, const QVariant & value, bmps::condition cond = bmps::condition::Egal) override {
         prepare(m_sqlExistsWhere.arg(QString(attribut(cle)).append(m_conditionString[cond]).append("?")));
         bindValue(0,value);
         exec();
@@ -164,22 +159,21 @@ public:
     //! Teste s'il existe une entité ayant les mêmes valeurs d'attributs uniques que l'entité entity en base de donnée.
     //! Si le test est positif, l'identitfiant de l'entité entity est remplacé par celui de l'entité en base de donnée
     //! ayant les mêmes valeurs d'attributs uniques.
-    bdd::ExisteUni existsUnique(Ent & entity) override
+    bmps::existeUni existsUnique(Ent & entity) override
         {return m_unique->existsUnique(entity);}
 
     //! Teste s'il existe une entité ayant les mêmes valeurs d'attributs uniques que entity en base de donnée.
-    bdd::ExisteUni existsUnique(const Ent & entity) override
+    bmps::existeUni existsUnique(const Ent & entity) override
         {return existsUniqueId(entity).first;}
 
     //! Teste s'il existe une entité ayant les mêmes valeurs d'attributs uniques que l'entité entity en base de donnée
     //! et renvoie l'identifiant du premier trouver.
-    QPair<bdd::ExisteUni,idt> existsUniqueId(const Ent & entity) override
+    std::pair<bmps::existeUni,idt> existsUniqueId(const Ent & entity) override
         {return m_unique->existsUniqueId(entity);}
 
 
     //! Supprime de la table en base de donnée l'entité d'identifiant id.
-    bool del(idt id) override
-    {
+    bool del(idt id) override {
         prepare(m_sqlDelete);
         bindValue(0,id);
         execFinish();
@@ -187,8 +181,7 @@ public:
     }
 
     //! Fonction d'agrega de valeur de type T sur l'attribut att appliquée à toutes les entités de la table.
-    QVariant fonctionAgrega(bdd::Agrega fonc, typename Ent::Position att) override
-    {
+    QVariant fonctionAgrega(bmps::agrega fonc, typename Ent::Position att) override {
         exec(m_sqlFonctionAgrega.arg(m_fonctionAgregaString[fonc],
                                      attribut(att)));
         next();
@@ -197,10 +190,9 @@ public:
 
     //! Fonction d'agrega de valeur de type T sur l'attribut att appliquée à toutes les entités vérifiant la condition,
     //! valeur de la colonne d'identifiant cle = value.
-    QVariant fonctionAgrega(bdd::Agrega fonc, typename Ent::Position att,
+    QVariant fonctionAgrega(bmps::agrega fonc, typename Ent::Position att,
                                        typename Ent::Position cle, const QVariant & value,
-                                       bdd::Condition cond = bdd::Condition::Egal) override
-    {      
+                                       bmps::condition cond = bmps::condition::Egal) override {
         prepare(m_sqlFonctionAgregaWhere1.arg(m_fonctionAgregaString[fonc],
                                               attribut(att),
                                               attribut(cle),
@@ -213,11 +205,11 @@ public:
 
     //! Fonction d'agrega de valeur de type T sur l'attribut att appliquée à toutes les entités vérifiant les deux conditions,
     //! valeur de la colonne d'identifiant cle1 = value1 et valeur de la colonne d'identifiant cle2 = value2.
-    QVariant fonctionAgrega(bdd::Agrega fonc, typename Ent::Position att,
+    QVariant fonctionAgrega(bmps::agrega fonc, typename Ent::Position att,
                                        typename Ent::Position cle1, const QVariant & value1,
                                        typename Ent::Position cle2, const QVariant & value2,
-                                       bdd::Condition cond1 = bdd::Condition::Egal, bdd::Condition cond2 = bdd::Condition::Egal) override
-    {
+                                       bmps::condition cond1 = bmps::condition::Egal,
+                                       bmps::condition cond2 = bmps::condition::Egal) override {
         prepare(m_sqlFonctionAgregaWhere2.arg(m_fonctionAgregaString[fonc],
                                               attribut(att),
                                               attribut(cle1),
@@ -234,34 +226,29 @@ public:
     //! Hydrate l'entité entity avec les valeurs des attributs de l'entité enregistrée en base de donnée
     //! ayant le même identifiant que entity.
     //! Retourne True si l'opération s'est correctement déroulée.
-    bool get(Ent & entity) override
-    {
+    bool get(Ent & entity) override {
         prepare(m_sqlGet);
         m_link.setId(entity);
         exec();
-        if(next())
-        {
+        if(next()) {
             m_link.fromRequete(entity);
             finish();
             return true;
         }
-        else
-        {
+        else {
             finish();
             return false;
         }
     }
 
     //! Renvoie la liste des entités de la table vérifiant la condition.
-    ListPtr<Ent> getList(const QString & condition) override
-    {
+    ListPtr<Ent> getList(const QString & condition) override {
         prepare(m_sqlGetListWhere.arg(condition));
         return listFromRequete();
     }
 
     //! Renvoie la liste des entités de la table ordonnée suivant la colonne d'identifiant ordre.
-    ListPtr<Ent> getList(typename Ent::Position ordre = Ent::Id, bool crois = true) override
-    {
+    ListPtr<Ent> getList(typename Ent::Position ordre = Ent::Id, bool crois = true) override {
         prepare(m_sqlGetList.arg(attribut(ordre),croissant(crois)));
         return listFromRequete();
     }
@@ -269,8 +256,8 @@ public:
     //! Renvoie la liste des entités de la table vérifiant la condition,
     //! valeur de la colonne d'identifiant cle = value, ordonnée suivant la colonne d'identifiant ordre.
     ListPtr<Ent> getList(typename Ent::Position cle, const QVariant & value,
-                         typename Ent::Position ordre = Ent::Id, bdd::Condition cond = bdd::Condition::Egal, bool crois = true) override
-    {
+                         typename Ent::Position ordre = Ent::Id,
+                         bmps::condition cond = bmps::condition::Egal, bool crois = true) override {
         prepare(m_sqlGetList1Where1.arg(attribut(cle), m_conditionString[cond],
                                         attribut(ordre), croissant(crois)));
         bindValue(0,value);
@@ -281,8 +268,7 @@ public:
     //! valeur de la colonne d'identifiant cle = value, ordonnée suivant les colonnes d'identifiant ordre1 puis ordre2.
     ListPtr<Ent> getList(typename Ent::Position cle, const QVariant & value,
                          typename Ent::Position ordre1, typename Ent::Position ordre2,
-                         bdd::Condition cond = bdd::Condition::Egal, bool crois1 = true, bool crois2 = true) override
-    {
+                         bmps::condition cond = bmps::condition::Egal, bool crois1 = true, bool crois2 = true) override {
         prepare(m_sqlGetList1Where2.arg(attribut(cle), m_conditionString[cond],
                                         attribut(ordre1), croissant(crois1),
                                         attribut(ordre2), croissant(crois2)));
@@ -294,9 +280,8 @@ public:
     //! valeur de la colonne d'identifiant cle = value, ordonnée suivant les colonnes d'identifiant ordre1, ordre2 puis ordre3.
     ListPtr<Ent> getList(typename Ent::Position cle, const QVariant & value,
                          typename Ent::Position ordre1, typename Ent::Position ordre2, typename Ent::Position ordre3,
-                         bdd::Condition cond = bdd::Condition::Egal,
-                         bool crois1 = true, bool crois2 = true, bool crois3 = true) override
-    {
+                         bmps::condition cond = bmps::condition::Egal,
+                         bool crois1 = true, bool crois2 = true, bool crois3 = true) override {
         prepare(m_sqlGetList1Where3.arg(attribut(cle), m_conditionString[cond],
                                         attribut(ordre1), croissant(crois1),
                                         attribut(ordre2), croissant(crois2),
@@ -311,9 +296,8 @@ public:
     ListPtr<Ent> getList(typename Ent::Position cle1, const QVariant & value1,
                          typename Ent::Position cle2,  const QVariant & value2,
                          typename Ent::Position ordre = Ent::Id,
-                         bdd::Condition cond1 = bdd::Condition::Egal, bdd::Condition cond2 = bdd::Condition::Egal,
-                         bool crois = true) override
-    {
+                         bmps::condition cond1 = bmps::condition::Egal, bmps::condition cond2 = bmps::condition::Egal,
+                         bool crois = true) override {
         prepare(m_sqlGetList2Where1.arg(attribut(cle1), m_conditionString[cond1],
                                         attribut(cle2), m_conditionString[cond2],
                                         attribut(ordre), croissant(crois)));
@@ -330,10 +314,9 @@ public:
                          typename Ent::Position cle2, const QVariant & value2,
                          typename Ent::Position cle3, const QVariant & value3,
                          typename Ent::Position ordre = Ent::Id,
-                         bdd::Condition cond1 = bdd::Condition::Egal, bdd::Condition cond2 = bdd::Condition::Egal,
-                         bdd::Condition cond3 = bdd::Condition::Egal,
-                         bool crois = true) override
-    {
+                         bmps::condition cond1 = bmps::condition::Egal, bmps::condition cond2 = bmps::condition::Egal,
+                         bmps::condition cond3 = bmps::condition::Egal,
+                         bool crois = true) override {
         prepare(m_sqlGetList3Where1.arg(attribut(cle1), m_conditionString[cond1],
                                         attribut(cle2), m_conditionString[cond2],
                                         attribut(cle3), m_conditionString[cond3],
@@ -348,48 +331,44 @@ public:
     //! valeur de la colonne d'identifiant cle[i] condition[i] value[i],
     //! ordonnée suivant les colonnes d'identifiant contenue dans ordre,
     //! croissante (crois[i]=true) ou décroissante (croiss[i]=false).
-    ListPtr<Ent> getList(const QList<typename Ent::Position> & cle, const QList<QVariant> & value,
-                         const QList<typename Ent::Position> & ordre = QList<typename Ent::Position>(),
-                         const QList<bdd::Condition> & condition = QList<bdd::Condition>(),
-                         const QList<bool> & crois = QList<bool>()) override
-    {
-        if(cle.count() != value.count())
+    ListPtr<Ent> getList(const std::vector<typename Ent::Position> & cle, const std::vector<QVariant> & value,
+                         const std::vector<typename Ent::Position> & ordre = std::vector<typename Ent::Position>(),
+                         const std::vector<bmps::condition> & condition = std::vector<bmps::condition>(),
+                         const std::vector<bool> & crois = std::vector<bool>()) override {
+        if(cle.size() != value.size())
             throw std::invalid_argument("getList le nombre de clés doit être égale au nombre de valeurs");
         QString sqlW;
 
-        for(int i = 0; i != cle.count(); ++i)
-        {
+        for(unsigned i = 0; i != cle.size(); ++i) {
             sqlW.append(attribut(i));
-            if(i < condition.count())
-                sqlW.append(m_conditionString.at(condition.at(i)));
+            if(i < condition.size())
+                sqlW.append(m_conditionString[condition[i]]);
             else
-                sqlW.append(m_conditionString[bdd::Condition::Egal]);
+                sqlW.append(m_conditionString[bmps::condition::Egal]);
             sqlW.append("? AND ");
         }
         sqlW.chop(4);
         QString sqlO;
-        for(int i =0; i != ordre.count(); ++i)
-        {
-            sqlO.append(m_conditionString.at(condition.at(i)));
-            if(i < crois.count())
-                sqlO.append(" ").append(croissant(crois.at(i)));
+        for(unsigned i =0; i != ordre.size(); ++i) {
+            sqlO.append(m_conditionString[condition[i]]);
+            if(i < crois.size())
+                sqlO.append(" ").append(croissant(crois[i]));
             sqlO.append(",");
         }
         sqlO.chop(1);
 
         prepare(m_sqlGetListWhereOrderby.arg(sqlW,sqlW));
-        for(int i = 0; i != value.count(); ++i)
-            bindValue(i,value.at(i));
+        for(unsigned i = 0; i != value.size(); ++i)
+            bindValue(i,value[i]);
 
         return listFromRequete();
     }
 
     //! Renvoie la liste des identifiants de la table vérifiant la condition,
     //! valeur de la colonne d'identifiant cle = value, ordonnée suivant la colonne d'identifiant ordre.
-    QList<idt> getListId(typename Ent::Position cle, const QVariant & value,
+    std::list<idt> getListId(typename Ent::Position cle, const QVariant & value,
                          typename Ent::Position ordre = Ent::Id,
-                         bdd::Condition cond = bdd::Condition::Egal, bool crois = true) override
-    {
+                         bmps::condition cond = bmps::condition::Egal, bool crois = true) override {
         prepare(m_sqlGetListId1Where1.arg(attribut(cle),m_conditionString[cond],
                                         attribut(ordre),croissant(crois)));
         bindValue(0,value);
@@ -398,11 +377,10 @@ public:
 
     //! Renvoie la liste des identifiants de la table vérifiant la condition,
     //! valeur de la colonne d'identifiant cle = value, ordonnée suivant les colonnes d'identifiant ordre1 puis ordre2.
-    QList<idt> getListId(typename Ent::Position cle, const QVariant & value,
+    std::list<idt> getListId(typename Ent::Position cle, const QVariant & value,
                          typename Ent::Position ordre1, typename Ent::Position ordre2,
-                         bdd::Condition cond = bdd::Condition::Egal,
-                         bool crois1 = true, bool crois2 = true) override
-    {
+                         bmps::condition cond = bmps::condition::Egal,
+                         bool crois1 = true, bool crois2 = true) override {
         prepare(m_sqlGetListId1Where2.arg(attribut(cle), m_conditionString[cond],
                                         attribut(ordre1), croissant(crois1),
                                         attribut(ordre2), croissant(crois2)));
@@ -412,11 +390,10 @@ public:
 
     //! Renvoie la liste des identifiants de la table vérifiant la condition,
     //! valeur de la colonne d'identifiant cle = value, ordonnée suivant les colonnes d'identifiant ordre1, ordre2 puis ordre3.
-    QList<idt> getListId(typename Ent::Position cle, const QVariant & value,
+    std::list<idt> getListId(typename Ent::Position cle, const QVariant & value,
                            typename Ent::Position ordre1, typename Ent::Position ordre2, typename Ent::Position ordre3,
-                           bdd::Condition cond = bdd::Condition::Egal,
-                           bool crois1 = true, bool crois2 = true, bool crois3 = true) override
-    {
+                           bmps::condition cond = bmps::condition::Egal,
+                           bool crois1 = true, bool crois2 = true, bool crois3 = true) override {
         prepare(m_sqlGetListId1Where3.arg(attribut(cle), m_conditionString[cond],
                                         attribut(ordre1), croissant(crois1),
                                         attribut(ordre2), croissant(crois2),
@@ -428,12 +405,11 @@ public:
     //! Renvoie la liste des identifiants de la table vérifiant les deux conditions,
     //! valeur de la colonne d'identifiant cle1 = value1 et valeur de la colonne d'identifiant cle2 = value2,
     //! ordonnée suivant la colonne d'identifiant ordre.
-    QList<idt> getListId(typename Ent::Position cle1, const QVariant & value1,
+    std::list<idt> getListId(typename Ent::Position cle1, const QVariant & value1,
                            typename Ent::Position cle2,  const QVariant & value2,
                            typename Ent::Position ordre = Ent::Id,
-                           bdd::Condition cond1 = bdd::Condition::Egal, bdd::Condition cond2 = bdd::Condition::Egal,
-                           bool crois = true) override
-    {
+                           bmps::condition cond1 = bmps::condition::Egal, bmps::condition cond2 = bmps::condition::Egal,
+                           bool crois = true) override {
         prepare(m_sqlGetListId2Where1.arg(attribut(cle1), m_conditionString[cond1],
                                         attribut(cle2), m_conditionString[cond2],
                                         attribut(ordre), croissant(crois)));
@@ -446,21 +422,20 @@ public:
     //! valeur de la colonne d'identifiant cle1 = value1, valeur de la colonne d'identifiant cle2 = value2
     //! et valeur de la colonne d'identifiant cle3 = value3,
     //! ordonnée suivant la colonne d'identifiant ordre.
-    QList<idt> getListId(typename Ent::Position cle1, const QVariant & value1,
+    std::list<idt> getListId(typename Ent::Position cle1, const QVariant & value1,
                          typename Ent::Position cle2, const QVariant & value2,
                          typename Ent::Position cle3, const QVariant & value3,
                          typename Ent::Position ordre = Ent::Id,
-                         bdd::Condition cond1 = bdd::Condition::Egal, bdd::Condition cond2 = bdd::Condition::Egal,
-                         bdd::Condition cond3 = bdd::Condition::Egal,
-                         bool crois = true) override
-    {
+                         bmps::condition cond1 = bmps::condition::Egal, bmps::condition cond2 = bmps::condition::Egal,
+                         bmps::condition cond3 = bmps::condition::Egal,
+                         bool crois = true) override {
         prepare(m_sqlGetListId3Where1.arg(attribut(cle1), m_conditionString[cond1],
                                         attribut(cle2), m_conditionString[cond2],
                                         attribut(cle3), m_conditionString[cond3],
                                         attribut(ordre), croissant(crois)));
         bindValue(0,value1);
         bindValue(1,value2);
-        bindValue(1,value3);
+        bindValue(2,value3);
         return listIdFromRequete();
     }
 
@@ -468,58 +443,54 @@ public:
     //! valeur de la colonne d'identifiant cle[i] condition[i] value[i],
     //! ordonnée suivant les colonnes d'identifiant contenue dans ordre,
     //! croissante (crois[i]=true) ou décroissante (croiss[i]=false).
-    QList<idt> getListId(const QList<typename Ent::Position> & cle, const QList<QVariant> & value,
-                           const QList<typename Ent::Position> & ordre = QList<typename Ent::Position>(),
-                           const QList<bdd::Condition> & condition = QList<bdd::Condition>(),
-                           const QList<bool> & crois = QList<bool>()) override
-    {
-        if(cle.count() != value.count())
+    std::list<idt> getListId(const std::vector<typename Ent::Position> & cle, const std::vector<QVariant> & value,
+                           const std::vector<typename Ent::Position> & ordre = std::vector<typename Ent::Position>(),
+                           const std::vector<bmps::condition> & condition = std::vector<bmps::condition>(),
+                           const std::vector<bool> & crois = std::vector<bool>()) override {
+        if(cle.size() != value.size())
             throw std::invalid_argument("getList le nombre de clés doit être égale au nombre de valeurs");
         QString sqlW;
 
-        for(int i = 0; i != cle.count(); ++i)
-        {
+        for(unsigned i = 0; i != cle.size(); ++i) {
             sqlW.append(attribut(i));
-            if(i < condition.count())
-                sqlW.append(m_conditionString.at(condition.at(i)));
+            if(i < condition.size())
+                sqlW.append(m_conditionString[condition[i]]);
             else
-                sqlW.append(m_conditionString[bdd::Condition::Egal]);
+                sqlW.append(m_conditionString[bmps::condition::Egal]);
             sqlW.append("? AND ");
         }
         sqlW.chop(4);
         QString sqlO;
-        for(int i =0; i != ordre.count(); ++i)
-        {
-            sqlO.append(m_conditionString.at(condition.at(i)));
-            if(i < crois.count())
-                sqlO.append(" ").append(croissant(crois.at(i)));
+        for(unsigned i =0; i != ordre.size(); ++i) {
+            sqlO.append(ordre[i]);
+            if(i < crois.size())
+                sqlO.append(" ").append(croissant(crois[i]));
             sqlO.append(",");
         }
         sqlO.chop(1);
 
-        prepare(m_sqlGetListIdWhereOrderby.arg(sqlW,sqlW));
-        for(int i = 0; i != value.count(); ++i)
-            bindValue(i,value.at(i));
+        prepare(m_sqlGetListIdWhereOrderby.arg(sqlW,sqlO));
+        for(szt i = 0; i != value.size(); ++i)
+            bindValue(i,value[i]);
 
         return listIdFromRequete();
     }
 
     //! Renvoie la liste des entités de la table vérifiant une condition sur une jointure (colonneTable = colonneJoin),
-    //! valeur des colonnes de la table Ent d'identifiant key = value de QMap whereMapTable,
-    //! valeur des colonnes de la table Join key = value de QMap whereMapJoin,
+    //! valeur des colonnes de la table Ent d'identifiant key = value de std::map whereMapTable,
+    //! valeur des colonnes de la table Join key = value de std::map whereMapJoin,
     //! ordonnée suivant les colonnes de la table Ent d'identifiants key
-    //! et d'ordre value de QMap orderMapTable (true -> croissant, false -> décroissant).
-    ListPtr<Ent> getListJoin(const QString & tableJoin, int colonneTable,
+    //! et d'ordre value de std::map orderMapTable (true -> croissant, false -> décroissant).
+    ListPtr<Ent> getListJoin(const QString & tableJoin, szt colonneTable,
                                                    const QString & colonneJoin,
-                                                   const QMap<int,QVariant> & whereMapTable,
-                                                   const QMap<QString,QVariant> & whereMapJoin,
-                                                   const QList<QPair<int,bool>> & orderMapTable) override
-    {
+                                                   const std::map<szt,QVariant> & whereMapTable,
+                                                   const std::map<QString,QVariant> & whereMapJoin,
+                                                   const std::vector<std::pair<szt,bool>> & orderMapTable) override {
         QString sqlWhere;
-        for(QMap<int,QVariant>::const_iterator i = whereMapTable.cbegin(); i != whereMapTable.cend(); ++i)
-            sqlWhere.append("T.").append(attribut(i.key())).append("=? AND ");
-        for(QMap<QString,QVariant>::const_iterator i = whereMapJoin.cbegin(); i != whereMapJoin.cend(); ++i)
-            sqlWhere.append("J.").append(i.key()).append("=? AND ");
+        for(auto i = whereMapTable.cbegin(); i != whereMapTable.cend(); ++i)
+            sqlWhere.append("T.").append(attribut(i->first)).append("=? AND ");
+        for(auto i = whereMapJoin.cbegin(); i != whereMapJoin.cend(); ++i)
+            sqlWhere.append("J.").append(i->first).append("=? AND ");
         sqlWhere.chop(5);
         QString sqlOrder;
         for(auto i = orderMapTable.cbegin(); i != orderMapTable.cend(); ++i)
@@ -530,11 +501,11 @@ public:
                                      colonneJoin,
                                      sqlWhere,
                                      sqlOrder));
-        int j = 0;
-        for(QMap<int,QVariant>::const_iterator i = whereMapTable.cbegin(); i != whereMapTable.cend(); ++i, ++j)
-            bindValue(j,i.value());
-        for(QMap<QString,QVariant>::const_iterator i = whereMapJoin.cbegin(); i != whereMapJoin.cend(); ++i, ++j)
-            bindValue(j,i.value());
+        szt j = 0;
+        for(auto i = whereMapTable.cbegin(); i != whereMapTable.cend(); ++i, ++j)
+            bindValue(j,i->second);
+        for(auto i = whereMapJoin.cbegin(); i != whereMapJoin.cend(); ++i, ++j)
+            bindValue(j,i->second);
         return listFromRequete();
     }
 
@@ -546,8 +517,7 @@ public:
                              const QString & whereJoin,
                              const QVariant & valueWhere,
                              typename Ent::Position ordre = Ent::Id,
-                             bdd::Condition cond = bdd::Condition::Egal, bool crois = true) override
-    {
+                             bmps::condition cond = bmps::condition::Egal, bool crois = true) override {
         prepare(m_sqlGetListJoin1Where1.arg(tableJoin,
                                             colonneJoin,
                                             whereJoin, m_conditionString[cond],
@@ -557,24 +527,21 @@ public:
     }
 
     //! Renvoie la map des entités de la table vérifiant la condition.
-    MapPtr<Ent> getMap(const QString & condition, typename Ent::Position cleMap = Ent::Id)
-    {
+    mapIdt<Ent> getMap(const QString & condition, typename Ent::Position cleMap = Ent::Id) {
         prepare(m_sqlGetListWhere.arg(condition));
         return mapFromRequete(cleMap);
     }
 
     //! Renvoie la map des entités de la table.
-    MapPtr<Ent> getMap(typename Ent::Position cleMap = Ent::Id)
-    {
+    mapIdt<Ent> getMap(typename Ent::Position cleMap = Ent::Id) {
         prepare(m_sqlGetList.arg(attribut(cleMap),QString()));
         return mapFromRequete(cleMap);
     }
 
     //! Renvoie la map des entités de la table vérifiant la condition,
     //! valeur de la colonne d'identifiant cle = value.
-    MapPtr<Ent> getMap(typename Ent::Position cle, const QVariant & value,
-                       typename Ent::Position cleMap = Ent::Id, bdd::Condition cond = bdd::Condition::Egal) override
-    {
+    mapIdt<Ent> getMap(typename Ent::Position cle, const QVariant & value,
+                       typename Ent::Position cleMap = Ent::Id, bmps::condition cond = bmps::condition::Egal) override {
         prepare(m_sqlGetList1Where1.arg(attribut(cle), m_conditionString[cond],
                                         attribut(cleMap), QString()));
         bindValue(0,value);
@@ -583,11 +550,10 @@ public:
 
     //! Renvoie la map des entités de la table vérifiant les deux conditions,
     //! valeur de la colonne d'identifiant cle1 = value1 et valeur de la colonne d'identifiant cle2 = value2.
-    MapPtr<Ent> getMap(typename Ent::Position cle1, const QVariant & value1,
+    mapIdt<Ent> getMap(typename Ent::Position cle1, const QVariant & value1,
                        typename Ent::Position cle2,  const QVariant & value2,
                        typename Ent::Position cleMap = Ent::Id,
-                       bdd::Condition cond1 = bdd::Condition::Egal, bdd::Condition cond2 = bdd::Condition::Egal) override
-    {
+                       bmps::condition cond1 = bmps::condition::Egal, bmps::condition cond2 = bmps::condition::Egal) override {
         prepare(m_sqlGetList2Where1.arg(attribut(cle1), m_conditionString[cond1],
                                         attribut(cle2), m_conditionString[cond2],
                                         attribut(cleMap), QString()));
@@ -599,20 +565,19 @@ public:
     //! Renvoie la map des entités de la table vérifiant les deux conditions,
     //! valeur de la colonne d'identifiant cle1 = value1, valeur de la colonne d'identifiant cle2 = value2
     //! et valeur de la colonne d'identifiant cle3 = value3.
-    MapPtr<Ent> getMap(typename Ent::Position cle1, const QVariant & value1,
+    mapIdt<Ent> getMap(typename Ent::Position cle1, const QVariant & value1,
                          typename Ent::Position cle2, const QVariant & value2,
                          typename Ent::Position cle3, const QVariant & value3,
                          typename Ent::Position cleMap = Ent::Id,
-                         bdd::Condition cond1 = bdd::Condition::Egal, bdd::Condition cond2 = bdd::Condition::Egal,
-                         bdd::Condition cond3 = bdd::Condition::Egal) override
-    {
+                         bmps::condition cond1 = bmps::condition::Egal, bmps::condition cond2 = bmps::condition::Egal,
+                         bmps::condition cond3 = bmps::condition::Egal) override {
         prepare(m_sqlGetList3Where1.arg(attribut(cle1), m_conditionString[cond1],
                                         attribut(cle2), m_conditionString[cond2],
                                         attribut(cle3), m_conditionString[cond3],
                                         attribut(cleMap), QString()));
         bindValue(0,value1);
         bindValue(1,value2);
-        bindValue(1,value3);
+        bindValue(3,value3);
         return mapFromRequete(cleMap);
     }
 
@@ -620,57 +585,53 @@ public:
     //! valeur de la colonne d'identifiant cle[i] condition[i] value[i],
     //! ordonnée suivant les colonnes d'identifiant contenue dans ordre,
     //! croissante (crois[i]=true) ou décroissante (croiss[i]=false).
-    MapPtr<Ent> getMap(const QList<typename Ent::Position> & cle, const QList<QVariant> & value,
+    mapIdt<Ent> getMap(const std::vector<typename Ent::Position> & cle, const std::vector<QVariant> & value,
                        typename Ent::Position cleMap = Ent::Id,
-                       const QList<typename Ent::Position> & ordre = QList<typename Ent::Position>(),
-                       const QList<bdd::Condition> & condition = QList<bdd::Condition>(),
-                       const QList<bool> & crois = QList<bool>()) override
-    {
-        if(cle.count() != value.count())
+                       const std::vector<typename Ent::Position> & ordre = std::vector<typename Ent::Position>(),
+                       const std::vector<bmps::condition> & condition = std::vector<bmps::condition>(),
+                       const std::vector<bool> & crois = std::vector<bool>()) override {
+        if(cle.size() != value.size())
             throw std::invalid_argument("getList le nombre de clés doit être égale au nombre de valeurs");
         QString sql;
 
-        for(int i = 0; i != cle.count(); ++i)
-        {
+        for(unsigned i = 0; i != cle.size(); ++i) {
             sql.append(attribut(i));
-            if(i < condition.count())
-                sql.append(m_conditionString.at(condition.at(i)));
+            if(i < condition.size())
+                sql.append(m_conditionString[condition[i]]);
             else
-                sql.append(m_conditionString[bdd::Condition::Egal]);
+                sql.append(m_conditionString[bmps::condition::Egal]);
             sql.append("? AND ");
         }
         sql.chop(4);
         sql.append("ORDER BY ");
-        for(int i =0; i != ordre.count(); ++i)
-        {
-            sql.append(m_conditionString.at(condition.at(i)));
-            if(i < crois.count())
-                sql.append(" ").append(croissant(crois.at(i)));
+        for(unsigned i =0; i != ordre.size(); ++i) {
+            sql.append(ordre[i]);
+            if(i < crois.size())
+                sql.append(" ").append(croissant(crois[i]));
             sql.append(",");
         }
         sql.chop(1);
 
         prepare(m_sqlGetListWhereOrderby.arg(sql));
-        for(int i = 0; i != value.count(); ++i)
-            bindValue(i,value.at(i));
+        for(unsigned i = 0; i != value.size(); ++i)
+            bindValue(i,value[i]);
 
         return mapFromRequete(cleMap);
     }
 
     //! Renvoie la map des entités de la table vérifiant une condition sur une jointure (colonneTable = colonneJoin),
-    //! valeur des colonnes de la table Ent d'identifiant key = value de QMap whereMapTable,
-    //! valeur des colonnes de la table Join key = value de QMap whereMapJoin.
-    MapPtr<Ent> getMapJoin(const QString & tableJoin, int colonneTable,
+    //! valeur des colonnes de la table Ent d'identifiant key = value de std::map whereMapTable,
+    //! valeur des colonnes de la table Join key = value de std::map whereMapJoin.
+    mapIdt<Ent> getMapJoin(const QString & tableJoin, szt colonneTable,
                            const QString & colonneJoin,
-                           const QMap<int,QVariant> & whereMapTable,
-                           const QMap<QString,QVariant> & whereMapJoin,
-                           typename Ent::Position cleMap = Ent::Id) override
-    {
+                           const std::map<szt,QVariant> & whereMapTable,
+                           const std::map<QString,QVariant> & whereMapJoin,
+                           typename Ent::Position cleMap = Ent::Id) override {
         QString sqlWhere;
-        for(QMap<int,QVariant>::const_iterator i = whereMapTable.cbegin(); i != whereMapTable.cend(); ++i)
-            sqlWhere.append("T.").append(attribut(i.key())).append("=? AND ");
-        for(QMap<QString,QVariant>::const_iterator i = whereMapJoin.cbegin(); i != whereMapJoin.cend(); ++i)
-            sqlWhere.append("J.").append(i.key()).append("=? AND ");
+        for(auto i = whereMapTable.cbegin(); i != whereMapTable.cend(); ++i)
+            sqlWhere.append("T.").append(attribut(i->first)).append("=? AND ");
+        for(auto i = whereMapJoin.cbegin(); i != whereMapJoin.cend(); ++i)
+            sqlWhere.append("J.").append(i->first).append("=? AND ");
         sqlWhere.chop(5);
         QString sqlOrder(" T.");
         sqlOrder.append(attribut(cleMap));
@@ -679,23 +640,22 @@ public:
                                      colonneJoin,
                                      sqlWhere,
                                      sqlOrder));
-        int j = 0;
-        for(QMap<int,QVariant>::const_iterator i = whereMapTable.cbegin(); i != whereMapTable.cend(); ++i, ++j)
-            bindValue(j,i.value());
-        for(QMap<QString,QVariant>::const_iterator i = whereMapJoin.cbegin(); i != whereMapJoin.cend(); ++i, ++j)
-            bindValue(j,i.value());
+        szt j = 0;
+        for(auto i = whereMapTable.cbegin(); i != whereMapTable.cend(); ++i, ++j)
+            bindValue(j,i->second);
+        for(auto i = whereMapJoin.cbegin(); i != whereMapJoin.cend(); ++i, ++j)
+            bindValue(j,i->second);
         return mapFromRequete(cleMap);
     }
 
     //! Renvoie la map des entités de la table vérifiant une condition sur une jointure (table.ID = join.colonneJoin),
     //! valeur de la colonne de la jointure d'identifiant cleWhere = valueWhere.
-    MapPtr<Ent> getMapJoin(const QString & tableJoin,
+    mapIdt<Ent> getMapJoin(const QString & tableJoin,
                            const QString & colonneJoin,
                            const QString & whereJoin,
                            const QVariant & valueWhere,
                            typename Ent::Position cleMap = Ent::Id,
-                           bdd::Condition cond = bdd::Condition::Egal) override
-    {
+                           bmps::condition cond = bmps::condition::Egal) override {
         prepare(m_sqlGetListJoin1Where1.arg(tableJoin,
                                             colonneJoin,
                                             whereJoin, m_conditionString[cond],
@@ -707,10 +667,9 @@ public:
     //! Hydrate l'entité entity avec les valeurs des attributs de l'entité enregistrée en base de donnée
     //! ayant les mêmes valeurs pour au moins un ensemble des attributs uniques.
     //! Retourne True si l'opération s'est correctement déroulée.
-    bool getUnique(Ent & entity) override
-    {
-        bdd::ExisteUni n = existsUnique(entity);
-        return (n == bdd::Tous || n == bdd::Meme) ? get(entity) : false;
+    bool getUnique(Ent & entity) override {
+        bmps::existeUni n = existsUnique(entity);
+        return (n == bmps::Tous || n == bmps::Meme) ? get(entity) : false;
     }
 
     //! Renvoie les info de la table associée au manager.
@@ -718,19 +677,17 @@ public:
         {return m_info;}
 
     //! Renvoie le nombre d'attribut de l'entité dans la base de donnée.
-    int nbrAtt() const
+    szt nbrAtt() const
         {return m_info.nbrAtt();}
 
     //! Teste s'il y a dans la base de donnée une entité ayant exactement les mêmes attributs (identifiant compris).
-    bool sameInBdd(const Ent & entity) override
-    {       
+    bool sameInBdd(const Ent & entity) override {
         Ent entityT(entity.id());
         return get(entityT) ? entityT == entity : false;
     }
 
     //! Teste s'il y a dans la base de donnée une entité d'identifiant id ayant exactement les mêmes attributs que entity.
-    bool sameInBdd(const Ent & entity, idt id) override
-    {
+    bool sameInBdd(const Ent & entity, idt id) override {
         Ent entityT(id);
         if(!get(entityT))
             return false;
@@ -753,14 +710,11 @@ public:
     //! soit entity à un identifiant idE non nul alors l'entité d'identifiant idU est mise à jour
     //! et l'entité d'identifiant idE est supprimé.
     //! Si l'entité est nouvelle en base de donnée l'identifiant de entity est mise-à-jour.
-    void saveUnique(Ent & entity) override
-    {
-        if(entity.isValid())
-        {
+    void saveUnique(Ent & entity) override {
+        if(entity.isValid()) {
             auto id = entity.id();
-            bdd::ExisteUni n = existsUnique(entity);
-            if(n <= bdd::ExisteUni::Meme)
-            {
+            bmps::existeUni n = existsUnique(entity);
+            if(n <= bmps::existeUni::Meme) {
                 if(entity.isNew())
                     add(entity);
                 else if(!sameInBdd(entity))
@@ -783,19 +737,15 @@ public:
     //! deux cas se présentent, soit entity à un identifiant nul alors l'entité d'identifiant idU est seulement mise à jour,
     //! soit entity à un identifiant idE non nul alors l'entité d'identifiant idU est mise à jour
     //! et l'entité d'identifiant idE est supprimé.
-    void saveUnique(const Ent & entity) override
-    {
+    void saveUnique(const Ent & entity) override {
         if(entity.isValid())
         {
-            QPair<bdd::ExisteUni,idt> pairExists = existsUniqueId(entity);
-            if(pairExists.first <= bdd::ExisteUni::Meme)
-            {
-                if(entity.isNew())
-                {
+            std::pair<bmps::existeUni,idt> pairExists = existsUniqueId(entity);
+            if(pairExists.first <= bmps::existeUni::Meme) {
+                if(entity.isNew()) {
                     if(pairExists.second == 0)
                         add(entity);
-                    else
-                    {
+                    else {
                         if(!sameInBdd(entity,pairExists.second))
                             modify(entity,pairExists.second);
                     }
@@ -825,20 +775,18 @@ protected:
 
     //! Insert la nouvelle entité entity dans la base de donnée
     //! et assigne l'identifiant de l'entité insérée en base de donnée à entity.
-    virtual void add(Ent & entity)
-    {
+    virtual void add(Ent & entity) {
         prepare(m_sqlAdd);
         m_link.bindValues(entity);
         exec();
         exec(m_sqllastId);
         next();
-        entity.setId(value<int>());
+        entity.setId(value<szt>());
         finish();
     }
 
     //! Insert la nouvelle entité entity dans la base de donnée.
-    virtual void add(const Ent & entity)
-    {
+    virtual void add(const Ent & entity) {
         prepare(m_sqlAdd);
         m_link.bindValues(entity);
         execFinish();
@@ -849,34 +797,31 @@ protected:
         {return crois ? QString(): " DESC";}
 
     //! Construit la liste des entités correspondant une requète de type sqlGetList.
-    ListPtr<Ent> listFromRequete()
-    {
+    ListPtr<Ent> listFromRequete() {
         exec();
         ListPtr<Ent> liste;
         while(next())
-            liste.append(m_link.newFromRequete());
+            liste.push_front(m_link.newFromRequete());
         finish();
         return liste;
     }
 
     //! Construit la liste des entités correspondant une requète de type sqlGetList.
-    QList<idt> listIdFromRequete()
-    {
+    std::list<idt> listIdFromRequete() {
         exec();
-        QList<idt> liste;
+        std::list<idt> liste;
         while(next())
-            liste.append(value<idt>());
+            liste.push_back(value<idt>());
         finish();
         return liste;
     }
 
     //! Construit la map des entités correspondant une requète de type sqlGetList.
-    MapPtr<Ent> mapFromRequete(typename Ent::Position cle)
-    {
+    mapIdt<Ent> mapFromRequete(typename Ent::Position cle) {
         exec();
-        MapPtr<Ent> map;
+        mapIdt<Ent> map;
         while(next())
-            map.insert(m_link.id(cle),m_link.newFromRequete());
+            m_link.fromRequete(map[m_link.id(cle)]);
         finish();
         return map;
     }
@@ -888,8 +833,7 @@ protected:
     QString messageErreursUnique(const Entity & entity) const override;
 
     //! Met à jour l'entité entity en base de donnée.
-    virtual void modify(const Ent & entity)
-    {
+    virtual void modify(const Ent & entity) {
         prepare(m_sqlModify);
         m_link.bindValues(entity);
         m_link.setId(entity,m_info.nbrAtt()-1);
@@ -897,8 +841,7 @@ protected:
     }
 
     //! Met à jour l'entité entity en base de donnée d'identifiant id avec les valeurs d'entity.
-    virtual void modify(const Ent & entity, idt id)
-    {
+    virtual void modify(const Ent & entity, idt id) {
         prepare(m_sqlModify);
         m_link.bindValues(entity);
         bindValue(m_info.nbrAtt()-1,id);
@@ -920,28 +863,25 @@ protected:
 
 template<class Ent> ManagerSql<Ent>::ManagerSql(const InfoBdd &info, AbstractUniqueSqlTemp<Ent> *unique)
     : m_info(info),
-      m_unique(unique)
-{
+      m_unique(unique) {
     writeStringSql();
     m_unique->initialise(m_info);
 }
 
-template<class Ent> void ManagerSql<Ent>::creer()
-{
+template<class Ent> void ManagerSql<Ent>::creer() {
     try
     {
-        QString sql(wordSqlString(bdd::wordSql::Create));
+        QString sql(wordSqlString(bmps::wordSql::Create));
         sql.append(" ").append(table()).append("(").append(attribut(Entity::Id)).append(" ")
-                .append(typeAttributSqlString(bdd::TypeAttributBdd::Primary));
-        for(auto i = 1; i != m_info.nbrAtt(); ++i)
-        {
+                .append(typeAttributSqlString(bmps::typeAttributBdd::Primary));
+        for(szt i = 1; i != m_info.nbrAtt(); ++i) {
             sql.append(",").append(attribut(i)).append(" ").append(typeAttributSqlString(m_info.creerAttribut(i).first));
             if(m_info.creerAttribut(i).second)
-                sql.append(" ").append(wordSqlString(bdd::wordSql::NotNull));
+                sql.append(" ").append(wordSqlString(bmps::wordSql::NotNull));
         }
         for(auto i = m_info.foreignKey().cbegin(); i != m_info.foreignKey().cend(); ++i)
-            sql.append(",").append(wordSqlString(bdd::wordSql::Foreign)).append("(").append(attribut(i.key())).append(") ")
-                .append(wordSqlString(bdd::wordSql::Ref)).append(" ").append(i.value());
+            sql.append(",").append(wordSqlString(bmps::wordSql::Foreign)).append("(").append(attribut(i->first)).append(") ")
+                .append(wordSqlString(bmps::wordSql::Ref)).append(" ").append(i->second);
         sql.append(m_unique->creer(m_info));
         sql.append(")");
         exec(sql);
@@ -951,38 +891,35 @@ template<class Ent> void ManagerSql<Ent>::creer()
                               .append(e.what()).toStdString());}
 }
 
-template<class Ent> QString ManagerSql<Ent>::messageErreurs(const Entity & entity) const
-{
+template<class Ent> QString ManagerSql<Ent>::messageErreurs(const Entity & entity) const {
     QString message("Entité invalide:");
     message.append(Ent::Name()).append(" d'identifiant:").append(QString::number(entity.id())).append("\n")
             .append(entity.affiche());
     return message;
 }
 
-template<class Ent> QString ManagerSql<Ent>::messageErreursUnique(const Entity & entity) const
-{
+template<class Ent> QString ManagerSql<Ent>::messageErreursUnique(const Entity & entity) const {
     QString message("Entité ayant les même valeurs d'attributs unique déjà présente dans la base de donnée.\n");
     message.append(Ent::Name()).append(" d'identifiant:").append(QString::number(entity.id())).append("\n");
     message.append(entity.toString());
     /*if(m_unique.nbrAttUnique() != 0)
     {
         message.append("Valeurs Uniques:\n");
-        for(int i = 0; i != m_unique.nbrAttUnique(); ++i)
+        for(szt i = 0; i != m_unique.nbrAttUnique(); ++i)
             message.append(attributUnique(i)).append("\n");
     }*/
     return message;
 }
 
-template<class Ent> void ManagerSql<Ent>::writeStringSql()
-{
+template<class Ent> void ManagerSql<Ent>::writeStringSql() {
     // Liste des colonnes.
     QString colonnesId;
-    for(int i = 0; i != m_info.nbrAtt(); ++i)
+    for(szt i = 0; i != m_info.nbrAtt(); ++i)
         colonnesId.append(attribut(i)).append(",");
     colonnesId.chop(1);
 
     QString colonnes;
-    for(int i = 1; i != m_info.nbrAtt(); ++i)
+    for(szt i = 1; i != m_info.nbrAtt(); ++i)
         colonnes.append(attribut(i)).append(",");
     colonnes.chop(1);
 
@@ -996,7 +933,7 @@ template<class Ent> void ManagerSql<Ent>::writeStringSql()
 
     // Select Join
     QString selectJoin("SELECT ");
-    for(int i = 0; i != m_info.nbrAtt(); ++i)
+    for(szt i = 0; i != m_info.nbrAtt(); ++i)
         selectJoin.append("T.").append(attribut(i)).append(",");
     selectJoin.chop(1);
     selectJoin.append(" FROM ").append(table()).append(" T JOIN %1 J ON ");
@@ -1004,7 +941,7 @@ template<class Ent> void ManagerSql<Ent>::writeStringSql()
     // Add
     m_sqlAdd.append("INSERT INTO ");
     m_sqlAdd.append(table()).append("(").append(colonnes).append(") VALUES(");
-    for(int i = 1; i != m_info.nbrAtt(); ++i)
+    for(szt i = 1; i != m_info.nbrAtt(); ++i)
         m_sqlAdd.append("?,");
     m_sqlAdd.chop(1);
     m_sqlAdd.append(")");
@@ -1118,11 +1055,11 @@ template<class Ent> void ManagerSql<Ent>::writeStringSql()
     // Modify
     m_sqlModify.append("UPDATE ");
     m_sqlModify.append(table()).append(" SET ");
-    for(int i = 1; i != m_info.nbrAtt(); ++i)
+    for(szt i = 1; i != m_info.nbrAtt(); ++i)
         m_sqlModify.append(attribut(i)).append("=?,");
     m_sqlModify.chop(1);
     m_sqlModify.append("WHERE ").append(idEgal);
     m_sqlModify.squeeze();
 }
-
+}
 #endif // MANAGERSQL_H

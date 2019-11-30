@@ -10,7 +10,7 @@
 #include "EntityDivers.h"
 #include <iostream>
 
-namespace bdd {
+namespace bddMPS {
     //! Version de création de la base de données.
     namespace bddVersion  {
         enum creationBdd{initiale,NbrCreationBdd};
@@ -24,29 +24,29 @@ namespace bdd {
     };
 }
 
+namespace managerMPS {
 /*! \ingroup groupeFile
  *  \brief Classe mère de la classe contenant les managers des entités pour la base de donnée.
  */
-class Managers
-{
+class Managers {
 protected:
-    const int m_nbrEntity;                          //!< Nombre d'entité associées à un managers de la base de donnée.
+    using VersionBdd = entityMPS::VersionBdd;
+
+    const szt m_nbrEntity;                          //!< Nombre d'entité associées à un managers de la base de donnée.
     QSqlQuery m_requete;                            //!< Requéte commune aux manageurs.
-    QVector<AbstractManager *> m_managers;          //!< Tableau des manageurs.
+    std::vector<AbstractManager *> m_managers;          //!< Tableau des manageurs.
     ManagerSql<VersionBdd> * m_managerVersion = nullptr;
     //!< Manager de l'entité version de la base de donnée.
 
 public:
     //! Constructeur.
-    Managers(const int nbrEntity, const QString & versionTable,
-                     const QMap<int,AbstractManager *> & managers = QMap<int,AbstractManager *>(),
+    Managers(szt nbrEntity, const QString & versionTable,
+                     const std::map<szt,AbstractManager *> & managers = std::map<szt,AbstractManager *>(),
                      const QSqlQuery & req = QSqlQuery());
 
     //! Destructeur.
-    ~Managers()
-    {
-        for(QVector<AbstractManager *>::const_iterator i = m_managers.cbegin(); i != m_managers.cend(); i++)
-        {
+    ~Managers() {
+        for(auto i = m_managers.cbegin(); i != m_managers.cend(); i++) {
             if(*i)
                 delete *i;
         }
@@ -59,10 +59,8 @@ public:
 
     //! Retourne le manager des entités de ID, id.
     //virtual AbstractManager * get(int id) const = 0;
-    AbstractManager * get(int id) const
-    {
-        if(id >= 0 and id < m_nbrEntity)
-        {
+    AbstractManager * get(szt id) const {
+        if(id < m_nbrEntity) {
             if(m_managers[id])
                 return m_managers[id];
             else
@@ -80,7 +78,7 @@ public:
     VersionBdd getVersion();
 
     //! Retourne le nombre d'entités associées à un manager dans la base de donnée.
-    int nbrEntity() const
+    szt nbrEntity() const
         {return m_nbrEntity;}
 
     //! Retourne le numero de version de la base de donnée.
@@ -137,4 +135,5 @@ protected:
         {return m_managers[id];}
 }
 */
+}
 #endif // MANAGERS_H

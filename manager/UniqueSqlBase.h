@@ -6,12 +6,12 @@
 
 #include "AbstractUniqueSql.h"
 
+namespace managerMPS {
 // Unique Arbre
 /*! \ingroup groupeUniqueSql
  * \brief Classe condition d'unicité pour les entités possédant une seule condition d'unicité sur le couple (num,parent).
  */
-template<class Ent> class ArbreUniqueSql : public SimpleUniqueSql<Ent>
-{
+template<class Ent> class ArbreUniqueSql : public SimpleUniqueSql<Ent> {
 protected:
     using SimpleUniqueSql<Ent>::bindValue;
 
@@ -24,8 +24,7 @@ public:
 
 protected:
     //! Transmet les valeurs des attributs uniques à la requète SQL préparée.
-    void bindValuesUnique(const Ent & entity) override
-    {
+    void bindValuesUnique(const Ent & entity) override {
         bindValue(NumUnique,entity.num());
         bindValue(ParentUnique,entity.parent());
     }
@@ -35,8 +34,7 @@ protected:
 /*! \ingroup groupeUniqueSql
  * \brief Classe condition d'unicité pour les entités possédant une seule condition d'unicité sur le couple (IdCible,Cible).
  */
-template<class Ent> class CibleSimpleUniqueSql : public SimpleUniqueSql<Ent>
-{
+template<class Ent> class CibleSimpleUniqueSql : public SimpleUniqueSql<Ent> {
 protected:
     using SimpleUniqueSql<Ent>::bindValue;
 
@@ -49,8 +47,7 @@ public:
 
 protected:
     //! Transmet les valeurs des attributs uniques à la requète SQL préparée.
-    void bindValuesUnique(const Ent & entity) override
-    {
+    void bindValuesUnique(const Ent & entity) override {
         bindValue(IdCibleUnique,entity.idCible());
         bindValue(CibleUnique,entity.cible());
     }
@@ -59,8 +56,7 @@ protected:
 /*! \ingroup groupeUniqueSql
  * \brief Classe condition d'unicité pour les entités possédant une seule condition d'unicité sur le triple (IdCible,Cible,Num).
  */
-template<class Ent> class CibleSimpleNumUniqueSql : public CibleSimpleUniqueSql<Ent>
-{
+template<class Ent> class CibleSimpleNumUniqueSql : public CibleSimpleUniqueSql<Ent> {
 protected:
     using CibleSimpleUniqueSql<Ent>::bindValue;
 
@@ -73,8 +69,7 @@ public:
 
 protected:
     //! Transmet les valeurs des attributs uniques à la requète SQL préparée.
-    void bindValuesUnique(const Ent & entity) override
-    {
+    void bindValuesUnique(const Ent & entity) override {
         CibleSimpleUniqueSql<Ent>::bindValuesUnique(entity);
         bindValue(NumUnique,entity.num());
     }
@@ -83,8 +78,7 @@ protected:
 /*! \ingroup groupeUniqueSql
  * \brief Classe condition d'unicité pour les entités possédant une seule condition d'unicité sur le triple (IdCible,Cible,Num,Type).
  */
-template<class Ent> class CibleSimpleNumTypeUniqueSql : public CibleSimpleNumUniqueSql<Ent>
-{
+template<class Ent> class CibleSimpleNumTypeUniqueSql : public CibleSimpleNumUniqueSql<Ent> {
 protected:
     using CibleSimpleNumUniqueSql<Ent>::bindValue;
 
@@ -97,8 +91,7 @@ public:
 
 protected:
     //! Transmet les valeurs des attributs uniques à la requète SQL préparée.
-    void bindValuesUnique(const Ent & entity) override
-    {
+    void bindValuesUnique(const Ent & entity) override {
         CibleSimpleNumUniqueSql<Ent>::bindValuesUnique(entity);
         bindValue(TypeUnique,entity.type());
     }
@@ -108,8 +101,7 @@ protected:
 /*! \ingroup groupeUniqueSql
  * \brief Classe condition d'unicité pour les entités possédant une seule condition d'unicité sur le quadruplet (IdCible,Cible,IdEtat,Etat).
  */
-template<class Ent> class HistoriqueUniqueSql : public CibleSimpleUniqueSql<Ent>
-{
+template<class Ent> class HistoriqueUniqueSql : public CibleSimpleUniqueSql<Ent> {
 protected:
     using CibleSimpleUniqueSql<Ent>::bindValue;
 
@@ -122,8 +114,7 @@ public:
 
 protected:
     //! Transmet les valeurs des attributs uniques à la requète SQL préparée.
-    void bindValuesUnique(const Ent & entity) override
-    {
+    void bindValuesUnique(const Ent & entity) override {
         CibleSimpleUniqueSql<Ent>::bindValuesUnique(entity);
         bindValue(IdEtatUnique,entity.idEtat());
         bindValue(EtatUnique,entity.etat());
@@ -134,8 +125,7 @@ protected:
 /*! \ingroup groupeUniqueSql
  * \brief Classe condition d'unicité pour les entités possédant une seule condition d'unicité sur id1.
  */
-template<class Ent> class IdUniqueSql : public SimpleUniqueSql<Ent>
-{
+template<class Ent> class IdUniqueSql : public SimpleUniqueSql<Ent> {
 protected:
     using SimpleUniqueSql<Ent>::bindValue;
 
@@ -156,8 +146,7 @@ protected:
 /*! \ingroup groupeUniqueSql
  * \brief Classe condition d'unicité pour les entités possédant une seule condition d'unicité sur le couple (Id1,Cible).
  */
-template<class Ent> class IdCibleUniqueSql : public IdUniqueSql<Ent>
-{
+template<class Ent> class IdCibleUniqueSql : public IdUniqueSql<Ent> {
 protected:
     using IdUniqueSql<Ent>::bindValue;
 
@@ -170,8 +159,7 @@ public:
 
 protected:
     //! Transmet les valeurs des attributs uniques à la requète SQL préparée.
-    void bindValuesUnique(const Ent & entity) override
-    {
+    void bindValuesUnique(const Ent & entity) override {
         IdUniqueSql<Ent>::bindValuesUnique(entity);
         bindValue(CibleUnique,entity.cible());
     }
@@ -180,8 +168,7 @@ protected:
 /*! \ingroup groupeUniqueSql
  * \brief Classe condition d'unicité pour les entités possédant une seule condition d'unicité sur le triple (Id1,Cible,Num).
  */
-template<class Ent> class IdCibleNumUniqueSql : public IdCibleUniqueSql<Ent>
-{
+template<class Ent> class IdCibleNumUniqueSql : public IdCibleUniqueSql<Ent> {
 protected:
     using IdCibleUniqueSql<Ent>::bindValue;
 
@@ -194,8 +181,7 @@ public:
 
 protected:
     //! Transmet les valeurs des attributs uniques à la requète SQL préparée.
-    void bindValuesUnique(const Ent & entity) override
-    {
+    void bindValuesUnique(const Ent & entity) override {
         IdCibleUniqueSql<Ent>::bindValuesUnique(entity);
         bindValue(NumUnique,entity.num());
     }
@@ -204,8 +190,7 @@ protected:
 /*! \ingroup groupeUniqueSql
  * \brief Classe condition d'unicité pour les entités possédant une seule condition d'unicité sur le triple (Id1,IdCible,Cible).
  */
-template<class Ent> class CibleUniqueSql : public IdCibleUniqueSql<Ent>
-{
+template<class Ent> class CibleUniqueSql : public IdCibleUniqueSql<Ent> {
 protected:
     using IdCibleUniqueSql<Ent>::bindValue;
 
@@ -218,8 +203,7 @@ public:
 
 protected:
     //! Transmet les valeurs des attributs uniques à la requète SQL préparée.
-    void bindValuesUnique(const Ent & entity) override
-    {
+    void bindValuesUnique(const Ent & entity) override {
         IdCibleUniqueSql<Ent>::bindValuesUnique(entity);
         bindValue(IdCibleUnique,entity.idCible());
     }
@@ -228,8 +212,7 @@ protected:
 /*! \ingroup groupeUniqueSql
  * \brief Classe condition d'unicité pour les entités possédant une seule condition d'unicité sur le 4-upplet (Id1,IdCible,Cible,DateTime).
  */
-template<class Ent> class CibleDateTimeUniqueSql : public CibleUniqueSql<Ent>
-{
+template<class Ent> class CibleDateTimeUniqueSql : public CibleUniqueSql<Ent> {
 protected:
     using CibleUniqueSql<Ent>::bindValue;
 
@@ -242,8 +225,7 @@ public:
 
 protected:
     //! Transmet les valeurs des attributs uniques à la requète SQL préparée.
-    void bindValuesUnique(const Ent & entity) override
-    {
+    void bindValuesUnique(const Ent & entity) override {
         CibleUniqueSql<Ent>::bindValuesUnique(entity);
         bindValue(DateTimeUnique,entity.dateTime());
     }
@@ -252,8 +234,7 @@ protected:
 /*! \ingroup groupeUniqueSql
  * \brief Classe condition d'unicité pour les entités possédant une seule condition d'unicité sur le 4-upplet (Id1,IdCible,Cible,Num).
  */
-template<class Ent> class CibleNumUniqueSql : public CibleUniqueSql<Ent>
-{
+template<class Ent> class CibleNumUniqueSql : public CibleUniqueSql<Ent> {
 protected:
     using CibleUniqueSql<Ent>::bindValue;
 
@@ -266,8 +247,7 @@ public:
 
 protected:
     //! Transmet les valeurs des attributs uniques à la requète SQL préparée.
-    void bindValuesUnique(const Ent & entity) override
-    {
+    void bindValuesUnique(const Ent & entity) override {
         CibleUniqueSql<Ent>::bindValuesUnique(entity);
         bindValue(NumUnique,entity.num());
     }
@@ -278,8 +258,7 @@ protected:
 /*! \ingroup groupeUniqueSql
  * \brief Classe condition d'unicité pour les entités possédant une seule condition d'unicité sur le couple (IdCible,Cible).
  */
-template<class Ent> class CibleNullUniqueSql : public SimpleUniqueSql<Ent>
-{
+template<class Ent> class CibleNullUniqueSql : public SimpleUniqueSql<Ent> {
 protected:
     using SimpleUniqueSql<Ent>::bindValue;
 
@@ -292,8 +271,7 @@ public:
 
 protected:
     //! Transmet les valeurs des attributs uniques à la requète SQL préparée.
-    void bindValuesUnique(const Ent & entity) override
-    {
+    void bindValuesUnique(const Ent & entity) override {
         bindValue(IdCibleUnique,entity.idCible());
         bindValue(CibleUnique,entity.cible());
     }
@@ -302,8 +280,7 @@ protected:
 /*! \ingroup groupeUniqueSql
  * \brief Classe condition d'unicité pour les entités possédant une seule condition d'unicité sur le tripplet (IdCible,Cible,Num).
  */
-template<class Ent> class CibleNullNumUniqueSql : public CibleNullUniqueSql<Ent>
-{
+template<class Ent> class CibleNullNumUniqueSql : public CibleNullUniqueSql<Ent> {
 protected:
     using CibleNullUniqueSql<Ent>::bindValue;
 
@@ -316,8 +293,7 @@ public:
 
 protected:
     //! Transmet les valeurs des attributs uniques à la requète SQL préparée.
-    void bindValuesUnique(const Ent & entity) override
-    {
+    void bindValuesUnique(const Ent & entity) override {
         CibleNullUniqueSql<Ent>::bindValuesUnique(entity);
         bindValue(NumUnique,entity.num());
     }
@@ -328,8 +304,7 @@ protected:
 /*! \ingroup groupeUniqueSql
  * \brief Classe condition d'unicité pour les entités possédant une seule condition d'unicité sur le nom.
  */
-template<class Ent> class NomUniqueSql : public SimpleUniqueSql<Ent>
-{
+template<class Ent> class NomUniqueSql : public SimpleUniqueSql<Ent> {
 protected:
     using SimpleUniqueSql<Ent>::bindValue;
 
@@ -349,8 +324,7 @@ protected:
 /*! \ingroup groupeUniqueSql
  * \brief Classe condition d'unicité pour les entités possédant une seule condition d'unicité sur le couple (nc, nom).
  */
-template<class Ent> class NomNcUniqueSql : public NomUniqueSql<Ent>
-{
+template<class Ent> class NomNcUniqueSql : public NomUniqueSql<Ent> {
 protected:
     using NomUniqueSql<Ent>::bindValue;
 
@@ -363,8 +337,7 @@ public:
 
 protected:
     //! Transmet les valeurs des attributs uniques à la requète SQL préparée.
-    void bindValuesUnique(const Ent &entity) override
-    {
+    void bindValuesUnique(const Ent &entity) override {
         NomUniqueSql<Ent>::bindValuesUnique(entity);
         bindValue(NcUnique,entity.nc());
     }
@@ -373,8 +346,7 @@ protected:
 /*! \ingroup groupeUniqueSql
  * \brief Classe condition d'unicité pour les entités possédant une seule condition d'unicité sur le couple (nom, type).
  */
-template<class Ent> class NomTypeUniqueSql : public NomUniqueSql<Ent>
-{
+template<class Ent> class NomTypeUniqueSql : public NomUniqueSql<Ent> {
 protected:
     using NomUniqueSql<Ent>::bindValue;
 
@@ -387,8 +359,7 @@ public:
 
 protected:
     //! Transmet les valeurs des attributs uniques à la requète SQL préparée.
-    void bindValuesUnique(const Ent &entity) override
-    {
+    void bindValuesUnique(const Ent &entity) override {
         NomUniqueSql<Ent>::bindValuesUnique(entity);
         bindValue(TypeUnique,entity.type());
     }
@@ -399,8 +370,7 @@ protected:
 /*! \ingroup groupeUniqueSql
  * \brief Classe condition d'unicité pour les entités possédant une seule condition d'unicité sur le couple de clé (id1,id2).
  */
-template<class Ent> class RelationUniqueSql : public IdUniqueSql<Ent>
-{
+template<class Ent> class RelationUniqueSql : public IdUniqueSql<Ent> {
 protected:
     using IdUniqueSql<Ent>::bindValue;
 
@@ -413,8 +383,7 @@ public:
 
 protected:
     //! Transmet les valeurs des attributs uniques à la requète SQL préparée.
-    void bindValuesUnique(const Ent &entity) override
-    {
+    void bindValuesUnique(const Ent &entity) override {
         IdUniqueSql<Ent>::bindValuesUnique(entity);
         bindValue(Id2Unique,entity.id2());
     }
@@ -423,8 +392,7 @@ protected:
 /*! \ingroup groupeUniqueSql
  * \brief Classe condition d'unicité pour les entités possédant une seule condition d'unicité sur le triplet (id1,id2,cible).
  */
-template<class Ent> class RelationCibleUniqueSql : public RelationUniqueSql<Ent>
-{
+template<class Ent> class RelationCibleUniqueSql : public RelationUniqueSql<Ent> {
 protected:
     using RelationUniqueSql<Ent>::bindValue;
 
@@ -437,8 +405,7 @@ public:
 
 protected:
     //! Transmet les valeurs des attributs uniques à la requète SQL préparée.
-    void bindValuesUnique(const Ent &entity) override
-    {
+    void bindValuesUnique(const Ent &entity) override {
         RelationUniqueSql<Ent>::bindValuesUnique(entity);
         bindValue(CibleUnique,entity.cible());
     }
@@ -447,8 +414,7 @@ protected:
 /*! \ingroup groupeUniqueSql
  * \brief Classe condition d'unicité pour les entités possédant une seule condition d'unicité sur le triplet (id1,id2,date).
  */
-template<class Ent> class RelationDateTimeUniqueSql : public RelationUniqueSql<Ent>
-{
+template<class Ent> class RelationDateTimeUniqueSql : public RelationUniqueSql<Ent> {
 protected:
     using RelationUniqueSql<Ent>::bindValue;
 
@@ -461,8 +427,7 @@ public:
 
 protected:
     //! Transmet les valeurs des attributs uniques à la requète SQL préparée.
-    void bindValuesUnique(const Ent &entity) override
-    {
+    void bindValuesUnique(const Ent &entity) override {
         RelationUniqueSql<Ent>::bindValuesUnique(entity);
         bindValue(DateTimeUnique,entity.dateTime());
     }
@@ -471,8 +436,7 @@ protected:
 /*! \ingroup groupeUniqueSql
  * \brief Classe condition d'unicité pour les entités possédant une seule condition d'unicité sur le triplet (id1,id2,num).
  */
-template<class Ent> class RelationNumUniqueSql : public RelationUniqueSql<Ent>
-{
+template<class Ent> class RelationNumUniqueSql : public RelationUniqueSql<Ent> {
 protected:
     using RelationUniqueSql<Ent>::bindValue;
 
@@ -485,8 +449,7 @@ public:
 
 protected:
     //! Transmet les valeurs des attributs uniques à la requète SQL préparée.
-    void bindValuesUnique(const Ent &entity) override
-    {
+    void bindValuesUnique(const Ent &entity) override {
         RelationUniqueSql<Ent>::bindValuesUnique(entity);
         bindValue(NumUnique,entity.num());
     }
@@ -495,8 +458,7 @@ protected:
 /*! \ingroup groupeUniqueSql
  * \brief Classe condition d'unicité pour les entités possédant une seule condition d'unicité sur le quadruplet (id1,id2,id3,num).
  */
-template<class Ent> class RelationTroisNumUniqueSql : public RelationNumUniqueSql<Ent>
-{
+template<class Ent> class RelationTroisNumUniqueSql : public RelationNumUniqueSql<Ent> {
 protected:
     using RelationNumUniqueSql<Ent>::bindValue;
 
@@ -509,8 +471,7 @@ public:
 
 protected:
     //! Transmet les valeurs des attributs uniques à la requète SQL préparée.
-    void bindValuesUnique(const Ent &entity) override
-    {
+    void bindValuesUnique(const Ent &entity) override {
         RelationNumUniqueSql<Ent>::bindValuesUnique(entity);
         bindValue(Id3Unique,entity.id3());
     }
@@ -521,8 +482,7 @@ protected:
 /*! \ingroup groupeUniqueSql
  * \brief Classe condition d'unicité pour les entités possédant une seule condition d'unicité sur le num.
  */
-template<class Ent> class NumUniqueSql : public SimpleUniqueSql<Ent>
-{
+template<class Ent> class NumUniqueSql : public SimpleUniqueSql<Ent> {
 protected:
     using SimpleUniqueSql<Ent>::bindValue;
 
@@ -542,8 +502,7 @@ protected:
 /*! \ingroup groupeUniqueSql
  * \brief Classe condition d'unicité pour les entités possédant une seule condition d'unicité sur le couple (id1,num).
  */
-template<class Ent> class IdNumUniqueSql : public IdUniqueSql<Ent>
-{
+template<class Ent> class IdNumUniqueSql : public IdUniqueSql<Ent> {
 protected:
     using IdUniqueSql<Ent>::bindValue;
 
@@ -556,8 +515,7 @@ public:
 
 protected:
     //! Transmet les valeurs des attributs uniques à la requète SQL préparée.
-    void bindValuesUnique(const Ent &entity) override
-    {
+    void bindValuesUnique(const Ent &entity) override {
         IdUniqueSql<Ent>::bindValuesUnique(entity);
         bindValue(NumUnique,entity.num());
     }
@@ -566,8 +524,7 @@ protected:
 /*! \ingroup groupeUniqueSql
  * \brief Classe condition d'unicité pour les entités possédant une seule condition d'unicité sur le couple (id1,type).
  */
-template<class Ent> class IdTypeUniqueSql : public IdUniqueSql<Ent>
-{
+template<class Ent> class IdTypeUniqueSql : public IdUniqueSql<Ent> {
 protected:
     using IdUniqueSql<Ent>::bindValue;
 
@@ -580,8 +537,7 @@ public:
 
 protected:
     //! Transmet les valeurs des attributs uniques à la requète SQL préparée.
-    void bindValuesUnique(const Ent &entity) override
-    {
+    void bindValuesUnique(const Ent &entity) override {
         IdUniqueSql<Ent>::bindValuesUnique(entity);
         bindValue(TypeUnique,entity.type());
     }
@@ -590,8 +546,7 @@ protected:
 /*! \ingroup groupeUniqueSql
  * \brief Classe condition d'unicité pour les entités possédant une seule condition d'unicité sur l'attribut idProg.
  */
-template<class Ent> class IdProgUniqueSql : public SimpleUniqueSql<Ent>
-{
+template<class Ent> class IdProgUniqueSql : public SimpleUniqueSql<Ent> {
 protected:
     using SimpleUniqueSql<Ent>::bindValue;
 
@@ -611,11 +566,10 @@ protected:
 /*! \ingroup groupeUniqueSql
  * \brief Classe condition d'unicité pour les entités possédant deux conditions d'unicité sur l'attribut idProg et le couple (Parent, nom).
  */
-template<class Ent> class IdProgNomUniqueSql : public DoubleUniqueSql<Ent>
-{
+template<class Ent> class IdProgNomUniqueSql : public DoubleUniqueSql<Ent> {
 protected:
     using DoubleUniqueSql<Ent>::bindValue;
-    using DoubleUniqueSql<Ent>::bindValuesUnique_1;
+    using DoubleUniqueSql<Ent>::bindValuesUnique;
     using DoubleUniqueSql<Ent>::bindValuesUnique_2;
 
 public:
@@ -628,7 +582,7 @@ public:
 
 protected:
     //! Transmet les valeurs des attributs uniques à la requète SQL préparée.
-    void bindValuesUnique_1(const Ent &entity) override
+    void bindValuesUnique(const Ent &entity) override
         {bindValue(IdProgUnique,entity.idProg());}
 
     //! Transmet les valeurs des attributs uniques à la requète SQL préparée.
@@ -639,8 +593,7 @@ protected:
 /*! \ingroup groupeUniqueSql
  * \brief Classe condition d'unicité pour les entités possédant deux conditions d'unicité sur l'attribut idProg et le nom.
  */
-template<class Ent> class IdProgNomParentUniqueSql : public IdProgNomUniqueSql<Ent>
-{
+template<class Ent> class IdProgNomParentUniqueSql : public IdProgNomUniqueSql<Ent> {
 protected:
     using IdProgNomUniqueSql<Ent>::bindValue;
     using IdProgNomUniqueSql<Ent>::bindValuesUnique_2;
@@ -654,17 +607,16 @@ public:
 
 protected:
     //! Transmet les valeurs des attributs uniques à la requète SQL préparée.
-    void bindValuesUnique_2(const Ent &entity) override
-    {
+    void bindValuesUnique_2(const Ent &entity) override {
         IdProgNomUniqueSql<Ent>::bindValuesUnique_2(entity);
-        bindValue(ParentUnique,entity.parent());}
+        bindValue(ParentUnique,entity.parent());
+    }
 };
 
 /*! \ingroup groupeUniqueSql
  * \brief Classe condition d'unicité pour les entités possédant une seule condition d'unicité sur le texte.
  */
-template<class Ent> class TexteUniqueSql : public SimpleUniqueSql<Ent>
-{
+template<class Ent> class TexteUniqueSql : public SimpleUniqueSql<Ent> {
 protected:
     using SimpleUniqueSql<Ent>::bindValue;
 
@@ -680,4 +632,27 @@ protected:
     void bindValuesUnique(const Ent &entity) override
         {bindValue(TexteUnique,entity.texte());}
 };
+
+/*! \ingroup groupeUniqueSql
+ * \brief Classe condition d'unicité pour les entités possédant deux conditions d'unicité (id1,id3) et (id2,id3) avec id1 et id2
+ * n'étant pas simultanément nuls ou simultanément non nuls.
+ */
+template<class Ent> class IdRelationExactOneNotNullUniqueSql : public AttsRelationExactOneNotNullUniqueSql<Ent> {
+protected:
+    using AREONNU = AttsRelationExactOneNotNullUniqueSql<Ent>;
+    using AREONNU::bindValue;
+
+public:
+    enum {Id3Unique = AREONNU::NbrUnique_1 ,NbrUnique_1, NbrUnique_2 = NbrUnique_1};
+    CONSTR_DEFAUT(IdRelationExactOneNotNullUniqueSql)
+
+    //! Destructeur.
+    ~IdRelationExactOneNotNullUniqueSql() override = default;
+
+protected:
+    //! Transmet les valeurs des attributs uniques à la requète SQL préparée.
+    void bindValuesUniqueAtts(const Ent &entity) override
+        {bindValue(Id3Unique,entity.id3());}
+};
+}
 #endif // UNIQUESQLBASE_H

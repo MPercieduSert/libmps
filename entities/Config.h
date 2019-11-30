@@ -4,32 +4,30 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
+#include <map>
 #include <QFile>
 #include <QDir>
-#include <QMap>
-#include <QXmlStreamReader>
-#include <QXmlStreamWriter>
 #include <QTextStream>
 #include <QString>
-#include <QStringList>
 #include <stdexcept>
 #include "FileInterface.h"
-#include "xmlmps.h"
+#include "XmlMps.h"
+
+namespace fichierMPS {
 
 /*! \ingroup groupeFile
  * \brief Gestionnaire du fichier de configuration.
  *
  * Gestionnaire du fichier de configuration enregistré sous la forme d'un document XML. Tous les noeuds ont des chemins uniques.
  */
-class Config : public FileInterface
-{
+class Config : public FileInterface {
 protected:
     QFile m_confFile;   //!< Fichier contenant la configuration.
 
 public:
     //! Constructeur. Transmettre en argument le chemin du fichier de configuration.
-    Config(const QString & file):FileInterface(file,"XML files (*.xml)"), m_confFile(file)
-        {}
+    Config(const QString & file)
+        :FileInterface(file,"XML files (*.xml)"), m_confFile(file) {}
 
     //! Destructeur. Referme le fichier de configuration s'il était ouvert.
     ~Config() override;
@@ -39,7 +37,7 @@ public:
      * Modifie la valeur par value du noeud de chemin XML path et modifie les attributs attributes.
      * Si les noeuds du chemin n'existent pas, ils sont créés.
      */
-    void add(const QString &path, const QString &value = "", const QMap<QString, QString> &attributes = QMap<QString,QString>());
+    void add(const QString &path, const QString &value = "", const std::map<QString, QString> & attributes = std::map<QString,QString>());
 
     //! Vérifie si le fichier de chemin name existe et est un fichier de configuration valide, si c'est le cas,
     //! le fichier de configuration est remplacé par une copie du fichier de chemin name.
@@ -61,19 +59,19 @@ public:
     QString getVars(const QString & name);
 
 
-    //QStringList getVars(const QString & name, const QMap<QString,QString> & atts  = QMap<QString,QString>());
+    //QStringList getVars(const QString & name, const std::map<QString,QString> & atts  = std::map<QString,QString>());
 
     //! Renvoie les attributs du noeud de chemin name.
-    QVector<varAtts> getVarsAtts(const QString & name);
+    std::vector<varAtts> getVarsAtts(const QString & name);
 
-    //QVector<varAtts> getVarsAtts(const QString & name, const QString & attName, const QString & attValue);
-    //QVector<varAtts> getVarsAtts(const QString & name, const QMap<QString,QString> & atts = QMap<QString,QString>());
+    //std::vector<varAtts> getVarsAtts(const QString & name, const QString & attName, const QString & attValue);
+    //std::vector<varAtts> getVarsAtts(const QString & name, const std::map<QString,QString> & atts = std::map<QString,QString>());
 
     //! Test si le fichier de configuration est valide.
     bool isValid() override;
 
     //! Modifie la valeur value du noeud de chemin XML path et les attributs attributes. Le noeud doit exister.
-    void modify(const QString &path, const QString &value = "", const QMap<QString, QString> &attributes = QMap<QString,QString>());
+    void modify(const QString &path, const QString &value = "", const std::map<QString, QString> &attributes = std::map<QString,QString>());
 
     //! Test si le fichier peut être ouvert en écriture puis le referme.
     bool open() override;
@@ -87,7 +85,7 @@ public:
     //! Test s'il existe un noeud de chemin name.
     bool varExists(const QString & name);
 
-    //bool varExists(const QString & name, const QMap<QString,QString> & atts  = QMap<QString,QString>());
+    //bool varExists(const QString & name, const std::map<QString,QString> & atts  = std::map<QString,QString>());
 
     //! Recopie l'arbre XML vers le chemin path (utiliser plutôt copy).
     void recopie(const QString &path = QDir::homePath()+"/notecpp/configCopie.xml");
@@ -98,15 +96,13 @@ public:
 protected:
 
     //! Ouvre le fichier en lecture, lance une exception si le fichier ne s'ouvre pas.
-    void openRead()
-    {
+    void openRead() {
         if(!m_confFile.open(QFile::ReadOnly | QFile::Text))
             throw std::runtime_error("Imposible d'ouvrir pour lecture le fichier :"+m_confFile.fileName().toStdString());
     }
 
     //! Ouvre le fichier en écriture, lance une exception si le fichier ne s'ouvre pas.
-    void openWrite()
-    {
+    void openWrite() {
         if(!m_confFile.open(QFile::WriteOnly | QFile::Text))
             throw std::runtime_error("Imposible d'ouvrir pour ecriture le fichier :"+m_confFile.fileName().toStdString());
     }
@@ -115,5 +111,5 @@ protected:
     void close()
         {m_confFile.close();}
 };
-
+}
 #endif // CONFIG_H

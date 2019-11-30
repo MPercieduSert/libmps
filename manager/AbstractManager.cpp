@@ -1,3 +1,3 @@
 #include "AbstractManager.h"
 
-AbstractManager::~AbstractManager() {}
+managerMPS::AbstractManager::~AbstractManager() {}

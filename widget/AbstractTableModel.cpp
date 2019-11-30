@@ -1,25 +1,24 @@
-#include "MAbstractTableModel.h"
+#include "AbstractTableModel.h"
 
-void MAbstractTableModel::coller(const QModelIndexList & selection)
-{
+using namespace modelMPS;
+
+void AbstractTableModel::coller(const QModelIndexList & selection) {
     SelectedRange range(selection);
     if(!range.isValid())
         QMessageBox::critical(nullptr,tr("Erreur de séléction"),tr("Ce type de séléction multiple n'est pas valide pour éffectuer un collage"));
-    else
-    {
-        QString str = QApplication::clipboard()->text();
-        QStringList rows = str.split('\n');
+    else {
+        auto str = QApplication::clipboard()->text();
+        auto rows = str.split('\n');
         if(!rows.isEmpty() && rows.last().isEmpty())
             {rows.removeLast();}
-        int numRows = rows.count();
-        int numColumns = rows.first().count('\t') + 1;
+        auto numRows = rows.count();
+        auto numColumns = rows.first().count('\t') + 1;
         DialogSelection n = DialogSelection::NoDialog;
         if(range.rowCount() * range.columnCount() != 1
             && (range.rowCount() < numRows || range.columnCount() < numColumns))
             n = dialogColler();
 
-        switch (n)
-        {
+        switch (n) {
         case DialogSelection::InsertIn:
             if(numRows > range.rowCount())
                 numRows = range.rowCount();
@@ -28,13 +27,10 @@ void MAbstractTableModel::coller(const QModelIndexList & selection)
         [[fallthrough]];
         case DialogSelection::NoDialog:
         case DialogSelection::InsertOut:
-            if(range.isRect())
-            {
-                for (int i = 0; i < numRows; ++i)
-                {
-                    QStringList columns = rows[i].split('\t');
-                    for (int j = 0; j < numColumns; ++j)
-                    {
+            if(range.isRect()) {
+                for (int i = 0; i < numRows; ++i) {
+                    auto columns = rows[i].split('\t');
+                    for (int j = 0; j < numColumns; ++j) {
                         int row = range.top() + i;
                         int column = range.left() + j;
                         if (row < rowCount() && column < columnCount())
@@ -42,15 +38,12 @@ void MAbstractTableModel::coller(const QModelIndexList & selection)
                     }
                 }
             }
-            else
-            {
-                for (int i = 0; i < numRows; ++i)
-                {
-                    QStringList columns = rows[i].split('\t');
-                    for (int j = 0; j < numColumns; ++j)
-                    {
-                        int row = i < range.rowCount() ? range.rows().at(i) : range.rows().last() + i - range.rowCount() + 1;
-                        int column =  j < range.columnCount() ? range.columns().at(j) : range.columns().last() + j - range.columnCount() + 1;
+            else {
+                for (int i = 0; i < numRows; ++i) {
+                    auto columns = rows[i].split('\t');
+                    for (int j = 0; j < numColumns; ++j) {
+                        auto row = i < range.rowCount() ? range.rows().at(i) : range.rows().back() + i - range.rowCount() + 1;
+                        auto column =  j < range.columnCount() ? range.columns().at(j) : range.columns().back() + j - range.columnCount() + 1;
                         if (row < rowCount() && column < columnCount())
                             setData(index(row, column), columns[j]);
                     }
@@ -63,36 +56,28 @@ void MAbstractTableModel::coller(const QModelIndexList & selection)
     }
 }
 
-void MAbstractTableModel::copier(const QModelIndexList &selection)
-{
+void AbstractTableModel::copier(const QModelIndexList &selection) {
     SelectedRange range(selection);
     if(!range.isValid())
         QMessageBox::critical(nullptr,tr("Erreur de séléction"),tr("Ce type de séléction multiple n'est pas valide pour éffectuer un collage"));
-    else
-    {
+    else {
         QString str;
-        if(range.isRect())
-        {
-            for (int i = 0; i < range.rowCount(); ++i)
-            {
+        if(range.isRect()) {
+            for (int i = 0; i < range.rowCount(); ++i) {
                 if (i > 0)
                     str.append("\n");
-                for (int j = 0; j < range.columnCount(); ++j)
-                {
+                for (int j = 0; j < range.columnCount(); ++j) {
                     if (j > 0)
                         str.append("\t");
                     str.append(data(index(range.top() + i, range.left() + j)).toString());
                 }
             }
         }
-        else
-        {
-            for (int i = 0; i < range.rowCount(); ++i)
-            {
+        else {
+            for (int i = 0; i < range.rowCount(); ++i) {
                 if (i > 0)
                     str += "\n";
-                for (int j = 0; j < range.columnCount(); ++j)
-                {
+                for (int j = 0; j < range.columnCount(); ++j)  {
                     if (j > 0)
                         str += "\t";
                     str += data(index(range.rows().at(i), range.columns().at(j))).toString();
@@ -103,14 +88,12 @@ void MAbstractTableModel::copier(const QModelIndexList &selection)
     }
 }
 
-void MAbstractTableModel::couper(const QModelIndexList &selection)
-{
+void AbstractTableModel::couper(const QModelIndexList &selection) {
     copier(selection);
     effacer(selection);
 }
 
-MAbstractTableModel::DialogSelection MAbstractTableModel::dialogColler() const
-{
+AbstractTableModel::DialogSelection AbstractTableModel::dialogColler() const {
     QMessageBox dial;
     dial.setText(tr("Erreur collage"));
     dial.setInformativeText(tr("La taille de la selection est plus petite que la taille du contenu du presse papier."));
@@ -127,17 +110,14 @@ MAbstractTableModel::DialogSelection MAbstractTableModel::dialogColler() const
 
 }
 
-void MAbstractTableModel::effacer(const QModelIndexList &selection)
-{
+void AbstractTableModel::effacer(const QModelIndexList &selection) {
     for(QModelIndexList::const_iterator i = selection.cbegin(); i != selection.cend(); ++i)
-        setData((*i),QVariant());
+        setData(*i,QVariant());
 }
 
-MAbstractTableModel::SelectedRange::SelectedRange(const QModelIndexList &range)
-    : m_selection(range)
-{
-    if(range.isEmpty())
-    {
+AbstractTableModel::SelectedRange::SelectedRange(const QModelIndexList &range)
+    : m_selection(range) {
+    if(range.isEmpty()) {
         m_bottom = -1;
         m_left = -1;
         m_right = -1;
@@ -145,43 +125,42 @@ MAbstractTableModel::SelectedRange::SelectedRange(const QModelIndexList &range)
         m_isRect = false;
         m_isValid = false;
     }
-    else
-    {
+    else {
         m_bottom = m_selection.first().row();
         m_left = m_selection.first().column();
         m_right = m_selection.first().column();
         m_top = m_selection.first().row();
-        for(QModelIndexList::const_iterator i = m_selection.cbegin(); i != m_selection.cend(); ++i)
-        {
-            if((*i).row() < m_top)
-                m_top = (*i).row();
-            else if((*i).row() > m_bottom)
-                m_bottom = (*i).row();
+        for(QModelIndexList::const_iterator i = m_selection.cbegin(); i != m_selection.cend(); ++i) {
+            if(i->row() < m_top)
+                m_top = i->row();
+            else if(i->row() > m_bottom)
+                m_bottom = i->row();
 
-            if((*i).column() < m_left)
-                m_left = (*i).column();
-            else if((*i).column() > m_right)
-                m_right = (*i).column();
+            if(i->column() < m_left)
+                m_left = i->column();
+            else if(i->column() > m_right)
+                m_right = i->column();
         }
 
-        if(!(m_isValid = m_isRect = (m_right - m_left +1 ) *  (m_bottom - m_top +1) == m_selection.count()))
-        {
-            QMap<int,QList<int>> list;
-            for(QModelIndexList::const_iterator i = m_selection.cbegin(); i != m_selection.cend(); ++i)
-                list[(*i).row()].append((*i).column());
+        if(!(m_isValid = m_isRect = (m_right - m_left +1 ) *  (m_bottom - m_top +1) == m_selection.count())) {
+            std::map<int,std::list<int>> list;
+            for(auto i = m_selection.cbegin(); i != m_selection.cend(); ++i)
+                list[i->row()].push_back(i->column());
 
-            std::sort(list.first().begin(),list.first().end());
-            m_columnList = QVector<int>::fromList(list.first());
-            m_rowList = QVector<int>::fromList(list.keys());
+            list.begin()->second.sort();
+            m_columnList.assign(list.cbegin()->second.cbegin(),list.cbegin()->second.cend());
+            m_rowList.resize(list.size());
+            auto j = m_rowList.begin();
+            for (auto i = list.cbegin(); i != list.cend(); ++i)
+                *j = i->first;
 
             m_isValid = true;
-            if(list.count() != 1)
-            {
-                QMap<int,QList<int>>::iterator i = ++(list.begin());
+            if(list.size() != 1) {
+                auto i = ++(list.begin());
                 while(m_isValid && i != list.end())
                 {
-                    std::sort(i.value().begin(),i.value().end());
-                    m_isValid = list.first() == i.value();
+                    i->second.sort();
+                    m_isValid = list.cbegin()->second == i->second;
                     ++i;
                 }
             }

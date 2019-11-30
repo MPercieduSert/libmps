@@ -4,105 +4,145 @@
 #ifndef MAPPTR_H
 #define MAPPTR_H
 
-#include <QMap>
-#include <QMap>
-
+#include <map>
 #include "macrolibmps.h"
 
-/*! \ingroup groupeDivers
+namespace conteneurMPS {
+
+/*! \ingroup groupeConteneur
  * \brief Classe patron des maps de pointeurs.
  */
-template<class T> class MapPtr : public QMap<int,T*>
+template<class T> class MapPtr : public std::map<int,T*>
 {
-public:
-    //! Itérateur.
-    class iterator : public QMap<int,T*>::const_iterator
-    {
+protected:
+    using Mptr = std::map<int,T*>;
+
+    /*! \ingroup groupeConteneur
+     * \brief Itérateur constant.
+     */
+    class const_iterator : public Mptr::const_iterator {
+    protected:
+        using MptrIter = typename Mptr::const_iterator;
+
     public:
-        using QMap<int,T*>::const_iterator::const_iterator;
-
-        //! Constructeur de recopie.
-        iterator(const typename QMap<int,T*>::const_iterator & i) : QMap<int,T*>::const_iterator(i) {}
-
         //! Constructeur.
-        iterator(const typename QMap<int,T*>::const_iterator && i) : QMap<int,T*>::const_iterator(i) {}
+        const_iterator(const MptrIter & iter) noexcept : MptrIter(iter) {}
 
-        //! Opérateur *.
-        T & operator *() const
-            {return *(QMap<int,T*>::const_iterator::operator *());}
+        //! Opérator *
+        std::pair<const int, const T &> operator *() const noexcept {
+            auto & iter = MptrIter::operator*();
+            return std::pair<const int, const T &>(iter.frist,*iter.second);}
 
-        //! Opérateur [].
-        T & operator [](int n) const
-            {return *(QMap<int,T*>::const_iterator::operator [](n));}
+        //! Opérator ->.
+        T const * operator -> () const noexcept
+            {return MptrIter::operator*();}
     };
 
-public:
-    using QMap<int,T*>::insert;
-    using QMap<int,T*>::cbegin;
-    using QMap<int,T*>::cend;
+    /*! \ingroup groupeConteneur
+     * \brief Itérateur.
+     */
+    class iterator : public Mptr::const_iterator {
+    protected:
+        using MptrIter = typename Mptr::const_iterator;
 
-    CONSTR_DEFAUT(MapPtr)
+    public:
+        //! Constructeur.
+        iterator(const MptrIter & iter) noexcept : MptrIter(iter) {}
+
+        //! Opérator *
+        std::pair<const int, const T &> operator *() const noexcept {
+            auto & iter = MptrIter::operator*();
+            return std::pair<const int, const T &>(iter.frist,*iter.second);}
+
+        //! Opérator *
+        std::pair<const int, T &> operator *() noexcept {
+            auto & iter = MptrIter::operator*();
+            return std::pair<const int, T &>(iter.frist,*iter.second);}
+
+        //! Opérator ->.
+        T const * operator -> () const noexcept
+            {return MptrIter::operator*();}
+
+        //! Opérator ->.
+        T * operator -> () noexcept
+            {return MptrIter::operator*();}
+    };
+
+    using Mptr::empty;
+    using Mptr::size;
+
+public:
+    using Mptr::insert;
+
+    MapPtr() = default;
 
     //! Constructeur de recopie.
-    MapPtr(const MapPtr<T> & liste)
-    {
-        for(typename QMap<int,T*>::const_iterator i = liste.cbegin(); i != liste.cend(); ++i)
-            insert(i.key(),new T(**i));
+    MapPtr(const MapPtr<T> & map) {
+        for(auto i = map.cbegin(); i != map.cend(); ++i)
+            insert(i-, new T(i));
     }
 
     //! Constructeur de déplacement.
     MapPtr(MapPtr<T> && ) = default;
 
-    //! Destructeur.
-    ~MapPtr()
-    {
-        for(typename QMap<int,T*>::const_iterator i = cbegin(); i != cend(); ++i)
-            delete *i;
-    }
+//    //! Destructeur.
+//    ~MapPtr()
+//    {
+//        for(typename Mptr::const_iterator i = cbegin(); i != cend(); ++i)
+//            delete *i;
+//    }
 
     //! Renvoie un itérateur sur le début de la liste.
     iterator begin() const
-        {return QMap<int,T*>::cbegin();}
+        {return Mptr::cbegin();}
 
+
+    //! Renvoie un itérateur constant sur le début de la liste.
+    const_iterator cbegin() const
+        {return Mptr::cbegin();}
 
     //! Renvoie un itérateur sur la fin de la liste.
     iterator end() const
-        {return QMap<int,T*>::cend();}
+        {return Mptr::cend();}
 
-    //! Supprime toutes les entités pointées par les pointeurs de la liste.
-    void clear()
-    {
-        for(typename QMap<int,T*>::const_iterator i = cbegin(); i != cend(); ++i)
-            delete *i;
-        QMap<int,T*>::clear();
-    }
+    //! Renvoie un itérateur constant sur la fin de la liste.
+    const_iterator cend() const
+        {return Mptr::cend();}
 
-    //! Supprime la liste des pointeurs, sans supprimer les entités pointés par les pointeurs composants cette liste.
-    void clearList()
-        {QMap<int,T*>::clear();}
+//    //! Supprime toutes les entités pointées par les pointeurs de la liste.
+//    void clear()
+//    {
+//        for(typename Mptr::const_iterator i = cbegin(); i != cend(); ++i)
+//            delete *i;
+//        Mptr::clear();
+//    }
+
+//    //! Supprime la liste des pointeurs, sans supprimer les entités pointés par les pointeurs composants cette liste.
+//    void clearList()
+//        {Mptr::clear();}
 
     //! Insert un pointeur dans la liste.
     void insert(int key, const T & entity)
-        {insert(key, new T(entity));}
+        {insert(key, std::make_unique<T>(entity));}
 
     //! Insert un pointeur dans la liste.
     void insert(const T & entity)
         {insert(entity.id(), entity);}
 
     //! Insert un pointeur dans la liste.
-    void insert(T * ptr)
+    void insert(std::unique_ptr<T> ptr)
         {insert(ptr->id(), ptr);}
 
-    //! Retourne une référence constante sur l'entité de clé n.
-    const T & value(int n) const
-        {return *(value(n,0));}
+//    //! Retourne une référence constante sur l'entité de clé n.
+//    const T & value(int n) const
+//        {return *(value(n,0));}
 
     //! Affectation par copie
     MapPtr<T> & operator = (const MapPtr<T> & liste)
     {
-        clear();
-        for(typename QMap<int,T*>::const_iterator i = liste.cbegin(); i != liste.cend(); ++i)
-            insert(i.key(),new T(**i));
+        Mptr::clear();
+        for(auto i = liste.cbegin(); i != liste.cend(); ++i)
+            insert(i.key(),std::make_unique<T>(**i));
         return *this;
     }
 
@@ -111,7 +151,7 @@ public:
 
     //! Opérateur [].
     T & operator [](int n) const
-        {return *(QMap<int,T*>::operator [](n));}
+        {return *(Mptr::operator [](n));}
 };
-
+}
 #endif // MAPPTR_H

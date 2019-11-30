@@ -13,11 +13,15 @@
 #include "EntityPredef.h"
 #include "MotCleModel.h"
 
-class MotCleWidget : public QWidget
-{
+namespace widgetMPS {
+using namespace typeMPS;
+/*! \ingroup groupeWidget
+ * \brief Widget de gestion des motcle.
+ */
+class MotCleWidget : public QWidget {
     Q_OBJECT
 protected:
-    MotCleModel * m_model;    //!< Model.
+    modelMPS::MotCleModel * m_model;    //!< Model.
 
     // Widget
     QTextEdit * m_afficheListMotCle;    //!< Partie de texte faisant la liste des mots clés associés à une entité.
@@ -27,7 +31,7 @@ protected:
 
 public:
     //! Constructeur.
-    explicit MotCleWidget(BddPredef * bd, int cible, QWidget *parent = nullptr);
+    explicit MotCleWidget(bddMPS::BddPredef * bd, int cible, QWidget *parent = nullptr);
 
     //! Destructeur.
     ~MotCleWidget() override = default;
@@ -35,8 +39,8 @@ signals:
     void idChanged(int newId);
 
 public slots:
-    void setIdSet(QSet<int> idSet);
+    void setIdSet(std::set<idt> idSet);
     //void setIndexSelected();
 };
-
+}
 #endif // MOTCLEWIDGET_H

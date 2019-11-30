@@ -10,12 +10,13 @@
 #include "BddPredef.h"
 #include "NewMotCleDialog.h"
 
+namespace modelMPS {
 /*! \ingroup groupeModel
  * \brief Model de gestion des motcle.
  */
-class TreeModelMotCle : public TreeModelEditEntity<MotCle>
-{
+class TreeModelMotCle : public TreeModelEditEntity<emps::MotCle> {
 public:
+    using MotCle = emps::MotCle;
     /*//! Enumération des permission de motcle possible.
     enum perm {
         BaremeIndex,
@@ -40,31 +41,29 @@ public:
         NbrColumnSup = 1,
         NbrColumn = NbrColumnMotCle + NbrColumnSup// + NbrIndex
     };
-
 protected:
     const int m_nbrEntity;                          //!< Nombre d'entités associées aux mots clés.
-    BddPredef * m_bdd;                              //!< Pointeur vers la base de donnée.
-    QVector<int> m_cibleList;                       //!< Liste des valeurs de cible associé à chaque index de colonnes.
+    bmps::BddPredef * m_bdd;                              //!< Pointeur vers la base de donnée.
+    std::vector<int> m_cibleList;                       //!< Liste des valeurs de cible associé à chaque index de colonnes.
     QStringList m_headerPerm;                       //!< Noms des colonnes.
-    QMap<idt,QVector<codeType>> m_permission;            //!< Map des permitions indexé par l'identifiant du mot clé associé.
+    std::map<idt,std::vector<codeType>> m_permission;            //!< Map des permitions indexé par l'identifiant du mot clé associé.
 
     using TreeModelEditEntity<MotCle>::m_tree;
-    using TreeModelEditEntity<MotCle>::getItem;
+    using TreeModelEditEntity<MotCle>::getIter;
     using TreeModelEditEntity<MotCle>::setDataTree;
 
 public:
     //! Constructeur, la variable header contient le nom des entité associé à leur identifiant.
-    explicit TreeModelMotCle(BddPredef * bdd, const QMap<int,QString> & header, QObject *parent = nullptr);
+    explicit TreeModelMotCle(bmps::BddPredef * bdd, const std::map<int,QString> & header, QObject *parent = nullptr);
 
     //! Destructeur par defaut.
     ~TreeModelMotCle() override = default;
 
     //! Renvoie les autorisations de modification pour un index donné.
-    bool autorisation(const QModelIndex & index, bdd::Autorisation autoris) const override;
+    bool autorisation(const QModelIndex & index, bmps::autorisation autoris) const override;
 
     //! Renvoie le numero de cible correspond à l'index
-    int cible(const QModelIndex & index) const
-    {
+    int cible(const QModelIndex & index) const {
         if(NbrColumnMotCle <= index.column() && index.column() < NbrColumnMotCle + m_nbrEntity)
             return m_cibleList[index.column() - NbrColumnMotCle];
         else
@@ -99,5 +98,5 @@ public:
     //! Enregistre les données.
     bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
 };
-
+}
 #endif // TREEMODELMOTCLE_H

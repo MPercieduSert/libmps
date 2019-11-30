@@ -1,5 +1,7 @@
 #include "Bdd.h"
 
+using namespace bddMPS;
+
 bool Bdd::copy(const QString & name)
 {
     Bdd bdd(m_bdd.driverName(), name,0);

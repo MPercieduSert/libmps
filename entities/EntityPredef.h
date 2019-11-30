@@ -62,39 +62,45 @@ namespace donnee {
               };*/
 }
 
-// Entités de type prédéfinies
-ID1_ENTITY(CommentaireCible,CibleDateTimeCurrentNum,InfoEntity::CommentaireCibleId,Commentaire)
-ID1_ENTITY_NEG(DonneeCible,CibleNegDateTimeCurrentNumValeurVariant,InfoEntity::DonneeCibleId,Donnee)
-ID1_ENTITY(MotCleCible,Cible,InfoEntity::MotCleCibleId,MotCle)
-ID1_ENTITY(MotClePermission,IdCibleCode,InfoEntity::MotClePermissionId,MotCle)
-RELATION_ENTITY_NEG(MotProgCible,CibleNeg,InfoEntity::MotProgCibleId,MotCle,Prog)
-RELATION_ENTITY_NEG(MotProgPermission,CibleAttCodeNeg,InfoEntity::MotProgPermissionId,MotCle,Prog)
-ID1_ENTITY(TexteCible,CibleDateTimeCurrentNumType,InfoEntity::TexteCibleId,Texte)
-ID1_ENTITY(Type,IdNullArbreSimpleNcNom,InfoEntity::TypeId,Prog);
-ID1_ENTITY(TypePermission,IdCibleCode,InfoEntity::TypePermissionId,Type)
-ID1_ENTITY(Utilisation,Utilisation,InfoEntity::UtilisationId,Usage)
-RELATION_ENTITY(SourceTexte,,InfoEntity::SourceTexteId,Source,Texte)
-using Commentaire = TexteEntity<InfoEntity::CommentaireId>;
-using MotCle = NcNomEntity<InfoEntity::MotCleId>;
-using Texte = TexteEntity<InfoEntity::TexteId>;
-using Historique = HistoriqueEntity<InfoEntity::HistoriqueId>;
-using Restriction = CibleSimpleCodeEntity<InfoEntity::RestrictionId>;
-using Source = NcNomTypeEntity<InfoEntity::SourceId>;
-using Usage = NcNomTypeEntity<InfoEntity::UsageId>;
+namespace entityMPS {
+using namespace typeMPS;
+namespace amps = attributMPS;
+namespace ebmps = entityBaseMPS;
 
+// Entités de type prédéfinies
+/*! \ingroup groupeEntity
+ * \brief Ensemble des classes de la fonctionalité commentaire.
+ */
+namespace ensembleCommentaire {
+using Commentaire = ebmps::TexteEntity<infoEntity::CommentaireId>;
+ID1_ENTITY(CommentaireCible,CibleDateTimeCurrentNum,infoEntity::CommentaireCibleId,Commentaire)
+}
+using namespace ensembleCommentaire;
+
+/*! \ingroup groupeEntity
+ * \brief Ensemble des classes de la fonctionalité donnee.
+ */
+namespace ensembleDonnee {
 /*! \ingroup groupeEntity
  * \brief Représentation de l'entité Donnee.
  */
-class Donnee : public EntityAttributsID<Attributs<NomTypeAttribut,IdProgAttribut,TpValAttribut>,InfoEntity::DonneeId>
-{
+class Donnee : public EntityIDs<infoEntity::DonneeId,amps::NomTypeAttribut,
+                                                             amps::IdProgAttribut,
+                                                             amps::TpValAttribut> {
+protected:
+    template<class T> using PositionEnum = PositionEnum<T,Donnee>;
+
 public:
-    using EAID = EntityAttributsID<Attributs<NomTypeAttribut,IdProgAttribut,TpValAttribut>,InfoEntity::DonneeId>;
+    using EAID = EntityIDs<infoEntity::DonneeId,amps::NomTypeAttribut,
+                                                        amps::IdProgAttribut,
+                                                        amps::TpValAttribut>;
+
     //! Positions des attributs.
-    enum Position {Id = PositionEnum<IdAttribut,Donnee>::Position,
-                   Nom = PositionEnum<NomAttribut,Donnee>::Position,
-                   Type = PositionEnum<TypeAttribut,Donnee>::Position,
-                   IdProg = PositionEnum<IdProgAttribut,Donnee>::Position,
-                   TpVal = PositionEnum<TpValAttribut,Donnee>::Position,
+    enum Position:szt {Id = PositionEnum<IdAttribut>::Position,
+                   Nom = PositionEnum<NomAttribut>::Position,
+                   Type = PositionEnum<TypeAttribut>::Position,
+                   IdProg = PositionEnum<IdProgAttribut>::Position,
+                   TpVal = PositionEnum<TpValAttribut>::Position,
                    NbrAtt = EAID::NbrAtt};
 
     //! Identifiant de programation
@@ -108,7 +114,7 @@ public:
         EntityCardIdND = -4 // contient le cardinal maximale d'entitée pouvant être enregistrée.
     };
 
-    using EAID::EntityAttributsID;
+    using EAID::EntityID;
     BASE_ENTITY(Donnee)
 
     //! Constructeur à partir des valeurs d'un ensemble d'attributs unique.
@@ -118,8 +124,7 @@ public:
 
     //! Constructeur à partir des valeurs attributs.
     Donnee(const QString & nom, idt type, int tpVal, idt idProg = prog::NoId, idt id = 0)
-        : Donnee(idProg,id)
-    {
+        : Donnee(idProg,id) {
         setNom(nom);
         setType(type);
         setTpVal(tpVal);
@@ -130,16 +135,23 @@ public:
  * \brief Représentation de l'entité DonneeCard.
  */
 class DonneeCard :
-        public EntityAttributsID<Attributs<Id1NegAttribut,CardAttribut,ExactAttribut,CibleAttribut>,InfoEntity::DonneeCardId>
-{
+        public EntityIDs<infoEntity::DonneeCardId,amps::Id1NegAttribut,
+                                                          amps::CardAttribut,
+                                                          amps::ExactAttribut,
+                                                          amps::CibleAttribut> {
+protected:
+    template<class T> using PositionEnum = PositionEnum<T,DonneeCard>;
 public:
-    using EAID = EntityAttributsID<Attributs<Id1NegAttribut,CardAttribut,ExactAttribut,CibleAttribut>,InfoEntity::DonneeCardId>;
+    using EAID = EntityIDs<infoEntity::DonneeCardId,amps::Id1NegAttribut,
+                                                            amps::CardAttribut,
+                                                            amps::ExactAttribut,
+                                                            amps::CibleAttribut>;
     //! Positions des attributs.
-    enum Position {Id = PositionEnum<IdAttribut,DonneeCard>::Position,
-                   Id1 = PositionEnum<Id1NegAttribut,DonneeCard>::Position,
-                   Card = PositionEnum<CardAttribut,DonneeCard>::Position,
-                   Cible = PositionEnum<CibleAttribut,DonneeCard>::Position,
-                   Exact = PositionEnum<ExactAttribut,DonneeCard>::Position,
+    enum Position:szt {Id = PositionEnum<IdAttribut>::Position,
+                   Id1 = PositionEnum<Id1NegAttribut>::Position,
+                   Card = PositionEnum<CardAttribut>::Position,
+                   Cible = PositionEnum<CibleAttribut>::Position,
+                   Exact = PositionEnum<ExactAttribut>::Position,
                    NbrAtt = EAID::NbrAtt,
                    IdDonnee = Id1,};
 
@@ -147,25 +159,83 @@ public:
     enum cardinal {Infini = 0};
 
 
-    using EAID::EntityAttributsID;
+    using EAID::EntityID;
     BASE_ENTITY(DonneeCard)
     ALIAS_CLE_NEG(Donnee,1)
 
     //! Constructeur à partir des valeurs d'un ensemble d'attributs unique.
     DonneeCard(int idDn, int cible, idt id = 0)
-        : EAID(id)
-    {
+        : EAID(id) {
         setIdDonnee(idDn);
         setCible(cible);
     }
 
     //! Constructeur à partir des valeurs attributs.
     DonneeCard(int idDn, int card, int cible, codeType exact = 0, idt id = 0)
-        : DonneeCard(idDn, cible, id)
-    {
+        : DonneeCard(idDn, cible, id) {
         setCard(card);
         setExact(exact);
     }
 };
+ID1_ENTITY_NEG(DonneeCible,CibleNegDateTimeCurrentNumValeurVariant,infoEntity::DonneeCibleId,Donnee)
+}
+using namespace ensembleDonnee;
 
+/*! \ingroup groupeEntity
+ * \brief Ensemble des classes de la fonctionalité historique.
+ */
+namespace ensembleHistorique {
+using Historique = ebmps::HistoriqueEntity<infoEntity::HistoriqueId>;
+}
+using namespace ensembleHistorique;
+
+/*! \ingroup groupeEntity
+ * \brief Ensemble des classes de la fonctionalité mot clé.
+ */
+namespace ensembleMotCle {
+using MotCle = ebmps::NcNomEntity<infoEntity::MotCleId>;
+ID1_ENTITY(MotCleCible,Cible,infoEntity::MotCleCibleId,MotCle)
+ID1_ENTITY(MotClePermission,IdCibleCode,infoEntity::MotClePermissionId,MotCle)
+RELATION_ENTITY_NEG(MotProgCible,RelationCibleNeg,infoEntity::MotProgCibleId,MotCle,Prog)
+RELATION_ENTITY_NEG(MotProgPermission,RelationCibleAttCodeNeg,infoEntity::MotProgPermissionId,MotCle,Prog)
+}
+using namespace ensembleMotCle;
+
+/*! \ingroup groupeEntity
+ * \brief Ensemble des classes de la fonctionalité restriction.
+ */
+namespace ensembleRestriction {
+using Restriction = ebmps::CibleSimpleCodeEntity<infoEntity::RestrictionId>;
+}
+using namespace ensembleRestriction;
+
+/*! \ingroup groupeEntity
+ * \brief Ensemble des classes de la fonctionalité texte.
+ */
+namespace ensembleTexte {
+using Source = ebmps::NcNomTypeEntity<infoEntity::SourceId>;
+RELATION_ENTITY(SourceTexte,Relation,infoEntity::SourceTexteId,Source,Texte)
+using Texte = ebmps::TexteEntity<infoEntity::TexteId>;
+ID1_ENTITY(TexteCible,CibleDateTimeCurrentNumType,infoEntity::TexteCibleId,Texte)
+}
+using namespace ensembleTexte;
+
+/*! \ingroup groupeEntity
+ * \brief Ensemble des classes de la fonctionalité type.
+ */
+namespace ensembleType {
+ID1_ENTITY(Type,IdNullArbreSimpleNcNom,infoEntity::TypeId,Prog);
+ID1_ENTITY(TypePermission,IdCibleCode,infoEntity::TypePermissionId,Type)
+}
+using namespace ensembleType;
+
+/*! \ingroup groupeEntity
+ * \brief Ensemble des classes de la fonctionalité utilisation.
+ */
+namespace ensembleUtilisation {
+using Usage = ebmps::NcNomTypeEntity<infoEntity::UsageId>;
+ID1_ENTITY(Utilisation,Utilisation,infoEntity::UtilisationId,Usage)
+}
+using namespace ensembleUtilisation;
+}
 #endif // ENTITYPREDEF_H

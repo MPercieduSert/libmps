@@ -11,7 +11,7 @@
 //! Début du coprs des deux methodes save.
 #define SAVE_MODIF_DEBUT if(entity.isValid()) \
     {if(entity.isNew()) \
-        {if(existsUnique(entity) == bdd::Aucun) \
+        {if(existsUnique(entity) == bmps::Aucun) \
             {Ent ent(entity); \
             add(ent);
 
@@ -23,7 +23,7 @@
                     "que cette nouvelle entité.").toStdString());} \
     else \
         {if(!sameInBdd(entity)) \
-            {if(existsUnique(entity) <= bdd::Meme) \
+            {if(existsUnique(entity) <= bmps::Meme) \
                 modify(entity); \
             else \
                 throw std::invalid_argument(messageErreursUnique(entity).append("\n Erreur d'unicité :  " \
@@ -35,19 +35,18 @@
 #define SAVE_MODIF_FIN }} else \
     throw std::invalid_argument(messageErreurs(entity).append("\n Erreur de validité").toStdString());
 
+namespace managerMPS {
 /*! \ingroup groupeManager
  * \brief Classe template mère des différents manageurs à modification controlée.
  */
-template<class Ent> class BaseManagerModifControle
-{
+template<class Ent> class BaseManagerModifControle {
 protected:
     bool m_bypass = false;  //!< Booléen permettant de courtcircuité le gestionnaire d'autorisation.
     AbstractGestionAutorisation<Ent> * m_gestionAutorisation;   //!< Gestionnaire d'autorisation
 public:
     //! Constructeur. (Posséde le gestionnaire d'autorisation.)
     BaseManagerModifControle(AbstractGestionAutorisation<Ent> * gestionAutorisation)
-        : m_gestionAutorisation(gestionAutorisation)
-    {}
+        : m_gestionAutorisation(gestionAutorisation) {}
 
     //! Destructeur.
     virtual ~BaseManagerModifControle();
@@ -57,23 +56,23 @@ public:
         {return m_gestionAutorisation;}
 
     //! Demande l'autorisation de modification pour une entité donnée.
-    virtual bool getAutorisation(const Ent & entity, bdd::Autorisation autorisation)
+    virtual bool getAutorisation(const Ent & entity, bmps::autorisation autorisation)
         {return m_gestionAutorisation->getAutorisation(entity, autorisation) || m_bypass;}
 
     //! Demande l'autorisation de modification pour une entité d'identifiant id avec les valeurs de entity.
-    virtual bool getAutorisation(const Ent & entity, idt id, bdd::Autorisation autorisation)
+    virtual bool getAutorisation(const Ent & entity, idt id, bmps::autorisation autorisation)
         {return m_gestionAutorisation->getAutorisation(entity, id, autorisation) || m_bypass;}
 
     //! Demande la liste des restrictions de modification pour une entité donnée.
-    virtual QList<int> getRestriction(const Ent & entity)
+    virtual std::vector<int> getRestriction(const Ent & entity)
         {return m_gestionAutorisation->getRestriction(entity);}
 
     //! Modifie une autorisation de modification pour une entité donnée.
-    virtual void setAutorisation(const Ent & entity, bdd::Autorisation autorisation, bool bb)
+    virtual void setAutorisation(const Ent & entity, bmps::autorisation autorisation, bool bb)
         {m_gestionAutorisation->setAutorisation(entity, autorisation, bb);}
 
     //! Modifie les autorisations de modification pour une entité donnée.
-    virtual void setAutorisation(const Ent & entity, QMap<bdd::Autorisation,bool> autorisations)
+    virtual void setAutorisation(const Ent & entity, std::map<bmps::autorisation,bool> autorisations)
         {m_gestionAutorisation->setAutorisation(entity, autorisations);}
 
     //! Mutateur du gestionnaire d'autorisations.
@@ -81,7 +80,7 @@ public:
         {m_gestionAutorisation = gestionAutorisation;}
 
     //! Ajoute les restrictions de modification pour une entité donnée.
-    virtual void setRestriction(const Ent & entity, QList<bdd::Autorisation> restrictions)
+    virtual void setRestriction(const Ent & entity, std::vector<bmps::autorisation> restrictions)
         {m_gestionAutorisation->setRestriction(entity, restrictions);}
 
 protected:
@@ -100,8 +99,7 @@ template<class Ent> BaseManagerModifControle<Ent>::~BaseManagerModifControle()
 /*! \ingroup groupeManager
  * \brief Classe template manageurs à modification controlée.
  */
-template<class Ent> class ManagerOfModifControle : public virtual ManagerSql<Ent>, public BaseManagerModifControle<Ent>
-{
+template<class Ent> class ManagerModifControle : public virtual ManagerSql<Ent>, public BaseManagerModifControle<Ent> {
 protected:
     using ManagerSqlEnt = ManagerSql<Ent>;
     using ManagerBMC = BaseManagerModifControle<Ent>;
@@ -126,22 +124,19 @@ public:
     using ManagerBMC::setRestriction;
 
     //! Constructeur
-    ManagerOfModifControle (const InfoBdd & info,
+    ManagerModifControle (const InfoBdd & info,
                             AbstractGestionAutorisation<Ent> * gestionAutorisation = new GestionAutorisationNoRestrictif<Ent>(),
                             AbstractUniqueSqlTemp<Ent> * unique = new NoUniqueSql<Ent>())
-        : ManagerSql<Ent>(info, unique), BaseManagerModifControle<Ent>(gestionAutorisation)
-    {}
+        : ManagerSql<Ent>(info, unique), BaseManagerModifControle<Ent>(gestionAutorisation) {}
 
     //! Destructeur.
-    ~ManagerOfModifControle() override = default;
-
+    ~ManagerModifControle() override = default;
 
     /*//! Supprime de la table en base de donnée l'entité d'identifiant id.
     bool del(idt id) override;*/
 
     //! Enregistre l'entité entity en base de donnée ainsi que sa nouvelle autorisation de modification.
-    void save(Ent & entity, bdd::Autorisation autorisation, bool bb = false) override
-    {
+    void save(Ent & entity, bmps::autorisation autorisation, bool bb = false) override {
         ouvrir();
         save(entity);
         fermer();
@@ -149,8 +144,7 @@ public:
     }
 
     //! Enregistre l'entité entity en base de donnée ainsi que sa nouvelle autorisation de modification.
-    void save(const Ent & entity, bdd::Autorisation autorisation, bool bb = false) override
-    {
+    void save(const Ent & entity, bmps::autorisation autorisation, bool bb = false) override {
         SAVE_MODIF_DEBUT
         setAutorisation(ent, autorisation, bb);
         SAVE_MODIF_MILIEU
@@ -159,8 +153,7 @@ public:
     }
 
     //! Enregistre l'entité entity en base de donnée ainsi que ses nouvelles autorisation de modification..
-    void save(Ent & entity, const QMap<bdd::Autorisation,bool> & autorisations) override
-    {
+    void save(Ent & entity, const std::map<bmps::autorisation,bool> & autorisations) override {
         ouvrir();
         save(entity);
         fermer();
@@ -168,8 +161,7 @@ public:
     }
 
     //! Enregistre l'entité entity en base de donnée ainsi que ses nouvelles autorisations de modification.
-    void save(const Ent & entity, const QMap<bdd::Autorisation,bool> & autorisations) override
-    {
+    void save(const Ent & entity, const std::map<bmps::autorisation,bool> & autorisations) override {
         SAVE_MODIF_DEBUT
         setAutorisation(ent, autorisations);
         SAVE_MODIF_MILIEU
@@ -178,8 +170,7 @@ public:
     }
 
     //! Enregistre l'entité entity en base de donnée ainsi que ses nouvelles restriction de modification.
-    void save(Ent & entity, const QList<bdd::Autorisation> restriction) override
-    {
+    void save(Ent & entity, const std::vector<bmps::autorisation> restriction) override {
         ouvrir();
         save(entity);
         fermer();
@@ -187,8 +178,7 @@ public:
     }
 
     //! Enregistre l'entité entity en base de donnée ainsi que ses nouvelles restrictions de modification..
-    void save(const Ent & entity, const QList<bdd::Autorisation> restriction) override
-    {
+    void save(const Ent & entity, const std::vector<bmps::autorisation> restriction) override {
         SAVE_MODIF_DEBUT
         setRestriction(ent, restriction);
         SAVE_MODIF_MILIEU
@@ -198,14 +188,13 @@ public:
 
 protected:
     /*//! Constructeur.
-    ManagerOfModifControle(AbstractGestionAutorisation<Ent> * gestionAutorisation = new GestionAutorisationNoRestrictif<Ent>())
+    ManagerModifControle(AbstractGestionAutorisation<Ent> * gestionAutorisation = new GestionAutorisationNoRestrictif<Ent>())
         : BaseManagerModifControle<Ent>(gestionAutorisation)
         {}*/
 
     //! Met à jour l'entité entity en base de donnée.
-    void modify(const Ent & entity) override
-    {
-        if(getAutorisation(entity, bdd::Autorisation::Modif))
+    void modify(const Ent & entity) override {
+        if(getAutorisation(entity, bmps::autorisation::Modif))
             ManagerSqlEnt::modify(entity);
         else
             throw std::invalid_argument(QString("Erreur d'autorisation de modification' : "
@@ -214,9 +203,8 @@ protected:
     }
 
     //! Met à jour l'entité entity en base de donnée d'identifiant id avec les valeurs d'entity.
-    void modify(const Ent & entity, idt id) override
-    {
-        if(getAutorisation(entity, id, bdd::Autorisation::Modif))
+    void modify(const Ent & entity, idt id) override {
+        if(getAutorisation(entity, id, bmps::autorisation::Modif))
             ManagerSqlEnt::modify(entity,id);
         else
             throw std::invalid_argument(QString("Erreur d'autorisation de modification' : "
@@ -225,11 +213,12 @@ protected:
     }
 };
 
-/*template<class Ent> bool ManagerOfModifControle<Ent>::del(idt id)
+/*template<class Ent> bool ManagerModifControle<Ent>::del(idt id)
 {
-    if(getAutorisation(Ent(id), bdd::Suppr))
+    if(getAutorisation(Ent(id), bmps::Suppr))
         return ManagerSqlEnt::del(id);
     else
         return false;
 }*/
+}
 #endif // MANAGERMODIFCONTROLE_H

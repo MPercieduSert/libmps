@@ -6,6 +6,7 @@
 
 #include "TreeModelReadTemp.h"
 
+namespace modelMPS {
 /*! \ingroup groupeModel
  * \brief Classe template des models de type d'arbre modifiable.
  */
@@ -33,4 +34,5 @@ public:
     bool removeRows(int position, int rows,
                     const QModelIndex &parent = QModelIndex()) override;
 };
+}
 #endif // TREEMODELTEMP_H

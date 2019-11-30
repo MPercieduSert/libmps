@@ -14,23 +14,32 @@
 #include "EntityPredef.h"
 #include "ReadTreeWidget.h"
 
+/*! \defgroup groupeDialogue Fenêtre de Dialogue
+ * \brief Ensemble de classes représentant des fenêtres de dialogue.
+ */
+
+/*! \ingroup groupeDialogue
+ * \brief Espace de noms des fenêtres de dialogue.
+ */
+namespace dialogMPS {
+
 /*! \ingroup groupeDialogue
  * \brief Fenêtre de dialogue de selection d'une donnée.
  */
-class SelectDonneeDialog : public QDialog
-{
+class SelectDonneeDialog : public QDialog {
     Q_OBJECT
 protected:
+    using Donnee = entityMPS::Donnee;
     QLabel *m_label;                            //!< Texte d'entête.
     QPushButton *m_cancelBouton;                //!< Bouton d'annulation.
     QPushButton *m_okBouton;                    //!< Bouton de confirmation de selection.
     QHBoxLayout *m_hLayout;                     //!< Calque secondaire.
     QVBoxLayout *m_vLayout;                     //!< Calque principal.
-    ReadTreeWidget<Donnee> * m_treeWidget;      //!< Arbre de données.
+    widgetMPS::ReadTreeWidget<Donnee> * m_treeWidget;      //!< Arbre de données.
 
 public:
     //! Constructeur.
-    explicit SelectDonneeDialog(const Tree<Donnee> & tree, QWidget * parent = nullptr);
+    explicit SelectDonneeDialog(const conteneurMPS::tree<Donnee> & tree, QWidget * parent = nullptr);
 
     //! Destructeur par defaut.
     ~SelectDonneeDialog() override = default;
@@ -42,5 +51,5 @@ public slots:
     //! Surdéfinition.
     void reject() override;
 };
-
+}
 #endif // SELECTDONNEEDIALOG_H

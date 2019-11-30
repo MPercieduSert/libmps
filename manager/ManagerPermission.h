@@ -6,11 +6,11 @@
 
 #include "ManagerSql.h"
 
+namespace managerMPS {
 /*! \ingroup groupeManager
  * \brief Classe template mère des différents manageurs de permissions code.
  */
-template<class Ent> class AbstractManagerOfPermission : virtual public ManagerSql<Ent>
-{
+template<class Ent> class AbstractManagerPermission : virtual public ManagerSql<Ent> {
 protected:
     using ManagerSqlEnt = ManagerSql<Ent>;
     using ManagerSqlEnt::del;
@@ -22,11 +22,10 @@ public:
 
 
     //! Destructeur.
-    ~AbstractManagerOfPermission() override = default;
+    ~AbstractManagerPermission() override = default;
 
     //! Teste s'il y a dans la base de donnée une entité ayant exactement les mêmes attributs (identifiant compris).
-    bool sameInBdd(const Ent & entity)
-    {
+    bool sameInBdd(const Ent & entity) {
         if(isVirtual(entity))
             return !exists(entity);
         else
@@ -34,8 +33,7 @@ public:
     }
 
     //! Teste s'il y a dans la base de donnée une entité d'identifiant id ayant exactement les mêmes attributs.
-    bool sameInBdd(const Ent & entity, idt id)
-    {
+    bool sameInBdd(const Ent & entity, idt id) {
         if(isVirtual(entity))
             return !exists(Ent(id));
         else
@@ -44,19 +42,17 @@ public:
 
 protected:
     /*//! Constructeur.
-    ManagerOfPermission() {}*/
+    ManagerPermission() {}*/
 
     //! Insert la nouvelle entité entity dans la base de donnée
     //! et assigne l'identifiant de l'entité insérée en base de donnée à entity.
-    void add(Ent & entity) override
-    {
+    void add(Ent & entity) override {
         if(!isVirtual(entity))
             addParent(entity);
     }
 
     //! Insert la nouvelle entité entity dans la base de donnée.
-    void add(const Ent & entity) override
-    {
+    void add(const Ent & entity) override {
         if(!isVirtual(entity))
             addParent(entity);
     }
@@ -73,8 +69,7 @@ protected:
     virtual bool isVirtual(const Ent entity) const = 0;
 
     //! Met à jour l'entité entity en base de donnée.
-    void modify(const Ent & entity) override
-    {
+    void modify(const Ent & entity) override {
         if(isVirtual(entity))
             del(entity.id());
         else
@@ -82,8 +77,7 @@ protected:
     }
 
     //! Met à jour l'entité entity en base de donnée d'identifiant id avec les valeurs d'entity.
-    void modify(const Ent & entity, idt id) override
-    {
+    void modify(const Ent & entity, idt id) override {
         if(isVirtual(entity))
             del(id);
         else
@@ -102,14 +96,14 @@ protected:
 /*! \ingroup groupeManager
  * \brief Classe template mère des différents manageurs de permissions num.
  */
-template<class Ent> class ManagerOfPermissionNum : virtual public AbstractManagerOfPermission<Ent>
+template<class Ent> class ManagerPermissionNum : virtual public AbstractManagerPermission<Ent>
 {
 public:
     enum {NoExists = 0};
-    using AbstractManagerOfPermission<Ent>::AbstractManagerOfPermission;
+    using AbstractManagerPermission<Ent>::AbstractManagerPermission;
 
     //! Destructeur.
-    ~ManagerOfPermissionNum() override = default;
+    ~ManagerPermissionNum() override = default;
 
 protected:
     //! Test si l'entité doit exister dans la base de donnée.
@@ -120,18 +114,19 @@ protected:
 /*! \ingroup groupeManager
  * \brief Classe template mère des différents manageurs de permissions code.
  */
-template<class Ent> class ManagerOfPermissionCode : virtual public AbstractManagerOfPermission<Ent>
+template<class Ent> class ManagerPermissionCode : virtual public AbstractManagerPermission<Ent>
 {
 public:
-    enum {NoExists = bdd::Autorisation::Toute};
-    using AbstractManagerOfPermission<Ent>::AbstractManagerOfPermission;
+    enum {NoExists = bmps::autorisation::Toute};
+    using AbstractManagerPermission<Ent>::AbstractManagerPermission;
 
     //! Destructeur.
-    ~ManagerOfPermissionCode() override = default;
+    ~ManagerPermissionCode() override = default;
 
 protected:
     //! Test si l'entité doit exister dans la base de donnée.
     bool isVirtual(const Ent entity) const override
         {return entity.code() == NoExists;}
 };
+}
 #endif // MANAGERPERMISSION_H

@@ -7,35 +7,34 @@
 #include "ManagerModifControle.h"
 #include "ManagerPermission.h"
 
+namespace managerMPS {
 /*! \ingroup groupeManager
  * \brief Classe template des différents manageurs à modification controlée de permission.
  */
-template<class ManagerOfPerm> class ManagerOfPermissionModifControle : public ManagerOfPerm,
-                                                                           public ManagerOfModifControle<typename ManagerOfPerm::EntType>
-{
+template<class ManagerPerm> class ManagerPermissionModifControle : public ManagerPerm,
+                                                                           public ManagerModifControle<typename ManagerPerm::EntType> {
 protected:
-    using Ent = typename ManagerOfPerm::EntType;
-    using ManagerMC = ManagerOfModifControle<Ent>;
-    using ManagerOfPerm::add;
+    using Ent = typename ManagerPerm::EntType;
+    using ManagerMC = ManagerModifControle<Ent>;
+    using ManagerPerm::add;
 
 public:
-    using ManagerOfPerm::sameInBdd;
+    using ManagerPerm::sameInBdd;
     using ManagerMC::del;
 
     //! Constructeur
-    ManagerOfPermissionModifControle (const InfoBdd & info,
+    ManagerPermissionModifControle (const InfoBdd & info,
                                       AbstractGestionAutorisation<Ent> * gestionAutorisation = new GestionAutorisationNoRestrictif<Ent>(),
                                       AbstractUniqueSqlTemp<Ent> * unique = new NoUniqueSql<Ent>())
-        : ManagerSql<Ent>(info, unique), ManagerOfPerm(info,unique),
-          ManagerOfModifControle<Ent>(info, gestionAutorisation, unique)
-    {}
+        : ManagerSql<Ent>(info, unique), ManagerPerm(info,unique),
+          ManagerModifControle<Ent>(info, gestionAutorisation, unique) {}
 
     //! Destructeur.
-    ~ManagerOfPermissionModifControle() override = default;
+    ~ManagerPermissionModifControle() override = default;
 
 protected:
     /*//! Constructeur.
-    ManagerOfPermissionModifControle() = default;*/
+    ManagerPermissionModifControle() = default;*/
 
     //! Appelle la fonction d'insertion parent souhaitée.
     void addParent(Ent & entity) override
@@ -50,11 +49,11 @@ protected:
 
     //! Réimplemente modify.
     void modify(const Ent & entity) override
-        {ManagerOfPerm::modify(entity);}
+        {ManagerPerm::modify(entity);}
 
     //! Réimplemente modify.
     void modify(const Ent & entity, idt id) override
-        {ManagerOfPerm::modify(entity,id);}
+        {ManagerPerm::modify(entity,id);}
 
     //! Appelle la fonction de modification parent souhaitée.
     void modifyParent(const Ent & entity) override
@@ -65,11 +64,12 @@ protected:
         {ManagerMC::modify(entity,id);}
 };
 
-template<class Ent> bool ManagerOfPermissionModifControle<Ent>::del(idt id)
+template<class Ent> bool ManagerPermissionModifControle<Ent>::del(idt id)
     {return ManagerMC::del(id);}
 
 //! Manager de permission de type num à modification controlé.
-template<class Ent> using ManagerOfPermissionNumModifControle = ManagerOfPermissionModifControle<ManagerOfPermissionNum<Ent>>;
+template<class Ent> using ManagerPermissionNumModifControle = ManagerPermissionModifControle<ManagerPermissionNum<Ent>>;
 //! Manager de permission de type code à modification controlé.
-template<class Ent> using ManagerOfPermissionCodeModifControle = ManagerOfPermissionModifControle<ManagerOfPermissionCode<Ent>>;
+template<class Ent> using ManagerPermissionCodeModifControle = ManagerPermissionModifControle<ManagerPermissionCode<Ent>>;
+}
 #endif // MANAGERPERMISSIONMODIFCONTROLE_H

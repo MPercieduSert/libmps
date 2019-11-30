@@ -15,19 +15,20 @@
 
 //! \ingroup groupeFen
 //! Défini les nom et nomBdd des entitée.
-#define DECL_TABLE_ENTITY_NOM(ENTITY,NOM) m_tables[InfoEntity::ENTITY##Id].nom = NOM; \
-    m_tables[InfoEntity::ENTITY##Id].nomBdd = InfoBdd<ENTITY>::table(); \
+#define DECL_TABLE_ENTITY_NOM(ENTITY,NOM) m_tables[infoEntity::ENTITY##Id].nom = NOM; \
+    m_tables[infoEntity::ENTITY##Id].nomBdd = InfoBdd<ENTITY>::table(); \
     nomAttributsBdd = InfoBdd<ENTITY>::attribut(); \
-    for(int i = 0; i != ENTITY::NbrAtt; ++i) m_tables[InfoEntity::ENTITY##Id].nomAttributs \
+    for(int i = 0; i != ENTITY::NbrAtt; ++i) m_tables[infoEntity::ENTITY##Id].nomAttributs \
 .append(ENTITY::nomAttribut(i).append("(").append(nomAttributsBdd.value(i)).append(")"));
 
 #define DECL_TABLE_ENTITY(ENTITY) DECL_TABLE_ENTITY_NOM(ENTITY,ENTITY::Name())
 #define DECL_TABLE_ENTITY_NAME(ENTITY) DECL_TABLE_ENTITY_NOM(ENTITY,#ENTITY)
+
+namespace fenMPS {
 /*! \ingroup groupeFen
  * \brief Onglet de gestion de la base de donnée.
  */
-class AbstractTabGestionBdd : public AbstractTabModule
-{
+class AbstractTabGestionBdd : public AbstractTabModule {
     Q_OBJECT
 protected:
     enum {ArbreCoursId,
@@ -45,8 +46,8 @@ protected:
         QTableView * view = nullptr;       //!< Vue.
     };
 
-    using Tables = QVector<table>;
-    const int m_nbrEntity;
+    using Tables = std::vector<table>;
+    const szt m_nbrEntity;
     Tables m_tables; //!< Ensemble des liens avec les tables.
     QListWidget * m_listName;   //!< Liste des noms des entitées
     QSplitter * m_splitter;     //!< Splitter entre la liste des noms des entités et les tables
@@ -57,10 +58,10 @@ protected:
 
 public:
     //! Constructeur.
-    explicit AbstractTabGestionBdd(QSqlDatabase & bdd, int nbrEntity, const QString & title = QString(), QWidget *parent = nullptr);
+    explicit AbstractTabGestionBdd(QSqlDatabase & bdd, szt nbrEntity, const QString & title = QString(), QWidget *parent = nullptr);
 
     //! Destructeur.
     ~AbstractTabGestionBdd() override = default;
 };
-
+}
 #endif // ABSTRACTTABGESTIONBDD_H

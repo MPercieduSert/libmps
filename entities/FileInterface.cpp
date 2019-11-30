@@ -1,3 +1,3 @@
 #include "FileInterface.h"
 
-FileInterface::~FileInterface() {}
+fichierMPS::FileInterface::~FileInterface() {}

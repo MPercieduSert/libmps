@@ -6,7 +6,6 @@
 
 #include <QGridLayout>
 #include <QGroupBox>
-#include <QMap>
 #include <QPushButton>
 #include <QSignalMapper>
 #include <QVBoxLayout>
@@ -14,11 +13,11 @@
 #include <stdexcept>
 #include "AbstractTabModule.h"
 
+namespace fenMPS {
 /*! \ingroup groupeFen
  * \brief Fenêtre menu d'une annee
  */
-class AbstractTabMenu : public AbstractTabModule
-{
+class AbstractTabMenu : public AbstractTabModule {
     Q_OBJECT
 protected:
     // Widget 
@@ -42,5 +41,5 @@ public:
     //! Destructeur.
     ~AbstractTabMenu() override = default;
 };
-
+}
 #endif // ABSTRACTTABMENU_H

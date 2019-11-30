@@ -8,52 +8,44 @@
 #include <QSqlQuery>
 #include <stdexcept>
 #include "ReqSql.h"
-//#include "Entity.h"
 
-/*! \defgroup groupeLinkSql Liens
- * \ingroup groupeManager
- * \brief Ensemble des liens entre les entités de programation et les entités en base de donnée.
- */
-
-/*! \ingroup groupeLinkSql
+namespace managerMPS {
+/*! \ingroup groupeManager
  * \brief Classe template frabriquant les liens avec la base de donnée à partir de l'ordre des attributs des entité.
  */
-template<class Attribut, class AttPre, class AttSuiv, int Pos> class LinkSqlDichot;
-template<class Attribut, int Pos = 0> using LinkSqlAttribut = LinkSqlDichot<Attribut, typename Attribut::AttPre, typename Attribut::AttSuiv, Pos>;
+template<class Attribut, class AttPre, class AttSuiv, szt Pos> class LinkSqlDichot;
+template<class Attribut, szt Pos = 0> using LinkSqlAttribut
+                                            = LinkSqlDichot<Attribut, typename Attribut::AttPre, typename Attribut::AttSuiv, Pos>;
 
-template<class Attribut, class AttPre, class AttSuiv, int Pos> class LinkSqlDichot :
+template<class Attribut, class AttPre, class AttSuiv, szt Pos> class LinkSqlDichot :
         public LinkSqlAttribut<AttPre, Pos>,
-        public LinkSqlAttribut<AttSuiv, AttPre::NbrAtt + Pos>
-{
+        public LinkSqlAttribut<AttSuiv, AttPre::NbrAtt + Pos> {
 public:
     enum {PosPre = Pos, PosSuiv = AttPre::NbrAtt + Pos};
     using LinkPre = LinkSqlAttribut<AttPre, PosPre>;
     using LinkSuiv = LinkSqlAttribut<AttSuiv, PosSuiv>;
 
     //! Transmet les valeurs des attributs à la requète SQL préparée.
-    void bindValues(const Attribut & entity)
-    {
+    void bindValues(const Attribut & entity) {
         LinkPre::bindValues(entity);
         LinkSuiv::bindValues(entity);
     }
 
     //! Transmet les valeurs des attributs à la requète SQL préparée.
-    void bindValues(Attribut & entity)
-    {
+    void bindValues(Attribut & entity) {
         LinkPre::bindValues(entity);
         LinkSuiv::bindValues(entity);
     }
 
     //! Hydrate l'entité entity avec à partir de la requète.
-    void fromRequete(Attribut & entity) const
-    {
+    void fromRequete(Attribut & entity) const {
         LinkPre::fromRequete(entity);
         LinkSuiv::fromRequete(entity);
     }
 };
 
-template<class Attribut, int Pos> class LinkSqlDichot<Attribut, NoAttribut, NoAttribut, Pos> : public virtual ReqSql
-{
+template<class Attribut, szt Pos> class LinkSqlDichot<Attribut, attributMPS::NoAttribut, attributMPS::NoAttribut, Pos>
+        : public virtual ReqSql {
 public:
     enum {PosPre = Pos};
     //! Transmet les valeurs des attributs à la requète SQL préparée.
@@ -69,8 +61,7 @@ public:
         {entity.set(value<typename Attribut::AttType>(PosPre));}
 };
 
-template<> class LinkSqlDichot<Entity, NoAttribut, NoAttribut, 0> : public virtual ReqSql
-{
+template<> class LinkSqlDichot<Entity, attributMPS::NoAttribut, attributMPS::NoAttribut, 0> : public virtual ReqSql {
 public:
     enum {PosPre = 0};
     //! Transmet les valeurs des attributs à la requète SQL préparée.
@@ -86,12 +77,11 @@ public:
     //    {return value<unsigned>(pos);}
 
     //! Mutateur de l'identifiant.
-    void setId(const Entity & entity, int pos = 0)
-        {m_requete->bindValue(pos,entity.id());}
+    void setId(const Entity & entity, szt pos = 0)
+        {m_requete->bindValue(static_cast<int>(pos),entity.id());}
 };
 
-template<class Ent> class LinkSql : public LinkSqlAttribut<Ent>
-{
+template<class Ent> class LinkSql : public LinkSqlAttribut<Ent> {
 public:
     using LinkSqlAttribut<Ent>::fromRequete;
     using LinkSqlAttribut<Ent>::id;
@@ -100,12 +90,12 @@ public:
 
     //! Crée dynamiquement une nouvelle entité de type Classe, l'hydrate à partir de la requète SQL.
     //! Puis retourne un  pointeur vers cette nouvelle entité.
-    Ent * newFromRequete() const
-    {
-        Ent * entity = new Ent(id());
-        fromRequete(*entity);
-        return entity;
+    Ent * newFromRequete() const {
+        Ent * ptr = new Ent();
+        //entity->setId(id());
+        fromRequete(*ptr);
+        return ptr;
     }
 };
-
+}
 #endif // ABSTRACTLINKSQL_H

@@ -24,7 +24,6 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-    Arbre.cpp \
     AttributMultiple.cpp \
     AttributSimple.cpp \
     Config.cpp \
@@ -33,18 +32,16 @@ SOURCES += \
     EntityDivers.cpp \
     EntityRelation.cpp \
     FileInterface.cpp \
-    InfoEntity.cpp \
-    ListPtr.cpp \
-    MapPtr.cpp \
+    infoEntity.cpp \
+#    ListPtr.cpp \
+#    MapPtr.cpp \
+#    VectorPtr.cpp \
+    EntityPredef.cpp \
+    XmlMps.cpp \
     Tree.cpp \
-    TreeItem.cpp \
-    VectorPtr.cpp \
-    xmlmps.cpp \
-    EntityPredef.cpp #\
-    #EntitiesPredef.cpp
+    ConteneurPtr.cpp
 
 HEADERS += \
-    Arbre.h \
     AttributMultiple.h \
     AttributSimple.h \
     Config.h \
@@ -54,15 +51,15 @@ HEADERS += \
     EntityPredef.h \
     EntityRelation.h \
     FileInterface.h \
-    InfoEntity.h \
-    ListPtr.h \
+    infoEntity.h \
+#    ListPtr.h \
     macrolibmps.h \
-    MapPtr.h \
+#    MapPtr.h \
+#    VectorPtr.h \
+    XmlMps.h \
     Tree.h \
-    TreeItem.h \
-    VectorPtr.h \
-    xmlmps.h #\
-    #EntitiesPredef.h
+    ConteneurPtr.h \
+    typemps.h
 unix {
     target.path = /usr/lib
     INSTALLS += target

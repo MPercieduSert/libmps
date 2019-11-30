@@ -4,28 +4,28 @@
 #ifndef MOTCLEMODEL_H
 #define MOTCLEMODEL_H
 
-#include <QSet>
-#include "TreeModelReadTemp.h"
+#include <set>
+#include "TreeModelReadEntity.h"
 #include "BddPredef.h"
 
+namespace modelMPS {
 /*! \ingroup groupeModel
  * \brief Model de gestion des motcle.
  */
-class MotCleModel : public TreeModelReadTemp<QPair<MotCle,int>>
-{
+class MotCleModel : public TreeModelReadTemp<std::pair<emps::MotCle,int>> {
     Q_OBJECT
 protected:
     enum {PasTous,TousJusquaPresent,Tous};
-    BddPredef * m_bdd;          //!< Pointeur vers la base de donnée.
+    bmps::BddPredef * m_bdd;          //!< Pointeur vers la base de donnée.
     const int m_cible;          //!< Numero de cible du type d'entité pour les quels on souhaite gérer les mots clés.
-    QSet<int> m_idSet;          //!< Ensemble des identifiants des entités dont les mots clés sont affichés.
-    QMap<idt,bool> m_idMotCle;  //!< Map dont les clés sont les identifiants des mots clés associés aux entités d'identifiant contenus dans m_idSet et de valeur true si le mot clé est associé à toutes les entités dont les identifiants sont contenus dans m_idSet et false sinon..
+    std::set<idt> m_idSet;          //!< Ensemble des identifiants des entités dont les mots clés sont affichés.
+    std::map<idt,bool> m_idMotCle;  //!< Map dont les clés sont les identifiants des mots clés associés aux entités d'identifiant contenus dans m_idSet et de valeur true si le mot clé est associé à toutes les entités dont les identifiants sont contenus dans m_idSet et false sinon..
 
 public:
     enum ColumnIndex{CheckColumn, NomColumn, NbrColumn, Aucun};
 
     //! Constructeur.
-    explicit MotCleModel(BddPredef *bd, int cible, QObject * parent);
+    explicit MotCleModel(bmps::BddPredef *bd, int cible, QObject * parent);
 
     //! Destructeur par defaut.
     ~MotCleModel() override = default;
@@ -47,11 +47,11 @@ public:
     void setTreeMotCle();
 
 signals:
-    void changedIdSet(QSet<int> IdSet);
+    void changedIdSet(std::set<idt> IdSet);
 
 public slots:
     //!< Mutateur de m_idEntityList, l'identifiant de l'entité pour laquelle sont affiché les mots clés.
-    void setIdSet(const QSet<int> & idSet);
+    void setIdSet(const std::set<idt> & idSet);
 };
-
+}
 #endif // MOTCLEMODEL_H

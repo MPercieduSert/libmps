@@ -8,8 +8,12 @@
 #include "AbstractTabMenu.h"
 #include "TabMotCle.h"
 
-class PredefTab : public AbstractTab
-{
+
+namespace fenMPS {
+/*! \ingroup groupeFen
+ * \brief Classe de création des onglets prédéfinis.
+ */
+class PredefTab : public AbstractTab {
     Q_OBJECT
 public:
     //! Constructeur.
@@ -19,7 +23,7 @@ public:
     ~PredefTab() override = default;
 
     //! Créateur d'onglet.
-    AbstractTabModule *createTab(QPair<int,int> pair) const override;
+    AbstractTabModule *createTab(std::pair<int,int> pair) const override;
 };
-
+}
 #endif // PREDEFTAB_H

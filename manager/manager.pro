@@ -32,7 +32,6 @@ SOURCES += \
     BddPredef.cpp \
     GestionAutorisationCible.cpp \
     InfoBdd.cpp \
-    InfoBddBase.cpp \
     ManagerForArbre.cpp \
     Managers.cpp \
     ManagersPredef.cpp \
@@ -45,7 +44,8 @@ SOURCES += \
     ManagerArbreSimpleModifControle.cpp \
     ManagerModifControle.cpp \
     ManagerPermission.cpp \
-    ManagerPermissionModifControle.cpp
+    ManagerPermissionModifControle.cpp \
+    AbstractManagerArbre.cpp
 
 HEADERS += \
     AbstractGestionAutorisation.h \
@@ -56,7 +56,6 @@ HEADERS += \
     BddPredef.h \
     GestionAutorisationCible.h \
     InfoBdd.h \
-    InfoBddBase.h \
     ManagerForArbre.h \
     Managers.h \
     ManagersPredef.h \
@@ -69,7 +68,8 @@ HEADERS += \
     ManagerArbreSimpleModifControle.h \
     ManagerModifControle.h \
     ManagerPermission.h \
-    ManagerPermissionModifControle.h
+    ManagerPermissionModifControle.h \
+    AbstractManagerArbre.h
 unix {
     target.path = /usr/lib
     INSTALLS += target

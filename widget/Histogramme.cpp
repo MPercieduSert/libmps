@@ -1,32 +1,27 @@
 #include "Histogramme.h"
 
-Histogramme::Histogramme(const QVector<double> & intervalle, const QVector<QBrush> &aspet, const QVector<double> donnee, QWidget * parent)
-    : BarPlotter(parent), m_aspet(aspet), m_intervalle(intervalle)
-{
-    setDonnee(donnee);
-}
+using namespace widgetMPS;
 
-void Histogramme::calculBar()
-{
-    if(m_intervalle.count() < 3 || m_donnee.isEmpty())
+Histogramme::Histogramme(const std::vector<double> & intervalle, const std::vector<QBrush> &aspet, const std::vector<double> donnee, QWidget * parent)
+    : BarPlotter(parent), m_aspet(aspet), m_intervalle(intervalle)
+ {setDonnee(donnee);}
+
+void Histogramme::calculBar() {
+    if(m_intervalle.size() < 3 || m_donnee.empty())
         return;
-    QVector<int> effectif(m_intervalle.count()-1);
-    for(QVector<double>::const_iterator i = m_donnee.cbegin(); i != m_donnee.cend(); ++i)
-    {
-        if(*i >= m_intervalle[0])
-        {
+    std::vector<int> effectif(m_intervalle.size()-1);
+    for(auto i = m_donnee.cbegin(); i != m_donnee.cend(); ++i) {
+        if(*i >= m_intervalle[0]){
             int j = 0;
-            while(j != effectif.count() - 1 && *i > m_intervalle[j])
+            while(j != effectif.size() - 1 && *i > m_intervalle[j])
                 ++j;
-            if(*i <= m_intervalle.last())
+            if(*i <= m_intervalle.back())
                 effectif[j] += 1;
         }
     }
     m_bars.resize(std::count_if(effectif.cbegin(),effectif.cend(),[](int i) -> bool {return i != 0;}));
-    for(int j = 0, i = 0; j != effectif.count(); ++j)
-    {
-        if(effectif[j] != 0)
-        {
+    for(int j = 0, i = 0; j != effectif.size(); ++j) {
+        if(effectif[j] != 0) {
             m_bars[i].aspet = m_aspet[j];
             m_bars[i].gauche = m_intervalle[j];
             m_bars[i].hauteur = effectif[j];

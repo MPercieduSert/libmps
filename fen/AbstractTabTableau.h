@@ -8,18 +8,18 @@
 #include <QTableView>
 
 #include "AbstractTabModule.h"
-#include "MAbstractTableModel.h"
+#include "AbstractTableModel.h"
 
+namespace fenMPS {
 /*! \ingroup groupeFen
  * \brief Classe mère des onglets contenant des tableaux
  */
-class AbstractTabTableau : public AbstractTabModule
-{
+class AbstractTabTableau : public AbstractTabModule {
     Q_OBJECT
 protected:
     QPushButton * m_addColumnButton;        //!< Bouton pour ajouter une colonne
     QStyledItemDelegate * m_delegate;       //!< Déleguer
-    MAbstractTableModel * m_model;          //!< Model
+    modelMPS::AbstractTableModel * m_model;          //!< Model
     QTableView * m_view;                    //!< Vue
     QPushButton * m_saveButton;             //!< Bouton save
 public:
@@ -43,5 +43,5 @@ public slots:
     //! Slot coorepondant à l'action sauver.
     void save() override   {m_model->save();}
 };
-
+}
 #endif // TABABSTRACTTABLEAU_H

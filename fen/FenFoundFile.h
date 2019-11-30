@@ -6,7 +6,6 @@
 #define FENFOUNDFILE_H
 
 #include <QFileDialog>
-#include <QMap>
 #include <QMessageBox>
 #include <QPushButton>
 #include <QString>
@@ -14,19 +13,20 @@
 #include "Config.h"
 #include "FileInterface.h"
 
+namespace fenMPS {
+namespace fimps = fichierMPS;
 /*! \ingroup groupeFen
  * \brief Cette classe est chargée de la vérifiaction des chemins des fichiers et de leur création s'il sont introuvables.
  */
 
-class FenFoundFile : QObject
-{
+class FenFoundFile : QObject {
 protected:
     QWidget * m_modal;
-    FileInterface * m_file; //!< Pointeur sur le gestionnaire du fichier que l'on souhaite ouvrrir.
+    fichierMPS::FileInterface * m_file; //!< Pointeur sur le gestionnaire du fichier que l'on souhaite ouvrrir.
 
 public:
     //! Constructeur. Donner en argument un pointeur sur le gestonnaire de fichier que l'on souhaite ouvrir.
-    FenFoundFile(FileInterface *file, QWidget *modal = nullptr, QObject * parent = nullptr)
+    FenFoundFile(fimps::FileInterface *file, QWidget *modal = nullptr, QObject * parent = nullptr)
         :QObject(parent), m_modal(modal), m_file(file)
     {}
 
@@ -42,7 +42,7 @@ public:
     QString isValid(bool copy = true);
 
     //! Ouvre un fichier à partir d'un chemin XML dans le fichier de configuration.
-    void openInConf(Config *config, const QString & path, bool save = true);
+    void openInConf(fimps::Config *config, const QString & path, bool save = true);
 
 protected:
     /*!
@@ -70,5 +70,5 @@ protected:
     //! Retourne true si le bouton de texte accept est cliqué et false sinon.
     bool message(const QString & text, const QString & accept, const QString & reject);
 };
-
+}
 #endif // FENFOUNDFILE_H

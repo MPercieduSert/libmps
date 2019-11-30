@@ -4,24 +4,64 @@
 #ifndef ENTITYDIVERS
 #define ENTITYDIVERS
 
-#include "Arbre.h"
+#include "Entity.h"
+
+/*! \defgroup groupeBaseEntity Entités de base
+ * \ingroup groupeEntity
+ * \brief Ensemble de classes représentant les entités de base.
+ */
+
+/*! \ingroup groupeBaseEntity
+ * \brief Espace de nom de entités de base.
+ */
+namespace entityBaseMPS {
+using namespace entityMPS;
+using namespace attributMPS;
 
 /*! \ingroup groupeBaseEntity
  * \brief Classe de base des entités ayant un attribut dateTime, Nom et type.
  */
-template<class DateTimeAtt, int IDM> class DateTimeNomTypeEntityTemp
-        : public EntityAttributsID<Attributs<DateTimeAtt,NomAttribut,TypeAttribut>,IDM>
-{
+class Arbre : public EntityID<infoEntity::ArbreId,ArbreAttribut> {
 public:
-    using EAID = EntityAttributsID<Attributs<DateTimeAtt,NomAttribut,TypeAttribut>,IDM>;
+    using EAID = EntityID<infoEntity::ArbreId,ArbreAttribut>;
     //! Positions des attributs.
-    enum Position {Id = PositionEnum<IdAttribut,EAID>::Position,
+    enum Position:szt {Id = PositionEnum<IdAttribut,EAID>::Position,
+                   Feuille = PositionEnum<FeuilleAttribut,EAID>::Position,
+                   Num = PositionEnum<NumAttribut,EAID>::Position,
+                   Parent = PositionEnum<ParentAttribut,EAID>::Position,
+                   NbrAtt = EAID::NbrAtt};
+
+    using EAID::EntityID;
+    BASE_ENTITY(Arbre)
+
+    //! Constructeur à partir des valeurs d'un ensemble d'attributs unique.
+    Arbre(int num, idt parent, idt id = 0)
+        : EAID(id) {
+        setNum(num);
+        setParent(parent);
+    }
+
+    //! Constructeur à partir des valeurs attributs.
+    Arbre(bool feuille, int num, idt parent, idt id = 0)
+        : Arbre(num,parent,id)
+        {setFeuille(feuille);}
+};
+
+/*! \ingroup groupeBaseEntity
+ * \brief Classe de base des entités ayant un attribut dateTime, Nom et type.
+ */
+template<szt IDM , class DateTimeAtt> class DateTimeNomTypeEntityTemp
+        : public EntityIDs<IDM,DateTimeAtt,NomAttribut,TypeAttribut> {
+public:
+    using EAID = EntityIDs<IDM,DateTimeAtt,NomAttribut,TypeAttribut>;
+    //! Positions des attributs.
+    enum Position:szt {Id = PositionEnum<IdAttribut,EAID>::Position,
                    DateTime = PositionEnum<DateTimeAtt,EAID>::Position,
                    Nom = PositionEnum<NomAttribut,EAID>::Position,
                    Type = PositionEnum<TypeAttribut,EAID>::Position,
                    NbrAtt = EAID::NbrAtt};
 
-    using EntityAttributsID<Attributs<DateTimeAtt,NomAttribut,TypeAttribut>,IDM>::EntityAttributsID;
+    using EntityIDs<IDM,DateTimeAtt,NomAttribut,TypeAttribut>::EntityIDs;
     using EAID::setDateTime;
     using EAID::setNom;
     using EAID::setType;
@@ -29,8 +69,7 @@ public:
 
     //! Constructeur à partir d'un jeux de valeurs attributs unique.
     DateTimeNomTypeEntityTemp(const QString & nom, idt type = 0, idt id = 0)
-        : EAID(id)
-    {
+        : EAID(id) {
         setNom(nom);
         setType(type);
     }
@@ -41,28 +80,27 @@ public:
         {setDateTime(dateTime);}
 };
 
-template<class DateTimeAtt, int IDM> DateTimeNomTypeEntityTemp<DateTimeAtt, IDM>::~DateTimeNomTypeEntityTemp() {}
+template<szt IDM , class DateTimeAtt> DateTimeNomTypeEntityTemp<IDM,DateTimeAtt>::~DateTimeNomTypeEntityTemp() {}
 
-template<int IDM> using DateTimeCurrentNomTypeEntity = DateTimeNomTypeEntityTemp<DateTimeCurrentAttribut,IDM>;
-template<int IDM> using DateTimeValideNomTypeEntity = DateTimeNomTypeEntityTemp<DateTimeValideAttribut,IDM>;
+template<szt IDM > using DateTimeCurrentNomTypeEntity = DateTimeNomTypeEntityTemp<IDM,DateTimeCurrentAttribut>;
+template<szt IDM > using DateTimeValideNomTypeEntity = DateTimeNomTypeEntityTemp<IDM,DateTimeValideAttribut>;
 
 /*! \ingroup groupeBaseEntity
  * \brief Classe de base des entités ayant un attribut dateTime, Nc, Nom et type.
  */
-template<class DateTimeAtt, int IDM> class DateTimeNcNomTypeEntityTemp
-        : public EntityAttributsID<Attributs<DateTimeAtt,NcNomAttribut,TypeAttribut>,IDM>
-{
+template<szt IDM , class DateTimeAtt> class DateTimeNcNomTypeEntityTemp
+        : public EntityIDs<IDM,DateTimeAtt,NcNomAttribut,TypeAttribut> {
 public:
-    using EAID = EntityAttributsID<Attributs<DateTimeAtt,NcNomAttribut,TypeAttribut>,IDM>;
+    using EAID = EntityIDs<IDM,DateTimeAtt,NcNomAttribut,TypeAttribut>;
     //! Positions des attributs.
-    enum Position {Id = PositionEnum<IdAttribut,EAID>::Position,
+    enum Position:szt {Id = PositionEnum<IdAttribut,EAID>::Position,
                    DateTime = PositionEnum<DateTimeAtt,EAID>::Position,
                    Nc = PositionEnum<NcAttribut,EAID>::Position,
                    Nom = PositionEnum<NomAttribut,EAID>::Position,
                    Type = PositionEnum<TypeAttribut,EAID>::Position,
                    NbrAtt = EAID::NbrAtt};
 
-    using EntityAttributsID<Attributs<DateTimeAtt,NcNomAttribut,TypeAttribut>,IDM>::EntityAttributsID;
+    using EntityIDs<IDM,DateTimeAtt,NcNomAttribut,TypeAttribut>::EntityIDs;
     using EAID::setDateTime;
     using EAID::setNom;
     using EAID::setNc;
@@ -71,8 +109,7 @@ public:
 
     //! Constructeur à partir d'un jeux de valeurs attributs unique.
     DateTimeNcNomTypeEntityTemp(const QString & nom, idt type = 0, idt id = 0)
-        : EAID(id)
-    {
+        : EAID(id) {
         setNom(nom);
         setType(type);
     }
@@ -88,24 +125,23 @@ public:
         {setDateTime(dateTime);}
 };
 
-template<class DateTimeAtt, int IDM> DateTimeNcNomTypeEntityTemp<DateTimeAtt, IDM>::~DateTimeNcNomTypeEntityTemp() {}
+template<szt IDM , class DateTimeAtt> DateTimeNcNomTypeEntityTemp<IDM,DateTimeAtt>::~DateTimeNcNomTypeEntityTemp() {}
 
-template<int IDM> using DateTimeCurrentNcNomTypeEntity = DateTimeNcNomTypeEntityTemp<DateTimeCurrentAttribut,IDM>;
-template<int IDM> using DateTimeValideNcNomTypeEntity = DateTimeNcNomTypeEntityTemp<DateTimeValideAttribut,IDM>;
+template<szt IDM > using DateTimeCurrentNcNomTypeEntity = DateTimeNcNomTypeEntityTemp<IDM,DateTimeCurrentAttribut>;
+template<szt IDM > using DateTimeValideNcNomTypeEntity = DateTimeNcNomTypeEntityTemp<IDM,DateTimeValideAttribut>;
 
 /*! \ingroup groupeBaseEntity
  * \brief Classe de base des entités ayant un attribut dateTime et Num.
  */
-template<class DateTimeAtt, int IDM> class DateTimeNumEntityTemp : public EntityAttributsID<Attributs<DateTimeAtt,NumAttribut>,IDM>
-{
+template<szt IDM , class DateTimeAtt> class DateTimeNumEntityTemp : public EntityIDs<IDM,DateTimeAtt,NumAttribut> {
 public:
-    using EAID = EntityAttributsID<Attributs<DateTimeAtt,NumAttribut>,IDM>;
+    using EAID = EntityIDs<IDM,DateTimeAtt,NumAttribut>;
     //! Positions des attributs.
-    enum Position {Id = PositionEnum<IdAttribut,EAID>::Position,
+    enum Position:szt {Id = PositionEnum<IdAttribut,EAID>::Position,
                    DateTime = PositionEnum<DateTimeAtt,EAID>::Position,
                    Num = PositionEnum<NumAttribut,EAID>::Position,
                    NbrAtt = EAID::NbrAtt};
-    using EntityAttributsID<Attributs<DateTimeAtt,NumAttribut>,IDM>::EntityAttributsID;
+    using EntityIDs<IDM,DateTimeAtt,NumAttribut>::EntityIDs;
     using EAID::setDateTime;
     using EAID::setNum;
     BASE_ENTITY(DateTimeNumEntityTemp)
@@ -121,28 +157,27 @@ public:
         {setDateTime(dateTime);}
 };
 
-template<class DateTimeAtt, int IDM> DateTimeNumEntityTemp<DateTimeAtt, IDM>::~DateTimeNumEntityTemp() {}
+template<szt IDM , class DateTimeAtt> DateTimeNumEntityTemp<IDM,DateTimeAtt>::~DateTimeNumEntityTemp() {}
 
-template<int IDM> using DateTimeCurrentNumEntity = DateTimeNumEntityTemp<DateTimeCurrentAttribut,IDM>;
-template<int IDM> using DateTimeValideNumEntity = DateTimeNumEntityTemp<DateTimeValideAttribut,IDM>;
+template<szt IDM > using DateTimeCurrentNumEntity = DateTimeNumEntityTemp<IDM,DateTimeCurrentAttribut>;
+template<szt IDM > using DateTimeValideNumEntity = DateTimeNumEntityTemp<IDM,DateTimeValideAttribut>;
 
 /*! \ingroup groupeBaseEntity
- * \brief Classe de base des entités ayant un attribut dateTime et Num.
+ * \brief Classe de base des entités ayant un attribut dateTime, type et valeur.
  */
-template<class DateTimeAtt, class ValeurAtt, int IDM> class DateTimeTypeValeurEntityTemp
-        : public EntityAttributsID<Attributs<DateTimeAtt,TypeAttribut,ValeurAtt>,IDM>
-{
+template<szt IDM , class DateTimeAtt, class ValeurAtt> class DateTimeTypeValeurEntityTemp
+        : public EntityIDs<IDM,DateTimeAtt,TypeAttribut,ValeurAtt> {
 public:
     using ValTrans = typename ValeurAtt::AttTrans;
-    using EAID = EntityAttributsID<Attributs<DateTimeAtt,TypeAttribut,ValeurAtt>,IDM>;
+    using EAID = EntityIDs<IDM,DateTimeAtt,TypeAttribut,ValeurAtt>;
     //! Positions des attributs.
-    enum Position {Id = PositionEnum<IdAttribut,EAID>::Position,
+    enum Position:szt {Id = PositionEnum<IdAttribut,EAID>::Position,
                    DateTime = PositionEnum<DateTimeAtt,EAID>::Position,
                    Type = PositionEnum<TypeAttribut,EAID>::Position,
                    Valeur = PositionEnum<ValeurAtt,EAID>::Position,
                    NbrAtt = EAID::NbrAtt};
 
-    using EntityAttributsID<Attributs<DateTimeAtt,TypeAttribut,ValeurAtt>,IDM>::EntityAttributsID;
+    using EntityIDs<IDM,DateTimeAtt,TypeAttribut,ValeurAtt>::EntityIDs;
     using EAID::setDateTime;
     using EAID::setType;
     using EAID::setValeur;
@@ -150,8 +185,7 @@ public:
 
     //! Constructeur à partir d'un jeux de valeurs attributs unique.
     DateTimeTypeValeurEntityTemp(idt type, ValTrans valeur, idt id = 0)
-        : EAID(id)
-    {
+        : EAID(id) {
         setType(type);
         setValeur(valeur);
     }
@@ -162,32 +196,32 @@ public:
         {setDateTime(dateTime);}
 };
 
-template<class DateTimeAtt, class ValeurAtt, int IDM> DateTimeTypeValeurEntityTemp<DateTimeAtt, ValeurAtt, IDM>
+template<szt IDM , class DateTimeAtt, class ValeurAtt> DateTimeTypeValeurEntityTemp<IDM,DateTimeAtt, ValeurAtt>
                                                                     ::~DateTimeTypeValeurEntityTemp() {}
 
-template<int IDM> using DateTimeCurrentTypeValeurDoubleEntity = DateTimeTypeValeurEntityTemp<DateTimeCurrentAttribut,ValeurDoubleAttribut,IDM>;
-template<int IDM> using DateTimeCurrentTypeValeurIntEntity = DateTimeTypeValeurEntityTemp<DateTimeCurrentAttribut,ValeurIntAttribut,IDM>;
-template<int IDM> using DateTimeCurrentTypeValeurVariantEntity = DateTimeTypeValeurEntityTemp<DateTimeCurrentAttribut,ValeurVariantAttribut,IDM>;
-template<int IDM> using DateTimeValideTypeValeurDoubleEntity = DateTimeTypeValeurEntityTemp<DateTimeValideAttribut,ValeurDoubleAttribut,IDM>;
-template<int IDM> using DateTimeValideTypeValeurIntEntity = DateTimeTypeValeurEntityTemp<DateTimeValideAttribut,ValeurIntAttribut,IDM>;
-template<int IDM> using DateTimeValideTypeValeurVariantEntity = DateTimeTypeValeurEntityTemp<DateTimeValideAttribut,ValeurVariantAttribut,IDM>;
+template<szt IDM > using DateTimeCurrentTypeValeurDoubleEntity = DateTimeTypeValeurEntityTemp<IDM,DateTimeCurrentAttribut,ValeurDoubleAttribut>;
+template<szt IDM > using DateTimeCurrentTypeValeurIntEntity = DateTimeTypeValeurEntityTemp<IDM,DateTimeCurrentAttribut,ValeurIntAttribut>;
+template<szt IDM > using DateTimeCurrentTypeValeurVariantEntity
+    = DateTimeTypeValeurEntityTemp<IDM,DateTimeCurrentAttribut,ValeurVariantAttribut>;
+template<szt IDM > using DateTimeValideTypeValeurDoubleEntity = DateTimeTypeValeurEntityTemp<IDM,DateTimeValideAttribut,ValeurDoubleAttribut>;
+template<szt IDM > using DateTimeValideTypeValeurIntEntity = DateTimeTypeValeurEntityTemp<IDM,DateTimeValideAttribut,ValeurIntAttribut>;
+template<szt IDM > using DateTimeValideTypeValeurVariantEntity = DateTimeTypeValeurEntityTemp<IDM,DateTimeValideAttribut,ValeurVariantAttribut>;
 
 /*! \ingroup groupeBaseEntity
  * \brief Classe de base des entités ayant des attributs parent, nc et nom.
  */
-template<int IDM> class ArbreSimpleNcNomEntity : public EntityAttributsID<Attributs<ArbreSimpleAttribut,NcAttribut,NomAttribut>,IDM>
-{
+template<szt IDM > class ArbreSimpleNcNomEntity : public EntityIDs<IDM,ParentAttribut,NcAttribut,NomAttribut> {
 public:
-    using EAID = EntityAttributsID<Attributs<ArbreSimpleAttribut,NcAttribut,NomAttribut>,IDM>;
+    using EAID = EntityIDs<IDM,ParentAttribut,NcAttribut,NomAttribut>;
     //! Positions des attributs.
-    enum Position {Id = PositionEnum<IdAttribut,EAID>::Position,
+    enum Position:szt {Id = PositionEnum<IdAttribut,EAID>::Position,
                    Nc = PositionEnum<NcAttribut,EAID>::Position,
                    Nom = PositionEnum<NomAttribut,EAID>::Position,
-                   Parent = PositionEnum<ArbreSimpleAttribut,EAID>::Position,
+                   Parent = PositionEnum<ParentAttribut,EAID>::Position,
                    NbrAtt = EAID::NbrAtt,
                    Ordre = Nom};
 
-    using EntityAttributsID<Attributs<ArbreSimpleAttribut,NcAttribut,NomAttribut>,IDM>::EntityAttributsID;
+    using EntityIDs<IDM,ParentAttribut,NcAttribut,NomAttribut>::EntityIDs;
     using EAID::setNc;
     using EAID::setNom;
     using EAID::setParent;
@@ -200,29 +234,27 @@ public:
 
     //! Constructeur à partir des valeurs attributs.
     ArbreSimpleNcNomEntity(const QString & nc, const QString & nom, idt parent = 0, idt id = 0)
-        : ArbreSimpleNcNomEntity(nom, id)
-    {
+        : ArbreSimpleNcNomEntity(nom, id) {
         setNc(nc);
         setParent(parent);
     }
 };
 
-template<int IDM> ArbreSimpleNcNomEntity<IDM>::~ArbreSimpleNcNomEntity() {}
+template<szt IDM > ArbreSimpleNcNomEntity<IDM>::~ArbreSimpleNcNomEntity() {}
 
 /*! \ingroup groupeBaseEntity
  * \brief Classe de base des entités ayant un attribut nom et nc.
  */
-template<int IDM> class NcNomEntity : public EntityAttributsID<NcNomAttribut,IDM>
-{
+template<szt IDM > class NcNomEntity : public EntityID<IDM,NcNomAttribut> {
 public:
-    using EAID = EntityAttributsID<NcNomAttribut,IDM>;
+    using EAID = EntityID<IDM,NcNomAttribut>;
     //! Positions des attributs.
-    enum Position {Id = PositionEnum<IdAttribut,EAID>::Position,
+    enum Position:szt {Id = PositionEnum<IdAttribut,EAID>::Position,
                    Nc = PositionEnum<NcAttribut,EAID>::Position,
                    Nom = PositionEnum<NomAttribut,EAID>::Position,
                    NbrAtt = EAID::NbrAtt};
 
-    using EntityAttributsID<NcNomAttribut,IDM>::EntityAttributsID;
+    using EntityID<IDM,NcNomAttribut>::EntityID;
     using EAID::setNc;
     using EAID::setNom;
     BASE_ENTITY(NcNomEntity)
@@ -238,23 +270,22 @@ public:
         {setNc(nc);}
 };
 
-template<int IDM> NcNomEntity<IDM>::~NcNomEntity() {}
+template<szt IDM > NcNomEntity<IDM>::~NcNomEntity() {}
 
 /*! \ingroup groupeBaseEntity
  * \brief Classe de base des entités ayant des attributs nc, nom et type.
  */
-template<int IDM> class NcNomTypeEntity : public EntityAttributsID<NcNomTypeAttribut,IDM>
-{
+template<szt IDM > class NcNomTypeEntity : public EntityID<IDM,NcNomTypeAttribut> {
 public:
-    using EAID = EntityAttributsID<NcNomTypeAttribut,IDM>;
+    using EAID = EntityID<IDM,NcNomTypeAttribut>;
     //! Positions des attributs.
-    enum Position {Id = PositionEnum<IdAttribut,EAID>::Position,
+    enum Position:szt {Id = PositionEnum<IdAttribut,EAID>::Position,
                    Nc = PositionEnum<NcAttribut,EAID>::Position,
                    Nom = PositionEnum<NomAttribut,EAID>::Position,
                    Type = PositionEnum<TypeAttribut,EAID>::Position,
                    NbrAtt = EAID::NbrAtt};
 
-    using EntityAttributsID<NcNomTypeAttribut,IDM>::EntityAttributsID;
+    using EntityID<IDM,NcNomTypeAttribut>::EntityID;
     using EAID::setNc;
     using EAID::setNom;
     using EAID::setType;
@@ -271,29 +302,27 @@ public:
 
     //! Constructeur à partir des valeurs attributs.
     NcNomTypeEntity(const QString & nc, const QString & nom, idt type, idt id = 0)
-        : EAID(id)
-    {
+        : EAID(id) {
         setNc(nc);
         setNom(nom);
         setType(type);
     }
 };
 
-template<int IDM> NcNomTypeEntity<IDM>::~NcNomTypeEntity() {}
+template<szt IDM > NcNomTypeEntity<IDM>::~NcNomTypeEntity() {}
 
 /*! \ingroup groupeBaseEntity
  * \brief Classe de base des entités ayant un attribut nom.
  */
-template<int IDM> class NomEntity : public EntityAttributsID<NomAttribut,IDM>
-{
+template<szt IDM > class NomEntity : public EntityID<IDM,NomAttribut> {
 public:
-    using EAID = EntityAttributsID<NomAttribut,IDM>;
+    using EAID = EntityID<IDM,NomAttribut>;
     //! Positions des attributs.
-    enum Position {Id = PositionEnum<IdAttribut,EAID>::Position,
+    enum Position:szt {Id = PositionEnum<IdAttribut,EAID>::Position,
                    Nom = PositionEnum<NomAttribut,EAID>::Position,
                    NbrAtt = EAID::NbrAtt};
 
-    using EntityAttributsID<NomAttribut,IDM>::EntityAttributsID;
+    using EntityID<IDM,NomAttribut>::EntityID;
     using EAID::setNom;
     BASE_ENTITY(NomEntity)
 
@@ -303,22 +332,21 @@ public:
         {setNom(nom);}
 };
 
-template<int IDM> NomEntity<IDM>::~NomEntity() {}
+template<szt IDM > NomEntity<IDM>::~NomEntity() {}
 
 /*! \ingroup groupeBaseEntity
  * \brief Classe de base des entités ayant un attribut nom et type.
  */
-template<int IDM> class NomTypeEntity : public EntityAttributsID<NomTypeAttribut,IDM>
-{
+template<szt IDM > class NomTypeEntity : public EntityID<IDM,NomTypeAttribut> {
 public:
-    using EAID = EntityAttributsID<NomTypeAttribut,IDM>;
+    using EAID = EntityID<IDM,NomTypeAttribut>;
     //! Positions des attributs.
-    enum Position {Id = PositionEnum<IdAttribut,EAID>::Position,
+    enum Position:szt {Id = PositionEnum<IdAttribut,EAID>::Position,
                    Nom = PositionEnum<NomAttribut,EAID>::Position,
                    Type = PositionEnum<TypeAttribut,EAID>::Position,
                    NbrAtt = EAID::NbrAtt};
 
-    using EntityAttributsID<NomTypeAttribut,IDM>::EntityAttributsID;
+    using EntityID<IDM,NomTypeAttribut>::EntityID;
     using EAID::setNom;
     using EAID::setType;
     BASE_ENTITY(NomTypeEntity)
@@ -329,28 +357,26 @@ public:
 
     //! Constructeur à partir des valeurs attributs.
     NomTypeEntity(const QString & nom, idt type, idt id = 0)
-        : EAID(id)
-    {
+        : EAID(id) {
         setNom(nom);
         setType(type);
     }
 };
 
-template<int IDM> NomTypeEntity<IDM>::~NomTypeEntity() {}
+template<szt IDM > NomTypeEntity<IDM>::~NomTypeEntity() {}
 
 /*! \ingroup groupeBaseEntity
  * \brief Classe de base des entités ayant un attribut num.
  */
-template<int IDM> class NumEntity : public EntityAttributsID<NumAttribut,IDM>
-{
+template<szt IDM > class NumEntity : public EntityID<IDM,NumAttribut> {
 public:
-    using EAID = EntityAttributsID<NumAttribut,IDM>;
+    using EAID = EntityID<IDM,NumAttribut>;
     //! Positions des attributs.
-    enum Position {Id = PositionEnum<IdAttribut,EAID>::Position,
+    enum Position:szt {Id = PositionEnum<IdAttribut,EAID>::Position,
                    Num = PositionEnum<NumAttribut,EAID>::Position,
                    NbrAtt = EAID::NbrAtt};
 
-    using EntityAttributsID<NumAttribut,IDM>::EntityAttributsID;
+    using EntityID<IDM,NumAttribut>::EntityID;
     using EAID::setNum;
     BASE_ENTITY(NumEntity)
 
@@ -360,23 +386,22 @@ public:
         {setNum(num);}
 };
 
-template<int IDM> NumEntity<IDM>::~NumEntity() {}
+template<szt IDM > NumEntity<IDM>::~NumEntity() {}
 
 /*! \ingroup groupeBaseEntity
  * \brief Classe de base des entités ayant un attribut Texte et deux DateTime.
  */
-template<int IDM> class TexteEntity : public EntityAttributsID<TexteAttributs,IDM>
-{
+template<szt IDM > class TexteEntity : public EntityID<IDM,TexteAttributs> {
 public:
-    using EAID = EntityAttributsID<TexteAttributs,IDM>;
+    using EAID = EntityID<IDM,TexteAttributs>;
     //! Positions des attributs.
-    enum Position {Id = PositionEnum<IdAttribut,EAID>::Position,
+    enum Position:szt {Id = PositionEnum<IdAttribut,EAID>::Position,
                    Creation = PositionEnum<CreationAttribut,EAID>::Position,
                    Modification = PositionEnum<ModificationAttribut,EAID>::Position,
                    Texte = PositionEnum<TexteAttribut,EAID>::Position,
                    NbrAtt = EAID::NbrAtt};
 
-    using EntityAttributsID<TexteAttributs,IDM>::EntityAttributsID;
+    using EntityID<IDM,TexteAttributs>::EntityID;
     using EAID::setCreation;
     using EAID::setModification;
     using EAID::setTexte;
@@ -389,44 +414,81 @@ public:
 
     //! Constructeur à partir des valeurs attributs.
     TexteEntity(const QDateTime & creation, const QDateTime & modification, const QString & texte, idt id = 0)
-        : TexteEntity(texte,id)
-    {
+        : TexteEntity(texte,id) {
         setCreation(creation);
         setModification(modification);
     }
 };
 
-template<int IDM> TexteEntity<IDM>::~TexteEntity() {}
+template<szt IDM > TexteEntity<IDM>::~TexteEntity() {}
+
+/*! \ingroup groupeBaseEntity
+ * \brief Classe de base des entités ayant un attribut type, valeur et version.
+ */
+template<szt IDM , class ValeurAtt> class TypeValeurVersionEntityTemp
+        : public EntityIDs<IDM,TypeAttribut,ValeurAtt,VersionAttribut> {
+public:
+    using ValTrans = typename ValeurAtt::AttTrans;
+    using EAID = EntityIDs<IDM,TypeAttribut,ValeurAtt,VersionAttribut>;
+    //! Positions des attributs.
+    enum Position:szt {Id = PositionEnum<IdAttribut,EAID>::Position,
+                   Type = PositionEnum<TypeAttribut,EAID>::Position,
+                   Valeur = PositionEnum<ValeurAtt,EAID>::Position,
+                   Version = PositionEnum<VersionAttribut,EAID>::Position,
+                   NbrAtt = EAID::NbrAtt};
+
+    using EntityIDs<IDM,TypeAttribut,ValeurAtt,VersionAttribut>::EntityIDs;
+    using EAID::setType;
+    using EAID::setValeur;
+    using EAID::setVersion;
+    BASE_ENTITY(TypeValeurVersionEntityTemp)
+
+    //! Constructeur à partir d'un jeux de valeurs attributs unique.
+    TypeValeurVersionEntityTemp(idt type, ValTrans valeur, int version, idt id = 0)
+        : EAID(id) {
+        setType(type);
+        setValeur(valeur);
+        setVersion(version);
+    }
+};
+
+template<szt IDM , class ValeurAtt> TypeValeurVersionEntityTemp<IDM, ValeurAtt>
+                                                                    ::~TypeValeurVersionEntityTemp() {}
+
+template<szt IDM > using TypeValeurDoubleVersionEntity = TypeValeurVersionEntityTemp<IDM,ValeurDoubleAttribut>;
+template<szt IDM > using TypeValeurIntVersionEntity = TypeValeurVersionEntityTemp<IDM,ValeurIntAttribut>;
+template<szt IDM > using TypeValeurVariantVersionEntity = TypeValeurVersionEntityTemp<IDM,ValeurVariantAttribut>;
 
 /*! \ingroup groupeBaseEntity
  * \brief Classe de base des entités ayant les attributs type et version.
  */
-template<int IDM> class TypeVersionEntity : public EntityAttributsID<Attributs<TypeAttribut,VersionAttribut>,IDM>
-{
+template<szt IDM > class TypeVersionEntity : public EntityIDs<IDM,TypeAttribut,VersionAttribut> {
 public:
-    using EAID = EntityAttributsID<Attributs<TypeAttribut,VersionAttribut>,IDM>;
+    using EAID = EntityIDs<IDM,TypeAttribut,VersionAttribut>;
     //! Positions des attributs.
-    enum Position {Id = PositionEnum<IdAttribut,EAID>::Position,
+    enum Position:szt {Id = PositionEnum<IdAttribut,EAID>::Position,
                    Type = PositionEnum<TypeAttribut,EAID>::Position,
                    Version = PositionEnum<VersionAttribut,EAID>::Position,
                    NbrAtt = EAID::NbrAtt};
 
-    using EntityAttributsID<Attributs<TypeAttribut,VersionAttribut>,IDM>::EntityAttributsID;
+    using EntityIDs<IDM,TypeAttribut,VersionAttribut>::EntityIDs;
     using EAID::setType;
     using EAID::setVersion;
     BASE_ENTITY(TypeVersionEntity)
 
     //! Constructeur à partir des valeurs attributs.
     TypeVersionEntity(idt type, int version, idt id = 0)
-        : EAID(id)
-    {
+        : EAID(id) {
         setType(type);
         setVersion(version);
     }
 };
 
-template<int IDM> TypeVersionEntity<IDM>::~TypeVersionEntity() {}
+template<szt IDM > TypeVersionEntity<IDM>::~TypeVersionEntity() {}
+}
 
-using VersionBdd = DateTimeCurrentNumEntity<InfoEntity::entityBaseId::VersionBddId>;
-
+namespace entityMPS {
+//Version
+using VersionBdd = entityBaseMPS::DateTimeCurrentNumEntity<infoEntity::entityBaseId::VersionBddId>;
+}
 #endif // ENTITYDIVERS

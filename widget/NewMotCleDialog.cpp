@@ -1,5 +1,7 @@
 #include "NewMotCleDialog.h"
 
+using namespace dialogMPS;
+
 NewMotCleDialog::NewMotCleDialog(const QString & nomparent, int position, QWidget * parent): QDialog(parent)
 {
     setWindowTitle(QString(tr("Créer un mot clé dans\"")).append(nomparent)

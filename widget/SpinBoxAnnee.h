@@ -13,6 +13,11 @@
  */
 
 /*! \ingroup groupeWidget
+ * \brief Espace de noms des widgets personnalisé.
+ */
+namespace widgetMPS {
+
+/*! \ingroup groupeWidget
  * \brief Spin Box pour les années scolaires.
  */
 class SpinBoxAnnee : public QAbstractSpinBox
@@ -41,5 +46,5 @@ public slots:
     //! Affiche la valeur.
     void printValue();
 };
-
+}
 #endif // SPINBOXANNEE_H

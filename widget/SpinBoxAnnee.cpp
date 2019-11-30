@@ -1,5 +1,7 @@
 #include "SpinBoxAnnee.h"
 
+using namespace widgetMPS;
+
 SpinBoxAnnee::SpinBoxAnnee(int value, QWidget *parent): QAbstractSpinBox(parent), m_value(value)
 {
     setReadOnly(true);

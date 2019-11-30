@@ -7,11 +7,11 @@
 #include <QLayout>
 #include <QWidget>
 
+namespace fenMPS {
 /*! \ingroup groupeFen
  * \brief Zone centrale.
  */
-class AbstractZoneCentrale : public QWidget
-{
+class AbstractZoneCentrale : public QWidget {
     Q_OBJECT
 protected:
 
@@ -54,5 +54,5 @@ public slots:
     //! Demande à l'onglet actif de sauvegarder.
     virtual void save() = 0;
 };
-
+}
 #endif // ABSTRACTZONECENTRALE_H

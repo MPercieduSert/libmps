@@ -4,24 +4,11 @@
 #ifndef ENTITY_H
 #define ENTITY_H
 
-#include <array>
-#include <QDate>
-#include <QDateTime>
-#include <QList>
-#include <QPair>
-#include <QString>
-#include <QStringList>
-#include <QVariant>
-#include <QVector>
 #include <string>
 #include <stdexcept>
 
 #include "AttributMultiple.h"
-#include "InfoEntity.h"
-
-/*! \defgroup groupeEntity Entités
- * \brief Ensemble de classes représentant les entités de la base de donnée.
- */
+#include "infoEntity.h"
 
 // Macro pour les entités
 /*! \defgroup groupeMacroEntity Macro de base des entités
@@ -54,6 +41,8 @@
     CONSTR_AFFECT_DEFAUT(ENTITY) \
     ~ENTITY() override {}
 
+
+namespace entityMPS {
 /*! \ingroup groupeEntity
  * \brief Classe abstraite de base des entités.
  *
@@ -66,14 +55,12 @@
  *
  *  - Ajouter un manager de l'entité dans Managers (membre, def_get (dans .h) et manager_tab (dans .cpp)).
  */
-class Entity : public IdAttribut
-{
+class Entity : public amps::IdAttribut {
 public:
     //! Position des attributs.
-    enum Position {Id,
-                   NbrAtt};
+    enum Position {Id, NbrAtt};
     //! Identifiant de l'entité.
-    enum IdentifiantEntity{ID = InfoEntity::entityBaseId::entityId};
+    //enum IdentifiantEntity{ID = infoEntity::entityBaseId::entityId};
 
     BASE_ENTITY_ABS(Entity)
 
@@ -81,21 +68,21 @@ public:
     QString affiche() const override;
 
     //! Retourne un QVariant contenant la donnée souhaitée ou un QVariant nulle si num est invalide.
-    virtual QVariant data(int pos) const
-    {return pos == Id ? id() : QVariant();}
+    virtual QVariant data(szt pos) const
+        {return pos == Id ? id() : QVariant();}
 
     //! Teste si l'entité est nouvelle ou si elle provient de la base de donnée en regardant si elle poséde un identifiant non-nul.
     bool isNew() const
         {return id() == 0;}
 
     //! Renvoie l'identifiant du type de l'entité.
-    virtual int idEntity() const = 0;
+    virtual szt idEntity() const = 0;
 
     //! Renvoie le nom de l'entité.
     virtual QString name() const = 0;
 
     //! Renvoie le nombre d'attribut de l'entité.
-    virtual int nbrAtt() const = 0;
+    virtual szt nbrAtt() const = 0;
 
     //! Modifient les valeurs des attributs de l'entité avec celles des attributs de entity.
     virtual void operator << (const Entity & entity) = 0;
@@ -110,8 +97,10 @@ protected:
         {setId(entity.id());}
 };
 
-template <class Attribut> class EntityAttributs : public Attributs<Entity,Attribut>
-{
+/*! \ingroup groupeEntity
+ * \brief Classe abstraite de base des entités contenant les attributs.
+ */
+template <class Attribut> class EntityAttributs : public Attributs<Entity,Attribut> {
 public:
     enum {NbrAtt = Attribut::NbrAtt + Entity::NbrAtt,      //!< Nombre d'attribut de l'entité.
          };
@@ -124,11 +113,11 @@ public:
         {setId(id);}
 
     //! Renvoie le nombre d'attribut de l'entité.
-    int nbrAtt() const override
+    szt nbrAtt() const override
         {return NbrAtt;}
 
     //! Retourne un QVariant contenant la donnée souhaitée ou un QVariant nulle si num est invalide.
-    static QString nomAttribut(int num)
+    static QString nomAttribut(szt num)
         {return num < EntityAttributs<Attribut>::NbrAtt ? Attributs<Entity,Attribut>::nomAttribut(num) : QString();}
 
     //! Modifient les valeurs des attributs de l'entité avec celles des attributs de entity.
@@ -136,8 +125,10 @@ public:
         {set(entity);}
 };
 
-template <class Attribut, int IDM> class EntityAttributsID : public EntityAttributs<Attribut>
-{
+/*! \ingroup groupeEntity
+ * \brief Classe abstraite de base des entités implémenté les membres utilisant l'identifiant du type de l'entité.
+ */
+template <szt IDM, class Attribut> class EntityID : public EntityAttributs<Attribut> {
 public:
     enum {ID = IDM,         //!< Identifiant de l'attribut.
          };
@@ -150,38 +141,35 @@ protected:
     using EntAtt::set;
 
 public:
-    CONSTR_DEFAUT(EntityAttributsID)
-    CONSTR_AFFECT_DEFAUT(EntityAttributsID)
+    CONSTR_DEFAUT(EntityID)
+    CONSTR_AFFECT_DEFAUT(EntityID)
 
     //! Convertit la référence entity en une référence de type ENTITY, aprés vérification.
-    static EntityAttributsID<Attribut,IDM> * convert(Entity *entity)
-    {
+    static EntityID<IDM,Attribut> * convert(Entity *entity) {
         if(verifEntity(entity))
-            return static_cast<EntityAttributsID<Attribut,IDM>*>(entity);
+            return static_cast<EntityID<IDM,Attribut>*>(entity);
         else
             throw std::invalid_argument("Mauvaise correspondance des Entity");
     }
 
     //! Convertit la référence constante entity en une référence constante de type ENTITY, aprés vérification.
-    static EntityAttributsID<Attribut,IDM> & convert(Entity & entity)
-    {
+    static EntityID<IDM,Attribut> & convert(Entity & entity) {
         if(verifEntity(entity))
-            return *(static_cast<EntityAttributsID<Attribut,IDM>*>(&entity));
+            return *(static_cast<EntityID<IDM,Attribut>*>(&entity));
         else
             throw std::invalid_argument("Mauvaise correspondance des Entity");
     }
 
     //*! Convertit le pointeur entity en un pointeur de type ENTITY, aprés vérification.
-    static const EntityAttributsID<Attribut,IDM> & convert(const Entity & entity)
-    {
+    static const EntityID<IDM,Attribut> & convert(const Entity & entity) {
         if(verifEntity(entity))
-            return  *(static_cast<const EntityAttributsID<Attribut,IDM>*>(&entity));
+            return  *(static_cast<const EntityID<IDM,Attribut>*>(&entity));
         else
             throw std::invalid_argument("Mauvaise correspondance des Entity");
     }
 
     //! Renvoie l'identifiant du type de l'entité.
-    int idEntity() const override
+    szt idEntity() const override
         {return ID;}
 
     //! Test si le pointeur entity est aussi un pointeur de ce type d'entité.
@@ -196,9 +184,12 @@ public:
     bool operator == (const Entity & entity) const
         {return verifEntity(entity) && EntityAttributs<Attribut>::operator == (convert(entity));}
 
-    //! Modifient les valeurs des attributs de l'entité avec celles des attributs de entity qui doit être de même type que la première opérande.
+    //! Modifient les valeurs des attributs de l'entité avec celles des attributs de entity
+    //! qui doit être de même type que la première opérande.
     void operator << (const Entity & entity)
         {set(convert(entity));}
 };
 
+template <szt IDM, class... Attribut> using EntityIDs = EntityID<IDM,Attributs<Attribut...>>;
+}
 #endif // ENTITY_H

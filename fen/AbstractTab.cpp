@@ -1,14 +1,14 @@
 #include "AbstractTab.h"
 
-bool AbstractTab::openTab(const QPair<int, int> &pair)
-{
-    if(m_mapTab.contains(pair))
-    {
-        setCurrentWidget(m_mapTab[pair]);
+using namespace fenMPS;
+
+bool AbstractTab::openTab(const std::pair<int, int> &pair) {
+    auto iter = m_mapTab.find(pair);
+    if(iter != m_mapTab.cend()) {
+        setCurrentWidget(iter->second);
         return true;
     }
-    else
-    {
+    else {
         auto tab = createTab(pair);
         if(!tab)
             return false;
@@ -19,8 +19,7 @@ bool AbstractTab::openTab(const QPair<int, int> &pair)
     }
 }
 
-void AbstractTab::connectTab(AbstractTabModule * tab) const
-{
+void AbstractTab::connectTab(AbstractTabModule * tab) const {
     connect(tab,&AbstractTabModule::effacerPermis,this,&AbstractTab::effacerPermis);
     connect(tab,&AbstractTabModule::collerPermis,this,&AbstractTab::collerPermis);
     connect(tab,&AbstractTabModule::copierPermis,this,&AbstractTab::copierPermis);
@@ -32,11 +31,10 @@ void AbstractTab::currentChange()
     {static_cast<AbstractTabModule *>(currentWidget())->becomeCurrent();}
 
 
-void AbstractTab::removeTab(const QPair<int,int> & pair)
-{
-    if(m_mapTab.contains(pair))
-    {
-        QTabWidget::removeTab(indexOf(m_mapTab[pair]));
-        m_mapTab.remove(pair);
+void AbstractTab::removeTab(const std::pair<int,int> & pair) {
+    auto iter = m_mapTab.find(pair);
+    if(iter != m_mapTab.cend()) {
+        QTabWidget::removeTab(indexOf(iter->second));
+        m_mapTab.erase(iter);
     }
 }
