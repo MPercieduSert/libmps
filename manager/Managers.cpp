@@ -3,20 +3,20 @@
 using namespace managerMPS;
 
 Managers::Managers(const szt nbrEntity, const QString & versionTable,
-                   const std::map<szt,AbstractManager *> & managers,
+                   std::map<szt,std::unique_ptr<AbstractManager>> && managers,
                    const QSqlQuery & req)
       : m_nbrEntity(nbrEntity),
         m_requete(req),
-        m_managers(nbrEntity,nullptr) {
+        m_managers(nbrEntity) {
       using UniqueVersion = NumUniqueSql<VersionBdd>;
       InfoBdd infoVersion(versionTable,VersionBdd::NbrAtt,{UniqueVersion::NbrUnique});
       infoVersion.setAttribut(VersionBdd::Num,"num");
       infoVersion.setAttribut(VersionBdd::DateTime,"dt",bmps::typeAttributBdd::DateTime);
       infoVersion.setUnique(VersionBdd::Num,UniqueVersion::NumUnique);
-      m_managerVersion = new ManagerSql<VersionBdd>(infoVersion, new UniqueVersion());
+      m_managerVersion = std::make_unique<ManagerSql<VersionBdd>>(infoVersion, std::make_unique<UniqueVersion>());
 
-      for(auto i = managers.cbegin(); i != managers.cend(); ++i)
-          m_managers[i->first]=i->second;
+      for(auto i = managers.begin(); i != managers.end(); ++i)
+          m_managers[i->first] = std::move(i->second);
 }
 
 void Managers::creerVersion() {

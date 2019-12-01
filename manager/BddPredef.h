@@ -41,23 +41,23 @@ namespace bddMPS {
 class BddPredef : public Bdd {
 public:
     //! Constructeur. Donner en argument le type ainsi que le chemin de la base de donnée.
-    BddPredef(const QString & dbtype, int version, managerMPS::ManagersPredef * manager)
-        : Bdd(dbtype,version,manager) {}
+    BddPredef(const QString & dbtype, int version, std::unique_ptr<managerMPS::ManagersPredef> && manager)
+        : Bdd(dbtype,version,std::move(manager)) {}
 
     //! Constructeur. Donner en argument le type ainsi que le chemin de la base de donnée.
-    BddPredef(const QString & dbtype, const QString & fileName, int version, managerMPS::ManagersPredef * manager)
-        : Bdd(dbtype,fileName,version,manager) {}
+    BddPredef(const QString & dbtype, const QString & fileName, int version, std::unique_ptr<managerMPS::ManagersPredef> && manager)
+        : Bdd(dbtype,fileName,version,std::move(manager)) {}
 
     //! Destructeur. Referme la base de donnée.
     ~BddPredef() override = default;
 
     //! Retourne le numéro de cible associé à l'identifiant d'une entité.
     int cible(int id) const
-        {return managers()->cible(id);}
+        {return managers().cible(id);}
 
     //! Retourne le numéro de cible associé à un type d'entité.
     template<class Ent> int cible() const
-        {return managers()->cible<Ent>();}
+        {return managers().cible<Ent>();}
 
     DECL_DEL_METHODE
 
@@ -98,8 +98,12 @@ protected:
     std::pair<int, int> intervalEntityInDonnee(idt idCible, int cible, int num);
 
     //! Acceseur du manageur.
-    managerMPS::ManagersPredef * managers() const
-        {return static_cast<managerMPS::ManagersPredef *>(m_manager);}
+    const managerMPS::ManagersPredef & managers() const
+        {return static_cast<const managerMPS::ManagersPredef &>(*m_manager);}
+
+    //! Acceseur du manageur.
+    managerMPS::ManagersPredef & managers()
+        {return static_cast<managerMPS::ManagersPredef &>(*m_manager);}
 };
 
 DEF_DEL_METHODE(BddPredef)

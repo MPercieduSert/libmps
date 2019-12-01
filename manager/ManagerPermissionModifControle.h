@@ -24,10 +24,11 @@ public:
 
     //! Constructeur
     ManagerPermissionModifControle (const InfoBdd & info,
-                                      AbstractGestionAutorisation<Ent> * gestionAutorisation = new GestionAutorisationNoRestrictif<Ent>(),
-                                      AbstractUniqueSqlTemp<Ent> * unique = new NoUniqueSql<Ent>())
-        : ManagerSql<Ent>(info, unique), ManagerPerm(info,unique),
-          ManagerModifControle<Ent>(info, gestionAutorisation, unique) {}
+                                    std::unique_ptr<AbstractGestionAutorisation<Ent>> && gestionAutorisation
+                                                = std::make_unique<GestionAutorisationNoRestrictif<Ent>>(),
+                                    std::unique_ptr<AbstractUniqueSqlTemp<Ent>> && unique = std::make_unique<NoUniqueSql<Ent>>())
+        : ManagerSql<Ent>(info, std::move(unique)),
+          ManagerModifControle<Ent>(std::move(gestionAutorisation)) {}
 
     //! Destructeur.
     ~ManagerPermissionModifControle() override = default;

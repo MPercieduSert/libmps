@@ -5,6 +5,7 @@
 #define BDD_H
 
 #include <functional>
+#include <memory>
 #include <QString>
 #include <QSqlDatabase>
 #include <QSqlQuery>
@@ -92,29 +93,29 @@ class Bdd : public fichierMPS::FileInterface
 {
 protected:
     QSqlDatabase m_bdd;                 //!< Connexion à la base de donnée.
-    managerMPS::Managers * m_manager;         //!< Manager des entités.
+    std::unique_ptr<managerMPS::Managers> m_manager;         //!< Manager des entités.
     const int m_version;                //!< Version de la base de donnée requis par le programme
 
 public:
     //! Constructeur. Donner en argument le type ainsi que le chemin de la base de donnée.
-    Bdd(const QString & dbtype, int version, managerMPS::Managers * manager = nullptr)
+    Bdd(const QString & dbtype, int version, std::unique_ptr<managerMPS::Managers> && manager = nullptr)
         : FileInterface(QString(),"Data Base files (*.db)"),
            m_bdd(QSqlDatabase::addDatabase(dbtype)),
-           m_manager(manager),
+           m_manager(std::move(manager)),
            m_version(version) {}
 
 
     //! Constructeur. Donner en argument le type ainsi que le chemin de la base de donnée, la version et le managers.
-    Bdd(const QString & dbtype, const QString & fileName, int version, managerMPS::Managers * manager = nullptr)
+    Bdd(const QString & dbtype, const QString & fileName, int version, std::unique_ptr<managerMPS::Managers> && manager = nullptr)
         : FileInterface(fileName,"Data Base files (*.db)"),
            m_bdd(QSqlDatabase::addDatabase(dbtype)),
-           m_manager(manager),
+           m_manager(std::move(manager)),
            m_version(version)
         {m_bdd.setDatabaseName(fileName);}
 
     //! Destructeur. Referme la base de donnée.
     ~Bdd() override {
-        delete m_manager;
+        //delete m_manager;
         m_bdd.close();
     }
 
@@ -411,7 +412,7 @@ public:
 
     //! Renvoie le nombre de type d'entitée (virtuelle).
     szt nbrEntity() const
-    {return m_manager->nbrEntity();}
+        {return m_manager->nbrEntity();}
 
     //! Ouvre la base de donnée.
     bool open() override;
@@ -506,7 +507,7 @@ public:
 protected:
     //! Création de la table de l'entité en base de donnée.
     template<class Ent> void creerTable()
-        {m_manager->get<Ent>()->creer();}
+        {m_manager->get<Ent>().creer();}
 
     //! Suppresseur d'une entité à partir de son identifiant.
     template<class Ent> bool del(idt id);
@@ -522,41 +523,41 @@ protected:
 };
 
 template<class Ent> bool Bdd::exists(const Ent & entity)
-    {return entity.isNew() ? false : m_manager->get<Ent>()->exists(entity);}
+    {return entity.isNew() ? false : m_manager->get<Ent>().exists(entity);}
 
 template<class Ent> bool Bdd::exists(typename Ent::Position cle, const QVariant & value, condition cond)
-    {return m_manager->get<Ent>()->exists(cle,value,cond);}
+    {return m_manager->get<Ent>().exists(cle,value,cond);}
 
 template<class Ent> bool Bdd::existsUnique(Ent & entity)
-    {return m_manager->get<Ent>()->existsUnique(entity) != Aucun;}
+    {return m_manager->get<Ent>().existsUnique(entity) != Aucun;}
 
 template<class Ent> bool Bdd::existsUnique(const Ent & entity)
-    {return m_manager->get<Ent>()->existsUnique(entity) != Aucun;}
+    {return m_manager->get<Ent>().existsUnique(entity) != Aucun;}
 
 template<class Ent> existeUni Bdd::existsUniqueEnsemble(Ent & entity)
-    {return m_manager->get<Ent>()->existsUnique(entity);}
+    {return m_manager->get<Ent>().existsUnique(entity);}
 
 template<class Ent> existeUni Bdd::existsUniqueEnsemble(const Ent & entity)
-    {return m_manager->get<Ent>()->existsUnique(entity);}
+    {return m_manager->get<Ent>().existsUnique(entity);}
 
 template<class Ent> bool Bdd::del(idt id)
-    {return m_manager->get<Ent>()->del(id);}
+    {return m_manager->get<Ent>().del(id);}
 
 template<class Ent> QVariant Bdd::fonctionAgrega(agrega fonc, typename Ent::Position att)
-    {return m_manager->get<Ent>()->fonctionAgrega(fonc, att);}
+    {return m_manager->get<Ent>().fonctionAgrega(fonc, att);}
 
 template<class Ent> QVariant Bdd::fonctionAgrega(agrega fonc, typename Ent::Position att, typename Ent::Position cle,
                                                    const QVariant & value, condition cond)
-    {return m_manager->get<Ent>()->fonctionAgrega(fonc, att, cle, value, cond);}
+    {return m_manager->get<Ent>().fonctionAgrega(fonc, att, cle, value, cond);}
 
 template<class Ent> QVariant Bdd::fonctionAgrega(agrega fonc, typename Ent::Position att,
                                                    typename Ent::Position cle1, const QVariant & value1,
                                                    typename Ent::Position cle2, const QVariant & value2,
                                                    condition cond1, condition cond2)
-    {return m_manager->get<Ent>()->fonctionAgrega(fonc, att, cle1, value1, cle2, value2, cond1, cond2);}
+    {return m_manager->get<Ent>().fonctionAgrega(fonc, att, cle1, value1, cle2, value2, cond1, cond2);}
 
 template<class Ent, class Fct> bool Bdd::foreachBeginChild(idt id, const Fct & fct, bool ordre) {
-    auto childs = m_manager->get<Ent>()->getListChildsIdLeaf(id);
+    auto childs = m_manager->get<Ent>().getListChildsIdLeaf(id);
     if(ordre){
         auto i = childs.cbegin();
         while (i != childs.cend() && (
@@ -579,7 +580,7 @@ template<class Ent, class Fct> bool Bdd::foreachBeginChild(idt id, const Fct & f
 
 template<class Ent, class Fct> bool Bdd::foreachNode(idt id, const Fct & fct, bool ordre) {
     if(fct(id)) {
-        auto childs = m_manager->get<Ent>()->getListChildsIdLeaf(id);
+        auto childs = m_manager->get<Ent>().getListChildsIdLeaf(id);
         if(ordre) {
             auto i = childs.cbegin();
             while (i != childs.cend()  && (
@@ -603,59 +604,59 @@ template<class Ent, class Fct> bool Bdd::foreachNode(idt id, const Fct & fct, bo
 }
 
 template<class Ent> bool Bdd::get(Ent & entity)
-    {return m_manager->get<Ent>()->get(entity);}
+    {return m_manager->get<Ent>().get(entity);}
 
 template<class Ent> bool Bdd::getAutorisation(const Ent & entity, autorisation autoris)
-    {return m_manager->get<Ent>()->getAutorisation(entity,autoris);}
+    {return m_manager->get<Ent>().getAutorisation(entity,autoris);}
 
 template<class Ent> tree<Ent> Bdd::getArbre()
-    {return m_manager->get<Ent>()->getArbre();}
+    {return m_manager->get<Ent>().getArbre();}
 
 template<class Ent> tree<Ent> Bdd::getArbre(idt id)
-    {return m_manager->get<Ent>()->getArbre(id);}
+    {return m_manager->get<Ent>().getArbre(id);}
 
 template<class Ent> VectorPtr<Ent> Bdd::getList(typename Ent::Position ordre, bool croissant)
-    {return m_manager->get<Ent>()->getList(ordre, croissant);}
+    {return m_manager->get<Ent>().getList(ordre, croissant);}
 
 template<class Ent> VectorPtr<Ent> Bdd::getList(typename Ent::Position cle, int value, typename Ent::Position ordre,
                                               condition cond, bool crois)
-    {return m_manager->get<Ent>()->getList(cle, QVariant(value), ordre, cond, crois);}
+    {return m_manager->get<Ent>().getList(cle, QVariant(value), ordre, cond, crois);}
 
 template<class Ent> VectorPtr<Ent> Bdd::getList(typename Ent::Position cle, idt value, typename Ent::Position ordre,
                                               condition cond, bool crois)
-    {return m_manager->get<Ent>()->getList(cle, QVariant(value), ordre, cond, crois);}
+    {return m_manager->get<Ent>().getList(cle, QVariant(value), ordre, cond, crois);}
 
 template<class Ent> VectorPtr<Ent> Bdd::getList(typename Ent::Position cle, const QVariant & value,
                                               typename Ent::Position ordre, condition cond, bool crois)
-    {return m_manager->get<Ent>()->getList(cle, value, ordre, cond, crois);}
+    {return m_manager->get<Ent>().getList(cle, value, ordre, cond, crois);}
 
 template<class Ent> VectorPtr<Ent> Bdd::getList(typename Ent::Position cle, const QVariant & value,
                                               typename Ent::Position order1, typename Ent::Position order2,
                                               condition cond, bool croissant1, bool croissant2)
-    {return m_manager->get<Ent>()->getList(cle, value, order1, order2, cond, croissant1, croissant2);}
+    {return m_manager->get<Ent>().getList(cle, value, order1, order2, cond, croissant1, croissant2);}
 
 template<class Ent> VectorPtr<Ent> Bdd::getList(typename Ent::Position cle, const QVariant & value,
                                               typename Ent::Position order1, typename Ent::Position order2,
                                               typename Ent::Position ordre3, condition cond,
                                               bool croissant1, bool croissant2, bool croissant3)
-    {return m_manager->get<Ent>()->getList(cle, value, order1, order2, ordre3, cond, croissant1, croissant2, croissant3);}
+    {return m_manager->get<Ent>().getList(cle, value, order1, order2, ordre3, cond, croissant1, croissant2, croissant3);}
 
 template<class Ent> VectorPtr<Ent> Bdd::getList(typename Ent::Position cle1, const QVariant & value1,
                                               typename Ent::Position cle2, const QVariant & value2,
                                               typename Ent::Position order, condition cond1, condition cond2, bool croissant)
-    {return m_manager->get<Ent>()->getList(cle1, value1, cle2, value2, order, cond1, cond2, croissant);}
+    {return m_manager->get<Ent>().getList(cle1, value1, cle2, value2, order, cond1, cond2, croissant);}
 
 template<class Ent> VectorPtr<Ent> Bdd::getList(typename Ent::Position cle1, const QVariant & value1,
                                               typename Ent::Position cle2, const QVariant & value2,
                                               typename Ent::Position cle3, const QVariant & value3,
                                               typename Ent::Position order,
                                               condition cond1, condition cond2, condition cond3, bool croissant)
-    {return m_manager->get<Ent>()->getList(cle1, value1, cle2, value2, cle3, value3, order, cond1, cond2, cond3, croissant);}
+    {return m_manager->get<Ent>().getList(cle1, value1, cle2, value2, cle3, value3, order, cond1, cond2, cond3, croissant);}
 
 template<class Ent> VectorPtr<Ent> Bdd::getList(const std::vector<typename Ent::Position> &cle, const std::vector<QVariant> &value,
                      const std::vector<typename Ent::Position> &ordre,
                      const std::vector<condition> &condition, const std::vector<bool> &crois)
-    {return m_manager->get<Ent>()->getList(cle,value,ordre,condition,crois);}
+    {return m_manager->get<Ent>().getList(cle,value,ordre,condition,crois);}
 
 template<class Ent, class Join> VectorPtr<Ent> Bdd::getList(typename Ent::Position colonneTable, typename Join::Position colonneJoin,
                                                const std::map<int,QVariant> & whereMapTable, const std::map<int,QVariant> & whereMapJoin,
@@ -663,53 +664,53 @@ template<class Ent, class Join> VectorPtr<Ent> Bdd::getList(typename Ent::Positi
     std::map<QString,QVariant> whereMapJoinString;
     for(auto i = whereMapJoin.cbegin(); i != whereMapJoin.cend(); i++)
         whereMapJoinString[m_manager->get<Join>()->attribut(i->first)] = i->second;
-    return m_manager->get<Ent>()->getListJoin(m_manager->get<Join>()->table(),colonneTable, m_manager->get<Join>()->attribut(colonneJoin),
+    return m_manager->get<Ent>().getListJoin(m_manager->get<Join>()->table(),colonneTable, m_manager->get<Join>()->attribut(colonneJoin),
                                                       whereMapTable, whereMapJoinString, orderMapTable);
 }
 
 template<class Ent, class Join> VectorPtr<Ent> Bdd::getList(typename Join::Position cleJoin, typename Join::Position cleWhere,
                                                           const QVariant & valueWhere, typename Ent::Position ordre,
                                                           condition cond, bool crois) {
-    return m_manager->get<Ent>()->getListJoin(m_manager->get<Join>()->table(),m_manager->get<Join>()->attribut(cleJoin),
+    return m_manager->get<Ent>().getListJoin(m_manager->get<Join>()->table(),m_manager->get<Join>()->attribut(cleJoin),
                                               m_manager->get<Join>()->attribut(cleWhere),
                                                       valueWhere, ordre, cond, crois);
 }
 
 template<class Ent> VectorPtr<Ent> Bdd::getListChilds(const Ent & entity)
-    {return m_manager->get<Ent>()->getListChilds(entity);}
+    {return m_manager->get<Ent>().getListChilds(entity);}
 
 template<class Ent> std::list<idt> Bdd::getListChildsId(idt id)
-    {return m_manager->get<Ent>()->getListChildsId(id);}
+    {return m_manager->get<Ent>().getListChildsId(id);}
 
 template<class Ent> std::vector<std::pair<idt,bool>> Bdd::getListChildsIdLeaf(int id)
-    {return m_manager->get<Ent>()->getListChildsIdLeaf(id);}
+    {return m_manager->get<Ent>().getListChildsIdLeaf(id);}
 
 template<class Ent> std::list<idt> Bdd::getListId(typename Ent::Position cle, int value, typename Ent::Position ordre,
                                               condition cond, bool crois)
-    {return m_manager->get<Ent>()->getListId(cle,value,ordre,cond,crois);}
+    {return m_manager->get<Ent>().getListId(cle,value,ordre,cond,crois);}
 
 template<class Ent> std::list<idt> Bdd::getListId(typename Ent::Position cle, idt value, typename Ent::Position ordre,
                                  condition cond, bool crois)
-    {return m_manager->get<Ent>()->getListId(cle,value,ordre,cond,crois);}
+    {return m_manager->get<Ent>().getListId(cle,value,ordre,cond,crois);}
 
 template<class Ent> std::list<idt> Bdd::getListId(typename Ent::Position cle, const QVariant & value,
                                  typename Ent::Position ordre, condition cond, bool crois)
-    {return m_manager->get<Ent>()->getListId(cle,value,ordre,cond,crois);}
+    {return m_manager->get<Ent>().getListId(cle,value,ordre,cond,crois);}
 
 template<class Ent> std::list<idt> Bdd::getListId(typename Ent::Position cle, const QVariant & value,
                                  typename Ent::Position ordre1, typename Ent::Position ordre2,
                                  condition cond, bool croissant1, bool croissant2)
-    {return m_manager->get<Ent>()->getListId(cle,value,ordre1,ordre2,cond,croissant1,croissant2);}
+    {return m_manager->get<Ent>().getListId(cle,value,ordre1,ordre2,cond,croissant1,croissant2);}
 
 template<class Ent> std::list<idt> Bdd::getListId(typename Ent::Position cle, const QVariant & value,
                                  typename Ent::Position ordre1, typename Ent::Position ordre2, typename Ent::Position ordre3,
                                  condition cond, bool crois1, bool crois2, bool crois3)
-    {return m_manager->get<Ent>()->getListId(cle,value,ordre1,ordre2,ordre3,cond,crois1,crois2,crois3);}
+    {return m_manager->get<Ent>().getListId(cle,value,ordre1,ordre2,ordre3,cond,crois1,crois2,crois3);}
 
 template<class Ent> std::list<idt> Bdd::getListId(typename Ent::Position cle1, const QVariant & value1,
                                  typename Ent::Position cle2, const QVariant & value2,
                                  typename Ent::Position ordre, condition cond1, condition cond2, bool crois)
-    {return m_manager->get<Ent>()->getListId(cle1,value1,cle2,value2,ordre,cond1,cond2,crois);}
+    {return m_manager->get<Ent>().getListId(cle1,value1,cle2,value2,ordre,cond1,cond2,crois);}
 
 template<class Ent> std::list<idt> Bdd::getListId(typename Ent::Position cle1, const QVariant & value1,
                                  typename Ent::Position cle2, const QVariant & value2,
@@ -717,39 +718,39 @@ template<class Ent> std::list<idt> Bdd::getListId(typename Ent::Position cle1, c
                                  typename Ent::Position ordre,
                                  condition cond1, condition cond2,condition cond3,
                                  bool crois)
-    {return m_manager->get<Ent>()->getListId(cle1,value1,cle2,value2,cle3,value3,ordre,cond1,cond2,cond3,crois);}
+    {return m_manager->get<Ent>().getListId(cle1,value1,cle2,value2,cle3,value3,ordre,cond1,cond2,cond3,crois);}
 
 template<class Ent> std::list<idt> Bdd::getListId(const std::vector<typename Ent::Position> & cle, const std::vector<QVariant> & value,
                          const std::vector<typename Ent::Position> & ordre,
                          const std::vector<condition> & condition,
                          const std::vector<bool> & crois)
-    {return m_manager->get<Ent>()->getListId(cle, value,ordre, condition, crois);}
+    {return m_manager->get<Ent>().getListId(cle, value,ordre, condition, crois);}
 
 template<class Ent> mapIdt<Ent> Bdd::getMap(typename Ent::Position cleMap)
-    {return m_manager->get<Ent>()->getMap(cleMap);}
+    {return m_manager->get<Ent>().getMap(cleMap);}
 
 template<class Ent> mapIdt<Ent> Bdd::getMap(typename Ent::Position cle, const QVariant & value,
                                             typename Ent::Position cleMap, condition cond)
-    {return m_manager->get<Ent>()->getMap(cle, value, cleMap, cond);}
+    {return m_manager->get<Ent>().getMap(cle, value, cleMap, cond);}
 
 template<class Ent> mapIdt<Ent> Bdd::getMap(typename Ent::Position cle1, const QVariant & value1,
                                             typename Ent::Position cle2, const QVariant & value2,
                                             typename Ent::Position cleMap, condition cond1, condition cond2)
-    { return m_manager->get<Ent>()->getMap(cle1, value1, cle2, value2, cleMap, cond1, cond2);}
+    { return m_manager->get<Ent>().getMap(cle1, value1, cle2, value2, cleMap, cond1, cond2);}
 
 template<class Ent> mapIdt<Ent> Bdd::getMap(typename Ent::Position cle1, const QVariant & value1,
                                             typename Ent::Position cle2, const QVariant & value2,
                                             typename Ent::Position cle3, const QVariant & value3,
                                             typename Ent::Position cleMap,
                                             condition cond1, condition cond2, condition cond3)
-    {return m_manager->get<Ent>()->getMap(cle1, value1, cle2, value2, cle3, value3, cleMap, cond1, cond2, cond3);}
+    {return m_manager->get<Ent>().getMap(cle1, value1, cle2, value2, cle3, value3, cleMap, cond1, cond2, cond3);}
 
 template<class Ent> mapIdt<Ent> Bdd::getMap(const std::vector<typename Ent::Position> & cle, const std::vector<QVariant> & value,
                      typename Ent::Position cleMap,
                      const std::vector<typename Ent::Position> & ordre,
                      const std::vector<condition> & cond,
                      const std::vector<bool> & crois)
-    {return m_manager->get<Ent>()->getMap(cle,value,cleMap,ordre,cond,crois);}
+    {return m_manager->get<Ent>().getMap(cle,value,cleMap,ordre,cond,crois);}
 
 template<class Ent, class Join> mapIdt<Ent> Bdd::getMap(typename Ent::Position colonneTable, typename Join::Position colonneJoin,
                                                const std::map<int,QVariant> & whereMapTable, const std::map<int,QVariant> & whereMapJoin,
@@ -757,80 +758,80 @@ template<class Ent, class Join> mapIdt<Ent> Bdd::getMap(typename Ent::Position c
     std::map<QString,QVariant> whereMapJoinString;
     for(auto i = whereMapJoin.cbegin(); i != whereMapJoin.cend(); i++)
         whereMapJoinString[m_manager->get<Join>()->attribut(i->first)] = i->second;
-    return m_manager->get<Ent>()->getMapJoin(m_manager->get<Join>()->table(),colonneTable, m_manager->get<Join>()->attribut(colonneJoin),
+    return m_manager->get<Ent>().getMapJoin(m_manager->get<Join>()->table(),colonneTable, m_manager->get<Join>()->attribut(colonneJoin),
                                                       whereMapTable, whereMapJoinString, cleMap);
 }
 
 template<class Ent, class Join> mapIdt<Ent> Bdd::getMap(typename Join::Position cleJoin,
                                                                 typename Join::Position cleWhere, const QVariant & valueWhere,
                                                                 typename Ent::Position cleMap, condition cond) {
-    return m_manager->get<Ent>()->getMapJoin(m_manager->get<Join>()->table(),m_manager->get<Join>()->attribut(cleJoin),
+    return m_manager->get<Ent>().getMapJoin(m_manager->get<Join>()->table(),m_manager->get<Join>()->attribut(cleJoin),
                                              m_manager->get<Join>()->attribut(cleWhere),
                                                       valueWhere, cleMap, cond);
 }
 
 template<class Ent> std::vector<int> Bdd::getRestriction(const Ent & entity)
-    {return m_manager->get<Ent>()->getRestriction(entity);}
+    {return m_manager->get<Ent>().getRestriction(entity);}
 
 
 template<class Ent> bool Bdd::getUnique(Ent & entity)
-    {return m_manager->get<Ent>()->getUnique(entity);}
+    {return m_manager->get<Ent>().getUnique(entity);}
 
 template<class Ent> bool Bdd::sameInBdd(const Ent & entity)
-    {return m_manager->get<Ent>()->sameInBdd(entity);}
+    {return m_manager->get<Ent>().sameInBdd(entity);}
 
 template<class Ent> void Bdd::save(Ent & entity)
-    {m_manager->get<Ent>()->save(entity);}
+    {m_manager->get<Ent>().save(entity);}
 
 template<class Ent> void Bdd::save(const Ent & entity)
-    {m_manager->get<Ent>()->save(entity);}
+    {m_manager->get<Ent>().save(entity);}
 
 template<class Ent> void Bdd::save(Ent & entity, autorisation autoris, bool bb)
-    {m_manager->get<Ent>()->save(entity, autoris, bb);}
+    {m_manager->get<Ent>().save(entity, autoris, bb);}
 
 template<class Ent> void Bdd::save(const Ent & entity, autorisation autoris, bool bb)
-    {m_manager->get<Ent>()->save(entity, autoris, bb);}
+    {m_manager->get<Ent>().save(entity, autoris, bb);}
 
 template<class Ent> void Bdd::save(Ent & entity, const std::map<autorisation,bool> & autorisations)
-    {m_manager->get<Ent>()->save(entity, autorisations);}
+    {m_manager->get<Ent>().save(entity, autorisations);}
 
 template<class Ent> void Bdd::save(const Ent & entity, const std::map<autorisation,bool> & autorisations)
-    {m_manager->get<Ent>()->save(entity, autorisations);}
+    {m_manager->get<Ent>().save(entity, autorisations);}
 
 template<class Ent> void Bdd::save(Ent & entity, const std::vector<autorisation> & restriction)
-    {m_manager->get<Ent>()->save(entity, restriction);}
+    {m_manager->get<Ent>().save(entity, restriction);}
 
 template<class Ent> void Bdd::save(const Ent & entity, const std::vector<autorisation> & restriction)
-    {m_manager->get<Ent>()->save(entity, restriction);}
+    {m_manager->get<Ent>().save(entity, restriction);}
 
 template<class Ent> void Bdd::save(Ent & entity, const Ent & parent, int num)
-    {m_manager->get<Ent>()->save(entity,parent,num);}
+    {m_manager->get<Ent>().save(entity,parent,num);}
 
 template<class Ent> void Bdd::save(const Ent & entity, const Ent & parent, int num)
-    {m_manager->get<Ent>()->save(entity,parent,num);}
+    {m_manager->get<Ent>().save(entity,parent,num);}
 
 template<class Ent> void Bdd::saveUnique(Ent & entity)
-    {m_manager->get<Ent>()->saveUnique(entity);}
+    {m_manager->get<Ent>().saveUnique(entity);}
 
 template<class Ent> void Bdd::saveUnique(const Ent & entity)
-    {m_manager->get<Ent>()->saveUnique(entity);}
+    {m_manager->get<Ent>().saveUnique(entity);}
 
 template<class Ent, class Conteneur> void Bdd::saveConteneur(const Conteneur & vector) {
     for(typename Conteneur::iterator i = vector.begin(); i != vector.end(); ++i)
-       m_manager->get<Ent>()->save(*i);
+       m_manager->get<Ent>().save(*i);
 }
 
 template<class Ent> void Bdd::save(tree<Ent> & arbre, treeSave n)
-    {m_manager->get<Ent>()->save(arbre,n);}
+    {m_manager->get<Ent>().save(arbre,n);}
 
 template<class Ent> void Bdd::setAutorisation(const Ent & entity, autorisation autoris, bool bb)
-    {m_manager->get<Ent>()->setAutorisation(entity, autoris, bb);}
+    {m_manager->get<Ent>().setAutorisation(entity, autoris, bb);}
 
 template<class Ent> void Bdd::setAutorisation(const Ent & entity, const std::map<autorisation,bool> & autorisations)
-    {m_manager->get<Ent>()->setAutorisation(entity, autorisations);}
+    {m_manager->get<Ent>().setAutorisation(entity, autorisations);}
 
 template<class Ent> void Bdd::setRestriction(const Ent & entity, const std::vector<autorisation> & restriction)
-    {m_manager->get<Ent>()->setRestriction(entity, restriction);}
+    {m_manager->get<Ent>().setRestriction(entity, restriction);}
 
 template<class Ent> void Bdd::setRestriction(const tree<Ent> & tree, const std::vector<autorisation> & restriction) {
     for(auto i = tree.begin(); i != tree.end(); i++)

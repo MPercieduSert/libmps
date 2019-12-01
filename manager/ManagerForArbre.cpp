@@ -3,7 +3,7 @@
 using namespace managerMPS;
 
 ManagerForArbre::ManagerForArbre(const InfoBdd & info)
-    : ManagerSqlArbre(info, new ArbreUniqueSql<Arbre>()) {
+    : ManagerSqlArbre(info, std::make_unique<ArbreUniqueSql<Arbre>>()) {
     // Get Parent
     m_sqlGetParent.append("SELECT ");
     m_sqlGetParent.append(attribut(Arbre::Parent));

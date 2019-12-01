@@ -10,7 +10,7 @@ void ManagersPredef::enableCommentaire(const QString & commentaire, const QStrin
     infoCommentaire.setAttribut(Commentaire::Creation,"crea",bmps::typeAttributBdd::DateTime);
     infoCommentaire.setAttribut(Commentaire::Modification,"modif",bmps::typeAttributBdd::DateTime);
     infoCommentaire.setAttribut(Commentaire::Texte,"txt",bmps::typeAttributBdd::Text,false);
-    setManager(new ManagerSql<Commentaire>(infoCommentaire));
+    setManager<Commentaire>(std::make_unique<ManagerSql<Commentaire>>(infoCommentaire));
     setCible<Commentaire>(bmps::cibleId::Commentaire);
 
     //CommentaireCible
@@ -25,7 +25,7 @@ void ManagersPredef::enableCommentaire(const QString & commentaire, const QStrin
     infoCibleCom.setUnique(CommentaireCible::Cible,Unique::CibleUnique);
     infoCibleCom.setUnique(CommentaireCible::Num,Unique::NumUnique);
     infoCibleCom.setForeignKey(CommentaireCible::IdCommentaire,infoCommentaire);
-    setManager(new ManagerSql<CommentaireCible>(infoCibleCom,new Unique));
+    setManager<CommentaireCible>(std::make_unique<ManagerSql<CommentaireCible>>(infoCibleCom,std::make_unique<Unique>()));
     setCible<CommentaireCible>(bmps::cibleId::CommentaireCible);
 
     m_commentaireEnabled = true;
@@ -33,9 +33,9 @@ void ManagersPredef::enableCommentaire(const QString & commentaire, const QStrin
 
 void ManagersPredef::enableDonnee(const QString & donnee, const QString & arbreDonnee, const QString & cibleDonnee,
                                   const QString & cardDonnee,
-                                  AbstractGestionAutorisation<Donnee> * gestion,
-                                  AbstractGestionAutorisation<DonneeCible> *gestionCilbeDonnee,
-                                  AbstractGestionAutorisation<DonneeCard> *gestionCardDonnee)
+                                  std::unique_ptr<AbstractGestionAutorisation<Donnee>> &&  gestion,
+                                  std::unique_ptr<AbstractGestionAutorisation<DonneeCible>> && gestionCilbeDonnee,
+                                  std::unique_ptr<AbstractGestionAutorisation<DonneeCard>> && gestionCardDonnee)
 {
     //Donnee
     auto infoArbre = infoBddArbre(arbreDonnee);
@@ -49,9 +49,10 @@ void ManagersPredef::enableDonnee(const QString & donnee, const QString & arbreD
     infoDonnee.setForeignKey(Donnee::Id,infoArbre);
     setTypeForeignKey<Donnee>(infoDonnee);
     if(gestion)
-        setManager(new ManagerArbreModifControle<Donnee>(infoDonnee,infoArbre,gestion, new UniqueDonnee));
+        setManager<Donnee>(std::make_unique<ManagerArbreModifControle<Donnee>>(infoDonnee,infoArbre,std::move(gestion),
+                                                                               std::make_unique<UniqueDonnee>()));
     else
-        setManager(new ManagerArbre<Donnee>(infoDonnee,infoArbre, new UniqueDonnee));
+        setManager<Donnee>(std::make_unique<ManagerArbre<Donnee>>(infoDonnee,infoArbre, std::make_unique<UniqueDonnee>()));
     setCible<Donnee>(bmps::cibleId::Donnee);
 
     //DonneeCible
@@ -68,9 +69,10 @@ void ManagersPredef::enableDonnee(const QString & donnee, const QString & arbreD
     infoCD.setUnique(DonneeCible::Cible,UniqueCD::CibleUnique);
     infoCD.setUnique(DonneeCible::Num,UniqueCD::NumUnique);
     if(gestionCilbeDonnee)
-        setManager(new ManagerModifControle<DonneeCible>(infoCD,gestionCilbeDonnee, new UniqueCD));
+        setManager<DonneeCible>(std::make_unique<ManagerModifControle<DonneeCible>>(infoCD,std::move(gestionCilbeDonnee),
+                                                                                    std::make_unique<UniqueCD>()));
     else
-        setManager(new ManagerSql<DonneeCible>(infoCD, new UniqueCD));
+        setManager<DonneeCible>(std::make_unique<ManagerSql<DonneeCible>>(infoCD, std::make_unique<UniqueCD>()));
     setCible<DonneeCible>(bmps::cibleId::DonneeCible);
 
     //DonneeCard
@@ -84,9 +86,10 @@ void ManagersPredef::enableDonnee(const QString & donnee, const QString & arbreD
     infoCard.setUnique(DonneeCard::Cible,UniqueCard::CibleUnique);
     infoCard.setForeignKey(DonneeCard::IdDonnee,infoDonnee);
     if(gestionCardDonnee)
-        setManager(new ManagerModifControle<DonneeCard>(infoCard,gestionCardDonnee, new UniqueCard));
+        setManager<DonneeCard>(std::make_unique<ManagerModifControle<DonneeCard>>(infoCard,std::move(gestionCardDonnee),
+                                                                                  std::make_unique<UniqueCard>()));
     else
-        setManager(new ManagerSql<DonneeCard>(infoCard, new UniqueCard));
+        setManager<DonneeCard>(std::make_unique<ManagerSql<DonneeCard>>(infoCard, std::make_unique<UniqueCard>()));
     setCible<DonneeCard>(bmps::cibleId::DonneeCard);
 
     m_donneeEnabled = true;
@@ -105,7 +108,7 @@ void ManagersPredef::enableHistorique(const QString & historique)
     info.setUnique(Historique::IdCible,Unique::IdCibleUnique);
     info.setUnique(Historique::Cible,Unique::CibleUnique);
     info.setUnique(Historique::Num,Unique::NumUnique);
-    setManager(new ManagerSql<Historique>(info, new Unique));
+    setManager<Historique>(std::make_unique<ManagerSql<Historique>>(info, std::make_unique<Unique>()));
     setCible<Historique>(bmps::cibleId::Historique);
 
     m_historiqueEnabled = true;
@@ -113,9 +116,9 @@ void ManagersPredef::enableHistorique(const QString & historique)
 
 void ManagersPredef::enableMotCle(const QString & motCle, const QString & motCleArbre, const QString & cibleMotCle,
                                   const QString & cibleProg, const QString & permissionMotCle, const QString & permissionProg,
-                                  AbstractGestionAutorisation<MotCle> * gestionMotCle,
-                                  AbstractGestionAutorisation<MotClePermission> * gestionPermission,
-                                  AbstractGestionAutorisation<MotProgPermission> * gestionProgPermission)
+                                  std::unique_ptr<AbstractGestionAutorisation<MotCle>> &&  gestionMotCle,
+                                  std::unique_ptr<AbstractGestionAutorisation<MotClePermission>> &&  gestionPermission,
+                                  std::unique_ptr<AbstractGestionAutorisation<MotProgPermission>> &&  gestionProgPermission)
 {
     //Mot Clé
     auto infoArbre = infoBddArbre(motCleArbre);
@@ -124,9 +127,9 @@ void ManagersPredef::enableMotCle(const QString & motCle, const QString & motCle
     infoMC.setAttribut(MotCle::Nom,"nm",bmps::typeAttributBdd::Text);
     infoMC.setForeignKey(MotCle::Id,infoArbre);
     if(gestionMotCle)
-        setManager(new ManagerArbreModifControle<MotCle>(infoMC,infoArbre,gestionMotCle));
+        setManager<MotCle>(std::make_unique<ManagerArbreModifControle<MotCle>>(infoMC,infoArbre,std::move(gestionMotCle)));
     else
-        setManager(new ManagerArbre<MotCle>(infoMC,infoArbre));
+        setManager<MotCle>(std::make_unique<ManagerArbre<MotCle>>(infoMC,infoArbre));
     setCible<MotCle>(bmps::cibleId::MotCle);
 
     // Cible Mot Clé
@@ -139,7 +142,7 @@ void ManagersPredef::enableMotCle(const QString & motCle, const QString & motCle
     infoCible.setUnique(MotCleCible::IdCible,UniqueCible::IdCibleUnique);
     infoCible.setUnique(MotCleCible::Cible,UniqueCible::CibleUnique);
     infoCible.setForeignKey(MotCleCible::IdMotCle,infoMC);
-    setManager(new ManagerSql<MotCleCible>(infoCible, new UniqueCible));
+    setManager<MotCleCible>(std::make_unique<ManagerSql<MotCleCible>>(infoCible, std::make_unique<UniqueCible>()));
     setCible<MotCleCible>(bmps::cibleId::MotCleCible);
 
     // Permission Mot Clé
@@ -152,9 +155,12 @@ void ManagersPredef::enableMotCle(const QString & motCle, const QString & motCle
     infoPermission.setUnique(MotClePermission::Cible,UniquePermission::CibleUnique);
     infoPermission.setForeignKey(MotClePermission::IdMotCle,infoMC);
     if(gestionPermission)
-        setManager(new ManagerPermissionCodeModifControle<MotClePermission>(infoPermission,gestionPermission, new UniquePermission));
+        setManager<MotClePermission>(std::make_unique<ManagerPermissionCodeModifControle<MotClePermission>>(infoPermission,
+                                                                                                   std::move(gestionPermission),
+                                                                                                   std::make_unique<UniquePermission>()));
     else
-        setManager(new ManagerPermissionCode<MotClePermission>(infoPermission, new UniquePermission));
+        setManager<MotClePermission>(std::make_unique<ManagerPermissionCode<MotClePermission>>(infoPermission,
+                                                                                               std::make_unique<UniquePermission>()));
     setCible<MotClePermission>(bmps::cibleId::MotClePermission);
 
     // Cible Mot Prog
@@ -168,7 +174,7 @@ void ManagersPredef::enableMotCle(const QString & motCle, const QString & motCle
     infoProgCible.setUnique(MotProgCible::IdCible,UniqueProgCible::IdCibleUnique);
     infoProgCible.setUnique(MotProgCible::Cible,UniqueProgCible::CibleUnique);
     infoProgCible.setForeignKey(MotProgCible::IdMotCle,infoMC);
-    setManager(new ManagerSql<MotProgCible>(infoProgCible, new UniqueProgCible));
+    setManager<MotProgCible>(std::make_unique<ManagerSql<MotProgCible>>(infoProgCible, std::make_unique<UniqueProgCible>()));
     setCible<MotProgCible>(bmps::cibleId::MotProgCible);
 
     // Permission Mot Prog
@@ -183,10 +189,13 @@ void ManagersPredef::enableMotCle(const QString & motCle, const QString & motCle
     infoProgPermission.setUnique(MotProgPermission::Cible,UniqueProgPermission::CibleUnique);
     infoProgPermission.setForeignKey(MotProgPermission::IdMotCle,infoMC);
     if(gestionProgPermission)
-        setManager(new ManagerPermissionCodeModifControle<MotProgPermission>(infoProgPermission,gestionProgPermission,
-                                                                               new UniqueProgPermission));
+        setManager<MotProgPermission>(
+                    std::make_unique<ManagerPermissionCodeModifControle<MotProgPermission>>(infoProgPermission,
+                                                                                            std::move(gestionProgPermission),
+                                                                                            std::make_unique<UniqueProgPermission>()));
     else
-        setManager(new ManagerPermissionCode<MotProgPermission>(infoProgPermission, new UniqueProgPermission));
+        setManager<MotProgPermission>(std::make_unique<ManagerPermissionCode<MotProgPermission>>(infoProgPermission,
+                                                                                                 std::make_unique<UniqueProgPermission>()));
     setCible<MotProgPermission>(bmps::cibleId::MotProgPermission);
 
     m_motCleEnabled = true;
@@ -201,7 +210,7 @@ void ManagersPredef::enableRestriction(const QString & restriction)
     info.setAttribut(Restriction::Code,"cd");
     info.setUnique(Restriction::IdCible,Unique::IdCibleUnique);
     info.setUnique(Restriction::Cible,Unique::CibleUnique);
-    setManager(new ManagerPermissionCode<Restriction>(info,new Unique));
+    setManager<Restriction>(std::make_unique<ManagerPermissionCode<Restriction>>(info,std::make_unique<Unique>()));
     setCible<Restriction>(bmps::cibleId::Restriction);
 
     m_restrictionModificationEnabled = true;
@@ -215,7 +224,7 @@ void ManagersPredef::enableTexte(const QString & texte, const QString & cibleTex
     infoTexte.setAttribut(Texte::Creation,"crea",bmps::typeAttributBdd::DateTime);
     infoTexte.setAttribut(Texte::Modification,"modif",bmps::typeAttributBdd::DateTime);
     infoTexte.setAttribut(Texte::Texte,"txt",bmps::typeAttributBdd::Text,false);
-    setManager(new ManagerSql<Texte>(infoTexte));
+    setManager<Texte>(std::make_unique<ManagerSql<Texte>>(infoTexte));
     setCible<Texte>(bmps::cibleId::Texte);
 
     //TexteCible
@@ -233,7 +242,7 @@ void ManagersPredef::enableTexte(const QString & texte, const QString & cibleTex
     infoCible.setUnique(TexteCible::Type,UniqueCible::TypeUnique);
     infoCible.setForeignKey(TexteCible::IdTexte,infoTexte);
     setTypeForeignKey<TexteCible>(infoCible);
-    setManager(new ManagerSql<TexteCible>(infoCible, new UniqueCible));
+    setManager<TexteCible>(std::make_unique<ManagerSql<TexteCible>>(infoCible, std::make_unique<UniqueCible>()));
     setCible<TexteCible>(bmps::cibleId::TexteCible);
 
     //Source
@@ -244,7 +253,7 @@ void ManagersPredef::enableTexte(const QString & texte, const QString & cibleTex
     infoSource.setAttribut(Source::Type,"tp");
     infoSource.setUnique(Source::Nom,UniqueSource::NomUnique);
     setTypeForeignKey<Source>(infoSource);
-    setManager(new ManagerSql<Source>(infoSource, new UniqueSource));
+    setManager<Source>(std::make_unique<ManagerSql<Source>>(infoSource, std::make_unique<UniqueSource>()));
     setCible<Source>(bmps::cibleId::Source);
 
     //SourceTexte
@@ -256,15 +265,15 @@ void ManagersPredef::enableTexte(const QString & texte, const QString & cibleTex
     infoTS.setUnique(SourceTexte::IdTexte,UniqueTS::Id2Unique);
     infoTS.setForeignKey(SourceTexte::IdSource,infoSource);
     infoTS.setForeignKey(SourceTexte::IdTexte,infoTexte);
-    setManager(new ManagerSql<SourceTexte>(infoTS, new UniqueTS));
+    setManager<SourceTexte>(std::make_unique<ManagerSql<SourceTexte>>(infoTS, std::make_unique<UniqueTS>()));
     setCible<SourceTexte>(bmps::cibleId::SourceTexte);
 
     m_texteEnabled = true;
 }
 
 void  ManagersPredef::enableType(const QString & typeEnt, const QString & permissionType,
-                AbstractGestionAutorisation<Type> * gestionType,
-                AbstractGestionAutorisation<TypePermission> * gestionPermission)
+                std::unique_ptr<AbstractGestionAutorisation<Type>> &&  gestionType,
+                std::unique_ptr<AbstractGestionAutorisation<TypePermission>> &&  gestionPermission)
 {
     //Type
     using UniqueType = IdProgNomParentUniqueSql<Type>;
@@ -278,9 +287,10 @@ void  ManagersPredef::enableType(const QString & typeEnt, const QString & permis
     infoType.setUnique(Type::Parent,UniqueType::ParentUnique,UniqueType::ParentUniqueSet);
     infoType.setForeignKey(Type::Parent,infoType);
     if(gestionType)
-        setManager(new ManagerArbreSimpleModifControle<Type>(infoType,gestionType,new UniqueType));
+        setManager<Type>(std::make_unique<ManagerArbreSimpleModifControle<Type>>(infoType,std::move(gestionType),
+                                                                                 std::make_unique<UniqueType>()));
     else
-        setManager(new ManagerArbreSimple<Type>(infoType,new UniqueType));
+        setManager<Type>(std::make_unique<ManagerArbreSimple<Type>>(infoType,std::make_unique<UniqueType>()));
     setCible<Type>(bmps::cibleId::Type);
 
     //Permission
@@ -293,16 +303,19 @@ void  ManagersPredef::enableType(const QString & typeEnt, const QString & permis
     infoPermission.setUnique(TypePermission::Cible,UniquePermission::CibleUnique);
     infoPermission.setForeignKey(TypePermission::IdType,infoType);
     if(gestionPermission)
-        setManager(new ManagerPermissionCodeModifControle<TypePermission>(infoPermission,gestionPermission, new UniquePermission));
+        setManager<TypePermission>(
+                    std::make_unique<ManagerPermissionCodeModifControle<TypePermission>>(infoPermission,std::move(gestionPermission),
+                                                                                         std::make_unique<UniquePermission>()));
     else
-        setManager(new ManagerPermissionCode<TypePermission>(infoPermission, new UniquePermission));
+        setManager<TypePermission>(std::make_unique<ManagerPermissionCode<TypePermission>>(infoPermission,
+                                                                                           std::make_unique<UniquePermission>()));
     setCible<TypePermission>(bmps::cibleId::TypePermission);
 
     m_typeEnabled = true;
 }
 
 void ManagersPredef::enableUtilisation(const QString &utilisation, const QString &usage, const QString & usageArbre,
-                                       AbstractGestionAutorisation<Usage> * gestionUsage)
+                                       std::unique_ptr<AbstractGestionAutorisation<Usage>> &&  gestionUsage)
 {
     //Usage
     auto infoArbre = infoBddArbre(usageArbre);
@@ -316,9 +329,10 @@ void ManagersPredef::enableUtilisation(const QString &utilisation, const QString
     infoN.setForeignKey(Usage::Id,infoArbre);
     setTypeForeignKey<Usage>(infoN);
     if(gestionUsage)
-        setManager(new ManagerArbreModifControle<Usage>(infoN, infoArbre, gestionUsage, new UniqueN));
+        setManager<Usage>(std::make_unique<ManagerArbreModifControle<Usage>>(infoN, infoArbre, std::move(gestionUsage),
+                                                                             std::make_unique<UniqueN>()));
     else
-        setManager(new ManagerArbre<Usage>(infoN,infoArbre, new UniqueN));
+        setManager<Usage>(std::make_unique<ManagerArbre<Usage>>(infoN,infoArbre, std::make_unique<UniqueN>()));
     setCible<Usage>(bmps::cibleId::Usage);
 
     //Utilisation
@@ -335,7 +349,7 @@ void ManagersPredef::enableUtilisation(const QString &utilisation, const QString
     infoU.setUnique(Utilisation::Cible,UniqueU::CibleUnique);
     infoU.setUnique(Utilisation::Num,UniqueU::NumUnique);
     infoU.setForeignKey(Utilisation::IdUsage,infoN);
-    setManager(new ManagerSql<Utilisation>(infoU, new UniqueU));
+    setManager<Utilisation>(std::make_unique<ManagerSql<Utilisation>>(infoU, std::make_unique<UniqueU>()));
     setCible<Utilisation>(bmps::cibleId::Utilisation);
 
     m_utilisationEnabled = true;

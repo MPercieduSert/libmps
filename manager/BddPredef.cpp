@@ -46,15 +46,15 @@ template<> bool BddPredef::del<Texte>(idt id)
 }*/
 
 bool BddPredef::delCible(idt idCible, int cible) {
-    return (!managers()->commentaireIsEnabled() || delList(getList<CommentaireCible>(CommentaireCible::Cible,cible,CommentaireCible::IdCible,idCible)))
-            && (!managers()->donneeIsEnabled() || delList(getList<DonneeCible>(DonneeCible::Cible,cible,DonneeCible::IdCible,idCible)))
-            && (!managers()->motCleIsEnabled() || delList(getList<MotCleCible>(MotCleCible::Cible,cible,MotCleCible::IdCible,idCible)))
-            && (!managers()->texteIsEnabled()|| delList(getList<TexteCible>(TexteCible::Cible,cible,TexteCible::IdCible,idCible)))
-            && (!managers()->restrictionModificationIsEnabled() || delList(getList<Restriction>(Restriction::Cible,
+    return (!managers().commentaireIsEnabled() || delList(getList<CommentaireCible>(CommentaireCible::Cible,cible,CommentaireCible::IdCible,idCible)))
+            && (!managers().donneeIsEnabled() || delList(getList<DonneeCible>(DonneeCible::Cible,cible,DonneeCible::IdCible,idCible)))
+            && (!managers().motCleIsEnabled() || delList(getList<MotCleCible>(MotCleCible::Cible,cible,MotCleCible::IdCible,idCible)))
+            && (!managers().texteIsEnabled()|| delList(getList<TexteCible>(TexteCible::Cible,cible,TexteCible::IdCible,idCible)))
+            && (!managers().restrictionModificationIsEnabled() || delList(getList<Restriction>(Restriction::Cible,
                                                                cible,Restriction::IdCible)))
-            && (!managers()->historiqueIsEnabled() || (delList(getList<Historique>(Historique::Cible,cible,Historique::IdCible))
+            && (!managers().historiqueIsEnabled() || (delList(getList<Historique>(Historique::Cible,cible,Historique::IdCible))
                                        && delList(getList<Historique>(Historique::Etat,cible,Historique::IdEtat))))
-            && (!managers()->utilisationIsEnabled() || (delList(getList<Utilisation>(Utilisation::Cible,cible,Utilisation::IdCible))
+            && (!managers().utilisationIsEnabled() || (delList(getList<Utilisation>(Utilisation::Cible,cible,Utilisation::IdCible))
                                        && delList(getList<Utilisation>(Utilisation::Etat,cible,Utilisation::IdEtat))));
 }
 
@@ -120,7 +120,7 @@ std::pair<int, int> BddPredef::intervalEntityInDonnee(idt idCible, int cible, in
     std::pair<int, int> interval(0,0);
     for(auto i = listeNum.begin(); i != listeNum.end(); ++i) {
         interval.first = interval.second;
-        interval.second += managers()->nombreAttributCible(i->valeur().toInt());
+        interval.second += managers().nombreAttributCible(i->valeur().toInt());
     }
     return interval;
 }
@@ -128,26 +128,26 @@ std::pair<int, int> BddPredef::intervalEntityInDonnee(idt idCible, int cible, in
 void BddPredef::listeMiseAJourBdd(int version) {
     if(version == bddVersion::initiale) {
         //Type
-        if(managers()->typeIsEnabled()) {
+        if(managers().typeIsEnabled()) {
             creerTable<Type>();
             creerTable<TypePermission>();
         }
         //Commentaire
-        if(managers()->commentaireIsEnabled()) {
+        if(managers().commentaireIsEnabled()) {
             creerTable<Commentaire>();
             creerTable<CommentaireCible>();
         }
         //Donnee
-        if(managers()->donneeIsEnabled()) {
+        if(managers().donneeIsEnabled()) {
             creerTable<Donnee>();
             creerTable<DonneeCible>();
             creerTable<DonneeCard>();
         }
         //Historique
-        if(managers()->historiqueIsEnabled())
+        if(managers().historiqueIsEnabled())
             creerTable<Historique>();
         //Mot Cle
-        if(managers()->motCleIsEnabled()) {
+        if(managers().motCleIsEnabled()) {
             creerTable<MotCle>();
             creerTable<MotCleCible>();
             creerTable<MotClePermission>();
@@ -155,21 +155,21 @@ void BddPredef::listeMiseAJourBdd(int version) {
             creerTable<MotProgPermission>();
         }
         //Restriction Modification
-        if(managers()->restrictionModificationIsEnabled())
+        if(managers().restrictionModificationIsEnabled())
             creerTable<Restriction>();
         //Texte
-        if(managers()->texteIsEnabled()) {
+        if(managers().texteIsEnabled()) {
             creerTable<Texte>();
             creerTable<TexteCible>();
             creerTable<Source>();
             creerTable<SourceTexte>();
         }
         //Utilisation
-        if(managers()->utilisationIsEnabled()) {
+        if(managers().utilisationIsEnabled()) {
             creerTable<Utilisation>();
             creerTable<Usage>();
         }
         //Mise à jour de la version de la base de donnée.
-        managers()->saveVersion(bddVersion::initialePredef);
+        managers().saveVersion(bddVersion::initialePredef);
     }
 }

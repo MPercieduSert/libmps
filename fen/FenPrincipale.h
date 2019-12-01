@@ -49,7 +49,7 @@ protected:
 
 public:
     //! Constructeur.
-    explicit FenPrincipale(AbstractNoyau * noyau, bmps::Bdd * bdd, AbstractZoneCentrale * centralZone,
+    explicit FenPrincipale(AbstractNoyau * noyau, std::unique_ptr<bddMPS::Bdd> &&bdd, AbstractZoneCentrale * centralZone,
                            const QString & bddPathXML,
                            const QString & configPath = QDir::currentPath().append("/Config.xml"),
                            QWidget *parent = nullptr);

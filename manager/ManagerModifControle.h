@@ -42,14 +42,14 @@ namespace managerMPS {
 template<class Ent> class BaseManagerModifControle {
 protected:
     bool m_bypass = false;  //!< Booléen permettant de courtcircuité le gestionnaire d'autorisation.
-    AbstractGestionAutorisation<Ent> * m_gestionAutorisation;   //!< Gestionnaire d'autorisation
+    std::unique_ptr<AbstractGestionAutorisation<Ent>>  m_gestionAutorisation;   //!< Gestionnaire d'autorisation
 public:
     //! Constructeur. (Posséde le gestionnaire d'autorisation.)
-    BaseManagerModifControle(AbstractGestionAutorisation<Ent> * gestionAutorisation)
-        : m_gestionAutorisation(gestionAutorisation) {}
+    BaseManagerModifControle(std::unique_ptr<AbstractGestionAutorisation<Ent>> &&  gestionAutorisation)
+        : m_gestionAutorisation(std::move(gestionAutorisation)) {}
 
     //! Destructeur.
-    virtual ~BaseManagerModifControle();
+    virtual ~BaseManagerModifControle() = default;
 
     //! Accesseur du gestionnaire d'autorisations.
     AbstractGestionAutorisation<Ent> * gestionAutorisation() const
@@ -93,9 +93,6 @@ protected:
         {m_bypass = false;}
 };
 
-template<class Ent> BaseManagerModifControle<Ent>::~BaseManagerModifControle()
-    {delete m_gestionAutorisation;}
-
 /*! \ingroup groupeManager
  * \brief Classe template manageurs à modification controlée.
  */
@@ -125,9 +122,10 @@ public:
 
     //! Constructeur
     ManagerModifControle (const InfoBdd & info,
-                            AbstractGestionAutorisation<Ent> * gestionAutorisation = new GestionAutorisationNoRestrictif<Ent>(),
-                            AbstractUniqueSqlTemp<Ent> * unique = new NoUniqueSql<Ent>())
-        : ManagerSql<Ent>(info, unique), BaseManagerModifControle<Ent>(gestionAutorisation) {}
+                          std::unique_ptr<AbstractGestionAutorisation<Ent>> && gestionAutorisation
+                                      = std::make_unique<GestionAutorisationNoRestrictif<Ent>>(),
+                          std::unique_ptr<AbstractUniqueSqlTemp<Ent>> && unique = std::make_unique<NoUniqueSql<Ent>>())
+        : ManagerSql<Ent>(info,std::move(unique)), BaseManagerModifControle<Ent>(std::move(gestionAutorisation)) {}
 
     //! Destructeur.
     ~ManagerModifControle() override = default;
@@ -187,10 +185,10 @@ public:
     }
 
 protected:
-    /*//! Constructeur.
-    ManagerModifControle(AbstractGestionAutorisation<Ent> * gestionAutorisation = new GestionAutorisationNoRestrictif<Ent>())
-        : BaseManagerModifControle<Ent>(gestionAutorisation)
-        {}*/
+    //! Constructeur.
+    ManagerModifControle(std::unique_ptr<AbstractGestionAutorisation<Ent>> && gestionAutorisation
+                         = std::make_unique<GestionAutorisationNoRestrictif<Ent>>())
+        : BaseManagerModifControle<Ent>(std::move(gestionAutorisation)) {}
 
     //! Met à jour l'entité entity en base de donnée.
     void modify(const Ent & entity) override {

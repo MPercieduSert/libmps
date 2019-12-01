@@ -33,8 +33,9 @@ public:
 
     //! Constructeur.
     ManagerArbreModifControle(const InfoBdd & info, const InfoBdd & infoArbre,
-                                AbstractGestionAutorisation<Ent> * gestionAutorisation = new GestionAutorisationNoRestrictif<Ent>(),
-                                AbstractUniqueSqlTemp<Ent> * unique = new NoUniqueSql<Ent>());
+                                std::unique_ptr<AbstractGestionAutorisation<Ent>> && gestionAutorisation
+                                            = std::make_unique<GestionAutorisationNoRestrictif<Ent>>(),
+                                std::unique_ptr<AbstractUniqueSqlTemp<Ent>> && unique = std::make_unique<NoUniqueSql<Ent>>());
 
     //! Destructeur.
     ~ManagerArbreModifControle() override = default;
@@ -85,18 +86,18 @@ public:
 
 protected:
     //! Constructeur.
-    ManagerArbreModifControle(const InfoBdd & InfoArbre,
-                                AbstractGestionAutorisation<Ent> * gestionAutorisation = new GestionAutorisationNoRestrictif<Ent>());
+    ManagerArbreModifControle(const InfoBdd & InfoArbre, std::unique_ptr<AbstractGestionAutorisation<Ent>> && gestionAutorisation
+                                                            = std::make_unique<GestionAutorisationNoRestrictif<Ent>>());
 };
 
 template<class Ent> ManagerArbreModifControle<Ent>::ManagerArbreModifControle(const InfoBdd & info, const InfoBdd & infoArbre,
-                                                                                  AbstractGestionAutorisation<Ent> * gestionAutorisation,
-                                                                                  AbstractUniqueSqlTemp<Ent> * unique)
-    : ManagerSql<Ent>(info,unique), ManagerArbre<Ent>(info, infoArbre, unique),
-      ManagerModifControle<Ent>(info, gestionAutorisation, unique) {}
+                                                      std::unique_ptr<AbstractGestionAutorisation<Ent>> && gestionAutorisation,
+                                                      std::unique_ptr<AbstractUniqueSqlTemp<Ent>> && unique)
+    : ManagerSql<Ent>(info,std::move(unique)), ManagerArbre<Ent>(infoArbre),
+      ManagerModifControle<Ent>(std::move(gestionAutorisation)) {}
 
 template<class Ent> ManagerArbreModifControle<Ent>::ManagerArbreModifControle(const InfoBdd & infoArbre,
-                                                                                  AbstractGestionAutorisation<Ent> * gestionAutorisation)
-    : ManagerArbre<Ent>(infoArbre), ManagerModifControle<Ent>(gestionAutorisation) {}
+                                                            std::unique_ptr<AbstractGestionAutorisation<Ent>> && gestionAutorisation)
+    : ManagerArbre<Ent>(infoArbre), ManagerModifControle<Ent>(std::move(gestionAutorisation)) {}
 }
 #endif // MANAGERARBREMODIFCONTROLE_H

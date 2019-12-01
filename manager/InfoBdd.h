@@ -96,6 +96,9 @@ protected:
     QString m_table;        //!< Nom de la table dans la base de donnée.
 public:
     //! Constructeur.
+    InfoBdd() = default;
+
+    //! Constructeur.
     InfoBdd(const QString & table, const std::map<szt,QString> & att,
             const std::vector<Caract> & attCaract,
             const std::vector<std::vector<szt>> & attUnique = std::vector<std::vector<szt>>(),

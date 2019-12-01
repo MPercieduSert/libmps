@@ -4,10 +4,11 @@
 #ifndef MANAGERSQL_H
 #define MANAGERSQL_H
 
+#include <memory>
 #include "AbstractLinkSql.h"
 #include "AbstractManager.h"
 #include "AbstractUniqueSql.h"
-#include <iostream>
+
 
 // Macro pour manageur.
 //! \ingroup groupeManager
@@ -64,7 +65,7 @@ template<class Ent> class ManagerSql : public AbstractManagerTemp<Ent>, public A
 protected:
     LinkSql<Ent> m_link;            //!< Lien.
     InfoBdd m_info;                 //!< Information sur la table dans la base de donnée.
-    AbstractUniqueSqlTemp<Ent> * m_unique;        //! Condition d'unicité.
+    std::unique_ptr<AbstractUniqueSqlTemp<Ent>> m_unique;        //! Condition d'unicité.
     // Requête sql
     QString m_sqlAdd;       //!< Requéte sql d'insertion d'une ligne.
     QString m_sqlDelete;    //!< Requéte sql de suppression d'une ligne
@@ -106,10 +107,11 @@ public:
     using AbstractManagerTemp<Ent>::save;
 
     //! Contructeur, avec les noms des attributs de la table et un po.
-    ManagerSql(const InfoBdd & info, AbstractUniqueSqlTemp<Ent> * unique = new NoUniqueSql<Ent>());
+    ManagerSql(const InfoBdd & info = InfoBdd(),
+               std::unique_ptr<AbstractUniqueSqlTemp<Ent>> && unique =  std::make_unique<NoUniqueSql<Ent>>());
 
     //! Destructeur.
-    ~ManagerSql() override  {delete m_unique;}
+    ~ManagerSql() override = default;
 
     //! Renvoie le nom en base de donnée du i-ème attribut.
     const QString & attribut(szt pos) const
@@ -861,9 +863,9 @@ protected:
     void writeStringSql();
 };
 
-template<class Ent> ManagerSql<Ent>::ManagerSql(const InfoBdd &info, AbstractUniqueSqlTemp<Ent> *unique)
+template<class Ent> ManagerSql<Ent>::ManagerSql(const InfoBdd &info, std::unique_ptr<AbstractUniqueSqlTemp<Ent>> && unique)
     : m_info(info),
-      m_unique(unique) {
+      m_unique(std::move(unique)) {
     writeStringSql();
     m_unique->initialise(m_info);
 }

@@ -40,7 +40,8 @@ public:
     using ManagerSqlEnt::save;
 
     //! Constructeur.
-    ManagerArbre(const InfoBdd & info, const InfoBdd & infoArbre, AbstractUniqueSqlTemp<Ent> * unique = new NoUniqueSql<Ent>());
+    ManagerArbre(const InfoBdd & info, const InfoBdd & infoArbre,
+                 std::unique_ptr<AbstractUniqueSqlTemp<Ent>> && unique = std::make_unique<NoUniqueSql<Ent>>());
 
     //! Destructeur.
     ~ManagerArbre() override = default;
@@ -125,8 +126,8 @@ public:
     void save(const Ent & entity, const Ent & parent, int num = 0);
 
 protected:
-    /*//! Constructeur.
-    ManagerArbre(const InfoBdd & infoArbre);*/
+    //! Constructeur.
+    ManagerArbre(const InfoBdd & infoArbre);
 
     /*//! Insert la nouvelle entité entity dans la base de donnée.
     void add(Ent & entity)
@@ -215,14 +216,14 @@ protected:
 };
 
 template<class Ent> ManagerArbre<Ent>::ManagerArbre(const InfoBdd & info, const InfoBdd & infoArbre,
-                                                        AbstractUniqueSqlTemp<Ent> * unique)
-    : ManagerSqlEnt(info,unique),
+                                                        std::unique_ptr<AbstractUniqueSqlTemp<Ent>> && unique)
+    : ManagerSqlEnt(info,std::move(unique)),
       m_managerArbre(infoArbre)
     {writeStringSql();}
 
-/*template<class Ent> ManagerArbre<Ent>::ManagerArbre(const InfoBdd &infoArbre)
+template<class Ent> ManagerArbre<Ent>::ManagerArbre(const InfoBdd &infoArbre)
     : m_managerArbre(infoArbre)
-    {writeStringSql();}*/
+    {writeStringSql();}
 
 
 

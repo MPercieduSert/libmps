@@ -43,35 +43,32 @@ namespace bmps = bddMPS;
 class AbstractNoyau : public QObject {
     Q_OBJECT
 protected:
-     bmps::Bdd  * m_bdd;                 //!< Gestionnaire de la Base de donnée.
-     fimps::Config * m_config;           //!< Gestionnaire de la configuration.
+     std::unique_ptr<bmps::Bdd> m_bdd;                 //!< Gestionnaire de la Base de donnée.
+     std::unique_ptr<fimps::Config> m_config;           //!< Gestionnaire de la configuration.
 
 public:
     //! Constructeur.
     AbstractNoyau() = default;
 
     //! Destructeur.
-    ~AbstractNoyau() {
-        delete m_bdd;
-        delete m_config;
-    }
+    ~AbstractNoyau() = default;
 
     //! Renvoie un pointeur sur l'onglet actif.
     //TabAbstractModule * activeTab() const;
 
     //! Renvoie un pointeur sur le gestionnaire de Base de donnée.
-    bmps::Bdd * bdd()
-        {return m_bdd;}
+    bmps::Bdd & bdd()
+        {return *m_bdd;}
 
     //! Renvoie un pointeur sur le gestionnaire de configuration.
-    fimps::Config * config()
-        {return m_config;}
+    fimps::Config & config()
+        {return *m_config;}
 
     //!Ouvre le gestionnaire de Base de données.
-    void setBdd(bmps::Bdd * bdd, const QString & pathXML, QWidget * modalParent = nullptr);
+    void setBdd(std::unique_ptr<bmps::Bdd> && bdd, const QString & pathXML, QWidget * modalParent = nullptr);
 
     //!Ouvre le gestionnaire de configuration.
-    void setConfig(fimps::Config * config, QWidget * modalParent = nullptr);
+    void setConfig(std::unique_ptr<fimps::Config> && config, QWidget * modalParent = nullptr);
 
     //!Ouvre le gestionnaire de configuration au chemin indiquer.
     virtual void setConfigByPath(const QString & configPath, QWidget * modalParent = nullptr) = 0;

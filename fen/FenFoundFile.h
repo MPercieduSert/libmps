@@ -22,11 +22,11 @@ namespace fimps = fichierMPS;
 class FenFoundFile : QObject {
 protected:
     QWidget * m_modal;
-    fichierMPS::FileInterface * m_file; //!< Pointeur sur le gestionnaire du fichier que l'on souhaite ouvrrir.
+    fichierMPS::FileInterface & m_file; //!< Pointeur sur le gestionnaire du fichier que l'on souhaite ouvrrir.
 
 public:
     //! Constructeur. Donner en argument un pointeur sur le gestonnaire de fichier que l'on souhaite ouvrir.
-    FenFoundFile(fimps::FileInterface *file, QWidget *modal = nullptr, QObject * parent = nullptr)
+    FenFoundFile(fimps::FileInterface & file, QWidget *modal = nullptr, QObject * parent = nullptr)
         :QObject(parent), m_modal(modal), m_file(file)
     {}
 
@@ -42,7 +42,7 @@ public:
     QString isValid(bool copy = true);
 
     //! Ouvre un fichier à partir d'un chemin XML dans le fichier de configuration.
-    void openInConf(fimps::Config *config, const QString & path, bool save = true);
+    void openInConf(fimps::Config & config, const QString & path, bool save = true);
 
 protected:
     /*!

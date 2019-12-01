@@ -4,11 +4,11 @@
 #ifndef MANAGERS_H
 #define MANAGERS_H
 
-
+//#include <iostream>
+#include <memory>
 #include "ManagerSql.h"
 #include "UniqueSqlBase.h"
 #include "EntityDivers.h"
-#include <iostream>
 
 namespace bddMPS {
     //! Version de création de la base de données.
@@ -34,35 +34,36 @@ protected:
 
     const szt m_nbrEntity;                          //!< Nombre d'entité associées à un managers de la base de donnée.
     QSqlQuery m_requete;                            //!< Requéte commune aux manageurs.
-    std::vector<AbstractManager *> m_managers;          //!< Tableau des manageurs.
-    ManagerSql<VersionBdd> * m_managerVersion = nullptr;
+    std::vector<std::unique_ptr<AbstractManager>> m_managers;          //!< Tableau des manageurs.
+    std::unique_ptr<ManagerSql<VersionBdd>> m_managerVersion;
     //!< Manager de l'entité version de la base de donnée.
 
 public:
     //! Constructeur.
     Managers(szt nbrEntity, const QString & versionTable,
-                     const std::map<szt,AbstractManager *> & managers = std::map<szt,AbstractManager *>(),
+                     std::map<szt,std::unique_ptr<AbstractManager>> && managers = std::map<szt,std::unique_ptr<AbstractManager>>(),
                      const QSqlQuery & req = QSqlQuery());
 
     //! Destructeur.
-    ~Managers() {
-        for(auto i = m_managers.cbegin(); i != m_managers.cend(); i++) {
-            if(*i)
-                delete *i;
-        }
-        if(m_managerVersion)
-            delete m_managerVersion;
-    }
+//    ~Managers()
+//    {
+//        for(auto i = m_managers.cbegin(); i != m_managers.cend(); i++) {
+//            if(*i)
+//                delete *i;
+//        }
+//        if(m_managerVersion)
+//            delete m_managerVersion;
+//    }
 
     //! Creé la table de l'entité VersionBdd
     void creerVersion();
 
     //! Retourne le manager des entités de ID, id.
     //virtual AbstractManager * get(int id) const = 0;
-    AbstractManager * get(szt id) const {
+    AbstractManager & get(szt id) const {
         if(id < m_nbrEntity) {
             if(m_managers[id])
-                return m_managers[id];
+                return *m_managers[id];
             else
                 throw std::invalid_argument(QString("Manager non initialisé: id : ").append(QString::number(id)).toStdString());
         }
@@ -71,8 +72,12 @@ public:
     }
 
     //! Méthode template permettant d'obtenir le manager correspondant à l'entité.
-    template<class Ent> AbstractManagerTemp<Ent> * get() const
-        {return static_cast<AbstractManagerTemp<Ent> *>(m_managers[Ent::ID]);}
+    template<class Ent> const AbstractManagerTemp<Ent> & get() const
+        {return static_cast<const AbstractManagerTemp<Ent> &>(*m_managers[Ent::ID]);}
+
+    //! Méthode template permettant d'obtenir le manager correspondant à l'entité.
+    template<class Ent> AbstractManagerTemp<Ent> & get()
+        {return static_cast<AbstractManagerTemp<Ent> &>(*m_managers[Ent::ID]);}
 
     //! Returne la version courante de la base de donnée.
     VersionBdd getVersion();
@@ -95,8 +100,8 @@ protected:
     InfoBdd infoBddArbre(const QString & table) const;
 
     //! Mutateur de manager.
-    template<class Ent> void setManager(AbstractManagerTemp<Ent> * manager)
-        {m_managers[Ent::ID] = manager;}
+    template<class Ent> void setManager(std::unique_ptr<AbstractManagerTemp<Ent>> && manager)
+        {m_managers[Ent::ID] = std::move(manager);}
 
     /*//! Retourne le manager des entités de ID, id sans vérification.
     virtual AbstractManager * getP(int id) const = 0;*/
