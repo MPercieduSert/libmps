@@ -14,13 +14,6 @@
 #include "EntityPredef.h"
 #include "ReadTreeWidget.h"
 
-/*! \defgroup groupeDialogue Fenêtre de Dialogue
- * \brief Ensemble de classes représentant des fenêtres de dialogue.
- */
-
-/*! \ingroup groupeDialogue
- * \brief Espace de noms des fenêtres de dialogue.
- */
 namespace dialogMPS {
 
 /*! \ingroup groupeDialogue

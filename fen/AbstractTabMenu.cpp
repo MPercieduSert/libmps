@@ -2,8 +2,8 @@
 
 using namespace fenMPS;
 
-AbstractTabMenu::AbstractTabMenu(QWidget *parent)
-    : AbstractTabModule(parent) {
+AbstractTabMenu::AbstractTabMenu(const std::pair<int, int> &pairIndex, QWidget *parent)
+    : AbstractTabModule(pairIndex,parent) {
         m_bddButton = new QPushButton(tr("Base de Données"));
         m_motCleButton = new QPushButton(tr("Mots Clés"));
         m_mainLayout = new QHBoxLayout(this);

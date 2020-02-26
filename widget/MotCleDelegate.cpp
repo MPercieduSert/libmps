@@ -7,8 +7,8 @@ QWidget * MotCleDelegate::createEditor(QWidget * parent, const QStyleOptionViewI
     if(TreeModelMotCle::NbrColumnMotCle <= index.column() && index.column() < TreeModelMotCle::NbrColumnMotCle + m_nbrEntity)
     {
         QComboBox * editor = new QComboBox(parent);
-        editor->addItem("Interdit",bmps::motClePermissionNum::InterditMCNum);
-        editor->addItem("Permis",bmps::motClePermissionNum::PermisMCNum);
+        editor->addItem("Interdit",bmps::code::Interdit);
+        editor->addItem("Permis",bmps::code::Attribuable);
         editor->setAutoFillBackground(true);
         return editor;
     }

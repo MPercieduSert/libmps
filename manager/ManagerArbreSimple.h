@@ -33,6 +33,7 @@ public:
 //    using ManagerSqlEnt::get;
     using ManagerSqlEnt::getList;
     using ManagerSqlEnt::getListId;
+    using ManagerSqlEnt::name;
 //    using ManagerSqlEnt::sameInBdd;
 //    using ManagerSqlEnt::save;
 
@@ -87,12 +88,18 @@ public:
         ManagerSqlEnt::save(entity);
     }
 
+    //! Retourne le type du manager.
+    virtual unsigned typeManager() const
+        {return bmps::ArbreSimpleTypeManager;}
+
 protected:
     //! Lance une execption si la paternité n'est pas valide.
     void exceptionParentInvalid(const Ent & entity) {
         if(!isValidParent(entity))
-            throw std::invalid_argument(QString("L'entité transmise en argument de getArbre n'est pas valide, "
-                                                "le parent spécifié n'existe pas:\n").append(entity.affiche()).toStdString());
+            throw entityMPS::InvalideEntityException(QString("void ManagerArbreSimple<").append(name())
+                                                     .append(">::exceptionParentInvalid(const ").append(name()).append(" &)")
+                                                     .append("L'entité transmise en argument de getArbre n'est pas valide, "
+                                                             "le parent spécifié n'existe pas."),entity);
     }
 
     //! Sauve un arbre où le changement de structure consite en l'ajout de nouveaux noeuds,

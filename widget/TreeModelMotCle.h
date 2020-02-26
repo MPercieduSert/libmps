@@ -43,7 +43,7 @@ public:
     };
 protected:
     const int m_nbrEntity;                          //!< Nombre d'entités associées aux mots clés.
-    bmps::BddPredef * m_bdd;                              //!< Pointeur vers la base de donnée.
+    bmps::BddPredef & m_bdd;                              //!< Pointeur vers la base de donnée.
     std::vector<int> m_cibleList;                       //!< Liste des valeurs de cible associé à chaque index de colonnes.
     QStringList m_headerPerm;                       //!< Noms des colonnes.
     std::map<idt,std::vector<codeType>> m_permission;            //!< Map des permitions indexé par l'identifiant du mot clé associé.
@@ -54,7 +54,7 @@ protected:
 
 public:
     //! Constructeur, la variable header contient le nom des entité associé à leur identifiant.
-    explicit TreeModelMotCle(bmps::BddPredef * bdd, const std::map<int,QString> & header, QObject *parent = nullptr);
+    explicit TreeModelMotCle(bmps::BddPredef & bdd, const std::map<int,QString> & header, QObject *parent = nullptr);
 
     //! Destructeur par defaut.
     ~TreeModelMotCle() override = default;

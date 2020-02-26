@@ -7,19 +7,51 @@ conteneurMPS::tree<XmlElement>::prevsuiv_iterator XmlDoc::seek(const QString & c
     auto iter = beginPrevsuiv();
     auto controle = true;
     auto list = chemin.split("/");
-    for(auto i = list.cbegin(); controle && i != list.cend(); ++i) {
-        auto j = iter.cbeginChild();
-        while(j && j->name() != *i)
-            ++j;
-        if(j) {
-            controle = false;        
-            for(;i != list.cend();++i)
-                iter = push_back(iter,*i);
+    auto i = list.cbegin();
+    if(iter->name() == *i) {
+        ++i;
+        while(controle && i != list.cend()) {
+            auto j = iter.cbeginChild();
+            while(j && j->name() != *i)
+                ++j;
+            if(j)
+                iter = j;
+            else {
+                controle = false;
+                while(i != list.cend()) {
+                    iter = push_back(iter,*i);
+                    ++i;
+                }
+            }
+            ++i;
+        }
+    }
+    else
+        iter.toParent();
+    return iter;
+}
+
+QString XmlDoc::toString() const
+{
+    QString string;
+    QString tab(">");
+    auto iter = cbeginPrevsuiv();
+    while(iter) {
+        if(iter.sens()) {
+            auto elt = *iter;
+            string.append(tab).append(elt.name()).append("\n");
+            tab.prepend("-");
+//            if(elt.hasAttributes())
+//                for(auto i = elt.attributes().cbegin(); i != elt.attributes().cend(); ++i)
+//                    writeAttribute(i->first,i->second);
+//            if(elt.hasText())
+//                writeCharacters(elt.text());
         }
         else
-            iter = j;
+            tab.remove(0,1);
+        ++iter;
     }
-    return iter;
+    return string;
 }
 
 /////////////////////////////////////////XmlReader/////////////////////////////////////
@@ -152,7 +184,11 @@ std::vector<varAtts> XmlReader::getVarsAtts(QString nameVar, const std::map<QStr
 
 void XmlReader::readIn(XmlDoc & doc) {
     doc.clear();
-    auto iter = doc.beginPrevsuiv();
+    auto iter = doc.begin();
+    while(!atEnd() && readNext() != QXmlStreamReader::StartElement) ;
+    if(!atEnd())
+        *iter = readElement();
+
     while(!atEnd()) {
         switch (readNext()) {
         case QXmlStreamReader::StartElement:
@@ -181,7 +217,7 @@ void XmlWriter::write(const XmlDoc & doc) {
     setAutoFormatting(true);
     auto iter = doc.cbeginPrevsuiv();
     writeStartDocument();
-    while(++iter) {
+    while(iter) {
         if(iter.sens()) {
             auto elt = *iter;
             writeStartElement(elt.name());
@@ -193,6 +229,7 @@ void XmlWriter::write(const XmlDoc & doc) {
         }
         else
             writeEndElement();
+        ++iter;
     }
     writeEndDocument();
 }

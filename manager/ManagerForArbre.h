@@ -16,7 +16,7 @@
     else \
         {if(!sameInBdd(node)) modify(node);}} \
 else \
-    throw std::invalid_argument(messageErreurs(node).append("\n Erreur de validité").toStdString());
+    throw entityMPS::InvalideEntityException(QString("void ManagerForArbre::save(Arbre &)"),node);
 
 //! \ingroup groupeManager
 //! Coprs des deux methodes saveStUnstable pour les arbres.
@@ -25,7 +25,7 @@ else \
     else \
         {if(!sameInBdd(node)) modifyStableUnstable(node);}} \
 else \
-    throw std::invalid_argument(messageErreurs(node).append("\n Erreur de validité").toStdString());
+    throw entityMPS::InvalideEntityException(QString("void ManagerForArbre::saveStUnstable(Arbre &)"),node);
 
 //! \ingroup groupeManager
 //! Coprs des deux methodes saveUnstable pour les arbres.
@@ -34,7 +34,7 @@ else \
     else \
         {if(!sameInBdd(node)) modifyUnstable(node);}} \
 else \
-    throw std::invalid_argument(messageErreurs(node).append("\n Erreur de validité").toStdString());
+    throw entityMPS::InvalideEntityException(QString("void ManagerForArbre::saveUnstable(Arbre &)"),node);
 
 namespace managerMPS {
 namespace ebmps = entityBaseMPS;

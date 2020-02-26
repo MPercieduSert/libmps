@@ -41,6 +41,9 @@ public slots:
 
     //! Demande à l'onglet actif de sauvegarder.
     void save() override    {m_tab->save();}
+
+    //! Demande l'ouverture d'un onglet.
+    void openTab(const std::pair<int,int> & pair) {m_tab->openTab(pair);}
 };
 }
 #endif // ABSTRACTTABZONECENTRALE_H

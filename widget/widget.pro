@@ -42,7 +42,8 @@ SOURCES += \
     TreeModelReadEntity.cpp \
     TreeModelReadTemp.cpp \
     TreeModelTemp.cpp \
-    AbstractTreeModel.cpp
+    AbstractTreeModel.cpp \
+    NewModifDialog.cpp
 
 HEADERS += \
     BarPlotter.h \
@@ -65,7 +66,8 @@ HEADERS += \
     TreeModelReadEntity.h \
     TreeModelReadTemp.h \
     TreeModelTemp.h \
-    AbstractTreeModel.h
+    AbstractTreeModel.h \
+    NewModifDialog.h
 unix {
     target.path = /usr/lib
     INSTALLS += target

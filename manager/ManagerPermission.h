@@ -40,6 +40,10 @@ public:
             return ManagerSqlEnt::sameInBdd(entity,id);
     }
 
+    //! Retourne le type du manager.
+    virtual unsigned typeManager() const
+        {return bmps::PermissionTypeManager;}
+
 protected:
     /*//! Constructeur.
     ManagerPermission() {}*/

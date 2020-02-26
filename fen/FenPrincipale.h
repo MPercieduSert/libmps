@@ -37,7 +37,6 @@ protected:
     // Menu
     QMenu *m_menuEdit;              //!< Menu édition.
     QMenu *m_menuFichier;           //!< Menu Fichier.
-    QMenu *m_menuNew;               //!< Menu nouveau.
 
     // Tools Bar
     QToolBar *m_toolBar;            //!< Barre d'outils.
@@ -58,6 +57,9 @@ public:
     ~FenPrincipale() override = default;
 
 protected:
+    //! Crée le menu Bdd.
+    void addMenuBdd();
+
     //! Crée les différente action des menus et toolbars de la fenêtre principale.
     void createAction();
 

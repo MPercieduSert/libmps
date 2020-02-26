@@ -7,7 +7,7 @@
 #include <forward_list>
 #include <map>
 #include <vector>
-#include "infoEntity.h"
+#include "typemps.h"
 
 /*! \defgroup groupeConteneurs Conteneur
  * \brief Ensemble de classes conteneurs.
@@ -63,7 +63,6 @@ public:
     void push_front(const T & entity)
         {push_front(new T(entity));}
 
-
     //! Ajoute un pointeur au début de la liste de donnée entity.
     void push_front(T && entity)
         {push_front(new T(std::move(entity)));}
@@ -90,7 +89,6 @@ protected:
     //! Efface la liste de pointeurs, ceux-ci doivent être préalablement déplacés ou les objet pointés détruit.
     void clearPtr() noexcept
         {Lptr::clear();}
-
 };
 
 /*! \ingroup groupeConteneur

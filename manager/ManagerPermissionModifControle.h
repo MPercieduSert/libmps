@@ -33,6 +33,22 @@ public:
     //! Destructeur.
     ~ManagerPermissionModifControle() override = default;
 
+    //! Renvoie la liste des restrictions gérer par le gestionérer d'autorisarion.
+    std::vector<bmps::autorisation> restriction() const override
+        {return ManagerModifControle<Ent>::restriction();}
+
+    //! Enregistre l'entité entity en base de donnée.
+    void save(Ent & entity) override
+        {ManagerPerm::save(entity);}
+
+    //! Enregistre l'entité entity en base de donnée.
+    void save(const Ent & entity) override
+        {ManagerPerm::save(entity);}
+
+    //! Retourne le type du manager.
+    virtual unsigned typeManager() const
+        {return ManagerPerm::typeManager() | ManagerMC::typeManager();}
+
 protected:
     /*//! Constructeur.
     ManagerPermissionModifControle() = default;*/
@@ -45,8 +61,8 @@ protected:
     void addParent(const Ent & entity) override
         {ManagerMC::add(entity);}
 
-    //! Supprime de la table en base de donnée l'entité d'identifiant id.
-    bool del(idt id) override;
+//    //! Supprime de la table en base de donnée l'entité d'identifiant id.
+//    bool del(idt id) override;
 
     //! Réimplemente modify.
     void modify(const Ent & entity) override
@@ -65,8 +81,8 @@ protected:
         {ManagerMC::modify(entity,id);}
 };
 
-template<class Ent> bool ManagerPermissionModifControle<Ent>::del(idt id)
-    {return ManagerMC::del(id);}
+//template<class Ent> bool ManagerPermissionModifControle<Ent>::del(idt id)
+//    {return ManagerMC::del(id);}
 
 //! Manager de permission de type num à modification controlé.
 template<class Ent> using ManagerPermissionNumModifControle = ManagerPermissionModifControle<ManagerPermissionNum<Ent>>;

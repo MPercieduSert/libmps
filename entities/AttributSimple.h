@@ -24,19 +24,23 @@
 #define ALIAS_CLE(NOM,NUM) /*! \brief Alias de l'accesseur de id ## NUM. */ \
     idt id ## NOM () const {return id ## NUM ();} \
     /*! \brief Alias du mutateurs de id ## NUM. */ \
-    void setId ## NOM (idt n) {setId ## NUM (n);}
+    void setId ## NOM (idt n) {setId ## NUM (n);} \
+    /*! Nom de identifiant*/ \
+    QString nameId ## NUM() const override {return "Id"#NOM;}
 
 //! \ingroup groupeAttributEntity
 //! Macro définisant les alias de l'accesseur et du mutateurs d'une clé numéroté.
 #define ALIAS_CLE_NEG(NOM,NUM) /*! \brief Alias de l'accesseur de id ## NUM. */ \
     int id ## NOM () const {return id ## NUM ();} \
     /*! \brief Alias du mutateurs de id ## NUM. */ \
-    void setId ## NOM (int n) {setId ## NUM (n);}
+    void setId ## NOM (int n) {setId ## NUM (n);} \
+    /*! Nom de identifiant*/ \
+    QString nameId ## NUM() const override {return "Id"#NOM;}
 
 /*! \ingroup groupeAttributEntity
- * \brief Macro de déclaration d'un attribut dans les entités.
+ * \brief Début des macros de déclaration d'un attribut dans les entités.
  */
-#define SINGLE_ATTRIBUT(ATTRIBUT,MERE,NOM,nom) /*! \ingroup groupeAttributEntity \brief Classe de l'attribut ATTRIBUT.*/ \
+#define SINGLE_ATTRIBUT_DEBUT(ATTRIBUT,MERE,NOM,nom) /*! \ingroup groupeAttributEntity \brief Classe de l'attribut ATTRIBUT.*/ \
     class ATTRIBUT: public MERE { \
     public: \
     using MERE::get; \
@@ -47,10 +51,10 @@
     ~ATTRIBUT() override; \
     /*! Positions des attributs.*/ \
     enum Position {NOM, NbrAtt}; \
-    /*! Nom de la classe de l'attribut.*/ \
-    QString nameAttribut() const override {return #ATTRIBUT;} \
     /*! Nom de l'attribut.*/ \
-    static QString nomAttribut(szt /*pos*/=0) {return #NOM;} \
+    static QString NameAttribut(szt /*pos*/=0) {return #NOM;} \
+    /*! Nom de la classe de l'attribut.*/ \
+    QString nameClasseAttribut() const override {return #ATTRIBUT;} \
     /*! Accesseur de l'attribut nom.*/ \
     ATTRIBUT::AttTrans nom() const {return get();} \
     /*! Mutateur de l'attribut.*/ \
@@ -58,7 +62,25 @@
     /*! Mutateur de l'attribut nom.*/ \
     void set ## NOM(ATTRIBUT::AttTrans valeur) {set(valeur);} \
     /*! Opérateur égalité */ \
-    bool operator ==(const ATTRIBUT & entity) const {return MERE::operator ==(entity);}};
+    bool operator ==(const ATTRIBUT & entity) const {return MERE::operator ==(entity);}
+
+/*! \ingroup groupeAttributEntity
+ * \brief Macro de déclaration d'un attribut dans les entités.
+ */
+#define SINGLE_ATTRIBUT(ATTRIBUT,MERE,NOM,nom) /*! \ingroup groupeAttributEntity \brief Classe de l'attribut ATTRIBUT.*/ \
+    SINGLE_ATTRIBUT_DEBUT(ATTRIBUT,MERE,NOM,nom) \
+    /*! Nom de l'attribut.*/ \
+    QString nameAtt() const override {return #NOM;}};
+
+/*! \ingroup groupeAttributEntity
+ * \brief Macro de déclaration d'un attribut de type clé dans les entités.
+ */
+#define SINGLE_ATTRIBUT_ID(ATTRIBUT,MERE,NUM) /*! \ingroup groupeAttributEntity \brief Classe de l'attribut ATTRIBUT.*/ \
+    SINGLE_ATTRIBUT_DEBUT(ATTRIBUT,MERE,Id ## NUM,id ## NUM) \
+    /*! Nom de l'attribut.*/ \
+    QString nameAtt() const override {return nameId ## NUM();}\
+    /*! Nom de identifiant*/ \
+    virtual QString nameId ## NUM() const {return "Id"#NUM;}};
 
 /*! \ingroup groupeAttributEntity
  * \brief Espace de nom des attributs des entités.
@@ -99,10 +121,17 @@ public:
         {return true;}
 
     //! Renvoie le nom de l'attribut.
-    virtual QString nameAttribut() const = 0;
+    virtual QString nameAtt() const = 0;
+
+    //! Renvoie le nom de l'attribut.
+    QString attributName(szt /*Pos*/) const
+        {return nameAtt();}
+
+    //! Renvoie le nom de l'attribut.
+    virtual QString nameClasseAttribut() const = 0;
 
     //! Modifie la donnée à partir d'un QVariant.
-    virtual void setDataP(const QVariant & value, szt /*pos*/) = 0;
+    virtual void setDataP(szt /*pos*/, const QVariant & value) = 0;
 
     //! Renvoie une chaine de caractère contenant la valeur de l'attribut.
     virtual QString toString() const
@@ -154,8 +183,9 @@ public:
         {m_valeur = valeur;}
 
     //! Modifie la donnée à partir d'un QVariant.
-    void setDataP(const QVariant & value, szt /*pos*/) override
-        {set(value.value<AttType>());}
+    void setDataP(szt /*pos*/, const QVariant & value) override
+        {auto at = affiche();
+        set(value.value<AttType>());}
 
     //! Renvoie une chaine de caractère contenant la valeur de l'attribut.
     QString toStringAttribut() const override
@@ -184,7 +214,7 @@ template<> inline AttributEntityVal<int>::AttributEntityTemp() : m_valeur(0) {}
 template<> inline AttributEntityVal<idt>::AttributEntityTemp() : m_valeur(0) {}
 
 // Spécilisation du setDatat pour les Variants.
-template<> inline void AttributEntityRef<QVariant>::setDataP(const QVariant & value, szt /*pos*/) {set(value);}
+template<> inline void AttributEntityRef<QVariant>::setDataP(szt /*pos*/, const QVariant & value) {set(value);}
 
 // Alis de spécialiations totales.
 using AttributBool = AttributEntityVal<bool>;
@@ -438,21 +468,24 @@ public:
 
     //! Ajoute une valeur.
     void add(unsigned valeur)
-        {m_valeur|=valeur;}
+        {m_valeur = valeur ? m_valeur | 1<<(valeur-1) : 0;}
 
     //! Retire une valeur.
-    void del(unsigned valeur)
-        {m_valeur&=~valeur;}
+    void del(unsigned valeur) {
+        if(valeur)
+            m_valeur &=~(1<<(valeur-1));
+    }
 
     //! Teste si la valeur est contenue.
     bool in(unsigned valeur) const
-        {return !(m_valeur & valeur);}
+        {return m_valeur & 1<<(valeur-1);}
 
-    std::vector<int> list() const {
-        std::vector<int> L;
-        for(unsigned i = 0, j = 1; i < sizeof (unsigned) - 1; ++i, j *= 2)
-            if(in(j))
-                L.push_back(static_cast<int>(i));
+    //! retourne la liste des valeurs contenue
+    std::vector<unsigned> list() const {
+        std::vector<unsigned> L;
+        for(unsigned i = 1; i <= sizeof (unsigned); ++i)
+            if(in(i))
+                L.push_back(i);
         return L;
     }
 };
@@ -489,16 +522,16 @@ SINGLE_ATTRIBUT(IdAttribut,AttributId,Id,id)
 SINGLE_ATTRIBUT(IdCibleAttribut,AttributIdSup<1>,IdCible,idCible)
 SINGLE_ATTRIBUT(IdEtatAttribut,AttributIdSup<1>,IdEtat,idEtat)
 SINGLE_ATTRIBUT(IdProgAttribut,AttributIdNull,IdProg,idProg)
-SINGLE_ATTRIBUT(Id1Attribut,AttributIdSup<1>,Id1,id1)
-SINGLE_ATTRIBUT(Id1NegAttribut,AttributInt,Id1,id1)
-SINGLE_ATTRIBUT(Id1NullAttribut,AttributIdNull,Id1,id1)
-SINGLE_ATTRIBUT(Id2Attribut,AttributIdSup<1>,Id2,id2)
-SINGLE_ATTRIBUT(Id2NegAttribut,AttributInt,Id2,id2)
-SINGLE_ATTRIBUT(Id2NullAttribut,AttributIdNull,Id2,id2)
-SINGLE_ATTRIBUT(Id3Attribut,AttributIdSup<1>,Id3,id3)
-SINGLE_ATTRIBUT(Id3NullAttribut,AttributIdNull,Id3,id3)
-SINGLE_ATTRIBUT(Id4Attribut,AttributIdSup<1>,Id4,id4)
-SINGLE_ATTRIBUT(Id5Attribut,AttributIdSup<1>,Id5,id5)
+SINGLE_ATTRIBUT_ID(Id1Attribut,AttributIdSup<1>,1)
+SINGLE_ATTRIBUT_ID(Id1NegAttribut,AttributInt,1)
+SINGLE_ATTRIBUT_ID(Id1NullAttribut,AttributIdNull,1)
+SINGLE_ATTRIBUT_ID(Id2Attribut,AttributIdSup<1>,2)
+SINGLE_ATTRIBUT_ID(Id2NegAttribut,AttributInt,2)
+SINGLE_ATTRIBUT_ID(Id2NullAttribut,AttributIdNull,2)
+SINGLE_ATTRIBUT_ID(Id3Attribut,AttributIdSup<1>,3)
+SINGLE_ATTRIBUT_ID(Id3NullAttribut,AttributIdNull,3)
+SINGLE_ATTRIBUT_ID(Id4Attribut,AttributIdSup<1>,4)
+SINGLE_ATTRIBUT_ID(Id5Attribut,AttributIdSup<1>,5)
 SINGLE_ATTRIBUT(NcAttribut,AttributStringNotEmpty,Nc,nc)
 SINGLE_ATTRIBUT(NomAttribut,AttributStringNotEmpty,Nom,nom)
 SINGLE_ATTRIBUT(ModifAttribut,AttributCode,Modif,modif)

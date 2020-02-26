@@ -4,8 +4,12 @@ using namespace fenMPS;
 
 AbstractTabModule * PredefTab::createTab(std::pair<int,int> pair) const {
     switch (pair.first) {
-        case AbstractTabMenu::MotCleTabIndex:
-            return new TabMotCle;
+        case GestionBddTabId:
+            return new TabGestionBdd(m_bdd , pair);
+
+
+        //case AbstractTabMenu::MotCleTabIndex:
+        //    return new TabMotCle;
 
 
         default:

@@ -1153,7 +1153,7 @@ public:
 
     //! Insert un nouveau noeud de donnée data avant le noeud pointé par pos dans la fratrie sauf si le pointé est la racine,
     //! dans ce cas le nouveau noeud est inseré en tant que fils ainé. Retourne un itérateur sur ce nouveau noeud.
-    iterator insert(abstract_iterator & pos, const T & data) {
+    iterator insert(abstract_iterator & pos, const T & data = T()) {
         auto * node = new Item(data);
         pos.m_ptr->insert(node);
         return node;
@@ -1194,7 +1194,7 @@ public:
 
     //! Insert un nouveau noeud de donnée data après le noeud pointé par pos dans la fratrie sauf si le pointé est la racine,
     //! dans ce cas le nouveau noeud est inseré en tant que fils benjamin. Retourne un itérateur sur ce nouveau noeud.
-    iterator insert_after(abstract_iterator & pos, const T & data) {
+    iterator insert_after(abstract_iterator & pos, const T & data = T()) {
         auto * node = new Item(data);
         pos.m_ptr->insert_after(node);
         return node;
@@ -1258,7 +1258,7 @@ public:
     tree<T> parentWithChilds(const_abstract_iterator & pos);
 
     //! Ajoute un fils benjamin au noeud pointé par pos de donnée data. Retourne un itérateur sur ce nouveau noeud.
-    iterator push_back(abstract_iterator & pos, const T & data) {
+    iterator push_back(abstract_iterator & pos, const T & data = T()) {
         auto * node = new Item(data);
         pos.m_ptr->push_back(node);
         return node;
@@ -1294,7 +1294,7 @@ public:
         {return push_back(pos,ilist.begin(),ilist.end());}
 
     //! Ajoute un fils ainé au noeud pointé par pos de donnée data. Retourne un itérateur sur ce nouveau noeud.
-    iterator push_front(abstract_iterator & pos, const T & data) {
+    iterator push_front(abstract_iterator & pos, const T & data = T()) {
         auto * node = new Item(data);
         pos.m_ptr->push_front(node);
         return node;

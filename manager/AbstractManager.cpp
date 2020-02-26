@@ -1,3 +1,7 @@
 #include "AbstractManager.h"
 
-managerMPS::AbstractManager::~AbstractManager() {}
+using namespace managerMPS;
+
+DESTR_VIDE_DEF(AbstractManager)
+DESTR_VIDE_DEF(UniqueEntityException)
+

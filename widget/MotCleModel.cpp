@@ -5,7 +5,7 @@ using MotCle = emps::MotCle;
 using MotCleCible = emps::MotCleCible;
 using MotClePermission = emps::MotClePermission;
 
-MotCleModel::MotCleModel(bmps::BddPredef *bd, int cible, QObject *parent)
+MotCleModel::MotCleModel(bddMPS::BddPredef &bd, int cible, QObject *parent)
     : TreeModelReadTemp<std::pair<MotCle,int>>(parent),
       m_bdd(bd),
       m_cible(cible)
@@ -32,7 +32,7 @@ QString MotCleModel::dataListeNomMotCle() const {
     QString str;
     for(auto i = m_idMotCle.cbegin(); i != m_idMotCle.cend(); ++i) {
         MotCle mot(i->first);
-        m_bdd->get(mot);
+        m_bdd.get(mot);
         str.append(mot.nom());
         if(i->second)
             str.append("*");
@@ -57,7 +57,7 @@ void MotCleModel::setIdSet(const std::set<idt> & idSet) {
     m_idMotCle.clear();
     int newValue = Tous;
     for(auto i = m_idSet.cbegin(); i != m_idSet.cend(); ++i) {
-        auto cibleMotcleList = m_bdd->getList<MotCleCible>(MotCleCible::Cible,m_cible,MotCleCible::IdCible,*i);
+        auto cibleMotcleList = m_bdd.getList<MotCleCible>(MotCleCible::Cible,m_cible,MotCleCible::IdCible,*i);
         for(auto j = cibleMotcleList.begin(); j != cibleMotcleList.end(); ++j) {
             auto k = m_idMotCle.find(j->idMotCle());
             if(k == m_idMotCle.end())
@@ -76,13 +76,13 @@ void MotCleModel::setIdSet(const std::set<idt> & idSet) {
 }
 
 void MotCleModel::setTreeMotCle() {
-    auto tree = m_bdd->getArbre<MotCle>();
+    auto tree = m_bdd.getArbre<MotCle>();
     tree.removeLeafIfData(
                 [this](const MotCle & motCle)->bool
                 {
                    MotClePermission perm(motCle.id(),m_cible);
-                   m_bdd->getUnique(perm);
-                   return perm.in(bmps::motClePermissionNum::InterditMCNum);
+                   m_bdd.getUnique(perm);
+                   return perm.in(bmps::code::Interdit);
                 });
     setDataTree(cmps::tree<std::pair<MotCle,int>>(tree,
                 [](const MotCle & motCle)->std::pair<MotCle,int>{return std::pair<MotCle,int>(motCle,Aucun);}));

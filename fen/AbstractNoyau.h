@@ -12,25 +12,9 @@
 #include "AbstractTab.h"
 #include "FenFoundFile.h"
 
-
 /*! \defgroup groupeNoyau Noyau
  * \brief Ensemble de classes regroupant les différentes fenêtres de l'application.
  */
-
-/*! \ingroup groupeNoyau
- * \brief Chemin XML du dossier de l'application par default.
- */
-#define DEFAULT_DIRECTORY "conf/directories/default"
-
-/*! \ingroup groupeNoyau
- * \brief Chemin XML de la base de donnée.
- */
-#define DATA_BASE "conf/files/databases/database"
-
-/*! \ingroup groupeNoyau
- * \brief Chemin XML de l'année par default.
- */
-#define DEFAULT_ANNEE "conf/parametre/initialisation/anneeDefaut"
 
 namespace fenMPS {
 namespace bmps = bddMPS;
@@ -57,12 +41,18 @@ public:
     //TabAbstractModule * activeTab() const;
 
     //! Renvoie un pointeur sur le gestionnaire de Base de donnée.
-    bmps::Bdd & bdd()
+    virtual bmps::Bdd & bdd()
         {return *m_bdd;}
 
     //! Renvoie un pointeur sur le gestionnaire de configuration.
-    fimps::Config & config()
+    virtual fimps::Config & config()
         {return *m_config;}
+
+    //! Importe des entités dans la base de données à partir du fichier xml de chemin path.
+    void importXml(const QString & path);
+
+    //! Écrit le schema xml des fichiers d'importation de données, dans le fichier de chemin path.
+    void schemaXmlForimport(const QString & path);
 
     //!Ouvre le gestionnaire de Base de données.
     void setBdd(std::unique_ptr<bmps::Bdd> && bdd, const QString & pathXML, QWidget * modalParent = nullptr);
@@ -88,6 +78,10 @@ signals:
 
     //! Signal d'activation/désactivation de l'action saugarder.
     void savePermis(bool);
+
+protected:
+    //! Hydrate l'entité à partire d'un itérateur sur un docXml.
+    bool hydrateXml(entityMPS::Entity & entity, fichierMPS::XmlDoc::const_brother_iterator iter);
 };
 }
 #endif // ABSTRACTNOYAU_H

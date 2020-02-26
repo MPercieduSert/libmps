@@ -15,6 +15,7 @@ bool AbstractTab::openTab(const std::pair<int, int> &pair) {
         m_mapTab[pair]=tab;
         connectTab(tab);
         QTabWidget::addTab(tab,tab->title());
+        setCurrentWidget(tab);
         return true;
     }
 }
@@ -27,9 +28,15 @@ void AbstractTab::connectTab(AbstractTabModule * tab) const {
     connect(tab,&AbstractTabModule::savePermis,this,&AbstractTab::savePermis);
 }
 
-void AbstractTab::currentChange()
-    {static_cast<AbstractTabModule *>(currentWidget())->becomeCurrent();}
+void AbstractTab::currentChange() {
+    if(currentWidget())
+        static_cast<AbstractTabModule *>(currentWidget())->becomeCurrent();
+}
 
+void AbstractTab::removeTab(int index) {
+    m_mapTab.erase(static_cast<AbstractTabModule*>(widget(index))->pairIndex());
+    QTabWidget::removeTab(index);
+}
 
 void AbstractTab::removeTab(const std::pair<int,int> & pair) {
     auto iter = m_mapTab.find(pair);

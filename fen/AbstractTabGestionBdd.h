@@ -58,7 +58,8 @@ protected:
 
 public:
     //! Constructeur.
-    explicit AbstractTabGestionBdd(QSqlDatabase & bdd, szt nbrEntity, const QString & title = QString(), QWidget *parent = nullptr);
+    explicit AbstractTabGestionBdd(QSqlDatabase & bdd, szt nbrEntity,
+                                   const std::pair<int, int> &pairIndex, QWidget *parent = nullptr);
 
     //! Destructeur.
     ~AbstractTabGestionBdd() override = default;

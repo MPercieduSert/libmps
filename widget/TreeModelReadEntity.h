@@ -67,7 +67,7 @@ template<class Ent> QItemSelection TreeModelReadEntity<Ent>::foundId(idt id) con
 
 template<class Ent> QVariant TreeModelReadEntity<Ent>::headerData(int section, Qt::Orientation orientation, int role) const {
     if (orientation == Qt::Horizontal && role == Qt::DisplayRole)
-        return m_atts.empty() ? Ent::nomAttribut(section) : Ent::nomAttribut(m_atts.at(section));
+        return m_atts.empty() ? Ent::NameAttribut(section) : Ent::NameAttribut(m_atts.at(section));
     return QVariant();
 }
 }

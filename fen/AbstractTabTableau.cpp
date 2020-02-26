@@ -2,8 +2,8 @@
 
 using namespace fenMPS;
 
-AbstractTabTableau::AbstractTabTableau(QWidget *parent)
-    : AbstractTabModule(parent) {}
+AbstractTabTableau::AbstractTabTableau(const std::pair<int, int> &pairIndex, QWidget *parent)
+    : AbstractTabModule(pairIndex, parent) {}
 
 void AbstractTabTableau::coller()
     {m_model->coller(m_view->selectionModel()->selectedIndexes());}

@@ -16,7 +16,7 @@ class MotCleModel : public TreeModelReadTemp<std::pair<emps::MotCle,int>> {
     Q_OBJECT
 protected:
     enum {PasTous,TousJusquaPresent,Tous};
-    bmps::BddPredef * m_bdd;          //!< Pointeur vers la base de donnée.
+    bmps::BddPredef & m_bdd;          //!< Pointeur vers la base de donnée.
     const int m_cible;          //!< Numero de cible du type d'entité pour les quels on souhaite gérer les mots clés.
     std::set<idt> m_idSet;          //!< Ensemble des identifiants des entités dont les mots clés sont affichés.
     std::map<idt,bool> m_idMotCle;  //!< Map dont les clés sont les identifiants des mots clés associés aux entités d'identifiant contenus dans m_idSet et de valeur true si le mot clé est associé à toutes les entités dont les identifiants sont contenus dans m_idSet et false sinon..
@@ -25,7 +25,7 @@ public:
     enum ColumnIndex{CheckColumn, NomColumn, NbrColumn, Aucun};
 
     //! Constructeur.
-    explicit MotCleModel(bmps::BddPredef *bd, int cible, QObject * parent);
+    explicit MotCleModel(bmps::BddPredef &bd, int cible, QObject * parent);
 
     //! Destructeur par defaut.
     ~MotCleModel() override = default;

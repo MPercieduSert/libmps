@@ -117,6 +117,8 @@ void FenFoundFile::openInConf(fichierMPS::Config &config, const QString & path, 
                                                      config.defaultDirectory(),
                                                     m_file.fileExtension());
         m_file.setFileName(pathFile);
+        if(m_file.exists())
+            QFile::remove(pathFile);
         if(m_file.creer() && save)
             config.add(path,pathFile);
         else {

@@ -228,7 +228,7 @@ public:
         {setNom(nom);}
 
     //! Constructeur à partir des valeurs attributs.
-    IdArbreSimpleNcNomEntityTemp(Id1Trans id1, const QString & nc, const QString & nom, idt parent, idt id = 0)
+    IdArbreSimpleNcNomEntityTemp(Id1Trans id1, const QString & nc, const QString & nom, idt parent = 0, idt id = 0)
         : IdArbreSimpleNcNomEntityTemp(nom, id) {
         setId1(id1);
         setNc(nc);
@@ -291,7 +291,7 @@ public:
 
     //! Constructeur à partir des valeurs attributs.
     IdArbreSimpleIdProgNcNomEntityTemp(Id1Trans id1, const QString & nc, const QString & nom,
-                                       idt parent, idt idProg = 0, idt id = 0)
+                                       idt parent = 0, idt idProg = 0, idt id = 0)
         : IdArbreSimpleIdProgNcNomEntityTemp(id, nom) {
         setId1(id1);
         setIdProg(idProg);

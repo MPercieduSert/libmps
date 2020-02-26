@@ -2,8 +2,9 @@
 
 using namespace fenMPS;
 
-AbstractTabModule::AbstractTabModule(QWidget *parent)
-    : QWidget(parent) {}
+AbstractTabModule::AbstractTabModule(const std::pair<int, int> &pairIndex, QWidget *parent)
+    : QWidget(parent),
+    m_pairIndex(pairIndex){}
 
 void AbstractTabModule::becomeCurrent() {
     emit collerPermis(false);

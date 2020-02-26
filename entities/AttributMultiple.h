@@ -55,9 +55,14 @@ public:
         {return AttributPremier::isValid() && Attributs<AttributSuivant...>::isValid();}
 
     //! Retourne le nom de l'attribut donnée souhaitée, pos doit être valide.
-    static QString nomAttribut(szt pos)
-        {return pos < AttributPremier::NbrAtt ? AttributPremier::nomAttribut(pos)
-                                              : Attributs<AttributSuivant...>::nomAttribut(pos - AttributPremier::NbrAtt);}
+    QString attributName(szt pos) const
+        {return pos < AttributPremier::NbrAtt ? AttributPremier::attributName(pos)
+                                              : Attributs<AttributSuivant...>::attributName(pos - AttributPremier::NbrAtt);}
+
+    //! Retourne le nom de l'attribut donnée souhaitée, pos doit être valide.
+    static QString NameAttribut(szt pos)
+        {return pos < AttributPremier::NbrAtt ? AttributPremier::NameAttribut(pos)
+                                              : Attributs<AttributSuivant...>::NameAttribut(pos - AttributPremier::NbrAtt);}
 
     //! Renvoie une chaine de caractère contenant les valeurs de l'attribut.
     QString toString() const override
@@ -80,9 +85,9 @@ protected:
     }
 
     //! Modifie la donnée à partir d'un QVariant, pos doit être valide.
-   void setDataP(const QVariant & value, szt pos) override
-        {return pos < AttributPremier::NbrAtt ? AttributPremier::setDataP(value, pos)
-                                              : Attributs<AttributSuivant...>::setDataP(value, pos - AttributPremier::NbrAtt);}
+   void setDataP(szt pos, const QVariant & value) override
+        {return pos < AttributPremier::NbrAtt ? AttributPremier::setDataP(pos, value)
+                                              : Attributs<AttributSuivant...>::setDataP(pos - AttributPremier::NbrAtt, value);}
 };
 
 /*! \ingroup groupeEntity

@@ -13,21 +13,27 @@
 // Macro pour manageur.
 //! \ingroup groupeManager
 //! Coprs des deux methodes saveValide.
-#define SAVE_VALIDE if(entity.isNew()) \
-        {if(existsUnique(entity) == bmps::Aucun) \
+#define SAVE_VALIDE auto controle = bmps::None;\
+    if(entity.isNew()) {\
+        controle = existsUnique(entity); \
+        if(controle == bmps::Aucun) {\
             add(entity); \
-         else \
-            throw std::invalid_argument(messageErreursUnique(entity) \
-                .append("\n Erreur d'unicité : il existe déjà dans la base de donnée une entité " \
-                        "ayant les mêmes valeurs d'attributs unique que cette nouvelle entité.").toStdString());} \
-    else \
-        {if(!sameInBdd(entity)) \
-            {if(existsUnique(entity) <= bmps::Meme) \
+            controle = bmps::None;}} \
+    else {\
+        if(!sameInBdd(entity)){ \
+            controle = existsUnique(entity); \
+            if(existsUnique(entity) <= bmps::Meme) { \
                 modify(entity); \
-            else \
-                throw std::invalid_argument(messageErreursUnique(entity) \
-                    .append("\n Erreur d'unicité :  il existe déjà dans la base de donnée une entité " \
-                            "ayant les mêmes valeurs d'attributs unique que l'entité modifiée.").toStdString());}}
+                controle = bmps::None;}}} \
+    if(controle != bmps::None){ \
+        if(controle != bmps::Conflit) { \
+            Ent entBdd(entity); \
+            entBdd.setId(0); \
+            getUnique(entBdd); \
+            throw UniqueEntityException(QString("void ManagerSql<").append(name()).append(">::saveValide(") \
+                                                       .append(name()).append("&)"),entity,entBdd);} \
+        else throw UniqueEntityException(QString("void ManagerSql<").append(name()).append(">::saveValide(") \
+                                        .append(name()).append("&)"),entity);}
 
 // Macro pour manageur.
 //! \ingroup groupeManager
@@ -35,20 +41,20 @@
 #define SAVE if(entity.isValid()) \
     saveValide(entity); \
 else \
-    throw std::invalid_argument(messageErreurs(entity).append("\n Erreur de validité").toStdString());
+    throw entityMPS::InvalideEntityException(QString("void ManagerSql<").append(name()).append(">::save(") \
+                                                        .append(name()).append("&)"),entity);
 
 namespace managerMPS {
 /*! \ingroup groupeManager
  * \brief Classe template mère des différents manageurs de type SQL.
  */
 class AbstractManagerSql :  public ReqSql {
-protected:
+public:
     static const std::vector<QString> m_fonctionAgregaString;
     static const std::vector<QString> m_conditionString;
     //static const std::vector<QString> m_conditionNullString;
     //static const std::array<const char *, bmps::condition> m_fonctionConditionString;
 
-public:
     CONSTR_DEFAUT(AbstractManagerSql)
     DESTR_VIDE(AbstractManagerSql)
 };
@@ -103,6 +109,7 @@ public:
     using AbstractManagerTemp<Ent>::get;
     using AbstractManagerTemp<Ent>::getList;
     using AbstractManagerTemp<Ent>::getUnique;
+    using AbstractManagerTemp<Ent>::name;
     using AbstractManagerTemp<Ent>::sameInBdd;
     using AbstractManagerTemp<Ent>::save;
 
@@ -126,7 +133,7 @@ public:
 
     //! Teste s'il existe une entité de même identifiant que entity en base de donnée.
     bool exists(const Entity & entity) override {
-        if(Ent::verifEntity(entity)) {
+        if(Ent::VerifEntity(entity)) {
             prepare(m_sqlExists);
             m_link.setId(entity);
             exec();
@@ -135,7 +142,7 @@ public:
             return bb;
         }
         else
-            {throw std::runtime_error("Mauvaise correspondance des Entity");}
+            throw entityMPS::InvalideEntityException(QString("bool ManagerSql<").append(name()).append(">::exist(const Entity &)"),entity);
     }
 
     //! Teste s'il existe une entité de même identifiant que entity en base de donnée.
@@ -726,12 +733,12 @@ public:
                     del(id);
             }
             else
-                throw std::invalid_argument(messageErreursUnique(entity)
-                                            .append("\n Erreur d'unicité : il existe déjà dans la base de donnée plusieurs entités "
-                                                    "ayant les mêmes valeurs d'attributs unique qu'entity.").toStdString());
+                throw UniqueEntityException(QString("void ManagerSql<").append(name()).append(">::saveUnique(") \
+                                            .append(name()).append("&)"), entity);
         }
         else
-            throw std::invalid_argument(messageErreurs(entity).append("\n Erreur de validité").toStdString());
+            throw entityMPS::InvalideEntityException(QString("void ManagerSql<").append(name()).append(">::saveUnique(") \
+                                                                                       .append(name()).append("&)"),entity);
     }
 
     //! Enregistre l'entity dans la base de donnée, s'il existe en base de donnée une entité d'identifiant idU
@@ -759,12 +766,12 @@ public:
                     del(entity.id());
             }
             else
-                throw std::invalid_argument(messageErreursUnique(entity)
-                                            .append("\n Erreur d'unicité : il existe déjà dans la base de donnée plusiers entités "
-                                                    "ayant les mêmes valeurs d'attributs unique qu'entity.").toStdString());
+                throw UniqueEntityException(QString("void ManagerSql<").append(name()).append(">::saveUnique(const ") \
+                                            .append(name()).append("&)"),entity);
         }
         else
-            throw std::invalid_argument(messageErreurs(entity).append("\n Erreur de validité").toStdString());
+            throw entityMPS::InvalideEntityException(QString("void ManagerSql<").append(name()).append(">::saveUnique(const ") \
+                                                                                       .append(name()).append("&)"),entity);
     }
 
     //! Renvoie le nom de la table de l'entité dans la base de donnée.
@@ -832,7 +839,7 @@ protected:
     QString messageErreurs(const Entity & entity) const override;
 
     //! Message d'erreurs s'il existe déjà en base de donnée une entité ayant les mêmes valeurs d'attributs uniques que entity.
-    QString messageErreursUnique(const Entity & entity) const override;
+    //QString messageErreursUnique(const Entity & entity) const override;
 
     //! Met à jour l'entité entity en base de donnée.
     virtual void modify(const Ent & entity) {
@@ -871,8 +878,8 @@ template<class Ent> ManagerSql<Ent>::ManagerSql(const InfoBdd &info, std::unique
 }
 
 template<class Ent> void ManagerSql<Ent>::creer() {
-    try
-    {
+    //try
+    //{
         QString sql(wordSqlString(bmps::wordSql::Create));
         sql.append(" ").append(table()).append("(").append(attribut(Entity::Id)).append(" ")
                 .append(typeAttributSqlString(bmps::typeAttributBdd::Primary));
@@ -881,35 +888,23 @@ template<class Ent> void ManagerSql<Ent>::creer() {
             if(m_info.creerAttribut(i).second)
                 sql.append(" ").append(wordSqlString(bmps::wordSql::NotNull));
         }
-        for(auto i = m_info.foreignKey().cbegin(); i != m_info.foreignKey().cend(); ++i)
-            sql.append(",").append(wordSqlString(bmps::wordSql::Foreign)).append("(").append(attribut(i->first)).append(") ")
-                .append(wordSqlString(bmps::wordSql::Ref)).append(" ").append(i->second);
+        for(auto i = m_info.foreignKeyTable().cbegin(); i != m_info.foreignKeyTable().cend(); ++i)
+            if(!i->second.isEmpty())
+                sql.append(",").append(wordSqlString(bmps::wordSql::Foreign)).append("(").append(attribut(i->first)).append(") ")
+                    .append(wordSqlString(bmps::wordSql::Ref)).append(" ").append(i->second);
         sql.append(m_unique->creer(m_info));
         sql.append(")");
         exec(sql);
-    }
-    catch(std::exception & e)
-    {throw std::runtime_error(QString("void ManagerSql<Ent>::creer() avec Ent=").append(Ent::Name()).append("/n")
-                              .append(e.what()).toStdString());}
+//    }
+//    catch(std::exception & e)
+//    {throw std::runtime_error(QString("void ManagerSql<Ent>::creer() avec Ent=").append(Ent::Name()).append("/n")
+//                              .append(e.what()).toStdString());}
 }
 
 template<class Ent> QString ManagerSql<Ent>::messageErreurs(const Entity & entity) const {
     QString message("Entité invalide:");
     message.append(Ent::Name()).append(" d'identifiant:").append(QString::number(entity.id())).append("\n")
             .append(entity.affiche());
-    return message;
-}
-
-template<class Ent> QString ManagerSql<Ent>::messageErreursUnique(const Entity & entity) const {
-    QString message("Entité ayant les même valeurs d'attributs unique déjà présente dans la base de donnée.\n");
-    message.append(Ent::Name()).append(" d'identifiant:").append(QString::number(entity.id())).append("\n");
-    message.append(entity.toString());
-    /*if(m_unique.nbrAttUnique() != 0)
-    {
-        message.append("Valeurs Uniques:\n");
-        for(szt i = 0; i != m_unique.nbrAttUnique(); ++i)
-            message.append(attributUnique(i)).append("\n");
-    }*/
     return message;
 }
 
@@ -988,7 +983,7 @@ template<class Ent> void ManagerSql<Ent>::writeStringSql() {
     m_sqlGetList.squeeze();
 
     // Get list where ordre
-    m_sqlGetListWhereOrderby.append(m_sqlGetListWhere.arg("%1 ORDER BY %2"));
+    m_sqlGetListWhereOrderby.append(m_sqlGetListWhere.arg("%1? ORDER BY %2"));
     m_sqlGetListWhereOrderby.squeeze();
 
     // Get list id where  ordre
@@ -996,7 +991,7 @@ template<class Ent> void ManagerSql<Ent>::writeStringSql() {
     m_sqlGetListIdWhereOrderby.squeeze();
 
     // Get list 1 where 1 ordre
-    m_sqlGetList1Where1.append(m_sqlGetListWhere.arg("%1%2? ORDER BY %3%4"));
+    m_sqlGetList1Where1.append(m_sqlGetListWhereOrderby.arg("%1%2","%3%4"));
     m_sqlGetList1Where1.squeeze();
 
     // Get list id 1 where 1 ordre
@@ -1024,19 +1019,19 @@ template<class Ent> void ManagerSql<Ent>::writeStringSql() {
     m_sqlGetListId1Where3.squeeze();
 
     // Get list 2 where 1 ordre
-    m_sqlGetList2Where1.append(m_sqlGetListWhere.arg("%1%2? AND %3%4? ORDER BY %5%6"));
+    m_sqlGetList2Where1.append(m_sqlGetListWhereOrderby.arg("%1%2? AND %3%4","%5%6"));
     m_sqlGetList2Where1.squeeze();
 
     // Get list id 2 where 1 ordre
-    m_sqlGetListId2Where1.append(m_sqlGetListIdWhereOrderby.arg("%1%2? AND %3%4?","%5%6"));
+    m_sqlGetListId2Where1.append(m_sqlGetListIdWhereOrderby.arg("%1%2? AND %3%4","%5%6"));
     m_sqlGetListId2Where1.squeeze();
 
     // Get list 3 where 1 ordre
-    m_sqlGetList3Where1.append(m_sqlGetListWhere.arg("%1%2? AND %3%4? AND %5%6? ORDER BY %7%8"));
+    m_sqlGetList3Where1.append(m_sqlGetListWhereOrderby.arg("%1%2? AND %3%4? AND %5%6","%7%8"));
     m_sqlGetList3Where1.squeeze();
 
     // Get list 3 where 1 ordre
-    m_sqlGetListId3Where1.append(m_sqlGetListIdWhereOrderby.arg("%1%2? AND %3%4? AND %5%6?","%7%8"));
+    m_sqlGetListId3Where1.append(m_sqlGetListIdWhereOrderby.arg("%1%2? AND %3%4? AND %5%6","%7%8"));
     m_sqlGetListId3Where1.squeeze();
 
     // Get list join
@@ -1060,7 +1055,7 @@ template<class Ent> void ManagerSql<Ent>::writeStringSql() {
     for(szt i = 1; i != m_info.nbrAtt(); ++i)
         m_sqlModify.append(attribut(i)).append("=?,");
     m_sqlModify.chop(1);
-    m_sqlModify.append("WHERE ").append(idEgal);
+    m_sqlModify.append(" WHERE ").append(idEgal);
     m_sqlModify.squeeze();
 }
 }

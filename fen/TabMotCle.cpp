@@ -2,15 +2,16 @@
 
 using namespace fenMPS;
 
-TabMotCle::TabMotCle(QWidget *parent): AbstractTabModuleWithBdd(parent) {
+TabMotCle::TabMotCle(bddMPS::BddPredef &bd, const std::pair<int, int> &pairIndex, QWidget *parent)
+    : AbstractTabModuleWithBdd(bd, pairIndex, parent) {
     m_treeWidget = new QTreeView;
-    m_treeModel = new modelMPS::TreeModelMotCle(bdd(), bdd()->nomsEntityCible(infoEntity::MotCleId), this);
+    m_treeModel = new modelMPS::TreeModelMotCle(bdd(), bdd().nomsEntityCible(infoEntity::MotCleId), this);
     m_treeWidget->setModel(m_treeModel);
-    m_treeWidget->setItemDelegate(new modelMPS::MotCleDelegate(bdd()->nbrEntityCible(infoEntity::MotCleId), this));
+    m_treeWidget->setItemDelegate(new modelMPS::MotCleDelegate(bdd().nbrEntityCible(infoEntity::MotCleId), this));
     m_treeWidget->setSelectionMode(QAbstractItemView::ExtendedSelection);
     connect(m_treeWidget->selectionModel(),SIGNAL(selectionChanged(QItemSelection,QItemSelection)),
             this,SLOT(selectionMotcle(QItemSelection,QItemSelection)));
-    m_motCleWidget = new widgetMPS::MotCleWidget(bdd(),bdd()->cible(infoEntity::MotCleId));
+    m_motCleWidget = new widgetMPS::MotCleWidget(bdd(),bdd().cible(infoEntity::MotCleId));
     m_horizontalSplitter = new QSplitter();
     m_horizontalSplitter->addWidget(m_treeWidget);
     m_horizontalSplitter->addWidget(m_motCleWidget);

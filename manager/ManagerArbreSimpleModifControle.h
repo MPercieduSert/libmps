@@ -14,14 +14,13 @@ namespace managerMPS {
 template<class Ent> class ManagerArbreSimpleModifControle : public ManagerArbreSimple<Ent>,
                                                                       public ManagerModifControle<Ent> {
 protected:
-    using ManagerForArbreEnt = ManagerArbreSimple<Ent>;
+    using ManagerArb = ManagerArbreSimple<Ent>;
     using ManagerMC = ManagerModifControle<Ent>;
 
     using ManagerMC::modify;
 
 public:
-    using ManagerForArbreEnt::get;
-    using ManagerMC::save;
+    using ManagerArb::get;
     using ManagerMC::getAutorisation;
 
     //! Constructeur.
@@ -35,17 +34,25 @@ public:
     //! Destructeur.
     ~ManagerArbreSimpleModifControle() override = default;
 
-    /*//! Supprime de la table en base de donnée l'entité d'identifiant id.
+    //! Supprime de la table en base de donnée l'entité d'identifiant id.
     bool del(idt id) override
-        {return getAutorisation(Ent(id), bmps::Suppr) && ManagerForArbreEnt::del(id);}*/
+        {return getAutorisation(id, bmps::Suppr) && ManagerArb::del(id);}
+
+    //! Renvoie la liste des restrictions gérer par le gestionérer d'autorisarion.
+    std::vector<bmps::autorisation> restriction() const override
+        {return ManagerModifControle<Ent>::restriction();}
 
     //! Enregistre l'entité entity en base de donnée.
     void save(Ent & entity) override
-        {ManagerForArbreEnt::save(entity);}
+        {ManagerArb::save(entity);}
 
     //! Enregistre l'entité entity en base de donnée.
     void save(const Ent & entity) override
-        {ManagerForArbreEnt::save(entity);}
+        {ManagerArb::save(entity);}
+
+    //! Retourne le type du manager.
+    virtual unsigned typeManager() const
+        {return ManagerArb::typeManager() | ManagerMC::typeManager();}
 
 protected:
     //! Constructeur.

@@ -10,11 +10,16 @@
 
 namespace bddMPS {
     namespace bddVersion {
-        enum creationBddPredef {initialePredef = NbrCreationBdd,
-                               NbrCreationBddPredef};}
+        enum creationBddPredef {InitialePredef = NbrCreationBdd,
+                        NbrCreationBddPredef};}
 
-    enum motClePermissionNum {InterditMCNum = 0,
-                              PermisMCNum = 1};
+    namespace code {
+        enum invalide : codeType {Invalide = sizeof(codeType) + 1};
+        enum permission : codeType {Interdit = 0,
+                              Visible = 1,
+                              Attribuable = 2,
+                            NbrPermission};
+    }
 
 /*! \ingroup groupeFile
  * \brief Gestionnaire de la base de donnée pour les entités prédéfinie.
@@ -52,14 +57,12 @@ public:
     ~BddPredef() override = default;
 
     //! Retourne le numéro de cible associé à l'identifiant d'une entité.
-    int cible(int id) const
+    int cible(szt id) const
         {return managers().cible(id);}
 
     //! Retourne le numéro de cible associé à un type d'entité.
     template<class Ent> int cible() const
         {return managers().cible<Ent>();}
-
-    DECL_DEL_METHODE
 
     //! Suppresseur d'une entité enregistrée comme donnée.
     void delEntityInDonnee(idt idCible, int cible, int num = 0);
@@ -75,27 +78,27 @@ public:
     virtual std::map<int,QString> nomsEntityCible(int /*cible*/) const
         {return std::map<int,QString>();}//à finir
 
-    //! Renvoie l'identifiant de la donnée d'idProg idP fourni ou 0 si elle n'existe pas.
-    idt idDonnee(idt idP);
+    //! renvoie le numéro permission associée à la chaine de caractères, ou NbrPermission la chaine ne correspond à aucun numéro.
+    virtual codeType code(const QString & str) const;
 
     //! Mutateur d'une entité enregistrée comme donnée.
     template<class Ent> void setEntityInDonnee(const Ent & entity, idt idCible, int cible, int num = 0);
 
 protected:
-    //! Suppresseur d'une entité à partir de son identifiant.
-    template<class Ent> bool del(idt id);
+    //! Supprime l'entité d'identifiant id de type d'identifiant idEntity de la base de données.
+    bool delP(idt id, szt idEntity) override;
 
-    //! Suppresseur d'un entité à partir de son identitiant et de ses dépendance de type cible.
-    template<class Ent> bool delSimple(idt id);
+    //! Renvoie l'autorisation de modification de l'entité donnée en argument.
+    bool getAutorisationP(idt id, szt idEntity, autorisation autoris) override;
 
-    //! Suppresseur des entités de dont idCible est l'identifiant de type cible.
-    bool delCible(idt idCible, int Cible);
-
-    //! Mise à jour de la base de donnée.
-    void listeMiseAJourBdd(int version) override;
+    //! Hydrate un attribut de l'entité par la valeur contenue dans le XmlDox à l'endroit pointé par iter.
+    QString hydrateAttributXml(entityMPS::Entity & entity, szt pos, fichierMPS::XmlDoc::const_brother_iterator iter) override;
 
     //! Renvoie le numero de début d'enregistrement d'une entité.
     std::pair<int, int> intervalEntityInDonnee(idt idCible, int cible, int num);
+
+    //! Mise à jour de la base de donnée.
+    void listeMiseAJourBdd(int version) override;
 
     //! Acceseur du manageur.
     const managerMPS::ManagersPredef & managers() const
@@ -106,13 +109,13 @@ protected:
         {return static_cast<managerMPS::ManagersPredef &>(*m_manager);}
 };
 
-DEF_DEL_METHODE(BddPredef)
+//DEF_DEL_METHODE(BddPredef)
 
-template<class Ent> bool BddPredef::del(idt id)
-    {return delSimple<Ent>(id);}
+//template<class Ent> bool BddPredef::del(idt id)
+//    {return delSimple<Ent>(id);}
 
-template<class Ent> bool BddPredef::delSimple(idt id)
-    {return getAutorisation(Ent(id),Suppr) && delCible(id, cible<Ent>()) && Bdd::del<Ent>(id);}
+//template<class Ent> bool BddPredef::delSimple(idt id)
+//    {return getAutorisation(Ent(id),Suppr) && delCible(id, cible<Ent>()) && Bdd::del<Ent>(id);}
 
 template<class Ent> Ent BddPredef::getEntityInDonnee(idt idCible, int Cible, int num)
 {

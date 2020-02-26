@@ -36,7 +36,7 @@ public:
                         NbrTabIndex};
 
     //! Constructeur
-    explicit AbstractTabMenu(QWidget * parent = nullptr);
+    explicit AbstractTabMenu(const std::pair<int, int> &pairIndex, QWidget * parent = nullptr);
 
     //! Destructeur.
     ~AbstractTabMenu() override = default;

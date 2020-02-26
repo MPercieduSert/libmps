@@ -31,7 +31,7 @@ protected:
 
 public:
     //! Constructeur.
-    explicit MotCleWidget(bddMPS::BddPredef * bd, int cible, QWidget *parent = nullptr);
+    explicit MotCleWidget(bddMPS::BddPredef & bd, int cible, QWidget *parent = nullptr);
 
     //! Destructeur.
     ~MotCleWidget() override = default;

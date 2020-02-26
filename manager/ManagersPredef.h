@@ -81,16 +81,16 @@ public:
     template<class Ent> int cible() const
         {return m_cibleArray[Ent::ID];}
 
-    int cible(int id) const
-        {return id >= 0 && id < m_nbrEntity ? m_cibleArray[id] : bmps::cibleId::Vide;}
+    int cible(szt id) const
+        {return id < m_nbrEntity ? m_cibleArray[id] : bmps::cibleId::Vide;}
 
     //! Renvoie le nombre d'attributs d'une entité à partir du numéro de cible.
     int nombreAttributCible(int cible) const {
-        if(cible == bmps::cibleId::Vide || cible >= m_cibleNbrAttArray.size())
+        if(cible == bmps::cibleId::Vide || cible >= static_cast<int>(m_cibleNbrAttArray.size()))
             return 0;
         if(cible < bmps::cibleId::Vide)
             return 1;
-        return m_cibleNbrAttArray[(cible)];
+        return m_cibleNbrAttArray[static_cast<unsigned>(cible)];
     }
 
     //! Prise en charge des commentaires?

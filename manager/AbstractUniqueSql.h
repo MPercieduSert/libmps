@@ -134,8 +134,8 @@ public:
 
     //! Teste s'il existe une entité ayant les mêmes valeurs d'attributs uniques que l'entité entity en base de donnée,
     //! dans le cas particulier où il y a un seul ensemble de valeurs unique.
-    //! Si le test est positif, l'identitfiant de l'entité entity est remplacé par celui l'entité en base de donnée
-    //! ayant les mêmes valeurs d'attributs uniques.
+    //! Si le test est positif et que l'entitée est nouvelle l'identitfiant de l'entité entity est remplacé
+    //! par celui l'entité en base de donnée ayant les mêmes valeurs d'attributs uniques.
     bmps::existeUni existsUnique(Ent & entity) override;
 
     //! Teste s'il existe une entité ayant les mêmes valeurs d'attributs uniques que l'entité entity en base de donnée,
@@ -242,8 +242,8 @@ public:
 
     //! Teste s'il existe une entité ayant les mêmes valeurs d'attributs uniques que l'entité entity en base de donnée,
     //! dans le cas particulier où il y a exactement deux ensembles de valeurs uniques.
-    //! Si le test est positif, l'identitfiant de l'entité entity est remplacé par celui l'entité en base de donnée
-    //! ayant les mêmes valeurs d'attributs uniques.
+    //! Si le test est positif et que l'entitée est nouvelle l'identitfiant de l'entité entity est remplacé
+    //! par celui l'entité en base de donnée ayant les mêmes valeurs d'attributs uniques.
     bmps::existeUni existsUnique(Ent & entity) override;
 
     //! Teste s'il existe une entité ayant les mêmes valeurs d'attributs uniques que l'entité entity en base de donnée,
@@ -389,8 +389,8 @@ public:
 
     //! Teste s'il existe une entité ayant les mêmes valeurs d'attributs uniques que l'entité entity en base de donnée,
     //! dans le cas particulier où il y a exactement deux ensembles de valeurs uniques.
-    //! Si le test est positif, l'identitfiant de l'entité entity est remplacé par celui l'entité en base de donnée
-    //! ayant les mêmes valeurs d'attributs uniques.
+    //! Si le test est positif et que l'entitée est nouvelle l'identitfiant de l'entité entity est remplacé
+    //! par celui l'entité en base de donnée ayant les mêmes valeurs d'attributs uniques.
     bmps::existeUni existsUnique(Ent & entity) override;
 
     //! Teste s'il existe une entité ayant les mêmes valeurs d'attributs uniques que l'entité entity en base de donnée,
@@ -408,19 +408,15 @@ protected:
         {bindValue(Id2Unique,entity.id2());}
 };
 
-template<class Ent> bmps::existeUni RelationExactOneNotNullUniqueSql<Ent>::existsUnique(Ent & entity)
-{
-    if(entity.id2() == 0)
-    {
-        if(entity.id1() != 0)
-        {
+template<class Ent> bmps::existeUni RelationExactOneNotNullUniqueSql<Ent>::existsUnique(Ent & entity) {
+    if(entity.id2() == 0) {
+        if(entity.id1() != 0) {
             prepare(m_unique);
             bindValuesUnique(entity);
             return execUnique(entity);
         }
     }
-    else if(entity.id1() == 0)
-    {
+    else if(entity.id1() == 0) {
         prepare(m_unique_2);
         bindValuesUnique_2(entity);
         return execUnique(entity);
@@ -428,12 +424,9 @@ template<class Ent> bmps::existeUni RelationExactOneNotNullUniqueSql<Ent>::exist
     return bmps::Conflit;
 }
 
-template<class Ent> std::pair<bmps::existeUni,idt> RelationExactOneNotNullUniqueSql<Ent>::existsUniqueId(const Ent & entity)
-{
-    if(entity.id2() == 0)
-    {
-        if(entity.id1() != 0)
-        {
+template<class Ent> std::pair<bmps::existeUni,idt> RelationExactOneNotNullUniqueSql<Ent>::existsUniqueId(const Ent & entity) {
+    if(entity.id2() == 0) {
+        if(entity.id1() != 0) {
             prepare(m_unique);
             bindValuesUnique(entity);
             return execUniqueId(entity);
@@ -441,8 +434,7 @@ template<class Ent> std::pair<bmps::existeUni,idt> RelationExactOneNotNullUnique
         else
             return std::pair<bmps::existeUni,idt>(bmps::existeUni::Aucun,0);
     }
-    else if(entity.id1() == 0)
-    {
+    else if(entity.id1() == 0) {
         prepare(m_unique_2);
         bindValuesUnique_2(entity);
         return execUniqueId(entity);
@@ -483,7 +475,7 @@ protected:
 template<class Ent> AttsRelationExactOneNotNullUniqueSql<Ent>::~AttsRelationExactOneNotNullUniqueSql() = default;
 
 /*! \ingroup groupeUniqueSql
- * \brief Classe mère des classes conditions d'unicité pour les entité possédant dtrois conditions d'unicités.
+ * \brief Classe mère des classes conditions d'unicité pour les entité possédant trois conditions d'unicités.
  */
 template<class Ent> class TripleUniqueSql : public virtual DoubleUniqueSql<Ent> {
 protected:
@@ -520,8 +512,8 @@ public:
 
     //! Teste s'il existe une entité ayant les mêmes valeurs d'attributs uniques que l'entité entity en base de donnée,
     //! dans le cas particulier où il y a exactement trois ensembles de valeurs uniques.
-    //! Si le test est positif, l'identitfiant de l'entité entity est remplacé par celui l'entité en base de donnée
-    //! ayant les mêmes valeurs d'attributs uniques.
+    //! Si le test est positif et que l'entitée est nouvelle l'identitfiant de l'entité entity est remplacé
+    //! par celui l'entité en base de donnée ayant les mêmes valeurs d'attributs uniques.
     bmps::existeUni existsUnique(Ent & entity) override;
 
     //! Teste s'il existe une entité ayant les mêmes valeurs d'attributs uniques que l'entité entity en base de donnée,
@@ -649,8 +641,8 @@ public:
 
     //! Teste s'il existe une entité ayant les mêmes valeurs d'attributs uniques que l'entité entity en base de donnée,
     //! dans le cas particulier où il y a exactement deux ensembles de valeurs uniques.
-    //! Si le test est positif, l'identitfiant de l'entité entity est remplacé par celui l'entité en base de donnée
-    //! ayant les mêmes valeurs d'attributs uniques.
+    //! Si le test est positif et que l'entitée est nouvelle l'identitfiant de l'entité entity est remplacé
+    //! par celui l'entité en base de donnée ayant les mêmes valeurs d'attributs uniques.
     bmps::existeUni existsUnique(Ent & entity) override;
 
     //! Teste s'il existe une entité ayant les mêmes valeurs d'attributs uniques que l'entité entity en base de donnée,

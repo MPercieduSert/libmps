@@ -15,23 +15,19 @@ namespace bmps = bddMPS;
 class AbstractTabModuleWithBdd : public AbstractTabModule {
     Q_OBJECT
 protected:
-    bmps::Bdd * m_bdd;    //!< Pointeur sur la base de donnée.
+    bmps::Bdd& m_bdd;    //!< Référence sur la base de donnée.
 
 public:
     //! Constructeur.
-    explicit AbstractTabModuleWithBdd(QWidget *parent = nullptr)
-        : AbstractTabModule(parent) {}
+    explicit AbstractTabModuleWithBdd(bmps::Bdd & bdd, const std::pair<int, int> &pairIndex, QWidget *parent = nullptr)
+        : AbstractTabModule(pairIndex, parent), m_bdd(bdd) {}
 
     //! Destructeur.
     ~AbstractTabModuleWithBdd() override = default;
 
     //! Accesseur de la base de donnée.
-    bmps::Bdd * bdd() const
+    bmps::Bdd & bdd() const
         {return m_bdd;}
-
-    //! Mutateur de la base de donnée.
-    void setBdd(bmps::Bdd * bdd)
-        {m_bdd = bdd;}
 };
 }
 #endif // ABSTRACTTABMODULEWITHBDD_H

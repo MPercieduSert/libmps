@@ -9,7 +9,7 @@ FenPrincipale::FenPrincipale(AbstractNoyau * noyau, std::unique_ptr<bmps::Bdd> &
     m_noyau->setConfigByPath(configPath,this);
     m_noyau->setBdd(std::move(bdd),bddPathXML,this);
 
-    m_menuNew = new QMenu(this);
+    //m_menuNew = new QMenu(this);
     //m_menuNew->setParent(this);
     // Initialise la zone centrale.
 
@@ -61,7 +61,7 @@ void FenPrincipale::createAction() {
 
 void FenPrincipale::createMenu() {
     m_menuFichier = menuBar()->addMenu(tr("&Fichier"));
-    m_menuNew = m_menuFichier->addMenu(tr("&Nouveau"));
+    //m_menuNew = m_menuFichier->addMenu(tr("&Nouveau"));
     m_menuFichier->addAction(m_actionSave );
 
     m_menuEdit = menuBar()->addMenu("&Edit");

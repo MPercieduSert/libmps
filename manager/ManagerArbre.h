@@ -24,7 +24,6 @@ protected:
 
     using ManagerSqlEnt::prepare;
     using ManagerSqlEnt::messageErreurs;
-    using ManagerSqlEnt::messageErreursUnique;
     using ManagerSqlEnt::modify;
     using ManagerSqlEnt::saveUnique;
     using ManagerSqlEnt::table;
@@ -35,6 +34,8 @@ public:
     using ManagerSqlEnt::existsUnique;
     using ManagerSqlEnt::exists;
     using ManagerSqlEnt::get;
+    using ManagerSqlEnt::getUnique;
+    using ManagerSqlEnt::name;
     using ManagerSqlEnt::nbrAtt;
     using ManagerSqlEnt::sameInBdd;
     using ManagerSqlEnt::save;
@@ -110,6 +111,9 @@ public:
 //        return liste;
 //    }
 
+    //! Renvoie les informations de la table arbre associée au manager.
+    virtual InfoBdd infoArbre() const
+        {return m_managerArbre.info();}
 
     //! Enregistre l'entité entity en base de donnée.
     void save(Ent & entity) override
@@ -120,10 +124,14 @@ public:
         {saveConst(entity);}
 
     //! Enregistre l'entité entity en base avec le parent et la position spécifiés.
-    void save(Ent & entity, const Ent & parent, int num = 0);
+    void save(Ent & entity, const Ent & parent, int num = 0) override;
 
     //! Enregistre l'entité entity en base avec le parent et la position spécifiés.
-    void save(const Ent & entity, const Ent & parent, int num = 0);
+    void save(const Ent & entity, const Ent & parent, int num = 0) override;
+
+    //! Retourne le type du manager.
+    virtual unsigned typeManager() const override
+        {return bmps::ArbreTypeManager;}
 
 protected:
     //! Constructeur.
@@ -165,7 +173,8 @@ protected:
                 saveValide(entity);
         }
         else
-            throw std::invalid_argument(messageErreurs(entity).append("\n Erreur de validité").toStdString());
+            throw entityMPS::InvalideEntityException(QString("void ManagerArbre<").append(name()).append(">::saveConst(const ")
+                                                     .append(name()).append("&)"),entity);
     }
 
     //! Sauve un arbre où le changement de structure consite en l'ajout de nouveaux noeuds,
@@ -185,25 +194,33 @@ protected:
 
     //! Enregistre l'entité valide et d'identifiant non nul entity en base de donnée.
     void saveValideConst(const Ent & entity) {
+        auto controle = bmps::None;
         if(exists(entity)) {
             if(!sameInBdd(entity)) {
-                if(existsUnique(entity) <= bmps::Meme)
+                controle = existsUnique(entity);
+                if( controle <= bmps::Meme) {
                     modify(entity);
-                else
-                    throw std::invalid_argument(messageErreursUnique(entity)
-                                                .append("\n Erreur d'unicité :  il existe déjà dans la base de donnée "
-                                                        "une entité ayant les mêmes valeurs d'attributs unique "
-                                                        "que l'entité modifiée.").toStdString());
+                    controle = bmps::None;
+                }
             }
         }
         else {
-            if(existsUnique(entity) == bmps::Aucun)
+            if(existsUnique(entity) == bmps::Aucun) {
                 add(entity);
+                controle = bmps::None;
+            }
+        }
+        if(controle != bmps::None){
+            if(controle == bmps::Autre) {
+                Ent entBdd(entity);
+                entBdd.setId(0);
+                getUnique(entBdd);
+                throw UniqueEntityException(QString("void ManagerArbre<").append(name()).append(">::saveValideConst(const")
+                                                                            .append(name()).append("&):\n"),entity,entBdd);
+            }
             else
-                throw std::invalid_argument(messageErreursUnique(entity)
-                                            .append("\n Erreur d'unicité : il existe déjà dans la base de donnée "
-                                                    "une entité ayant les mêmes valeurs d'attributs unique "
-                                                    "que cette nouvelle entité.").toStdString());
+                throw UniqueEntityException(QString("void ManagerArbre<").append(name()).append(">::saveValideConst(const")
+                                                                            .append(name()).append("&):\n"),entity);
         }
     }
 
@@ -239,7 +256,9 @@ template<class Ent> void ManagerArbre<Ent>::save(Ent & entity, const Ent & paren
         saveValide(entity);
     }
     else
-        throw std::invalid_argument(messageErreurs(entity).append("\n Erreur de validité").toStdString());
+        throw entityMPS::InvalideEntityException(QString("void ManagerArbre<").append(name()).append(">::save(")
+                                                 .append(name()).append("&,const ").append(name())
+                                                 .append(" &,int)"),entity);
 }
 
 template<class Ent> void ManagerArbre<Ent>::save(const Ent & entity, const Ent & parent, int num) {
@@ -257,7 +276,9 @@ template<class Ent> void ManagerArbre<Ent>::save(const Ent & entity, const Ent &
         }
     }
     else
-        throw std::invalid_argument(messageErreurs(entity).append("\n Erreur de validité").toStdString());
+        throw entityMPS::InvalideEntityException(QString("void ManagerArbre<").append(name()).append(">::save(const ")
+                                                 .append(name()).append("&,const ").append(name())
+                                                 .append(" &,int)"),entity);
 }
 
 template<class Ent> void ManagerArbre<Ent>::saveAddLeaf(typename tree<Ent>::iterator iter) {
@@ -274,7 +295,8 @@ template<class Ent> void ManagerArbre<Ent>::saveAddLeaf(typename tree<Ent>::iter
                 saveAddLeaf(child);
         }
         else
-            throw std::invalid_argument(messageErreurs(*child).append("\n Erreur de validité").toStdString());
+            throw entityMPS::InvalideEntityException(QString("void ManagerArbre<").append(name()).append(">::saveAddLeaf(tree<")
+                                                     .append(name()).append(">::iterator)"),*child);
     }
 }
 
@@ -289,7 +311,8 @@ template<class Ent> void ManagerArbre<Ent>::saveRoot(tree<Ent> & tree) {
         saveValide(*iter);
     }
     else
-        throw std::invalid_argument(messageErreurs(*iter).append("\n Erreur de validité").toStdString());
+        throw entityMPS::InvalideEntityException(QString("void ManagerArbre<").append(name()).append(">::saveRoot(tree<")
+                                                 .append(name()).append("> &)"),*iter);
 }
 
 template<class Ent> void ManagerArbre<Ent>::saveWithoutDelete(typename tree<Ent>::iterator iter) {
@@ -305,7 +328,8 @@ template<class Ent> void ManagerArbre<Ent>::saveWithoutDelete(typename tree<Ent>
                 saveWithoutDelete(child);
         }
         else
-            throw std::invalid_argument(messageErreurs(*child).append("\n Erreur de validité").toStdString());
+            throw entityMPS::InvalideEntityException(QString("void ManagerArbre<").append(name()).append(">::saveWithoutDelete(tree<")
+                                                     .append(name()).append(">::iterator)"),*child);
     }
 }
 
@@ -325,7 +349,8 @@ template<class Ent> void ManagerArbre<Ent>::saveExt(typename tree<Ent>::iterator
                 saveExt(child,idRoot);
         }
         else
-            throw std::invalid_argument(messageErreurs(*child).append("\n Erreur de validité").toStdString());
+            throw entityMPS::InvalideEntityException(QString("void ManagerArbre<").append(name()).append(">::saveExt(tree<")
+                                                     .append(name()).append(">::iterator,idt)"),*child);
     }
 }
 

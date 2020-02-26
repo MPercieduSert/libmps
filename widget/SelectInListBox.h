@@ -51,21 +51,27 @@ public:
     //!Constructeur
     explicit SelectInListBox(const QString & titreGauche = QString(), const QString & titreDroite = QString(),
                              bool ordre = false, bool repetition = false,
-                             const std::map<int,QString> & choicesGauche = std::map<int,QString>(),
-                             const std::map<int,QString> & choicesDroite = std::map<int,QString>(), QWidget *parent = nullptr);
+                             const std::map<QVariant,QString> & choicesGauche = std::map<QVariant,QString>(),
+                             const std::map<QVariant,QString> & choicesDroite = std::map<QVariant,QString>(), QWidget *parent = nullptr);
 
     //! Destructeur par default.
     ~ SelectInListBox() override = default;
 
     //! Ajoute un élément dans la liste de droite
-    void append(int n, const QString & txt, bool droite = true);
+    void append(QVariant n, const QString & txt, bool droite = true);
+
+    //! Efface les listes de droite et gauche.
+    void clear();
 
     //! Supprime les éléments des liste de valeur n et texte txt
-    void remove(int n, const QString & txt);
+    void remove(QVariant n, const QString & txt);
+
+    //! Mutateur des deux listes.
+    void setValue(const std::map<QVariant,QString> & choicesGauche, const std::map<QVariant,QString> & choicesDroite);
 
     //! Retourne une paire contenant deux listes d'entiters, la liste des données (Qt::UserData) de la liste gauche
     //! et celles de la liste de droite.
-    std::pair<std::vector<int>,std::vector<int>> value() const;
+    std::pair<std::vector<QVariant>,std::vector<QVariant>> value() const;
 signals:
 
 public slots:

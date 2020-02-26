@@ -2,7 +2,7 @@
 
 using namespace widgetMPS;
 
-MotCleWidget::MotCleWidget(bddMPS::BddPredef * bd, int cible, QWidget *parent) : QWidget(parent)
+MotCleWidget::MotCleWidget(bddMPS::BddPredef & bd, int cible, QWidget *parent) : QWidget(parent)
 {
     m_afficheListMotCle = new QTextEdit();
     m_chercheMotCle = new QLineEdit();

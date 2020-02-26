@@ -31,14 +31,14 @@ protected:
 
 public:
     //! Constructeur.
-    explicit TabMotCle(QWidget *parent = nullptr);
+    explicit TabMotCle(bmps::BddPredef & bdd, const std::pair<int, int> &pairIndex, QWidget *parent = nullptr);
 
     //! Destructeur.
     ~TabMotCle() override = default;
 
     //! Acceseur de la base de données.
-    bmps::BddPredef * bdd() const
-        {return static_cast<bmps::BddPredef *>(AbstractTabModuleWithBdd::bdd());}
+    bmps::BddPredef & bdd() const
+        {return static_cast<bmps::BddPredef &>(AbstractTabModuleWithBdd::bdd());}
 
     //! Titre.
     QString title() const override

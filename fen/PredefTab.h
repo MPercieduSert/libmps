@@ -7,6 +7,7 @@
 #include "AbstractTab.h"
 #include "AbstractTabMenu.h"
 #include "TabMotCle.h"
+#include "TabGestionBdd.h"
 
 
 namespace fenMPS {
@@ -15,9 +16,17 @@ namespace fenMPS {
  */
 class PredefTab : public AbstractTab {
     Q_OBJECT
+protected:
+    bmps::BddPredef & m_bdd;          //!< Référence à la base de donnée.
+
 public:
+    enum tabName{GestionBddTabId,
+                NbrTabId};
+
+
     //! Constructeur.
-    explicit PredefTab(QWidget *parent = nullptr) : AbstractTab(parent) {}
+    explicit PredefTab(bmps::BddPredef & bdd, QWidget *parent = nullptr)
+        : AbstractTab(parent), m_bdd(bdd) {}
 
     //! Destructeur par default.
     ~PredefTab() override = default;

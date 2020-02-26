@@ -7,7 +7,7 @@ QSqlQuery * ReqSql::m_requete = nullptr;
 void ReqSql::affError() const {
     QSqlError err(m_requete->lastError());
     if(err.isValid())
-        throw std::invalid_argument(err.text().append("\n"+err.nativeErrorCode()+m_requete->lastQuery()).toStdString());
+        throw std::invalid_argument(err.text().append("\n"+err.nativeErrorCode()+"\n"+m_requete->lastQuery()).toStdString());
 }
 
 QString ReqSql::typeAttributSqlString(bmps::typeAttributBdd n) {

@@ -19,8 +19,10 @@ protected:
 public:
     //! Constructeur
     AbstractTab(QWidget *parent = nullptr)
-        : QTabWidget(parent)
-    {connect(this,&AbstractTab::currentChanged,this,&AbstractTab::currentChange);}
+        : QTabWidget(parent) {
+        setTabsClosable(true);
+        connect(this,SIGNAL(tabCloseRequested(int)),this,SLOT(removeTab(int)));
+        connect(this,&AbstractTab::currentChanged,this,&AbstractTab::currentChange);}
 
     //! Destructeur
     ~AbstractTab() override = default;
@@ -65,6 +67,9 @@ public slots:
 
     //! Ouvre un nouvel onglet et le crée si celui-ci n'existe pas.
     bool openTab(const std::pair<int,int> & pair);
+
+    //! Supprime un onglet.
+    void removeTab(int index);
 
     //! Supprime un onglet.
     void removeTab(const std::pair<int, int> &pair);

@@ -47,14 +47,6 @@ public:
     XmlElement(const QString & name)
         {m_name = name;}
 
-    //! Renvoie le nom de du noeud.
-    const QString & name() const
-        {return m_name;}
-
-    //! Renvoie le texte du noeud.
-    const QString & text() const
-        {return m_text;}
-
     //! Renvoie les attributs du noeud sous la forme d'un map<clé,valeur>.
     const std::map<QString,QString> & attributes() const
         {return m_attributes;}
@@ -67,6 +59,18 @@ public:
     bool hasText() const
         {return !m_text.isEmpty();}
 
+    //! Renvoie le nom de du noeud.
+    const QString & name() const
+        {return m_name;}
+
+    //! Ajoute ou modifie l'attribut de nom name avec la valeur val.
+    void setAttribut(const QString & name, const QString & val)
+        {m_attributes[name] = val;}
+
+    //! Remplace les attributs du noeud par ceux donnés en argument sous la forme d'un std::map<clé,valeur>.
+    void setAttributes(const std::map<QString,QString> & map)
+        {m_attributes = map;}
+
     //! Modifie le nom du noeud.
     void setName(const QString & name)
         {m_name = name;}
@@ -75,9 +79,9 @@ public:
     void setText(const QString & text)
         {m_text = text;}
 
-    //! Remplace les attributs du noeud par ceux donnés en argument sous la forme d'un std::map<clé,valeur>.
-    void setAttributes(const std::map<QString,QString> & map)
-        {m_attributes = map;}
+    //! Renvoie le texte du noeud.
+    const QString & text() const
+        {return m_text;}
 };
 
 /*! \ingroup groupeXML
@@ -112,9 +116,13 @@ public:
     
     //! Renvoie un itérateur sur le noeud de chemin indiqué.
     /*! L'itérateur pointe sur l'élément correspond au chemin indiqué dont les différents noeuds sont
-     * séparés par un /. Si les noeuds du chemin n'existent pas il sont créés.
+     * séparés par un /. Si le premier terme du chemin ne coorespond pas à la racine, l'itérteur renvoyé est nul
+     * dans le cas contraire, si les noeuds du chemin n'existent pas il sont créés.
      */
     prevsuiv_iterator seek(const QString & chemin);
+
+    //! Revoie l'arbre dévelopé sous forme d'un QString.
+    QString toString() const;
 
 //    //! Remplace les attributs du noeud courant par ceux donnés en argument sous la forme d'un std::map<clé,valeur>.
 //    void setAttributes(const std::map<QString, QString> & atts)
@@ -191,7 +199,6 @@ public:
         element.setAttributes(map);
         return element;
     }
-
 protected:
     //! fonction récurrsive à la base de la fonction getVars
     //void getVarsRec(const QString & name, const std::map<QString,QString> & atts, std::list<QString> & strList);

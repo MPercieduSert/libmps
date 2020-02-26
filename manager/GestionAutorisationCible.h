@@ -18,8 +18,9 @@ protected:
 
 public:
     //! Constructeur. (Ne posséde pas le manageur de restriction)
-    AbstractGestionAutorisationCible(szt cible, AbstractManagerTemp<Restrict> & managerRestriction)
-        : m_cible(cible), m_managerRestriction(managerRestriction)
+    AbstractGestionAutorisationCible(szt cible, AbstractManagerTemp<Restrict> & managerRestriction,
+                                     const std::vector<bmps::autorisation> & restriction = std::vector<bmps::autorisation>())
+        : AbstractGestionAutorisation<Ent>(restriction), m_cible(cible), m_managerRestriction(managerRestriction)
     {}
 
     //! Destructeur.
@@ -41,36 +42,34 @@ public:
 /*! \ingroup groupeManager
  * \brief Classe template d'un gestionnaire d'autorisation de type cible et num.
  */
-template<class Ent, class Restrict> class GestionAutorisationCibleNum : public AbstractGestionAutorisationCible<Ent, Restrict> {
+template<class Ent, class Restrict> class GestionAutorisationCibleNum : public AbstractGestionAutorisationCible<Ent,Restrict> {
 protected:
     using AbstractGestionAutorisationCible<Ent, Restrict>::m_cible;
     using AbstractGestionAutorisationCible<Ent, Restrict>::m_managerRestriction;
 public:
-    //! Constructeur. (Ne posséde pas le manageur de restriction)
-    GestionAutorisationCibleNum(szt cible, AbstractUniqueSqlTemp<Restrict> & managerRestriction)
-        : AbstractGestionAutorisationCible<Ent, Restrict>(cible, managerRestriction)
-    {}
+    using AbstractGestionAutorisationCible<Ent,Restrict>::AbstractGestionAutorisationCible;
 
     //! Destructeur.
     ~GestionAutorisationCibleNum() override = default;
 
-    //! Demande l'autorisation de modification pour une entité donnée.
-    bool getAutorisation(const Ent & entity, bmps::autorisation autorisation) override
-        {return !m_managerRestriction.existsUnique(Restrict(entity.id(), m_cible, autorisation));}
-
-    //! Demande l'autorisation de modification pour une entité d'identifiant id avec les valeurs de entity.
-    bool getAutorisation(const Ent & /*entity*/, idt id, bmps::autorisation autorisation) override
+    //! Demande l'autorisation de modification pour l'entité d'identifiant id.
+    bool getAutorisation(idt id, bmps::autorisation autorisation) override
         {return !m_managerRestriction.existsUnique(Restrict(id, m_cible, autorisation));}
 
-    //! Demande la liste des restrictions de modification pour une entité donnée.
-    std::vector<int> getRestriction(const Ent & entity) override {
-        return m_managerRestriction.getList(Restrict::IdCible, entity.id(), Restrict::Cible, m_cible, Restrict:: Num)
+    //! Demande l'autorisation de modification pour une entité d'identifiant id avec les valeurs de entity.
+    bool getAutorisation(idt id, bmps::autorisation autorisation, const Ent & /*entity*/) override
+        {return getAutorisation(id,autorisation);}
+
+    //! Demande la liste des restrictions de modification pour l'entité d'identifiant id.
+    std::vector<int> getRestriction(idt id) override {
+        return m_managerRestriction.getList(Restrict::IdCible, id, Restrict::Cible, m_cible, Restrict:: Num)
                 .vectorOf([](const Ent & entity)->int{return entity.num();});
     }
 
-    //! Modifie une autorisation de modification pour une entité donnée.
-    void setAutorisation(const Ent & entity, bmps::autorisation autorisation, bool bb) override {
-        Restrict restriction(entity.id(), m_cible, autorisation);
+    //! Modifie une autorisation de modification pour l'entité d'identifiant id.
+    void setAutorisation(idt id, bmps::autorisation autorisation, bool bb) override {
+        AbstractGestionAutorisationCible<Ent, Restrict>::setAutorisation(id,autorisation,bb);
+        Restrict restriction(id, m_cible, autorisation);
         bool existRestric = m_managerRestriction.existsUnique(restriction);
         if(bb) {
             if(existRestric)
@@ -92,40 +91,42 @@ protected:
     using AbstractGestionAutorisationCible<Ent, Restrict>::m_managerRestriction;
 
 public:
-    //! Constructeur. (Ne posséde pas le manageur de restriction)
-    GestionAutorisationCibleCode(int cible, AbstractManagerTemp<Restrict> & managerRestriction)
-        : AbstractGestionAutorisationCible<Ent, Restrict>(cible, managerRestriction) {}
+    using AbstractGestionAutorisationCible<Ent,Restrict>::AbstractGestionAutorisationCible;
 
     //! Destructeur.
     ~GestionAutorisationCibleCode() override = default;
 
     //! Demande l'autorisation de modification pour une entité donnée.
-    bool getAutorisation(const Ent & entity, bmps::autorisation autorisation) override {
-        Restrict restrict(entity.id(),m_cible);
+    bool getAutorisation(idt id, bmps::autorisation autorisation) override {
+        Restrict restrict(id,m_cible);
         if(!(m_managerRestriction.getUnique(restrict)))
             return true;
         return !restrict.in(autorisation);
     }
 
     //! Demande l'autorisation de modification pour une entité d'identifiant id avec les valeurs de entity.
-    bool getAutorisation(const Ent & /*entity*/, idt id, bmps::autorisation autorisation) override
-        {return getAutorisation(Ent(id),autorisation);}
+    bool getAutorisation(idt id, bmps::autorisation autorisation, const Ent & /*entity*/) override
+        {return getAutorisation(id,autorisation);}
 
     //! Demande la liste des restrictions de modification pour une entité donnée.
-    std::vector<int> getRestriction(const Ent & entity) override {
-        Restrict restrict(entity.id(),m_cible);
-        return m_managerRestriction.getUnique(restrict)? restrict.list(): std::vector<int>();
+    std::vector<unsigned> getRestriction(idt id) override {
+        Restrict restrict(id, m_cible);
+        return m_managerRestriction.getUnique(restrict)? restrict.list(): std::vector<unsigned>();
     }
 
-    //! Modifie une autorisation de modification pour une entité donnée.
-    void setAutorisation(const Ent & entity, bmps::autorisation autorisation, bool bb) override {
-        Restrict restriction(entity.id(), m_cible);
+    //! Modifie une autorisation de modification pour l'entité d'identifiant id.
+    void setAutorisation(idt id, bmps::autorisation autorisation, bool bb) override {
+        AbstractGestionAutorisationCible<Ent,Restrict>::setAutorisation(id,autorisation,bb);
+        Restrict restriction(id, m_cible);
         if(m_managerRestriction.getUnique(restriction)) {
-            if(restriction.in(autorisation) != bb) {
-                if(bb)
+            if(restriction.in(autorisation)) {
+                if(bb){
                     restriction.del(autorisation);
-                else
-                    restriction.add(autorisation);
+                    m_managerRestriction.save(restriction);
+                }
+            }
+            else if (!bb) {
+                restriction.add(autorisation);
                 m_managerRestriction.save(restriction);
             }
         }

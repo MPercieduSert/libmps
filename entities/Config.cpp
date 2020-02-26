@@ -11,9 +11,15 @@ void Config::add(const QString & path, const QString & value, const std::map<QSt
     XmlDoc doc;
     readConfIn(doc);
     auto iter = doc.seek(path);
-    iter->setText(value);
-    iter->setAttributes(attributes);
-    writeConf(doc);
+    if(iter) {
+        iter->setText(value);
+        iter->setAttributes(attributes);
+        writeConf(doc);
+    }
+    else
+        throw std::invalid_argument("void Config::add(const QString & path, const QString & value, const std::map<QString, QString> & attributes) \n "
+                                    "path invalide, le premier terme du chemin doit être la racine du fichier de configuration.\n"
+                                    " path = "+path.toStdString());
 }
 
 bool Config::copy(const QString &name) {
@@ -116,9 +122,15 @@ void Config::modify(const QString &path, const QString &value, const std::map<QS
     XmlDoc doc;
     readConfIn(doc);
     auto iter = doc.seek(path);
-    iter->setText(value);
-    iter->setAttributes(attributes);
-    writeConf(doc);
+    if(iter) {
+        iter->setText(value);
+        iter->setAttributes(attributes);
+        writeConf(doc);
+    }
+    else
+        throw std::invalid_argument("void Config::modify(const QString & path, const QString & value, const std::map<QString, QString> & attributes) \n "
+                                    "path invalide, le premier terme du chemin doit être la racine du fichier de configuration.\n"
+                                    " path = "+path.toStdString());
 }
 
 bool Config::open() {

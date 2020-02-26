@@ -16,16 +16,21 @@ using namespace typeMPS;
 class AbstractTabModule : public QWidget {
     Q_OBJECT
 protected:
+    const std::pair<int,int> m_pairIndex; //!< Référence de l'onglet
 
 public:
     //! Constructeur.
-    explicit AbstractTabModule(QWidget * parent = nullptr);
+    explicit AbstractTabModule(const std::pair<int,int> & pairIndex, QWidget * parent = nullptr);
 
     //! Destructeur.
     virtual ~AbstractTabModule() override = default;
 
     //! Accesseur du titre.
     virtual QString title() const = 0;
+
+    //! Accesseur de pairIndex.
+    const std::pair<int,int> & pairIndex() const noexcept
+        {return m_pairIndex;}
 
 signals:
     //! Signal d'activation/désactivation de l'action effacer.

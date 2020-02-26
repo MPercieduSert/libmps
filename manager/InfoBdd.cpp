@@ -2,14 +2,17 @@
 
 using namespace bddMPS;
 
-InfoBdd::InfoBdd(const QString & table, const std::map<szt,QString> & att,
-        const std::vector<Caract> & attCaract,
-        const std::vector<std::vector<szt>> & attUnique,
-        const std::map<szt,QString> & foreignKey)
+InfoBdd::InfoBdd(const QString & name, const QString & table, const std::map<szt,QString> & att,
+                const std::vector<Caract> & attCaract,
+                const std::vector<std::vector<szt>> & attUnique,
+                const std::map<szt,QString> & foreignKeyName,
+                const std::map<szt,QString> & foreignKeyTable)
     : m_attSql(att.size()),
       m_attCaract(attCaract),
       m_attUnique(attUnique),
-      m_foreignKey(foreignKey),
+      m_foreignKeyName(foreignKeyName),
+      m_foreignKeyTable(foreignKeyTable),
+      m_name(name),
       m_table(table) {
     m_attSql[emps::Entity::Id] = QString("ID");
     m_attSql[emps::Entity::Id].squeeze();
@@ -24,10 +27,11 @@ InfoBdd::InfoBdd(const QString & table, const std::map<szt,QString> & att,
     }
 }
 
-InfoBdd::InfoBdd(const QString & table, szt nbrAtt, const std::vector<szt> &nbrAttUnique)
+InfoBdd::InfoBdd(const QString & name, const QString & table, szt nbrAtt, const std::vector<szt> &nbrAttUnique)
     : m_attSql(nbrAtt),
       m_attCaract(nbrAtt-1),
       m_attUnique(nbrAttUnique.size()),
+      m_name(name),
       m_table(table) {
     m_attSql[emps::Entity::Id] = QString("ID");
     m_attSql[emps::Entity::Id].squeeze();

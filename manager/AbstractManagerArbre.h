@@ -60,7 +60,7 @@ public:
             return tree;
         }
         else
-            throw std::invalid_argument("L'entité transmise en argument de getArbre n'existe pas.");
+            throw std::invalid_argument("L'identifiant transmise en argument de getArbre ne correspond à aucune entité.");
     }
 
     //! Renvoie la liste des identifiants des racines.

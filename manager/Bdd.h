@@ -13,20 +13,21 @@
 #include <stdexcept>
 #include "Managers.h"
 #include "FileInterface.h"
+#include "XmlMps.h"
 
-/*! \ingroup groupeFile
- * \brief Macro permettant déclarer les méthodes de suppression.
- */
-#define DECL_DEL_METHODE /*! \brief Supprime l'entité entity de la base de donnée et met l'identifiant de l'entité à zéro. */ \
-    template<class Ent> bool del(Ent & entity) \
-    {bool bb = del<Ent>(entity.id()); \
-    entity.setId(0); \
-    return bb;} \
-    /*! Supprime l'entité entity de la base de donnée. */ \
-    template<class Ent> bool del(const Ent & entity) {return del<Ent>(entity.id());}\
-    /*! \brief Essaie de supprimer les éléments de la liste de la base de donnée,*/ \
-    /*! se termine au premièr échec et renvoye false et true si tout les éléments ont été supprimés.*/ \
-    template<class Ent> bool delList(const VectorPtr<Ent> & liste);
+///*! \ingroup groupeFile
+// * \brief Macro permettant déclarer les méthodes de suppression.
+// */
+//#define DECL_DEL_METHODE /*! \brief Supprime l'entité entity de la base de donnée et met l'identifiant de l'entité à zéro. */ \
+//    template<class Ent> bool del(Ent & entity) \
+//    {bool bb = del<Ent>(entity.id()); \
+//    entity.setId(0); \
+//    return bb;} \
+//    /*! Supprime l'entité entity de la base de donnée. */ \
+//    template<class Ent> bool del(const Ent & entity) {return del<Ent>(entity.id());}\
+//    /*! \brief Essaie de supprimer les éléments de la liste de la base de donnée,*/ \
+//    /*! se termine au premièr échec et renvoye false et true si tout les éléments ont été supprimés.*/ \
+//    template<class Ent> bool delList(const conteneurMPS::VectorPtr<Ent> & liste);
 //    //*! \brief Méthode de suppression pour les entité de type arbre. */
 //    template<class Ent, class U> bool delArbre(idt id, U delFonction);
 //    /*! \brief Méthode de suppression pour les entité de type arbre à modification controlée. */
@@ -61,9 +62,9 @@
 /*! \ingroup groupeFile
  * \brief Corps de la méthode delModifControle.
  */
-#define DEL_LIST {auto i = liste.begin(); \
-    while(i != liste.end() && del(*i)) ++i; \
-    return i == liste.end();}
+//#define DEL_LIST {auto i = liste.begin(); \
+//    while(i != liste.end() && del(*i)) ++i; \
+//    return i == liste.end();}
 
 /*! \ingroup groupeFile
  * \brief Corps de la méthode delModifControle.
@@ -77,13 +78,14 @@
 /*! \ingroup groupeFile
  * \brief Macro permettant définir les méthodes de suppression.
  */
-#define DEF_DEL_METHODE(CLASS) template<class Ent> bool CLASS::delList(const VectorPtr<Ent> & liste) DEL_LIST
+//#define DEF_DEL_METHODE(CLASS) template<class Ent> bool CLASS::delList(const conteneurMPS::VectorPtr<Ent> & liste) DEL_LIST
     //template<class Ent, class U> bool Bdd::delArbre(Ent & entity, U delFonction) DEL_ARBRE
 //    template<class Ent, class U> bool Bdd::delArbreModifControle(Ent & entity, U delFonction) DEL_ARBRE_MODIF_CONTROLE
 //    template<class Ent, class U> bool Bdd::delModifControle(Ent & entity, U delFonction) DEL_MODIF_CONTROLE
 
 namespace bddMPS {
 using namespace conteneurMPS;
+using Entity = entityMPS::Entity;
 /*! \ingroup groupeFile
  *  \brief Classe mère du gestionnaire de base de donnée.
  *
@@ -126,13 +128,44 @@ public:
     //! Créer la base de donnée avec les tables et les entrées par défault.
     bool creer() final;
 
-    //! Renvoie une réfrence sur la base de donnée.
-    QSqlDatabase &db()
+    //! Renvoie une réfrence sur la base de données.
+    QSqlDatabase &db() noexcept
         {return m_bdd;}
+
+    //! Supprime l'entité entity de la base de données.
+    bool del(const Entity & entity)
+        {return delP(entity.id(),entity.idEntity());}
+
+    //! Supprime l'entité entity de la base de donnée et met l'identifiant de l'entité à zéro.
+    bool del(Entity & entity) {
+        bool bb = del(static_cast<const Entity &>(entity));
+        if(bb)
+            entity.setId(0);
+        return bb;
+    }
+
+    //! Supprime les entités d'une liste.
+    template<class Ent> bool del(const conteneurMPS::VectorPtr<Ent> & liste) {
+        auto i = liste.cbegin();
+        while(i != liste.cend() && del(*i))
+            ++i;
+        return i == liste.cend();
+    }
+
+    //! Supprime les entités d'une liste.
+    template<class Ent> bool del(conteneurMPS::VectorPtr<Ent> & liste) {
+        auto i = liste.begin();
+        while(i != liste.end() && del(*i))
+            ++i;
+        return i == liste.end();
+    }
 
     //! Teste si le fichier de base de donnée existe.
     bool exists() const override
         {return QFile::exists(m_fileName);}
+
+    //! Teste s'il existe une entité de même identifiant que entity en base de donnée.
+    bool exists(const Entity & entity);
 
     //! Teste s'il existe une entité de même identifiant que entity en base de donnée.
     template<class Ent> bool exists(const Ent & entity);
@@ -143,24 +176,45 @@ public:
     //! Teste s'il existe une entité ayant les mêmes valeurs qu'un des ensemble d'attributs uniques d'entity en base de donnée.
     //! De plus, si l'identifiant de entity est nul et qu'il existe en base de donnée exactement une entité possédant des ensembles
     //! d'attributs uniques avec les mêmes valeurs qu'entity, alors l'identifiant d'entity est remplacé par l'identifiant de cette entité.
+    bool existsUnique(Entity & entity);
+
+    //! Teste s'il existe une entité ayant les mêmes valeurs qu'un des ensemble d'attributs uniques d'entity en base de donnée.
+    //! De plus, si l'identifiant de entity est nul et qu'il existe en base de donnée exactement une entité possédant des ensembles
+    //! d'attributs uniques avec les mêmes valeurs qu'entity, alors l'identifiant d'entity est remplacé par l'identifiant de cette entité.
     template<class Ent> bool existsUnique(Ent & entity);
+
+    //! Teste s'il existe une entité ayant les mêmes valeurs qu'un ensemble d'attributs uniques que entity en base de donnée.
+    bool existsUnique(const Entity & entity);
 
     //! Teste s'il existe une entité ayant les mêmes valeurs qu'un ensemble d'attributs uniques que entity en base de donnée.
     template<class Ent> bool existsUnique(const Ent & entity);
 
-    //! Supprime l'entité entity de la base de donnée et met l'identifiant de l'entité à zéro.
-    template<class Ent> bool del(Ent & entity) {
-        bool bb = del<Ent>(entity.id());
-        entity.setId(0);
-        return bb;
-    }
+//    //! Supprime l'entité entity de la base de donnée et met l'identifiant de l'entité à zéro.
+//    bool del(Entity & entity) {
+//        bool bb = m_manager->get(entity.idEntity()).del(entity.id());
+//        entity.setId(0);
+//        return bb;
+//    }
 
-    //! Supprime l'entité entity de la base de donnée.
-    template<class Ent> bool del(const Ent & entity)
-        {return del<Ent>(entity.id());}
+//    //! Supprime l'entité entity de la base de donnée et met l'identifiant de l'entité à zéro.
+//    template<class Ent> bool del(Ent & entity) {
+//        bool bb = del<Ent>(entity.id());
+//        entity.setId(0);
+//        return bb;
+//    }
+
+//    //! Supprime l'entité entity de la base de donnée.
+//    template<class Ent> bool del(const Ent & entity)
+//        {return del<Ent>(entity.id());}
+
+    //! Teste s'il existe une entité ayant les mêmes valeurs d'attributs uniques que entity en base de donnée.
+    existeUni existsUniqueEnsemble(Entity & entity);
 
     //! Teste s'il existe une entité ayant les mêmes valeurs d'attributs uniques que entity en base de donnée.
     template<class Ent> existeUni existsUniqueEnsemble(Ent & entity);
+
+    //! Teste s'il existe une entité ayant les mêmes valeurs d'attributs uniques que entity en base de donnée.
+    existeUni existsUniqueEnsemble(const Entity & entity);
 
     //! Teste s'il existe une entité ayant les mêmes valeurs d'attributs uniques que entity en base de donnée.
     template<class Ent> existeUni existsUniqueEnsemble(const Ent & entity);
@@ -179,7 +233,8 @@ public:
                                                   const QVariant & value1, typename Ent::Position cle2,  const QVariant & value2,
                                                   condition cond1 = condition::Egal, condition cond2 = condition::Egal);
 
-    //! Applique la fonction fonction bool fct(idt id) à chaque noeud descendant de celui d'identifiant id en commençant par les descendants.
+    //! Applique la fonction fonction bool fct(idt id) à chaque noeud descendant de celui d'identifiant id
+    //! en commençant par les descendants.
     template<class Ent, class Fct> bool foreachBeginChild(idt id, const Fct & fct, bool ordre = true);
 
     //! Applique la fonction fonction bool fct(idt id) à chaque noeud descendant celui d'identifiant id.
@@ -188,16 +243,28 @@ public:
     //! Hydrate l'entité entity avec les valeurs des attributs de l'entité enregistrées en base de donnée
     //! ayant le même identifiant que entity.
     //! Retourne True si l'opération s'est correctement déroulée.
+    bool get(Entity & entity);
+
+    //! Hydrate l'entité entity avec les valeurs des attributs de l'entité enregistrées en base de donnée
+    //! ayant le même identifiant que entity.
+    //! Retourne True si l'opération s'est correctement déroulée.
     template<class Ent> bool get(Ent & entity);
 
     //! Renvoie l'autorisation de modification de l'entité donnée en argument.
-    template<class Ent> bool getAutorisation(const Ent & entity, autorisation autoris);
+    bool getAutorisation(const Entity & entity, autorisation autoris)
+        {return getAutorisationP(entity.id(), entity.idEntity(), autoris);}
+
+//    //! Renvoie l'autorisation de modification de l'entité donnée en argument.
+//    template<class Ent> bool getAutorisation(const Ent & entity, autorisation autoris);
 
     //! Renvoie l'arbre de toutes les entités pour une entité de type arbre.
     template<class Ent> tree<Ent> getArbre();
 
     //! Renvoie l'arbre de racine d'identifiant id pour une entité de type arbre.
     template<class Ent> tree<Ent> getArbre(idt id);
+
+    //! Renvoie l'arbre de racine d'entité entity pour une entité de type arbre.
+    template<class Ent> tree<Ent> getArbre(const Ent & entity);
 
     //! Renvoie la liste des entités de la table des entités Ent ordonnée suivant la colonne d'identifiant ordre.
     template<class Ent> VectorPtr<Ent> getList(typename Ent::Position ordre = Ent::Id, bool croissant = true);
@@ -394,59 +461,126 @@ public:
     template<class Ent, class Join> mapIdt<Ent> getMap(typename Join::Position cleJoin, typename Join::Position cleWhere,
                                                        const QVariant & valueWhere, typename Ent::Position cleMap = Ent::Id,
                                                        condition cond = condition::Egal);
+    //! Renvoie la liste des restrictions de modification de l'entité donnée en argument.
+    std::vector<unsigned> getRestriction(const Entity & entity);
 
     //! Renvoie la liste des restrictions de modification de l'entité donnée en argument.
-    template<class Ent> std::vector<int> getRestriction(const Ent & entity);
+    template<class Ent> std::vector<unsigned> getRestriction(const Ent & entity);
+
+    //! Hydrate l'entité entity avec les valeurs des attributs de l'entité enregistrées en base de donnée
+    //! ayant les mêmes valeurs uniques.
+    //! Retourne True si l'opération s'est correctement déroulée.
+    bool getUnique(Entity & entity);
+
 
     //! Hydrate l'entité entity avec les valeurs des attributs de l'entité enregistrées en base de donnée
     //! ayant les mêmes valeurs uniques.
     //! Retourne True si l'opération s'est correctement déroulée.
     template<class Ent> bool getUnique(Ent & entity);
 
+    //! Renvoie l'identifiant de l'entité de type Ent d'idProg idP fourni ou 0 si elle n'existe pas.
+    template<class Ent> idt idProgToId(idt idP) {
+         Ent entity;
+         entity.setIdProg(idP);
+         return existsUnique(entity) ? entity.id() : 0;
+    }
+
+    //! Importation de donnée à partir d'un xmlDoc
+    QString importXml(const fichierMPS::XmlDoc & doc);
+
+    //! Renvoie les informations de la base de donnée sur les Entity du même type que entity.
+    const managerMPS::InfoBdd & info(const Entity & entity) const;
+
     //! Teste si la base de donnée est valide.
-    bool isValid() override
+    bool isValid() noexcept override
         {return true;}
+
+
+    //! Fabrique d'entité de classe nomée entity.
+    std::unique_ptr<Entity> makeEntity(const QString & entity) const
+        {return m_manager->makeEntity(entity);}
+
+    //! Acceseur du managers.
+    const managerMPS::Managers & managers() const noexcept
+        {return *m_manager;}
 
     //! Mise à jour de la base de donnée.
     void miseAJourBdd();
 
     //! Renvoie le nombre de type d'entitée (virtuelle).
-    szt nbrEntity() const
+    szt nbrEntity() const noexcept
         {return m_manager->nbrEntity();}
 
     //! Ouvre la base de donnée.
     bool open() override;
+
+    //! Renvoie un vector faisant la correspondance emun <-> QString pour les restrictions.
+    static std::map<autorisation, QString> RestrictionStr();
+
+    //! Teste s'il y a dans la base de donnée une entité ayant exactement les mêmes attributs (identifiant compris).
+    bool sameInBdd(const Entity & entity);
 
     //! Teste s'il y a dans la base de donnée une entité ayant exactement les mêmes attributs (identifiant compris).
     template<class Ent> bool sameInBdd(const Ent & entity);
 
     //! Enregistre l'entity dans la base de donnée.
     //! Si l'entité est nouvelle en base de donnée l'identifiant de entity est mise-à-jour.
+    void save(Entity & entity);
+
+    //! Enregistre l'entity dans la base de donnée.
+    //! Si l'entité est nouvelle en base de donnée l'identifiant de entity est mise-à-jour.
     template<class Ent> void save(Ent & entity);
+
+    //! Enregistre l'entity dans la base de donnée.
+    void save(const Entity & entity);
 
     //! Enregistre l'entity dans la base de donnée.
     template<class Ent> void save(const Ent & entity);
 
     //! Enregistre l'entité entity en base de donnée ainsi que sa nouvelle autorisation de modification.
+    void save(Entity & entity, autorisation autoris, bool bb = false);
+
+    //! Enregistre l'entité entity en base de donnée ainsi que sa nouvelle autorisation de modification.
     template<class Ent> void save(Ent & entity, autorisation autoris, bool bb = false);
+
+//    //! Enregistre l'entité entity en base de donnée ainsi que sa nouvelle autorisation de modification.
+//    void save(const Entity & entity, autorisation autoris, bool bb = false);
 
     //! Enregistre l'entité entity en base de donnée ainsi que sa nouvelle autorisation de modification.
     template<class Ent> void save(const Ent & entity, autorisation autoris, bool bb = false);
 
     //! Enregistre l'entité entity en base de donnée ainsi que ses nouvelles autorisations de modification.
+    void save(Entity & entity, const std::map<autorisation,bool> & autorisations);
+
+    //! Enregistre l'entité entity en base de donnée ainsi que ses nouvelles autorisations de modification.
     template<class Ent> void save(Ent & entity, const std::map<autorisation,bool> & autorisations);
+
+//    //! Enregistre l'entité entity en base de donnée ainsi que ses nouvelles autorisations de modification.
+//    void save(const Entity & entity, const std::map<autorisation,bool> & autorisations);
 
     //! Enregistre l'entité entity en base de donnée ainsi que ses nouvelles autorisations de modification.
     template<class Ent> void save(const Ent & entity, const std::map<autorisation,bool> & autorisations);
 
     //! Enregistre l'entité entity en base de donnée ainsi que ses nouvelles restriction de modification.
+    void save(Entity & entity, const std::vector<autorisation> & restriction);
+
+    //! Enregistre l'entité entity en base de donnée ainsi que ses nouvelles restriction de modification.
     template<class Ent> void save(Ent & entity, const std::vector<autorisation> & restriction);
+
+//    //! Enregistre l'entité entity en base de donnée ainsi que ses nouvelle restriction de modification.
+//    void save(const Entity & entity, const std::vector<autorisation> & restriction);
 
     //! Enregistre l'entité entity en base de donnée ainsi que ses nouvelle restriction de modification.
     template<class Ent> void save(const Ent & entity, const std::vector<autorisation> & restriction);
 
     //! Enregistre l'entité entity en base avec le parent et la position spécifiés.
+    void save(Entity & entity, const Entity & parent, int num = 0);
+
+    //! Enregistre l'entité entity en base avec le parent et la position spécifiés.
     template<class Ent> void save(Ent & entity, const Ent & parent, int num = 0);
+
+    //! Enregistre l'entité entity en base avec le parent et la position spécifiés.
+    void save(const Entity & entity, const Entity & parent, int num = 0);
 
     //! Enregistre l'entité entity en base avec le parent et la position spécifiés.
     template<class Ent> void save(const Ent & entity, const Ent & parent, int num = 0);
@@ -477,7 +611,23 @@ public:
     //! soit entity à un identifiant idE non nul alors l'entité d'identifiant idU est mise à jour
     //! et l'entité d'identifiant idE est supprimé.
     //! Si l'entité est nouvelle en base de donnée l'identifiant de entity est mise-à-jour.
+    void saveUnique(Entity & entity);
+
+    //! Enregistre l'entity dans la base de donnée, s'il existe en base de donnée une entité d'identifiant idU
+    //! ayant les mêmes attributs unique,
+    //! deux cas se présentent, soit entity à un identifiant nul alors l'entité d'identifiant idU est mise à jour
+    //! et l'identifiant de entity devient idU,
+    //! soit entity à un identifiant idE non nul alors l'entité d'identifiant idU est mise à jour
+    //! et l'entité d'identifiant idE est supprimé.
+    //! Si l'entité est nouvelle en base de donnée l'identifiant de entity est mise-à-jour.
     template<class Ent> void saveUnique(Ent & entity);
+
+    //! Enregistre l'entity dans la base de donnée, s'il existe en base de donnée une entité d'identifiant idU
+    //! ayant les mêmes attributs unique,
+    //! deux cas se présentent, soit entity à un identifiant nul alors l'entité d'identifiant idU est seulement mise à jour,
+    //! soit entity à un identifiant idE non nul alors l'entité d'identifiant idU est mise à jour
+    //! et l'entité d'identifiant idE est supprimé.
+    void saveUnique(const Entity & entity);
 
     //! Enregistre l'entity dans la base de donnée, s'il existe en base de donnée une entité d'identifiant idU
     //! ayant les mêmes attributs unique,
@@ -486,8 +636,17 @@ public:
     //! et l'entité d'identifiant idE est supprimé.
     template<class Ent> void saveUnique(const Ent & entity);
 
+    //! Renvoie le schema xml pour valider les fichiers d'importation de données.
+    fichierMPS::XmlDoc schemaXmlForImport() const;
+
+    //! Modifie une autorisation de modification pour une entité donnée.
+    void setAutorisation(const Entity & entity, autorisation autoris, bool bb = false);
+
     //! Modifie une autorisation de modification pour une entité donnée.
     template<class Ent> void setAutorisation(const Ent & entity, autorisation autoris, bool bb = false);
+
+    //! Modifie les autorisations de modification pour une entité donnée.
+    void setAutorisation(const Entity & entity, const std::map<autorisation,bool> & autorisations);
 
     //! Modifie les autorisations de modification pour une entité donnée.
     template<class Ent> void setAutorisation(const Ent & entity, const std::map<autorisation,bool> & autorisations);
@@ -499,18 +658,61 @@ public:
     void setFileName(const QString & fileName) override;
 
     //! Ajoute des restrictions de modification pour une entité donnée.
+    void setRestriction(const Entity & entity, const std::vector<autorisation> & restriction);
+
+    //! Ajoute des restrictions de modification pour une entité donnée.
     template<class Ent> void setRestriction(const Ent & entity, const std::vector<autorisation> & restriction);
 
     //! Ajoute des restrictions de modification aux entités d'un arbre.
     template<class Ent> void setRestriction(const tree<Ent> & entity, const std::vector<autorisation> & restriction);
+
+    //! Convertit la chaine de caractères représentant une restriction.
+    static autorisation strToAutorisation(const QString & str) noexcept;
 
 protected:
     //! Création de la table de l'entité en base de donnée.
     template<class Ent> void creerTable()
         {m_manager->get<Ent>().creer();}
 
-    //! Suppresseur d'une entité à partir de son identifiant.
-    template<class Ent> bool del(idt id);
+//    //! Suppresseur d'une entité à partir de son identifiant.
+//    template<class Ent> bool del(idt id);
+
+    //! Supprime les entités d'une liste.
+    template<class Ent> bool del(const std::list<idt> & liste) {
+        auto i = liste.cbegin();
+        while(i != liste.cend() && delP(*i,Ent::ID))
+            ++i;
+        return i == liste.cend();
+    }
+
+    //! Supprime les entités de la liste vérifiant les conditions donnée en arguments.
+    template<class Ent, class... Args> bool delList(Args... args)
+        {return del<Ent>(getListId<Ent>(args...));}
+
+    //! Supprime l'entité d'identifiant id de type d'identifiant idEntity de la base de données.
+    virtual bool delP(idt id, szt idEntity)
+        {return m_manager->get(idEntity).del(id);}
+
+    //! Renvoie l'autorisation de modification de l'entité donnée en argument.
+    virtual bool getAutorisationP(idt id, szt idEntity, autorisation autoris);
+
+    //! Vérifie les autorisations des entités dont l'identifiant est dans liste.
+    template<class Ent> bool getAutorisation(const std::list<idt> & liste, autorisation autoris) {
+        auto i = liste.cbegin();
+        while(i != liste.cend() && getAutorisationP(*i,Ent::ID, autoris))
+            ++i;
+        return i == liste.cend();
+    }
+
+    //! //! Vérifie les autorisations des entités de la liste vérifiant les conditions donnée en arguments.
+    template<class Ent, class... Args> bool getAutorisationList(autorisation autoris, Args... args)
+        {return getAutorisation<Ent>(getListId<Ent>(args...), autoris);}
+
+    //! Hydrate un attribut de l'entité par la valeur contenue dans le XmlDox à l'endroit pointé par iter.
+    virtual QString hydrateAttributXml(entityMPS::Entity & entity, szt pos, fichierMPS::XmlDoc::const_brother_iterator iter);
+
+    //! Hydrate l'entité avec les valeurs contenues dans le XmlDox à l'endroit pointé par iter.
+    QString hydrateEntityXml(entityMPS::Entity & entity, fichierMPS::XmlDoc::const_brother_iterator iter);
 
     //! Mise à jour de la base de donnée.
     virtual void listeMiseAJourBdd(int /*version*/) {}
@@ -540,8 +742,8 @@ template<class Ent> existeUni Bdd::existsUniqueEnsemble(Ent & entity)
 template<class Ent> existeUni Bdd::existsUniqueEnsemble(const Ent & entity)
     {return m_manager->get<Ent>().existsUnique(entity);}
 
-template<class Ent> bool Bdd::del(idt id)
-    {return m_manager->get<Ent>().del(id);}
+//template<class Ent> bool Bdd::del(idt id)
+//    {return m_manager->get<Ent>().del(id);}
 
 template<class Ent> QVariant Bdd::fonctionAgrega(agrega fonc, typename Ent::Position att)
     {return m_manager->get<Ent>().fonctionAgrega(fonc, att);}
@@ -606,14 +808,17 @@ template<class Ent, class Fct> bool Bdd::foreachNode(idt id, const Fct & fct, bo
 template<class Ent> bool Bdd::get(Ent & entity)
     {return m_manager->get<Ent>().get(entity);}
 
-template<class Ent> bool Bdd::getAutorisation(const Ent & entity, autorisation autoris)
-    {return m_manager->get<Ent>().getAutorisation(entity,autoris);}
+//template<class Ent> bool Bdd::getAutorisation(const Ent & entity, autorisation autoris)
+//    {return m_manager->get<Ent>().getAutorisation(entity.id(),autoris);}
 
 template<class Ent> tree<Ent> Bdd::getArbre()
     {return m_manager->get<Ent>().getArbre();}
 
 template<class Ent> tree<Ent> Bdd::getArbre(idt id)
     {return m_manager->get<Ent>().getArbre(id);}
+
+template<class Ent> tree<Ent> Bdd::getArbre(const Ent & entity)
+    {return m_manager->get<Ent>().getArbre(entity.id());}
 
 template<class Ent> VectorPtr<Ent> Bdd::getList(typename Ent::Position ordre, bool croissant)
     {return m_manager->get<Ent>().getList(ordre, croissant);}
@@ -770,9 +975,8 @@ template<class Ent, class Join> mapIdt<Ent> Bdd::getMap(typename Join::Position 
                                                       valueWhere, cleMap, cond);
 }
 
-template<class Ent> std::vector<int> Bdd::getRestriction(const Ent & entity)
-    {return m_manager->get<Ent>().getRestriction(entity);}
-
+template<class Ent> std::vector<unsigned> Bdd::getRestriction(const Ent & entity)
+    {return m_manager->get<Ent>().getRestriction(entity.id());}
 
 template<class Ent> bool Bdd::getUnique(Ent & entity)
     {return m_manager->get<Ent>().getUnique(entity);}
@@ -825,17 +1029,17 @@ template<class Ent> void Bdd::save(tree<Ent> & arbre, treeSave n)
     {m_manager->get<Ent>().save(arbre,n);}
 
 template<class Ent> void Bdd::setAutorisation(const Ent & entity, autorisation autoris, bool bb)
-    {m_manager->get<Ent>().setAutorisation(entity, autoris, bb);}
+    {m_manager->get<Ent>().setAutorisation(entity.id(), autoris, bb);}
 
 template<class Ent> void Bdd::setAutorisation(const Ent & entity, const std::map<autorisation,bool> & autorisations)
-    {m_manager->get<Ent>().setAutorisation(entity, autorisations);}
+    {m_manager->get<Ent>().setAutorisation(entity.id(), autorisations);}
 
 template<class Ent> void Bdd::setRestriction(const Ent & entity, const std::vector<autorisation> & restriction)
-    {m_manager->get<Ent>().setRestriction(entity, restriction);}
+    {m_manager->get<Ent>().setRestriction(entity.id(), restriction);}
 
 template<class Ent> void Bdd::setRestriction(const tree<Ent> & tree, const std::vector<autorisation> & restriction) {
     for(auto i = tree.begin(); i != tree.end(); i++)
-        setRestriction((*i)->data(),restriction);
+        setRestriction((*i)->data().id(),restriction);
 }
 }
 #endif // BDD_H

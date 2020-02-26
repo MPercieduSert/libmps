@@ -594,7 +594,7 @@
 	}{
 		\fkey{parent}{Type}\\
 		\unique{idProg}\\
-		\unique{nom, parent}\\
+		\unique{nom}\\
 		ArbreSimpleModifControle*
 		
 	}[\bdd]
@@ -1002,7 +1002,7 @@
 \end{itemize}
 \subsection{ERD}
 \begin{tikzpicture}[thick]
-\matrix[ampersand replacement=\&,column sep =0.5cm, row sep =1.25cm]{
+\matrix[ampersand replacement=\&,column sep =0.5cm, row sep =1cm]{
 	\arbreERD{Cours}
 	\&
 	\&
@@ -1025,7 +1025,8 @@
 	\arbreERD{Exercice}\\
 	\entity{Exercice}{
 		type\\
-		version
+		version\\
+		correction
 	}\\
 };
 \lienArbreERD{Cours}
@@ -1173,9 +1174,8 @@
 	
 	\arbreERD{Bareme}[left=1cm of Bareme]
 	
-	
 \lien{typageEtablissement}{TypeEtablissement}{$0-N$}
-\lien{typageEtablissement}{Etablissement}{$1$}
+\lien{typageEtablissement}{Etablissement}{$0-N$}
 \lien{Etablissement}{dansEtablissement}{$0-N$}
 \lien{Niveau}{dansEtablissement}{$0-N$}
 \lien{Niveau}{dansTypeEtablissement}{$1-N$}
@@ -1230,7 +1230,7 @@
 %\lien{ventile}{Epreuve}{$0-N$}
 \end{tikzpicture}
 \subsection{Tables}
-
+\newpage
 \begin{tikzpicture}[thick]
 \scriptsize
 
@@ -1242,7 +1242,7 @@
 		ModifControle
 	}[\bdd]
 
-	\tableEntity{NiveauTypeEtablissament}{
+	\tableEntity{NiveauTypeEtablissement}{
 		idNiveau&uint&idSup1&idNiv\\
 		idTpEtab&uint&idSup1&idTE&
 	}{
@@ -1258,16 +1258,21 @@
 		\fkey{idPrecedent}{Niveau}\\
 		\fkey{idSuivant}{Niveau}\\
 		\unique{idPrecedent, idSuivant}
-	}[right=1.2cm of NiveauTypeEtablissament,\bdd]
+	}[right=1.2cm of NiveauTypeEtablissement,\bdd]
+	
+	\tableEntity{EtablissementType}{
+		idEtab&unit&idSup1&idEt\\
+		idTpEtab&uint&idSup1&idTE
+	}{
+		\unique{idEtab, idTpEtab}
+	}[below=0.3cm of TypeEtablissement,\bdd]
 	
 	\tableEntity{Etablissement}{
-		idTpEtab&uint&idSup1&idTE\\
 		nc&text&stringNotEmpty&nc&\\
-		nom&text&stringNotEmpty&nm&
+		nom&text&stringNotEmpty&nm&\\
 	}{
-		\fkey{idTpEtab}{TypeEtablissement}\\
 		\unique{nom}
-	}[below=0.2cm of TypeEtablissement,\bdd]
+	}[below=0.2cm of EtablissementType,\bdd]
 	
 	\tableEntity{EtablissementNiveau}{
 		idEtab&uint&idSup1&idEt&\\
@@ -1276,7 +1281,7 @@
 		\fkey{idEtab}{Etablissement}\\
 		\fkey{idNiveau}{Niveau}\\
 		\unique{idEtab, idNiveau}
-	}[right=.8cm of Etablissement,\bdd]
+	}[below=.25cm of NiveauTypeEtablissement,\bdd]
 
 	\tableEntity{Niveau}{
 		nc&text&stringNotEmpty&nc\\
@@ -1302,7 +1307,7 @@
 		\fkey{idClasse}{Classe}\\
 		\fkey{idEleve}{Eleve}\\
 		\unique{idClasse, idEleve}
-	}[below=0.5cm of Niveau,\bdd]
+	}[below=0.25cm of Niveau,\bdd]
 
 	\tableEntity{Classe}{
 		idAn&uint&idSup1&idAn\\
@@ -1445,7 +1450,7 @@
 		\fkey{idBareme}{Bareme}\\
 		\fkey{idEnonce}{Enonce}\\
 		\unique{idBareme, idEnonce, ensPoint}
-	}[below=2.25cm of ControleEpreuve,\bdd]
+	}[below=0.25cm of ControleEpreuve,\bdd]
 
 	\tableEntity{Enonce}{
 		type&uint&idSup1&tp\\
@@ -1455,7 +1460,7 @@
 		\fkey{id}{ArbreEnonce}\\
 		\fkey{type}{Type}\\
 		Arbre
-	}[below=0.5cm of Epreuve,\bdd]
+	}[below=0.3cm of Epreuve,\bdd]
 
 	\tableEntity{EnoncePoint}
 	{
@@ -1479,15 +1484,16 @@
 		\fkey{id}{ArbreBareme}\\
 		\fkey{type}{Type}\\
 		Arbre
-	}[below=0.15cm of Controle,\bdd]
+	}[below=0.25cm of Enonce,\bdd]
 
 
-\lkey{TypeEtablissement}{NiveauTypeEtablissament}
+\lkey{TypeEtablissement}{NiveauTypeEtablissement}
 \lkey{Etablissement}{EtablissementNiveau}
-\lkey{TypeEtablissement}{Etablissement}
+\lkey{TypeEtablissement}{EtablissementType}
+\lkey{Etablissement}{EtablissementType}
 \lkey{Niveau.north}{FiliationNiveau.south west}
 \lkey{Niveau.north}{FiliationNiveau.south east}
-\lkey{Niveau.north west}{NiveauTypeEtablissament}
+\lkey{Niveau.north west}{NiveauTypeEtablissement}
 \lkey{Niveau}{EtablissementNiveau}
 \lkey{Etablissement}{Classe}
 \lkey{Niveau.south west}{Classe.north east} 
@@ -1512,7 +1518,7 @@
 \lkey{Point}{EnoncePoint}
 %\lkey{Point}{Bareme}
 \lkey{Controle.north east}{Note.south west}
-\lkey{Bareme}{Epreuve}
+\lkey{Bareme.north west}{Epreuve.south west}
 \lkey{Epreuve}{ControleEpreuve}
 \lkey{Enonce}{EnoncePoint} 
 \end{tikzpicture}	
