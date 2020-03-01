@@ -53,12 +53,6 @@ public:
     bool newEnt() const
         {return m_new;}
 
-    //! Rempli le nom et créer la case de check de chaque ligne du QListWidget.
-    template<class Ent> static void nomUncheckedList(QListWidget * list, const conteneurMPS::VectorPtr<Ent> & vec);
-
-    //! Mutateur des cases check d'un QListWidget.
-    template<class Ent> void setCheckedList(QListWidget * list, const conteneurMPS::VectorPtr<Ent> & vec,idt(*idF)(const Ent &));
-
     //! Titre de la fenêtre de dialogue.
     virtual QString title() const
         {return QString();}
@@ -268,29 +262,6 @@ public slots:
         }
     }
 };
-
-template<class Ent> void AbstractNewModifForm::nomUncheckedList(QListWidget * list, const conteneurMPS::VectorPtr<Ent> &vec) {
-    for(auto i = vec.cbegin(); i != vec.cend(); ++i) {
-        auto * item = new QListWidgetItem(i->nom());
-        item->setData(Qt::UserRole,i->id());
-        item->setCheckState(Qt::Unchecked);
-        list->addItem(item);
-    }
-}
-
-template<class Ent> void AbstractNewModifForm::setCheckedList(QListWidget * list, const conteneurMPS::VectorPtr<Ent> & vec,
-                                                              idt(*idF)(const Ent &)) {
-    for(auto i = 0; i != list->count(); ++i) {
-        auto * item = list->item(i);
-        auto j = vec.cbegin();
-        while(j != vec.cend() && idF(*j) != item->data(Qt::UserRole))
-            j++;
-        if(j == vec.cend())
-            item->setCheckState(Qt::Unchecked);
-        else
-            item->setCheckState(Qt::Checked);
-    }
-}
 
 template<class Ent> void AbstractNomNewModifForm::updateTemp(Ent & entity) {
     entity.setId(id());
