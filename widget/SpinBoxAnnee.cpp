@@ -2,8 +2,7 @@
 
 using namespace widgetMPS;
 
-SpinBoxAnnee::SpinBoxAnnee(int value, QWidget *parent): QAbstractSpinBox(parent), m_value(value)
-{
+SpinBoxAnnee::SpinBoxAnnee(int value, QWidget *parent): QAbstractSpinBox(parent), m_value(value) {
     setReadOnly(true);
     setAlignment(Qt::AlignHCenter);
     printValue();
@@ -12,10 +11,8 @@ SpinBoxAnnee::SpinBoxAnnee(int value, QWidget *parent): QAbstractSpinBox(parent)
 void SpinBoxAnnee::printValue()
     {lineEdit()->setText(QString::number(m_value)+"-"+QString::number(m_value+1));}
 
-void SpinBoxAnnee::stepBy(int steps)
-{
-    if(m_value + steps > 0)
-    {
+void SpinBoxAnnee::stepBy(int steps) {
+    if(m_value + steps > 0) {
         m_value += steps;
         printValue();
     }

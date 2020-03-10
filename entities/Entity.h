@@ -305,9 +305,13 @@ public:
     static bool VerifEntity(const Entity & entity)
         {return ID == entity.idEntity();}
 
-    /*! \brief Opérateur d'égalité.*/ \
+    //! Opérateur d'égalité.
     bool operator == (const Entity & entity) const
         {return VerifEntity(entity) && EntityAttributs<Attribut>::operator == (Convert(entity));}
+
+    //! Opérateur de différence.
+    bool operator != (const Entity & entity) const
+        {return ! operator== (entity);}
 
     //! Modifient les valeurs des attributs de l'entité avec celles des attributs de entity
     //! qui doit être de même type que la première opérande.

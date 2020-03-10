@@ -48,7 +48,6 @@ public slots:
 
     //! Écrit le schema xml de validation des fichier d'importation de données.
     void schemaXml();
-
 };
 }
 #endif // PREDEFFENPRINCIPALE_H

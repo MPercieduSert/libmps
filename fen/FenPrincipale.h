@@ -15,6 +15,7 @@
 #include <stdexcept>
 #include "AbstractNoyau.h"
 #include "AbstractZoneCentrale.h"
+#include "NewModifDialog.h"
 
 namespace fenMPS {
 /*! \ingroup groupeFen
@@ -56,9 +57,16 @@ public:
     //! Destructeur.
     ~FenPrincipale() override = default;
 
+    //! Accesseur du noyau.
+    virtual AbstractNoyau * noyau()
+        {return m_noyau;}
+
 protected:
     //! Crée le menu Bdd.
     void addMenuBdd();
+
+    //! Connect une QAction à l'ouverture d'un dialogue de création et modification.
+    template<class From> void connectActionToNewModifDialog(QAction * action, bool newEnt);
 
     //! Crée les différente action des menus et toolbars de la fenêtre principale.
     void createAction();
@@ -69,5 +77,13 @@ protected:
     //! Crée les toolbars de la fenêtre principale.
     void createToolBar();
 };
+
+template<class Form> void FenPrincipale::connectActionToNewModifDialog(QAction * action, bool newEnt) {
+    connect(action,&QAction::triggered,this, [this,newEnt](){
+                            auto * form = new Form(noyau()->bdd(), newEnt);
+                            dialogMPS::NewModifDialog diag(form,this);
+                            diag.exec();
+                        });
+}
 }
 #endif // FENPRINCIPALE_H

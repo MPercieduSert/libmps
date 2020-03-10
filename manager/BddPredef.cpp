@@ -91,7 +91,7 @@ void BddPredef::delEntityInDonnee(idt idCible, int cible, int num) {
 
     DonneeCible nature(Donnee::EntityNatureIdND, idCible, cible, num);
     if(get(nature)) {
-        if(nature.valeur().toInt() != cibleId::Vide)
+        if(nature.valeur().toInt() != natureId::Vide)
         {
             std::pair<int, int> interval(intervalEntityInDonnee(idCible,cible,num));
             delList<DonneeCible>(std::vector<DonneeCible::Position>({DonneeCible::Num,
@@ -120,7 +120,7 @@ void BddPredef::delEntityInDonnee(idt idCible, int cible, int num) {
                 i->setNum(i->num() - (interval.second - interval.first));
                 save(*i);
             }
-            nature.setValeur(cibleId::Vide);
+            nature.setValeur(natureId::Vide);
             save(nature);
         }
     }

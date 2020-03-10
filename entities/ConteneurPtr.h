@@ -53,7 +53,7 @@ public:
     void clear() noexcept {
         for(auto i = cbegin(); i != cend(); ++i)
             delete *i;
-        Lptr::clear();
+        clearPtr();
     }
 
     //! Affectation par déplacement
@@ -79,9 +79,8 @@ public:
     template<class Usine> decltype(auto) vectorOf(Usine f) const {
         std::vector<decltype (f(**cbegin()))> vec(size());
         auto j = vec.rbegin();
-        for (auto i = cbegin(); i != cend(); ++i) {
+        for (auto i = cbegin(); i != cend(); ++i)
             *j = f(**i);
-        }
         return vec;
     }
 
@@ -149,6 +148,7 @@ public:
 
     using typename Vptr::size_type;
     using Vptr::empty;
+    using Vptr::resize;
     using Vptr::size;
     using Vptr::shrink_to_fit;
 
@@ -193,6 +193,14 @@ public:
     const T & at(size_type n) const
         {return *(Vptr::at(n));}
 
+    //! Renvoie une référence sur la valeur du dernier élément.
+    T & back()
+        {return *(Vptr::back());}
+
+    //! Renvoie une référence sur la valeur du dernier élément.
+    const T & back() const
+        {return *(Vptr::back());}
+
     //! Renvoie un itérateur sur le début du vecteur.
     iterator begin() const noexcept
         {return Vptr::cbegin();}
@@ -203,7 +211,7 @@ public:
 
     //! Supprime toutes les entités pointées par les pointeurs de la liste.
     void clear() noexcept {
-        for(auto i = cbegin(); i != cend(); ++i)
+        for(auto i = Vptr::cbegin(); i != Vptr::cend(); ++i)
             delete *i;
         clear();
     }
@@ -218,6 +226,14 @@ public:
 
     //! Renvoie un iterateur sur l'entité d'identifiant id si elle existe.
     const_iterator findId(unsigned id) noexcept;
+
+    //! Renvoie une référence sur la valeur du premier élément.
+    T & front()
+        {return *(Vptr::front());}
+
+    //! Renvoie une référence sur la valeur du premier élément.
+    const T & front() const
+        {return *(Vptr::front());}
 
     //! Affectation par recopie.
     VectorPtr<T> &operator =(const VectorPtr<T> & vector);
@@ -324,7 +340,7 @@ template<class T> VectorPtr<T> & VectorPtr<T>::operator =(VectorPtr<T> && vector
         auto i = Vptr::begin();
         for(auto j = vector.Vptr::cbegin(); j != vector.Vptr::cend(); ++j, ++i)
             *i = *j;
-        vector.clear();
+        vector.Vptr::clear();
     }
     return *this;
 }

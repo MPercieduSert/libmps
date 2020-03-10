@@ -134,7 +134,7 @@ NewModifDialog::NewModifDialog(AbstractNewModifForm * form, QWidget * parent)
     //m_okButton->setEnabled(m_form->valide());
     connect(m_okButton,&QPushButton::clicked,this,&NewModifDialog::accept);
     connect(m_form,SIGNAL(savePermis(bool)),m_okButton,SLOT(setEnabled(bool)));
-    if(!m_form->newEnt()) {
+    if(!m_form->delDisable()) {
         m_supprButton = new QPushButton(tr("Supprimer"));
         connect(m_form,SIGNAL(effacerPermis(bool)),m_supprButton,SLOT(setEnabled(bool)));
         connect(m_supprButton,&QPushButton::clicked,this,[this](){
@@ -148,7 +148,7 @@ NewModifDialog::NewModifDialog(AbstractNewModifForm * form, QWidget * parent)
     // Calque bouton
     m_buttonLayout = new QHBoxLayout;
     m_buttonLayout->addWidget(m_okButton);
-    if(!m_form->newEnt())
+    if(!m_form->delDisable())
         m_buttonLayout->addWidget(m_supprButton);
     m_buttonLayout->addWidget(m_annulButton);
 

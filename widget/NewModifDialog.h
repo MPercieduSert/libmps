@@ -49,8 +49,12 @@ public:
     //! Connecte les signals et slots du formulaire.
     virtual void connexion() = 0;
 
+    //! Paramètre l'absence du bouton supprimé.
+    virtual bool delDisable() const noexcept
+        {return m_new;}
+
     //! Accesseur de m_new.
-    bool newEnt() const
+    bool newEnt() const noexcept
         {return m_new;}
 
     //! Titre de la fenêtre de dialogue.
@@ -58,7 +62,8 @@ public:
         {return QString();}
 
     //! Teste si le formulaire est valide pour l'enregistrement.
-    virtual bool valide() const = 0;
+    virtual bool valide() const
+        {return true;}
 
 public slots:
     //! Sauve l'entité et les réponces du formulairs dans la bases de donnée.

@@ -121,7 +121,7 @@ template<class Ent> Ent BddPredef::getEntityInDonnee(idt idCible, int Cible, int
 {
     using namespace entityMPS;
     DonneeCible nature(Donnee::EntityNatureIdND,idCible,Cible,num);
-    if(!get(nature) || nature.valeur().toInt() == cibleId::Vide || nature.valeur().toInt() != cible<Ent>())
+    if(!get(nature) || nature.valeur().toInt() == natureId::Vide || nature.valeur().toInt() != cible<Ent>())
         return Ent();
 
     std::pair<int,int> interval(intervalEntityInDonnee(idCible,Cible,num));
@@ -179,7 +179,7 @@ template<class Ent> void BddPredef::setEntityInDonnee(const Ent & entity, idt id
     else {
         if(num != 0) {
             DonneeCible natureNumPrec(Donnee::EntityNatureIdND, idCible, Cible, num - 1);
-            natureNumPrec.setValeur(cibleId::Vide);
+            natureNumPrec.setValeur(natureId::Vide);
             while(natureNumPrec.num() >= 0 && !existsUnique(natureNumPrec)) {
                 save(natureNumPrec);
                 natureNumPrec.setNum(natureNumPrec.num() - 1);

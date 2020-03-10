@@ -14,15 +14,7 @@ namespace bddMPS {
     //! Associe un numéro de cible.
     namespace cibleId  {
         //! Numéro de cible des types de base.
-        enum typeBase{Vide = -1,
-              Int = -2,
-              String = -3,
-              Bool = -4,
-              Float = -5,
-              Double = -6,
-              Date = -7,
-              DateTime = -8,
-              Variant = -9};
+        enum cibleNeg{Configuration = -1};
 
         //! Numéro de cible des entités prédéfinies.
         enum EntityPredef{Commentaire,
@@ -46,7 +38,44 @@ namespace bddMPS {
                           Utilisation,
                           Usage,
                           NbrCibleEntPredef};
-}}
+    }
+
+    namespace natureId {
+    //! Idantifiant de nature des types de base.
+    enum typeBase{Vide = -1,
+          Int = -2,
+          String = -3,
+          Bool = -4,
+          Float = -5,
+          Double = -6,
+          Date = -7,
+          DateTime = -8,
+          Variant = -9};
+
+    //! Idantifiant de nature des entités prédéfinies.
+    enum EntityPredef{Commentaire,
+                      CommentaireCible,
+                      Donnee,
+                      DonneeCard,
+                      DonneeCible,
+                      Historique,
+                      MotCle,
+                      MotCleCible,
+                      MotClePermission,
+                      MotProgCible,
+                      MotProgPermission,
+                      Restriction,
+                      Source,
+                      Texte,
+                      TexteCible,
+                      SourceTexte,
+                      Type,
+                      TypePermission,
+                      Utilisation,
+                      Usage,
+                      NbrCibleEntPredef};
+    }
+}
 
 namespace managerMPS {
 namespace emps = entityMPS;
@@ -72,7 +101,7 @@ public:
                      std::map<szt,std::unique_ptr<AbstractManager>> && managers = std::map<szt,std::unique_ptr<AbstractManager>>(),
                      const QSqlQuery & req = QSqlQuery())
         : Managers (NbrEntity, versionTable, std::move(managers), req),
-          m_cibleArray(nbrEntity(),bmps::cibleId::Vide),
+          m_cibleArray(nbrEntity(),bmps::natureId::Vide),
           m_cibleNbrAttArray(nbrCible,0) {}
 
     //! Destructeur.
@@ -82,13 +111,13 @@ public:
         {return m_cibleArray[Ent::ID];}
 
     int cible(szt id) const
-        {return id < m_nbrEntity ? m_cibleArray[id] : bmps::cibleId::Vide;}
+        {return id < m_nbrEntity ? m_cibleArray[id] : bmps::natureId::Vide;}
 
     //! Renvoie le nombre d'attributs d'une entité à partir du numéro de cible.
     int nombreAttributCible(int cible) const {
-        if(cible == bmps::cibleId::Vide || cible >= static_cast<int>(m_cibleNbrAttArray.size()))
+        if(cible == bmps::natureId::Vide || cible >= static_cast<int>(m_cibleNbrAttArray.size()))
             return 0;
-        if(cible < bmps::cibleId::Vide)
+        if(cible < bmps::natureId::Vide)
             return 1;
         return m_cibleNbrAttArray[static_cast<unsigned>(cible)];
     }
@@ -180,28 +209,28 @@ protected:
 };
 
 template<> inline int ManagersPredef::cible<int>() const
-    {return bmps::cibleId::Int;}
+    {return bmps::natureId::Int;}
 
 template<> inline int ManagersPredef::cible<QString>() const
-    {return bmps::cibleId::String;}
+    {return bmps::natureId::String;}
 
 template<> inline int ManagersPredef::cible<bool>() const
-    {return bmps::cibleId::Bool;}
+    {return bmps::natureId::Bool;}
 
 template<> inline int ManagersPredef::cible<float>() const
-    {return bmps::cibleId::Float;}
+    {return bmps::natureId::Float;}
 
 template<> inline int ManagersPredef::cible<double>() const
-    {return bmps::cibleId::Double;}
+    {return bmps::natureId::Double;}
 
 template<> inline int ManagersPredef::cible<QDate>() const
-    {return bmps::cibleId::Date;}
+    {return bmps::natureId::Date;}
 
 template<> inline int ManagersPredef::cible<QDateTime>() const
-    {return bmps::cibleId::DateTime;}
+    {return bmps::natureId::DateTime;}
 
 template<> inline int ManagersPredef::cible<QVariant>() const
-    {return bmps::cibleId::Variant;}
+    {return bmps::natureId::Variant;}
 
 template<class Ent> void ManagersPredef::setTypeForeignKey(InfoBdd & info)
 {
