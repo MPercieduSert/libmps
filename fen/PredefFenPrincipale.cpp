@@ -10,10 +10,10 @@ PredefFenPrincipale::PredefFenPrincipale(AbstractNoyau * noyau, std::unique_ptr<
 }
 
 void PredefFenPrincipale::addMenuBdd(){
-    m_menuBdd = menuBar()->addMenu(tr("Bdd"));
+    m_bddMenu = menuBar()->addMenu(tr("Bdd"));
 
     // Table
-    m_menuBddTable = m_menuBdd->addMenu("Tables");
+    m_bddTableMenu = m_bddMenu->addMenu("Tables");
     std::vector<std::pair<int,QString>> vec;
     vec.reserve(m_noyau->bdd().nbrEntity());
     for(szt i = 0; i < m_noyau->bdd().nbrEntity(); ++i) {
@@ -27,18 +27,22 @@ void PredefFenPrincipale::addMenuBdd(){
               [](const std::pair<int, QString> & p1, const std::pair<int, QString> & p2)->bool {return p1.second < p2.second;});
 
     for(auto iter = vec.cbegin(); iter != vec.cend(); ++iter) {
-        auto action = m_menuBddTable->addAction(iter->second);
+        auto action = m_bddTableMenu->addAction(iter->second);
         auto i =iter->first;
         connect(action,&QAction::triggered,[this,i](){centraleZone()->openTab({PredefTab::GestionBddTabId,i});});
     }
 
     // XML
-    m_menuBddXml = m_menuBdd->addMenu("XML");
-    auto iXml = m_menuBddXml->addAction("Importer");
-    auto schXml = m_menuBddXml->addAction("Schema Xml");
+    m_bddXmlMenu = m_bddMenu->addMenu("XML");
+    auto iXml = m_bddXmlMenu->addAction("Importer");
+    //auto schXml = m_bddXmlMenu->addAction("Schema Xml");
     connect(iXml,&QAction::triggered,this,&PredefFenPrincipale::importXml);
-    connect(schXml,&QAction::triggered,this,&PredefFenPrincipale::schemaXml);
+    //connect(schXml,&QAction::triggered,this,&PredefFenPrincipale::schemaXml);
 }
+
+void PredefFenPrincipale::connectActionToOpenTab(QAction * action, const std::pair<int,int>& pairIndex,
+                                           const std::vector<QVariant> & vec)
+    {connect(action,&QAction::triggered,this,[this,pairIndex,vec](){centraleZone()->openTab(pairIndex,vec);});}
 
 void PredefFenPrincipale::importXml() {
     auto fileName = QFileDialog::getOpenFileName(this,

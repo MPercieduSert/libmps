@@ -2,14 +2,14 @@
 
 using namespace fenMPS;
 
-bool AbstractTab::openTab(const std::pair<int, int> &pair) {
+bool AbstractTab::openTab(const std::pair<int, int> &pair, const std::vector<QVariant> &args) {
     auto iter = m_mapTab.find(pair);
     if(iter != m_mapTab.cend()) {
         setCurrentWidget(iter->second);
         return true;
     }
     else {
-        auto tab = createTab(pair);
+        auto tab = createTab(pair, args);
         if(!tab)
             return false;
         m_mapTab[pair]=tab;

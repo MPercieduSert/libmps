@@ -20,9 +20,9 @@ class PredefFenPrincipale : public FenPrincipale {
     Q_OBJECT
 protected:
     // Menu
-    QMenu *m_menuBdd;       //!< Menu de gestion de la base de données.
-    QMenu *m_menuBddTable;  //!< Menu des tables.
-    QMenu *m_menuBddXml;    //!< Menu d'importation d'entité de la base de donnée au format xml.
+    QMenu *m_bddMenu;       //!< Menu de gestion de la base de données.
+    QMenu *m_bddTableMenu;  //!< Menu des tables.
+    QMenu *m_bddXmlMenu;    //!< Menu d'importation d'entité de la base de donnée au format xml.
 
 public:
     //! Constructeur.
@@ -42,6 +42,9 @@ protected:
     //! Crée le menu Bdd.
     void addMenuBdd();
 
+    //! Connecte une QAction à l'ouverture d'un onglet.
+    void connectActionToOpenTab(QAction * action, const std::pair<int,int>& pairIndex,
+                                const std::vector<QVariant> & vec = std::vector<QVariant>());
 public slots:
     //! Importe des entités dans la base de à partir d'un fichier xml fourni par l'utilisateur.
     void importXml();

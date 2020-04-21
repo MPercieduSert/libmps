@@ -7,14 +7,14 @@
 #include <QStyledItemDelegate>
 #include <QTableView>
 
-#include "AbstractTabModule.h"
+#include "AbstractTabModuleWithBdd.h"
 #include "AbstractTableModel.h"
 
 namespace fenMPS {
 /*! \ingroup groupeFen
  * \brief Classe mère des onglets contenant des tableaux
  */
-class AbstractTabTableau : public AbstractTabModule {
+class AbstractTabTableau : public AbstractTabModuleWithBdd {
     Q_OBJECT
 protected:
     QPushButton * m_addColumnButton;        //!< Bouton pour ajouter une colonne
@@ -24,10 +24,17 @@ protected:
     QPushButton * m_saveButton;             //!< Bouton save
 public:
     //! Constructeur.
-    explicit AbstractTabTableau(const std::pair<int, int> &pairIndex, QWidget *parent = nullptr);
+    explicit AbstractTabTableau(bmps::Bdd & bdd, const std::pair<int, int> &pairIndex, QWidget *parent = nullptr);
 
     //! Destructeur.
     ~AbstractTabTableau() override = default;
+
+    //! Action à effectuer lorsque l'onglet devient actif.
+    void becomeCurrent() override;
+
+    //! Renvoie un pointeur sur le model.
+    virtual modelMPS::AbstractTableModel * model() const
+        {return m_model;}
 
 signals:
 

@@ -13,6 +13,7 @@
 #include <QMessageBox>
 #include <QPushButton>
 #include <QTreeWidget>
+#include <QtGlobal>
 #include <QVBoxLayout>
 #include "BddPredef.h"
 #include "EntityPredef.h"

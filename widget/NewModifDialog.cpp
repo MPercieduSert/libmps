@@ -28,10 +28,11 @@ AbstractNomNewModifForm::AbstractNomNewModifForm(bddMPS::Bdd & bdd, const QStrin
 void AbstractNomNewModifForm::connexion() {
     if(m_new)
         connect(m_nameLine,&QLineEdit::textChanged,this,[this](){emit savePermis(valide());});
-    else {
-        connect(m_nameCB,SIGNAL(currentIndexChanged(int)),this,SLOT(updateData()));
-        connect(m_nameCB,&QComboBox::currentTextChanged,this,[this](){emit savePermis(valide());});
-    }
+    else
+        connect(m_nameCB,qOverload<int>(&QComboBox::currentIndexChanged),this,[this](){
+            updateData();
+            emit savePermis(valide());
+        });
 }
 
 void AbstractNomNewModifForm::setNoms(const std::vector<std::pair<idt,QString>> & noms) {

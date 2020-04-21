@@ -24,51 +24,53 @@ FenPrincipale::FenPrincipale(AbstractNoyau * noyau, std::unique_ptr<bmps::Bdd> &
 
 void FenPrincipale::createAction() {
     // Coller
-    m_actionEditColler = new QAction(tr("Coller"),this);
-    m_actionEditColler->setShortcut(QKeySequence::Paste);
-    m_actionEditColler->setEnabled(false);
-    connect(m_actionEditColler,&QAction::triggered,m_zoneCentrale,&AbstractZoneCentrale::coller);
-    connect(m_noyau,&AbstractNoyau::collerPermis,m_actionEditColler,&QAction::setEnabled);
+    m_collerAction = new QAction(tr("Coller"),this);
+    m_collerAction->setShortcut(QKeySequence::Paste);
+    m_collerAction->setEnabled(false);
+    connect(m_collerAction,&QAction::triggered,m_zoneCentrale,&AbstractZoneCentrale::coller);
+    connect(m_zoneCentrale,&AbstractZoneCentrale::collerPermis,m_collerAction,&QAction::setEnabled);
 
     // Copier
-    m_actionEditCopier = new QAction(tr("Copier"),this);
-    m_actionEditCopier->setShortcut(QKeySequence::Copy);
-    m_actionEditCopier->setEnabled(false);
-    connect(m_actionEditCopier,&QAction::triggered,m_zoneCentrale,&AbstractZoneCentrale::copier);
-    connect(m_noyau,&AbstractNoyau::copierPermis,m_actionEditCopier,&QAction::setEnabled);
+    m_copierAction = new QAction(tr("Copier"),this);
+    m_copierAction->setShortcut(QKeySequence::Copy);
+    m_copierAction->setEnabled(false);
+    connect(m_copierAction,&QAction::triggered,m_zoneCentrale,&AbstractZoneCentrale::copier);
+    connect(m_zoneCentrale,&AbstractZoneCentrale::copierPermis,m_copierAction,&QAction::setEnabled);
 
     // Couper
-    m_actionEditCouper = new QAction(tr("Couper"),this);
-    m_actionEditCouper->setShortcut(QKeySequence::Cut);
-    m_actionEditCouper->setEnabled(false);
-    connect(m_actionEditCouper,&QAction::triggered,m_zoneCentrale,&AbstractZoneCentrale::couper);
-    connect(m_noyau,&AbstractNoyau::couperPermis,m_actionEditCouper,&QAction::setEnabled);
+    m_couperAction = new QAction(tr("Couper"),this);
+    m_couperAction->setShortcut(QKeySequence::Cut);
+    m_couperAction->setEnabled(false);
+    connect(m_couperAction,&QAction::triggered,m_zoneCentrale,&AbstractZoneCentrale::couper);
+    connect(m_zoneCentrale,&AbstractZoneCentrale::couperPermis,m_couperAction,&QAction::setEnabled);
 
     // Effacer
-    m_actionEditEffacer = new QAction(tr("Effacer"),this);
-    m_actionEditEffacer->setShortcut(QKeySequence::Delete);
-    m_actionEditEffacer->setEnabled(false);
-    connect(m_actionEditEffacer,&QAction::triggered,m_zoneCentrale,&AbstractZoneCentrale::effacer);
-    connect(m_noyau,&AbstractNoyau::effacerPermis,m_actionEditEffacer,&QAction::setEnabled);
+    m_effacerAction = new QAction(tr("Effacer"),this);
+    m_effacerAction->setShortcut(QKeySequence::Delete);
+    m_effacerAction->setEnabled(false);
+    connect(m_effacerAction,&QAction::triggered,m_zoneCentrale,&AbstractZoneCentrale::effacer);
+    connect(m_zoneCentrale,&AbstractZoneCentrale::effacerPermis,m_effacerAction,&QAction::setEnabled);
 
     // Save
-    m_actionSave = new QAction(tr("Sauvegarder"),this);
-    m_actionSave->setShortcut(QKeySequence::Save);
-    m_actionSave->setEnabled(false);
-    connect(m_actionSave,&QAction::triggered,m_zoneCentrale,&AbstractZoneCentrale::save);
-    connect(m_noyau,&AbstractNoyau::savePermis,m_actionSave,&QAction::setEnabled);
+    m_saveAction = new QAction(tr("Sauvegarder"),this);
+    m_saveAction->setShortcut(QKeySequence::Save);
+    m_saveAction->setEnabled(false);
+    connect(m_saveAction,&QAction::triggered,m_zoneCentrale,&AbstractZoneCentrale::save);
+    connect(m_zoneCentrale,&AbstractZoneCentrale::savePermis,m_saveAction,&QAction::setEnabled);
 }
 
 void FenPrincipale::createMenu() {
-    m_menuFichier = menuBar()->addMenu(tr("&Fichier"));
+    m_fichierMenu = menuBar()->addMenu(tr("&Fichier"));
     //m_menuNew = m_menuFichier->addMenu(tr("&Nouveau"));
-    m_menuFichier->addAction(m_actionSave );
+    m_fichierMenu->addAction(m_saveAction );
 
-    m_menuEdit = menuBar()->addMenu("&Edit");
-    m_menuEdit->addAction(m_actionEditColler);
-    m_menuEdit->addAction(m_actionEditCopier);
-    m_menuEdit->addAction(m_actionEditCouper);
-    m_menuEdit->addAction(m_actionEditEffacer);
+    m_editMenu = menuBar()->addMenu(tr("&Edit"));
+    m_editMenu->addAction(m_collerAction);
+    m_editMenu->addAction(m_copierAction);
+    m_editMenu->addAction(m_couperAction);
+    m_editMenu->addAction(m_effacerAction);
+
+    m_newModifMenu = menuBar()->addMenu(tr("&Créer / Modifier"));
 }
 
 void FenPrincipale::createToolBar()

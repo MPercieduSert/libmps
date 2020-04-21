@@ -15,26 +15,6 @@
             {Ent ent(entity); \
             add(ent);
 
-//! \ingroup groupeManager
-//! Milieu du coprs des deux methodes save.
-//#define SAVE_MODIF_MILIEU }else \
-//            throw std::invalid_argument(messageErreursUnique(entity).append("\n Erreur d'unicité : " \
-//                    "il existe déjà dans la base de donnée une entité ayant les mêmes valeurs d'attributs unique " \
-//                    "que cette nouvelle entité.").toStdString());} \
-//    else \
-//        {if(!sameInBdd(entity)) \
-//            {if(existsUnique(entity) <= bmps::Meme) \
-//                modify(entity); \
-//            else \
-//                throw std::invalid_argument(messageErreursUnique(entity).append("\n Erreur d'unicité :  " \
-//                    "il existe déjà dans la base de donnée une entité ayant les mêmes valeurs d'attributs unique " \
-//                    "que l'entité modifiée.").toStdString());}
-
-//            //! \ingroup groupeManager
-//            //! Milieu du coprs des deux methodes save.
-//#define SAVE_MODIF_FIN }} else \
-//    throw std::invalid_argument(messageErreurs(entity).append("\n Erreur de validité").toStdString());
-
 namespace managerMPS {
 /*! \ingroup groupeManager
  * \brief Classe template mère des différents manageurs à modification controlée.
@@ -75,17 +55,9 @@ public:
     virtual void setAutorisation(idt id, bmps::autorisation autorisation, bool bb)
         {m_gestionAutorisation->setAutorisation(id, autorisation, bb);}
 
-//    //! Modifie les autorisations de modification pour une entité donnée.
-//    virtual void setAutorisation(const Ent & entity, std::map<bmps::autorisation,bool> autorisations)
-//        {m_gestionAutorisation->setAutorisation(entity, autorisations);}
-
     //! Mutateur du gestionnaire d'autorisations.
     void setGestionAutorisation(AbstractGestionAutorisation<Ent> * gestionAutorisation)
         {m_gestionAutorisation = gestionAutorisation;}
-
-//    //! Ajoute les restrictions de modification pour une entité donnée.
-//    virtual void setRestriction(const Ent & entity, std::vector<bmps::autorisation> restrictions)
-//        {m_gestionAutorisation->setRestriction(entity, restrictions);}
 
 protected:
     //! Met en place un court circuit du gestionnaire d'autorisations.

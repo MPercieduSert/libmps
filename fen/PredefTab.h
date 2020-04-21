@@ -21,7 +21,7 @@ protected:
 
 public:
     enum tabName{GestionBddTabId,
-                NbrTabId};
+                NbrPredefTabId};
 
 
     //! Constructeur.
@@ -32,7 +32,7 @@ public:
     ~PredefTab() override = default;
 
     //! Créateur d'onglet.
-    AbstractTabModule *createTab(std::pair<int,int> pair) const override;
+    AbstractTabModule *createTab(const std::pair<int,int> & pair, const std::vector<QVariant> & args = std::vector<QVariant>()) const override;
 };
 }
 #endif // PREDEFTAB_H
