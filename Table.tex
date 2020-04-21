@@ -110,6 +110,7 @@
 \newcommand{\lkeyArbre}[1]{\lkeyloop{Arbre#1}}
 \newcommand{\ent}{purple}
 \newcommand{\bdd}{blue}
+\newcommand{\gui}{violet}
 \begin{document}
 \section{Predef}
 \subsection{Commentaire}
@@ -1071,6 +1072,8 @@
 	\relation{duNiveau}[below=0.75cm of Niveau]
 	
 	\entity{Classe}{
+		nc
+		nom
 		num
 	}[right=2cm of classeDans]
 
@@ -1240,7 +1243,7 @@
 	}{
 		\unique{nom}\\
 		ModifControle
-	}[\bdd]
+	}[\gui]
 
 	\tableEntity{NiveauTypeEtablissement}{
 		idNiveau&uint&idSup1&idNiv\\
@@ -1249,7 +1252,7 @@
 		\fkey{idNiveau}{Niveau}\\
 		\fkey{idTpEtab}{TypeEtablissement}\\
 		\unique{idTpEtab, idNiveau}
-	}[right=1.2cm of TypeEtablissement,\bdd]
+	}[right=1.2cm of TypeEtablissement,\gui]
 	
 	\tableEntity{FiliationNiveau}{
 	idPrecedent&uint&idSup1&idP\\
@@ -1257,22 +1260,24 @@
 	}{
 		\fkey{idPrecedent}{Niveau}\\
 		\fkey{idSuivant}{Niveau}\\
-		\unique{idPrecedent, idSuivant}
-	}[right=1.2cm of NiveauTypeEtablissement,\bdd]
+		\unique{idPrecedent, idSuivant}\\
+		ModifControle
+	}[right=1.2cm of NiveauTypeEtablissement,\gui]
 	
 	\tableEntity{EtablissementType}{
 		idEtab&unit&idSup1&idEt\\
 		idTpEtab&uint&idSup1&idTE
 	}{
 		\unique{idEtab, idTpEtab}
-	}[below=0.3cm of TypeEtablissement,\bdd]
+	}[below=0.3cm of TypeEtablissement,\gui]
 	
 	\tableEntity{Etablissement}{
 		nc&text&stringNotEmpty&nc&\\
 		nom&text&stringNotEmpty&nm&\\
 	}{
-		\unique{nom}
-	}[below=0.2cm of EtablissementType,\bdd]
+		\unique{nom}\\
+		ModifControle
+	}[below=0.2cm of EtablissementType,\gui]
 	
 	\tableEntity{EtablissementNiveau}{
 		idEtab&uint&idSup1&idEt&\\
@@ -1281,7 +1286,7 @@
 		\fkey{idEtab}{Etablissement}\\
 		\fkey{idNiveau}{Niveau}\\
 		\unique{idEtab, idNiveau}
-	}[below=.25cm of NiveauTypeEtablissement,\bdd]
+	}[below=.25cm of NiveauTypeEtablissement,\gui]
 
 	\tableEntity{Niveau}{
 		nc&text&stringNotEmpty&nc\\
@@ -1289,20 +1294,22 @@
 		type&uint&idSup1&tp
 	}{
 		\fkey{type}{Type}\\
-		\unique{nom}	
-	}[below=0.5cm of FiliationNiveau,\bdd]
+		\unique{nom}\\
+		ModifControle	
+	}[below=0.5cm of FiliationNiveau,\gui]
 
 	\tableEntity{Annee}{
 		num&int&intSup0&num
 	}{
-		\unique{num}
-	}[below=0.15cm of Etablissement,\bdd]
+		\unique{num}\\
+		ModifControle
+	}[below=0.15cm of Etablissement,\gui]
 	
 	\tableEntity{ClasseEleve}{
 		idClasse&uint&idSup1&idCl\\
 		idEleve&uint&idSup1&idEl\\
 		entree&dateTime&dtValide&ent\\
-		sortie&dateTime&dtValide&sort&NULL
+		sortie&dateTime&dtValide&sort
 	}{
 		\fkey{idClasse}{Classe}\\
 		\fkey{idEleve}{Eleve}\\
@@ -1313,13 +1320,16 @@
 		idAn&uint&idSup1&idAn\\
 		idEtab&uint&idSup1&idEt\\
 		idNiveau&uint&idSup1&idNv\\
+		nc&text&stringNotEmpty&nc&\\
+		nom&text&stringNotEmpty&nm&\\
 		num&int&intSup0&num
 	}{
 		\fkey{idAn}{An}\\
 		\fkey{idEtab}{Etablissement}\\
 		\fkey{idNiveau}{Niveau}\\
-		\unique{idAn,idEtab, idNiveau, num}
-	}[left=.8cm of ClasseEleve,\bdd]
+		\unique{idAn,idEtab, idNiveau, num}\\
+		ModifControle
+	}[left=.8cm of ClasseEleve,\gui]
 
 	\tableEntity{ClasseGroupe}{
 		idAn&uint&idSup1Null&idAn&NULL\\
@@ -1359,7 +1369,8 @@
 		nom&text&stringNotEmpty&nm\\
 		prenom&text&stringNotEmpty&pnm
 	}{
-		\unique{nom, prenom, date}
+		\unique{nom, prenom, date}\\
+		ModifControle
 	}[below=0.5cm of ClasseEleve,\bdd]
 	
 	\tableEntity{Note}{

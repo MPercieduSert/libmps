@@ -21,8 +21,7 @@ class NewMotCleDialog : public QDialog
     Q_OBJECT
 public:
     //! Structure de réponse de la fenêtre de dialogue.
-    struct dialogResult
-    {
+    struct dialogResult {
         QString nc;
         QString nom;
     };

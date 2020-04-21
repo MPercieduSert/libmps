@@ -44,7 +44,8 @@ SOURCES += \
     TreeModelTemp.cpp \
     AbstractTreeModel.cpp \
     NewModifDialog.cpp \
-    Checklist.cpp
+    Checklist.cpp \
+    AbstractTableEntityModel.cpp
 
 HEADERS += \
     BarPlotter.h \
@@ -69,7 +70,8 @@ HEADERS += \
     TreeModelTemp.h \
     AbstractTreeModel.h \
     NewModifDialog.h \
-    Checklist.h
+    Checklist.h \
+    AbstractTableEntityModel.h
 unix {
     target.path = /usr/lib
     INSTALLS += target

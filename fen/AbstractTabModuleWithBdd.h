@@ -26,7 +26,7 @@ public:
     ~AbstractTabModuleWithBdd() override = default;
 
     //! Accesseur de la base de donnée.
-    bmps::Bdd & bdd() const
+    virtual bmps::Bdd & bdd() const
         {return m_bdd;}
 };
 }

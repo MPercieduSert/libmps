@@ -7,6 +7,7 @@ AbstractTabModule::AbstractTabModule(const std::pair<int, int> &pairIndex, QWidg
     m_pairIndex(pairIndex){}
 
 void AbstractTabModule::becomeCurrent() {
+    emit effacerPermis(false);
     emit collerPermis(false);
     emit copierPermis(false);
     emit couperPermis(false);

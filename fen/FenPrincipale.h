@@ -29,15 +29,16 @@ class FenPrincipale : public QMainWindow {
     Q_OBJECT
 protected:
     // Action
-    QAction *m_actionEditColler;    //!< Action coller.
-    QAction *m_actionEditCopier;    //!< Action copier.
-    QAction *m_actionEditCouper;    //!< Action couper.
-    QAction *m_actionEditEffacer;   //!< Action effacer.
-    QAction *m_actionSave;          //!< Action sauvegarder.
+    QAction *m_collerAction;    //!< Action coller.
+    QAction *m_copierAction;    //!< Action copier.
+    QAction *m_couperAction;    //!< Action couper.
+    QAction *m_effacerAction;   //!< Action effacer.
+    QAction *m_saveAction;          //!< Action sauvegarder.
 
     // Menu
-    QMenu *m_menuEdit;              //!< Menu édition.
-    QMenu *m_menuFichier;           //!< Menu Fichier.
+    QMenu *m_editMenu;              //!< Menu édition.
+    QMenu *m_fichierMenu;           //!< Menu Fichier.
+    QMenu *m_newModifMenu;          //!< Création modification.
 
     // Tools Bar
     QToolBar *m_toolBar;            //!< Barre d'outils.
@@ -65,7 +66,7 @@ protected:
     //! Crée le menu Bdd.
     void addMenuBdd();
 
-    //! Connect une QAction à l'ouverture d'un dialogue de création et modification.
+    //! Connecte une QAction à l'ouverture d'un dialogue de création et modification.
     template<class From> void connectActionToNewModifDialog(QAction * action, bool newEnt);
 
     //! Crée les différente action des menus et toolbars de la fenêtre principale.

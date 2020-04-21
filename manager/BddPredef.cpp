@@ -291,6 +291,11 @@ void BddPredef::listeMiseAJourBdd(int version) {
             creerTable<Donnee>();
             creerTable<DonneeCible>();
             creerTable<DonneeCard>();
+//            Donnee dn;
+//            dn.setIdProg(donnee::defaultValueId);
+//            dn.setNom("Valeur par défaut");
+//            dn.setType()
+//            save(Donnee)
         }
         //Historique
         if(managers().historiqueIsEnabled())

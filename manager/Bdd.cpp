@@ -196,6 +196,16 @@ void Bdd::save(Entity & entity, const Entity & parent, int num)
 void Bdd::save(const Entity & entity, const Entity & parent, int num)
     {m_manager->get(entity.idEntity()).save(entity,parent,num);}
 
+void Bdd::save(VectorPtr<Entity> & vector) {
+    for (auto iter = vector.begin(); iter != vector.end(); ++iter)
+        save(*iter);
+}
+
+void Bdd::save(const VectorPtr<Entity> & vector) {
+    for (auto iter = vector.cbegin(); iter != vector.cend(); ++iter)
+        save(*iter);
+}
+
 void Bdd::saveUnique(Entity & entity)
     {m_manager->get(entity.idEntity()).saveUnique(entity);}
 

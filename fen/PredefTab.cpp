@@ -2,7 +2,7 @@
 
 using namespace fenMPS;
 
-AbstractTabModule * PredefTab::createTab(std::pair<int,int> pair) const {
+AbstractTabModule * PredefTab::createTab(const std::pair<int,int> & pair, const std::vector<QVariant> & /*args*/) const {
     switch (pair.first) {
         case GestionBddTabId:
             return new TabGestionBdd(m_bdd , pair);

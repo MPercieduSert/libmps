@@ -34,6 +34,8 @@ namespace donnee {
                   Date = 5,
                   DateTime = 6};
 
+    enum prog {NoId,
+               defaultValueId};
     /*//! Identifiant de programation
     enum prog {NoId,
               ContactIdProg,
@@ -103,8 +105,8 @@ public:
                    TpVal = PositionEnum<TpValAttribut>::Position,
                    NbrAtt = EAID::NbrAtt};
 
-    //! Identifiant de programation
-    enum prog {NoId};
+//    //! Identifiant de programation
+//    enum prog {NoId};
 
     //! Identifiant des donnée hors de l'arbre.
     enum idNegDonneProg{
@@ -123,7 +125,7 @@ public:
         {setIdProg(idProg);}
 
     //! Constructeur à partir des valeurs attributs.
-    Donnee(const QString & nom, idt type, int tpVal, idt idProg = prog::NoId, idt id = 0)
+    Donnee(const QString & nom, idt type, int tpVal, idt idProg = donnee::NoId, idt id = 0)
         : Donnee(idProg,id) {
         setNom(nom);
         setType(type);

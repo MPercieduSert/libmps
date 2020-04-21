@@ -5,6 +5,7 @@
 #define ABSTRACTTAB_H
 
 #include <QTabWidget>
+#include <QVariant>
 #include "AbstractTabModule.h"
 
 namespace fenMPS {
@@ -31,7 +32,7 @@ public:
     virtual void connectTab(AbstractTabModule * tab) const;
 
     //! Créateur d'onglet.
-    virtual AbstractTabModule *createTab(std::pair<int,int> pair) const = 0;
+    virtual AbstractTabModule *createTab(const std::pair<int,int>& pair, const std::vector<QVariant> & args = std::vector<QVariant>()) const = 0;
 
 signals:
     //! Signal d'activation/désactivation de l'action effacer.
@@ -66,7 +67,7 @@ public slots:
     void effacer()  {static_cast<AbstractTabModule*>(currentWidget())->effacer();}
 
     //! Ouvre un nouvel onglet et le crée si celui-ci n'existe pas.
-    bool openTab(const std::pair<int,int> & pair);
+    bool openTab(const std::pair<int,int> & pair, const std::vector<QVariant> & args = std::vector<QVariant>());
 
     //! Supprime un onglet.
     void removeTab(int index);

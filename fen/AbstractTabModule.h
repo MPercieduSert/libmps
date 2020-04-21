@@ -19,6 +19,7 @@ protected:
     const std::pair<int,int> m_pairIndex; //!< Référence de l'onglet
 
 public:
+    enum {NoId = -1};
     //! Constructeur.
     explicit AbstractTabModule(const std::pair<int,int> & pairIndex, QWidget * parent = nullptr);
 

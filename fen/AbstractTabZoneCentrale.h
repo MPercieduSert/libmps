@@ -43,7 +43,7 @@ public slots:
     void save() override    {m_tab->save();}
 
     //! Demande l'ouverture d'un onglet.
-    void openTab(const std::pair<int,int> & pair) {m_tab->openTab(pair);}
+    void openTab(const std::pair<int,int> & pair, const std::vector<QVariant> & args = std::vector<QVariant>()) {m_tab->openTab(pair,args);}
 };
 }
 #endif // ABSTRACTTABZONECENTRALE_H

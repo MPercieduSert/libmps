@@ -15,34 +15,12 @@
 #include "FileInterface.h"
 #include "XmlMps.h"
 
-///*! \ingroup groupeFile
-// * \brief Macro permettant déclarer les méthodes de suppression.
-// */
-//#define DECL_DEL_METHODE /*! \brief Supprime l'entité entity de la base de donnée et met l'identifiant de l'entité à zéro. */ \
-//    template<class Ent> bool del(Ent & entity) \
-//    {bool bb = del<Ent>(entity.id()); \
-//    entity.setId(0); \
-//    return bb;} \
-//    /*! Supprime l'entité entity de la base de donnée. */ \
-//    template<class Ent> bool del(const Ent & entity) {return del<Ent>(entity.id());}\
-//    /*! \brief Essaie de supprimer les éléments de la liste de la base de donnée,*/ \
-//    /*! se termine au premièr échec et renvoye false et true si tout les éléments ont été supprimés.*/ \
-//    template<class Ent> bool delList(const conteneurMPS::VectorPtr<Ent> & liste);
-//    //*! \brief Méthode de suppression pour les entité de type arbre. */
-//    template<class Ent, class U> bool delArbre(idt id, U delFonction);
-//    /*! \brief Méthode de suppression pour les entité de type arbre à modification controlée. */
-//    template<class Ent, class U> bool delArbreModifControle(idt id, U delFonction);
-//    /*! \brief Méthode de suppression pour les entité à modification controlée. */
-//    template<class Ent, class U> bool delModifControle(idt id, U delFonction);
-
 /*! \ingroup groupeFile
  * \brief Corps des deux méthodes delArbre.
  */
 //#define DEL_ARBRE {return foreachBeginChild(id,
 //    [this,&delFonction(idt id)->bool{return delFonction(id) && del<Ent>(id);}]
 //    ,false);}
-
-
 
 //VectorPtr<Ent> childs = getVectorChilds(entity);
 //    typename VectorPtr<Ent>::iterator i = childs.begin();
@@ -60,28 +38,11 @@
 //    return i == childs.end() && delFonction(entity);});}
 
 /*! \ingroup groupeFile
- * \brief Corps de la méthode delModifControle.
- */
-//#define DEL_LIST {auto i = liste.begin(); \
-//    while(i != liste.end() && del(*i)) ++i; \
-//    return i == liste.end();}
-
-/*! \ingroup groupeFile
- * \brief Corps de la méthode delModifControle.
- */
-//#define DEL_MODIF_CONTROLE {if(getAutorisation(entity, Suppr) && delFonction(entity)
-//    && delList(getList<Restriction>(Restriction::IdCible,entity.id(),
-//    restriction::Cible,Cible<Ent>::value)))
-//    return Bdd::del(entity);
-//    else return false;}
-
-/*! \ingroup groupeFile
  * \brief Macro permettant définir les méthodes de suppression.
  */
-//#define DEF_DEL_METHODE(CLASS) template<class Ent> bool CLASS::delList(const conteneurMPS::VectorPtr<Ent> & liste) DEL_LIST
+//#define DEF_DEL_METHODE(CLASS)
     //template<class Ent, class U> bool Bdd::delArbre(Ent & entity, U delFonction) DEL_ARBRE
 //    template<class Ent, class U> bool Bdd::delArbreModifControle(Ent & entity, U delFonction) DEL_ARBRE_MODIF_CONTROLE
-//    template<class Ent, class U> bool Bdd::delModifControle(Ent & entity, U delFonction) DEL_MODIF_CONTROLE
 
 namespace bddMPS {
 using namespace conteneurMPS;
@@ -597,6 +558,12 @@ public:
     template<class Ent> void save(tree<Ent> & arbre, treeSave n = treeSave::ExternalChange);
 
     //! Enregistre les entités de vector dans la base de donnée.
+    void save(VectorPtr<Entity> & vector);
+
+    //! Enregistre les entités de vector dans la base de donnée.
+    void save(const VectorPtr<Entity> & vector);
+
+    //! Enregistre les entités de vector dans la base de donnée.
     template<class Ent> void save(VectorPtr<Ent> & vector)
         {saveConteneur<Ent,VectorPtr<Ent>>(vector);}
 
@@ -868,17 +835,19 @@ template<class Ent, class Join> VectorPtr<Ent> Bdd::getList(typename Ent::Positi
                                                const std::vector<std::pair<int,bool>> & orderMapTable) {
     std::map<QString,QVariant> whereMapJoinString;
     for(auto i = whereMapJoin.cbegin(); i != whereMapJoin.cend(); i++)
-        whereMapJoinString[m_manager->get<Join>()->attribut(i->first)] = i->second;
-    return m_manager->get<Ent>().getListJoin(m_manager->get<Join>()->table(),colonneTable, m_manager->get<Join>()->attribut(colonneJoin),
-                                                      whereMapTable, whereMapJoinString, orderMapTable);
+        whereMapJoinString[m_manager->get<Join>().attribut(i->first)] = i->second;
+    return m_manager->get<Ent>().getListJoin(m_manager->get<Join>().info().table(),colonneTable,
+                                             m_manager->get<Join>().info().attribut(colonneJoin),
+                                             whereMapTable, whereMapJoinString, orderMapTable);
 }
 
 template<class Ent, class Join> VectorPtr<Ent> Bdd::getList(typename Join::Position cleJoin, typename Join::Position cleWhere,
-                                                          const QVariant & valueWhere, typename Ent::Position ordre,
-                                                          condition cond, bool crois) {
-    return m_manager->get<Ent>().getListJoin(m_manager->get<Join>()->table(),m_manager->get<Join>()->attribut(cleJoin),
-                                              m_manager->get<Join>()->attribut(cleWhere),
-                                                      valueWhere, ordre, cond, crois);
+                                                            const QVariant & valueWhere, typename Ent::Position ordre,
+                                                            condition cond, bool crois) {
+    return m_manager->get<Ent>().getListJoin(m_manager->get<Join>().info().table(),
+                                             m_manager->get<Join>().info().attribut(cleJoin),
+                                             m_manager->get<Join>().info().attribut(cleWhere),
+                                             valueWhere, ordre, cond, crois);
 }
 
 template<class Ent> VectorPtr<Ent> Bdd::getListChilds(const Ent & entity)
@@ -962,16 +931,16 @@ template<class Ent, class Join> mapIdt<Ent> Bdd::getMap(typename Ent::Position c
                                                typename Ent::Position cleMap) {
     std::map<QString,QVariant> whereMapJoinString;
     for(auto i = whereMapJoin.cbegin(); i != whereMapJoin.cend(); i++)
-        whereMapJoinString[m_manager->get<Join>()->attribut(i->first)] = i->second;
-    return m_manager->get<Ent>().getMapJoin(m_manager->get<Join>()->table(),colonneTable, m_manager->get<Join>()->attribut(colonneJoin),
+        whereMapJoinString[m_manager->get<Join>().attribut(i->first)] = i->second;
+    return m_manager->get<Ent>().getMapJoin(m_manager->get<Join>().table(),colonneTable, m_manager->get<Join>().attribut(colonneJoin),
                                                       whereMapTable, whereMapJoinString, cleMap);
 }
 
 template<class Ent, class Join> mapIdt<Ent> Bdd::getMap(typename Join::Position cleJoin,
                                                                 typename Join::Position cleWhere, const QVariant & valueWhere,
                                                                 typename Ent::Position cleMap, condition cond) {
-    return m_manager->get<Ent>().getMapJoin(m_manager->get<Join>()->table(),m_manager->get<Join>()->attribut(cleJoin),
-                                             m_manager->get<Join>()->attribut(cleWhere),
+    return m_manager->get<Ent>().getMapJoin(m_manager->get<Join>().table(),m_manager->get<Join>().attribut(cleJoin),
+                                             m_manager->get<Join>().attribut(cleWhere),
                                                       valueWhere, cleMap, cond);
 }
 
