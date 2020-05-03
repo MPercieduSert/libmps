@@ -150,24 +150,6 @@ public:
     //! Teste s'il existe une entité ayant les mêmes valeurs qu'un ensemble d'attributs uniques que entity en base de donnée.
     template<class Ent> bool existsUnique(const Ent & entity);
 
-//    //! Supprime l'entité entity de la base de donnée et met l'identifiant de l'entité à zéro.
-//    bool del(Entity & entity) {
-//        bool bb = m_manager->get(entity.idEntity()).del(entity.id());
-//        entity.setId(0);
-//        return bb;
-//    }
-
-//    //! Supprime l'entité entity de la base de donnée et met l'identifiant de l'entité à zéro.
-//    template<class Ent> bool del(Ent & entity) {
-//        bool bb = del<Ent>(entity.id());
-//        entity.setId(0);
-//        return bb;
-//    }
-
-//    //! Supprime l'entité entity de la base de donnée.
-//    template<class Ent> bool del(const Ent & entity)
-//        {return del<Ent>(entity.id());}
-
     //! Teste s'il existe une entité ayant les mêmes valeurs d'attributs uniques que entity en base de donnée.
     existeUni existsUniqueEnsemble(Entity & entity);
 
@@ -179,6 +161,14 @@ public:
 
     //! Teste s'il existe une entité ayant les mêmes valeurs d'attributs uniques que entity en base de donnée.
     template<class Ent> existeUni existsUniqueEnsemble(const Ent & entity);
+
+    //! Teste s'il existe une entité ayant les mêmes valeurs d'attributs uniques que l'entité entity en base de donnée
+    //! et renvoie l'identifiant du premier trouver.
+    std::pair<existeUni,idt> existsUniqueId(const Entity & entity);
+
+    //! Teste s'il existe une entité ayant les mêmes valeurs d'attributs uniques que l'entité entity en base de donnée
+    //! et renvoie l'identifiant du premier trouver.
+    template<class Ent> std::pair<existeUni,idt> existsUniqueId(const Ent & entity);
 
     //! Fonction d'agrega de valeur de type T sur l'attribut att appliquée à toutes les entités de la table.
     template<class Ent> QVariant fonctionAgrega(agrega fonc, typename Ent::Position att);
@@ -214,9 +204,6 @@ public:
     //! Renvoie l'autorisation de modification de l'entité donnée en argument.
     bool getAutorisation(const Entity & entity, autorisation autoris)
         {return getAutorisationP(entity.id(), entity.idEntity(), autoris);}
-
-//    //! Renvoie l'autorisation de modification de l'entité donnée en argument.
-//    template<class Ent> bool getAutorisation(const Ent & entity, autorisation autoris);
 
     //! Renvoie l'arbre de toutes les entités pour une entité de type arbre.
     template<class Ent> tree<Ent> getArbre();
@@ -504,9 +491,6 @@ public:
     //! Enregistre l'entité entity en base de donnée ainsi que sa nouvelle autorisation de modification.
     template<class Ent> void save(Ent & entity, autorisation autoris, bool bb = false);
 
-//    //! Enregistre l'entité entity en base de donnée ainsi que sa nouvelle autorisation de modification.
-//    void save(const Entity & entity, autorisation autoris, bool bb = false);
-
     //! Enregistre l'entité entity en base de donnée ainsi que sa nouvelle autorisation de modification.
     template<class Ent> void save(const Ent & entity, autorisation autoris, bool bb = false);
 
@@ -516,9 +500,6 @@ public:
     //! Enregistre l'entité entity en base de donnée ainsi que ses nouvelles autorisations de modification.
     template<class Ent> void save(Ent & entity, const std::map<autorisation,bool> & autorisations);
 
-//    //! Enregistre l'entité entity en base de donnée ainsi que ses nouvelles autorisations de modification.
-//    void save(const Entity & entity, const std::map<autorisation,bool> & autorisations);
-
     //! Enregistre l'entité entity en base de donnée ainsi que ses nouvelles autorisations de modification.
     template<class Ent> void save(const Ent & entity, const std::map<autorisation,bool> & autorisations);
 
@@ -527,9 +508,6 @@ public:
 
     //! Enregistre l'entité entity en base de donnée ainsi que ses nouvelles restriction de modification.
     template<class Ent> void save(Ent & entity, const std::vector<autorisation> & restriction);
-
-//    //! Enregistre l'entité entity en base de donnée ainsi que ses nouvelle restriction de modification.
-//    void save(const Entity & entity, const std::vector<autorisation> & restriction);
 
     //! Enregistre l'entité entity en base de donnée ainsi que ses nouvelle restriction de modification.
     template<class Ent> void save(const Ent & entity, const std::vector<autorisation> & restriction);
@@ -641,9 +619,6 @@ protected:
     template<class Ent> void creerTable()
         {m_manager->get<Ent>().creer();}
 
-//    //! Suppresseur d'une entité à partir de son identifiant.
-//    template<class Ent> bool del(idt id);
-
     //! Supprime les entités d'une liste.
     template<class Ent> bool del(const std::list<idt> & liste) {
         auto i = liste.cbegin();
@@ -709,8 +684,8 @@ template<class Ent> existeUni Bdd::existsUniqueEnsemble(Ent & entity)
 template<class Ent> existeUni Bdd::existsUniqueEnsemble(const Ent & entity)
     {return m_manager->get<Ent>().existsUnique(entity);}
 
-//template<class Ent> bool Bdd::del(idt id)
-//    {return m_manager->get<Ent>().del(id);}
+template<class Ent> std::pair<existeUni,idt> Bdd::existsUniqueId(const Ent & entity)
+    {return m_manager->get<Ent>().existsUniqueId(entity);}
 
 template<class Ent> QVariant Bdd::fonctionAgrega(agrega fonc, typename Ent::Position att)
     {return m_manager->get<Ent>().fonctionAgrega(fonc, att);}
@@ -774,9 +749,6 @@ template<class Ent, class Fct> bool Bdd::foreachNode(idt id, const Fct & fct, bo
 
 template<class Ent> bool Bdd::get(Ent & entity)
     {return m_manager->get<Ent>().get(entity);}
-
-//template<class Ent> bool Bdd::getAutorisation(const Ent & entity, autorisation autoris)
-//    {return m_manager->get<Ent>().getAutorisation(entity.id(),autoris);}
 
 template<class Ent> tree<Ent> Bdd::getArbre()
     {return m_manager->get<Ent>().getArbre();}

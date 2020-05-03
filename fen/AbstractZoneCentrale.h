@@ -6,6 +6,7 @@
 
 #include <QLayout>
 #include <QWidget>
+#include "FenFlags.h"
 
 namespace fenMPS {
 /*! \ingroup groupeFen
@@ -23,20 +24,8 @@ public:
     //! Initialise le widget.
     //virtual void init(QWidget * parent) = 0;
 signals:
-    //! Signal d'activation/désactivation de l'action effacer.
-    void effacerPermis(bool);
-
-    //! Signal d'activation/désactivation de l'action coller.
-    void collerPermis(bool);
-
-    //! Signal d'activation/désactivation de l'action copier.
-    void copierPermis(bool);
-
-    //! Signal d'activation/désactivation de l'action couper.
-    void couperPermis(bool);
-
-    //! Signal d'activation/désactivation de l'action saugarder.
-    void savePermis(bool);
+    //! Signal d'activation/désactivation des actions.
+    void actionPermise(const Action & action);
 
 public slots:
     //! Demande à l'onglet actif de coller.

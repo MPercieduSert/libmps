@@ -150,6 +150,7 @@ public:
 
     using typename Vptr::size_type;
     using Vptr::empty;
+    using Vptr::reserve;
     using Vptr::size;
     using Vptr::shrink_to_fit;
 
@@ -242,7 +243,7 @@ public:
     iterator erase(const_iterator first, const_iterator last) {
         for(auto pos = first; pos != last; ++pos)
             delete pos.Vptr::const_iterator::operator*();
-        return Vptr::erase(first,last);
+        return static_cast<iterator>(Vptr::erase(first,last));
     }
 
     //! Renvoie un iterateur sur l'entité d'identifiant id si elle existe.
@@ -298,7 +299,7 @@ public:
     }
 
     //! Redimension le vecteur à la taille count.
-    template<class Factory> void resize(size_type count, Factory factory = [](){return new T();}){
+    template<class Factory> void resize(size_type count, Factory factory){
         auto i = size();
         if(count < i)
             Vptr::resize(count);

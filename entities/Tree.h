@@ -995,6 +995,10 @@ public:
     tree(const T & data)
         : tree(new Item(data)){}
 
+    //! Constructeur, crée une racine de donnée associée data et initialise l'itérateur sur cette racine.
+    tree(T && data)
+        : tree(new Item(std::move(data))){}
+
     //! Constructeur, créer un arbre possédant la même structure et les même valeur que tree,
     //! T doit posséder un constructeur à partir de U.
     template<class U> tree(const tree<U> & t)

@@ -35,6 +35,9 @@ existeUni Bdd::existsUniqueEnsemble(Entity & entity)
 existeUni Bdd::existsUniqueEnsemble(const Entity & entity)
     {return m_manager->get(entity.idEntity()).existsUnique(entity);}
 
+std::pair<existeUni,idt> Bdd::existsUniqueId(const Entity & entity)
+    {return m_manager->get(entity.idEntity()).existsUniqueId(entity);}
+
 bool Bdd::get(Entity & entity)
     {return m_manager->get(entity.idEntity()).get(entity);}
 

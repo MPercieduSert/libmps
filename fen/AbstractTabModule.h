@@ -6,6 +6,7 @@
 
 #include <QVBoxLayout>
 #include <QWidget>
+#include "FenFlags.h"
 #include "typemps.h"
 
 namespace fenMPS {
@@ -34,20 +35,8 @@ public:
         {return m_pairIndex;}
 
 signals:
-    //! Signal d'activation/désactivation de l'action effacer.
-    void effacerPermis(bool);
-
-    //! Signal d'activation/désactivation de l'action coller.
-    void collerPermis(bool);
-
-    //! Signal d'activation/désactivation de l'action copier.
-    void copierPermis(bool);
-
-    //! Signal d'activation/désactivation de l'action couper.
-    void couperPermis(bool);
-
-    //! Signal d'activation/désactivation de l'action saugarder.
-    void savePermis(bool);
+    //! Signal d'activation/désactivation des actions.
+    void actionPermise(const Action & action);
 
     //! Demande l'ouverture d'un onglet.
     void openTabRequested(const std::pair<int,int> &);
