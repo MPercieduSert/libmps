@@ -5,13 +5,8 @@ using namespace fenMPS;
 AbstractTabTableau::AbstractTabTableau(bmps::Bdd & bdd, const std::pair<int, int> &pairIndex, QWidget *parent)
     : AbstractTabModuleWithBdd(bdd,pairIndex, parent) {}
 
-void AbstractTabTableau::becomeCurrent() {
-    emit effacerPermis(true);
-    emit collerPermis(true);
-    emit copierPermis(true);
-    emit couperPermis(true);
-    emit savePermis(true);
-}
+void AbstractTabTableau::becomeCurrent()
+    {emit actionPermise(EditerActions);}
 
 void AbstractTabTableau::coller()
     {m_model->coller(m_view->selectionModel()->selectedIndexes());}

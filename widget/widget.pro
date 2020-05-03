@@ -25,7 +25,6 @@ SOURCES += \
     BarPlotter.cpp \
     EditTreeWidget.cpp \
     Histogramme.cpp \
-    AbstractTableModel.cpp \
     MotCleDelegate.cpp \
     MotCleModel.cpp \
     MotCleWidget.cpp \
@@ -45,13 +44,17 @@ SOURCES += \
     AbstractTreeModel.cpp \
     NewModifDialog.cpp \
     Checklist.cpp \
-    AbstractTableEntityModel.cpp
+    TableEntityView.cpp \
+    AbstractFindModel.cpp \
+    FindWidget.cpp \
+    AbstractColonnesModel.cpp \
+    TableModel.cpp \
+    AbstractEntityTableau.cpp
 
 HEADERS += \
     BarPlotter.h \
     EditTreeWidget.h \
     Histogramme.h \
-    AbstractTableModel.h \
     MotCleDelegate.h \
     MotCleModel.h \
     MotCleWidget.h \
@@ -71,7 +74,12 @@ HEADERS += \
     AbstractTreeModel.h \
     NewModifDialog.h \
     Checklist.h \
-    AbstractTableEntityModel.h
+    TableEntityView.h \
+    AbstractFindModel.h \
+    FindWidget.h \
+    AbstractColonnesModel.h \
+    TableModel.h \
+    AbstractEntityTableau.h
 unix {
     target.path = /usr/lib
     INSTALLS += target

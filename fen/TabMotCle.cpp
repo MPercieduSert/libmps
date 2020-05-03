@@ -18,12 +18,12 @@ TabMotCle::TabMotCle(bddMPS::BddPredef &bd, const std::pair<int, int> &pairIndex
     m_mainLayout->addWidget(m_horizontalSplitter);
 }
 
-void TabMotCle::becomeCurrent() {
-    emit collerPermis(false);
-    emit copierPermis(false);
-    emit couperPermis(false);
-    emit savePermis(false);
-}
+//void TabMotCle::becomeCurrent() {
+//    emit collerPermis(false);
+//    emit copierPermis(false);
+//    emit couperPermis(false);
+//    emit savePermis(false);
+//}
 
 void TabMotCle::selectionMotcle(const QItemSelection &selected, const QItemSelection &/*deselected*/) {
     auto indexList = selected.indexes();

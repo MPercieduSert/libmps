@@ -38,7 +38,8 @@ SOURCES += \
     TabMotCle.cpp \
     TabGestionBdd.cpp \
     PredefZoneCentrale.cpp \
-    PredefFenPrincipale.cpp
+    PredefFenPrincipale.cpp \
+    FenFlags.cpp
 
 HEADERS += \
     AbstractNoyau.h \
@@ -57,7 +58,8 @@ HEADERS += \
     TabMotCle.h \
     TabGestionBdd.h \
     PredefZoneCentrale.h \
-    PredefFenPrincipale.h
+    PredefFenPrincipale.h \
+    FenFlags.h
 unix {
     target.path = /usr/lib
     INSTALLS += target

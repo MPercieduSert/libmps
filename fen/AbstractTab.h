@@ -7,6 +7,7 @@
 #include <QTabWidget>
 #include <QVariant>
 #include "AbstractTabModule.h"
+#include "FenFlags.h"
 
 namespace fenMPS {
 /*! \ingroup groupeFen
@@ -35,20 +36,8 @@ public:
     virtual AbstractTabModule *createTab(const std::pair<int,int>& pair, const std::vector<QVariant> & args = std::vector<QVariant>()) const = 0;
 
 signals:
-    //! Signal d'activation/désactivation de l'action effacer.
-    void effacerPermis(bool);
-
-    //! Signal d'activation/désactivation de l'action coller.
-    void collerPermis(bool);
-
-    //! Signal d'activation/désactivation de l'action copier.
-    void copierPermis(bool);
-
-    //! Signal d'activation/désactivation de l'action couper.
-    void couperPermis(bool);
-
-    //! Signal d'activation/désactivation de l'action saugarder.
-    void savePermis(bool);
+    //! Signal d'activation/désactivation des actions.
+    void actionPermise(const Action & action);
 
 public slots:
     //! Demande à l'onglet actif de coller.

@@ -15,6 +15,7 @@
 #include <stdexcept>
 #include "AbstractNoyau.h"
 #include "AbstractZoneCentrale.h"
+#include "FenFlags.h"
 #include "NewModifDialog.h"
 
 namespace fenMPS {
@@ -29,11 +30,12 @@ class FenPrincipale : public QMainWindow {
     Q_OBJECT
 protected:
     // Action
+    QAction *m_chercherAction;  //!< Action chercher.
     QAction *m_collerAction;    //!< Action coller.
     QAction *m_copierAction;    //!< Action copier.
     QAction *m_couperAction;    //!< Action couper.
     QAction *m_effacerAction;   //!< Action effacer.
-    QAction *m_saveAction;          //!< Action sauvegarder.
+    QAction *m_sauverAction;    //!< Action sauvegarder.
 
     // Menu
     QMenu *m_editMenu;              //!< Menu édition.
@@ -61,6 +63,10 @@ public:
     //! Accesseur du noyau.
     virtual AbstractNoyau * noyau()
         {return m_noyau;}
+
+public slots:
+    //! Mutateur des actions.
+    void setAction(Action action);
 
 protected:
     //! Crée le menu Bdd.

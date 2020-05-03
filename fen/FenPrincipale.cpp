@@ -23,55 +23,75 @@ FenPrincipale::FenPrincipale(AbstractNoyau * noyau, std::unique_ptr<bmps::Bdd> &
 }
 
 void FenPrincipale::createAction() {
+    // Chercher
+    m_chercherAction = new QAction(tr("Chercher"),this);
+    m_chercherAction->setShortcut(QKeySequence::Find);
+    //connect(m_chercherAction,&QAction::triggered,m_zoneCentrale,&AbstractZoneCentrale::chercher);
+
     // Coller
     m_collerAction = new QAction(tr("Coller"),this);
     m_collerAction->setShortcut(QKeySequence::Paste);
-    m_collerAction->setEnabled(false);
     connect(m_collerAction,&QAction::triggered,m_zoneCentrale,&AbstractZoneCentrale::coller);
-    connect(m_zoneCentrale,&AbstractZoneCentrale::collerPermis,m_collerAction,&QAction::setEnabled);
 
     // Copier
     m_copierAction = new QAction(tr("Copier"),this);
     m_copierAction->setShortcut(QKeySequence::Copy);
-    m_copierAction->setEnabled(false);
     connect(m_copierAction,&QAction::triggered,m_zoneCentrale,&AbstractZoneCentrale::copier);
-    connect(m_zoneCentrale,&AbstractZoneCentrale::copierPermis,m_copierAction,&QAction::setEnabled);
 
     // Couper
     m_couperAction = new QAction(tr("Couper"),this);
     m_couperAction->setShortcut(QKeySequence::Cut);
-    m_couperAction->setEnabled(false);
     connect(m_couperAction,&QAction::triggered,m_zoneCentrale,&AbstractZoneCentrale::couper);
-    connect(m_zoneCentrale,&AbstractZoneCentrale::couperPermis,m_couperAction,&QAction::setEnabled);
 
     // Effacer
     m_effacerAction = new QAction(tr("Effacer"),this);
     m_effacerAction->setShortcut(QKeySequence::Delete);
-    m_effacerAction->setEnabled(false);
     connect(m_effacerAction,&QAction::triggered,m_zoneCentrale,&AbstractZoneCentrale::effacer);
-    connect(m_zoneCentrale,&AbstractZoneCentrale::effacerPermis,m_effacerAction,&QAction::setEnabled);
 
     // Save
-    m_saveAction = new QAction(tr("Sauvegarder"),this);
-    m_saveAction->setShortcut(QKeySequence::Save);
-    m_saveAction->setEnabled(false);
-    connect(m_saveAction,&QAction::triggered,m_zoneCentrale,&AbstractZoneCentrale::save);
-    connect(m_zoneCentrale,&AbstractZoneCentrale::savePermis,m_saveAction,&QAction::setEnabled);
+    m_sauverAction = new QAction(tr("Sauvegarder"),this);
+    m_sauverAction->setShortcut(QKeySequence::Save);
+    connect(m_sauverAction,&QAction::triggered,m_zoneCentrale,&AbstractZoneCentrale::save);
+
+    setAction(NoActions);
+    connect(m_zoneCentrale,&AbstractZoneCentrale::actionPermise,this,&FenPrincipale::setAction);
 }
 
 void FenPrincipale::createMenu() {
     m_fichierMenu = menuBar()->addMenu(tr("&Fichier"));
     //m_menuNew = m_menuFichier->addMenu(tr("&Nouveau"));
-    m_fichierMenu->addAction(m_saveAction );
+    m_fichierMenu->addAction(m_sauverAction );
 
     m_editMenu = menuBar()->addMenu(tr("&Edit"));
     m_editMenu->addAction(m_collerAction);
     m_editMenu->addAction(m_copierAction);
     m_editMenu->addAction(m_couperAction);
     m_editMenu->addAction(m_effacerAction);
+    m_editMenu->addSeparator();
+    m_editMenu->addAction(m_chercherAction);
 
     m_newModifMenu = menuBar()->addMenu(tr("&Créer / Modifier"));
 }
 
 void FenPrincipale::createToolBar()
     {m_toolBar = addToolBar(tr("Module"));}
+
+
+void FenPrincipale::setAction(Action action) {
+    if(!action) {
+        m_copierAction->setEnabled(false);
+        m_collerAction->setEnabled(false);
+        m_couperAction->setEnabled(false);
+        m_effacerAction->setEnabled(false);
+        m_sauverAction->setEnabled(false);
+        m_chercherAction->setEnabled(false);
+    }
+    else {
+        m_copierAction->setEnabled(action.testFlag(CopierAction));
+        m_collerAction->setEnabled(action.testFlag(CollerAction));
+        m_couperAction->setEnabled(action.testFlag(CouperAction));
+        m_effacerAction->setEnabled(action.testFlag(EffacerAction));
+        m_sauverAction->setEnabled(action.testFlag(SauverAction));
+        m_chercherAction->setEnabled(action.testFlag(ChercherAction));
+    }
+}

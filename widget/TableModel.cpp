@@ -1,8 +1,21 @@
-#include "AbstractTableModel.h"
+#include "TableModel.h"
 
 using namespace modelMPS;
 
-void AbstractTableModel::coller(const QModelIndexList & selection) {
+///////////////////////////////////////// TableModel //////////////////////////
+TableModel::TableModel(bool uniqueLigne, bool valideLigne, QObject * parent)
+    : AbstractColonnesModel (uniqueLigne,valideLigne,parent){
+    connect(this,&TableModel::etatLigneChanged,this,[this](szt ligne){
+        auto row = ligneToRow(ligne);
+        if(row != -1)
+            emit headerDataChanged(Qt::Vertical,row,row);});
+    connect(this,&TableModel::etatRowsChanged,this,[this](const QModelIndex & parent, int first, int last){
+        if(!parent.isValid())
+            emit headerDataChanged(Qt::Vertical,first,last);});
+    connect(this,&TableModel::etatsChanged,this,[this](){emit headerDataChanged(Qt::Vertical,0,rowCount());});
+}
+
+void TableModel::coller(const QModelIndexList & selection) {
     SelectedRange range(selection);
     if(!range.isValid())
         QMessageBox::critical(nullptr,tr("Erreur de séléction"),
@@ -59,7 +72,7 @@ void AbstractTableModel::coller(const QModelIndexList & selection) {
     }
 }
 
-void AbstractTableModel::copier(const QModelIndexList &selection) {
+void TableModel::copier(const QModelIndexList &selection) {
     SelectedRange range(selection);
     if(!range.isValid())
         QMessageBox::critical(nullptr,tr("Erreur de séléction"),
@@ -92,12 +105,12 @@ void AbstractTableModel::copier(const QModelIndexList &selection) {
     }
 }
 
-void AbstractTableModel::couper(const QModelIndexList &selection) {
+void TableModel::couper(const QModelIndexList &selection) {
     copier(selection);
     effacer(selection);
 }
 
-AbstractTableModel::DialogSelection AbstractTableModel::dialogColler() const {
+TableModel::DialogSelection TableModel::dialogColler() const {
     QMessageBox dial;
     dial.setText(tr("Erreur collage"));
     dial.setInformativeText(tr("La taille de la selection est plus petite que la taille du contenu du presse papier."));
@@ -113,12 +126,192 @@ AbstractTableModel::DialogSelection AbstractTableModel::dialogColler() const {
     return DialogSelection::Annuler;
 }
 
-void AbstractTableModel::effacer(const QModelIndexList &selection) {
+void TableModel::effacer(const QModelIndexList &selection) {
     for(QModelIndexList::const_iterator i = selection.cbegin(); i != selection.cend(); ++i)
         setData(*i,QVariant());
 }
 
-AbstractTableModel::SelectedRange::SelectedRange(const QModelIndexList &range)
+Qt::ItemFlags TableModel::flags(const QModelIndex &index) const {
+    Qt::ItemFlags f = AbstractColonnesModel::flags(index);
+    if (index.isValid())
+        f |= Qt::ItemNeverHasChildren;
+    return f;
+}
+
+bool TableModel::hasChildren(const QModelIndex &parent) const {
+    if (!parent.isValid())
+        return rowCount(parent) > 0 && columnCount(parent) > 0;
+    return false;
+}
+
+QVariant TableModel::headerData(int section, Qt::Orientation orientation, int role) const {
+    if(orientation == Qt::Vertical){
+        if(role == Qt::DisplayRole)
+            return section + 1;
+        if((m_valideLigne || m_uniqueLigne) && role == Qt::BackgroundRole)
+            return m_brush[m_etats[rowToLigne(section)]];
+    }
+    return AbstractColonnesModel::headerData(section,orientation,role);
+}
+
+QModelIndex TableModel::index(int row, int column, const QModelIndex &parent) const{
+    return hasIndex(row, column, parent) ? createIndex(row, column) : QModelIndex();
+}
+
+bool TableModel::insertRows(int row, int count, const QModelIndex & parent) {
+    if (count <= 0 || row < 0 || row > rowCount())
+        return false;
+    auto nbrLigneOld = nbrLignes();
+    m_data->add(static_cast<szt>(count));
+    // Insertion des nouvelles lignes dans le vecteur des indices.
+    beginInsertRows(parent, row, row + count - 1);
+        auto iterNew = m_rowToLigne.insert(std::next(m_rowToLigne.cbegin(),row),static_cast<szt>(count),0);
+        for(szt ligne = nbrLigneOld; ligne != nbrLignes(); ++ligne, ++iterNew)
+            *iterNew = ligne;
+    endInsertRows();
+    return true;
+}
+
+int TableModel::ligneToRow(szt ligne) const {
+    int row = 0;
+    auto iter = m_rowToLigne.cbegin();
+    while (iter != m_rowToLigne.end() && *iter != ligne){
+        ++row;
+        ++iter;
+    }
+    return iter != m_rowToLigne.end() ? row : -1;
+}
+
+bool TableModel::removeRows(int row, int count, const QModelIndex & parent) {
+    count = std::min(count, rowCount()-row);
+    if(count <= 0 || row < 0)
+        return false;
+    beginRemoveRows(parent,row,row + count - 1);
+        // Suppression d'une ligne.
+        if (count == 1) {
+            auto ligne = rowToLigne(row);
+            if(m_data->removeInternalData(ligne)){
+                m_rowToLigne.erase(std::next(m_rowToLigne.cbegin(),row));
+                for (auto write = m_rowToLigne.begin(); write != m_rowToLigne.end(); ++write) {
+                    if(*write > ligne)
+                        --(*write);
+                }
+                m_data->erase(ligne);
+            }
+        }
+        //Suppression de plusieur lignes.
+        else {
+            // Récupération des indices des lignes à supprimer et suppression des lignes du vecteur des lignes.
+            auto read = std::next(m_rowToLigne.cbegin(),row);
+            auto vecId = std::vector<szt>();
+            vecId.reserve(static_cast<szt>(count));
+            auto first = read;
+            auto last = read;
+            auto newPlage = false;
+            for(auto i = 0; i != count; ++i, ++read){
+                if(m_data->removeInternalData(*read)){
+                    if(newPlage)
+                        first = last = read;
+                    vecId.push_back(*read);
+                    ++last;
+                }
+                else {
+                    m_rowToLigne.erase(first,last);
+                    newPlage = true;
+                }
+            }
+            if(!newPlage)
+                m_rowToLigne.erase(first,last);
+            // Mise à jour du vecteur des lignes.
+            std::sort(vecId.begin(),vecId.end());
+            for (auto write = m_rowToLigne.begin(); write != m_rowToLigne.end(); ++write) {
+                szt pos = 0;
+                read = vecId.begin();
+                while (read != vecId.end() && *write > *read) {
+                    ++pos;
+                    ++read;
+                }
+                *write -= pos;
+            }
+            szt firstLigne = vecId.back();
+            szt lastLigne = firstLigne;
+            newPlage = true;
+            // Suppréssion des lignes de données par numéro décroissant.
+            for(auto iter = std::next(vecId.crbegin(),1); iter != vecId.crend(); ++iter){
+                if (*iter == firstLigne - 1)
+                    --firstLigne;
+                else {
+                    if(firstLigne == lastLigne)
+                        m_data->erase(firstLigne);
+                    else
+                        m_data->erase(firstLigne, lastLigne);
+                    firstLigne = lastLigne = *iter;
+                }
+            }
+        }
+    endRemoveRows();
+    return true;
+}
+
+bool TableModel::removeRowsSelected(const QModelIndexList &selection) {
+    SelectedRange range(selection);
+    if(range.isValid() && range.left() == 0 && range.right() == columnCount() - 1){
+        auto bloc = range.rowBloc();
+        for (auto read = bloc.crbegin(); read != bloc.crend(); ++read)
+            removeRows(read->first,read->second);
+        return true;
+    }
+    else
+        return false;
+}
+
+void TableModel::resetRowToLigne() {
+    m_rowToLigne.resize(nbrLignes());
+    std::iota(m_rowToLigne.begin(),m_rowToLigne.end(),0);
+    if(m_colonneSorted >=0 && m_colonneSorted < columnCount())
+        sort(m_colonneSorted);
+}
+
+void TableModel::save() {
+    AbstractColonnesModel::save();
+    if(m_valideLigne || m_uniqueLigne)
+        headerDataChanged(Qt::Vertical,0,rowCount()-1);
+}
+
+void TableModel::sort(int column, Qt::SortOrder order){
+    beginResetModel();
+        auto col = static_cast<szt>(column);
+        if(order == Qt::AscendingOrder)
+            std::stable_sort(m_rowToLigne.begin(),m_rowToLigne.end(),[this,col](szt a, szt b) {return m_colonnes[col]->compare(a,b);});
+        else
+            std::stable_sort(m_rowToLigne.begin(),m_rowToLigne.end(),[this,col](szt a, szt b) {return m_colonnes[col]->compare(b,a);});
+    endResetModel();
+}
+
+std::vector<szt> TableModel::statOnLignes(bool lignesVisibles) const {
+    if(lignesVisibles)
+        return m_rowToLigne;
+    auto vec = std::vector<szt>(nbrLignes());
+    std::iota(vec.begin(),vec.end(),0);
+    return vec;
+
+}
+
+void TableModel::updateAllEtats() {
+    AbstractColonnesModel::updateAllEtats();
+    headerDataChanged(Qt::Vertical,0,rowCount()-1);
+}
+
+void TableModel::updateEtats(int first, int last, const QModelIndex & parent) {
+    if(!parent.isValid()) {
+        AbstractColonnesModel::updateEtats(first,last,parent);
+        headerDataChanged(Qt::Vertical,first,last);
+    }
+}
+
+/////////////////////////////////// SelectedRange///////////////////////////////////////
+
+TableModel::SelectedRange::SelectedRange(const QModelIndexList &range)
     : m_selection(range) {
     if(range.isEmpty()) {
         m_bottom = -1;
@@ -136,7 +329,7 @@ AbstractTableModel::SelectedRange::SelectedRange(const QModelIndexList &range)
     }
 }
 
-const std::vector<int> & AbstractTableModel::SelectedRange::columns() {
+const std::vector<int> & TableModel::SelectedRange::columns() {
     if(isRect() && m_columnList.empty()){
         m_columnList.resize(static_cast<szt>(m_right - m_left + 1));
         std::iota(m_columnList.begin(),m_columnList.end(),m_left);
@@ -145,7 +338,7 @@ const std::vector<int> & AbstractTableModel::SelectedRange::columns() {
     return m_columnList;
 }
 
-std::list<std::pair<int,int>> AbstractTableModel::SelectedRange::columnBloc() {
+std::list<std::pair<int,int>> TableModel::SelectedRange::columnBloc() {
     std::list<std::pair<int,int>> list;
     if(isRect())
         list.push_back({m_left, m_right - m_left + 1});
@@ -162,7 +355,7 @@ std::list<std::pair<int,int>> AbstractTableModel::SelectedRange::columnBloc() {
     return list;
 }
 
-void AbstractTableModel::SelectedRange::findCorners() {
+void TableModel::SelectedRange::findCorners() {
     if(!m_cornersFound){
         m_bottom = m_selection.first().row();
         m_left = m_selection.first().column();
@@ -187,7 +380,7 @@ void AbstractTableModel::SelectedRange::findCorners() {
     }
 }
 
-std::list<std::pair<int,int>> AbstractTableModel::SelectedRange::rowBloc(){
+std::list<std::pair<int,int>> TableModel::SelectedRange::rowBloc(){
     std::list<std::pair<int,int>> list;
     if(isRect())
         list.push_back({m_top, m_bottom - m_top + 1});
@@ -204,7 +397,7 @@ std::list<std::pair<int,int>> AbstractTableModel::SelectedRange::rowBloc(){
     return list;
 }
 
-const std::vector<int> & AbstractTableModel::SelectedRange::rows() {
+const std::vector<int> & TableModel::SelectedRange::rows() {
     if(isRect() && m_rowList.empty()){
         m_rowList.resize(static_cast<szt>(m_bottom - m_top + 1));
         std::iota(m_rowList.begin(),m_rowList.end(),m_top);
@@ -213,7 +406,7 @@ const std::vector<int> & AbstractTableModel::SelectedRange::rows() {
     return m_rowList;
 }
 
-void AbstractTableModel::SelectedRange::setValidity() {
+void TableModel::SelectedRange::setValidity() {
     if(!m_validitySet) {
         if(!(m_isValid = isRect())){
             // Réorganise la sélection ligne par ligne.

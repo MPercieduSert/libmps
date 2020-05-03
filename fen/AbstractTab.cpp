@@ -20,13 +20,8 @@ bool AbstractTab::openTab(const std::pair<int, int> &pair, const std::vector<QVa
     }
 }
 
-void AbstractTab::connectTab(AbstractTabModule * tab) const {
-    connect(tab,&AbstractTabModule::effacerPermis,this,&AbstractTab::effacerPermis);
-    connect(tab,&AbstractTabModule::collerPermis,this,&AbstractTab::collerPermis);
-    connect(tab,&AbstractTabModule::copierPermis,this,&AbstractTab::copierPermis);
-    connect(tab,&AbstractTabModule::couperPermis,this,&AbstractTab::couperPermis);
-    connect(tab,&AbstractTabModule::savePermis,this,&AbstractTab::savePermis);
-}
+void AbstractTab::connectTab(AbstractTabModule * tab) const
+    {connect(tab,&AbstractTabModule::actionPermise,this,&AbstractTab::actionPermise);}
 
 void AbstractTab::currentChange() {
     if(currentWidget())

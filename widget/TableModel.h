@@ -1,33 +1,22 @@
 /*Auteur: PERCIE DU SERT Maxime
  *Date: 03/04/2019
  */
-#ifndef MABSTRACTTABLEMODEL_H
-#define MABSTRACTTABLEMODEL_H
+#ifndef TABLEMODEL_H
+#define TABLEMODEL_H
 
-#include <QAbstractTableModel>
 #include <QApplication>
 #include <QClipboard>
-//#include <QHBoxLayout>
 #include <QMessageBox>
 #include <QPushButton>
-#include <QTableWidgetSelectionRange>
-//#include <QVBoxLayout>
-//#include <stdlib.h>
+#include "AbstractColonnesModel.h"
 #include "typemps.h"
 
-/*! \defgroup groupeModel Model
- * \brief Ensemble de classes représentant les models.
- */
-
-/*! \ingroup groupeModel
- * \brief Espace de noms des model.
- */
 namespace modelMPS {
 using namespace typeMPS;
 /*! \ingroup groupeModel
- * \brief Classe mère des model de type tabelau.
+ * \brief Classe mère des model de type tableau.
  */
-class AbstractTableModel : public QAbstractTableModel {
+class TableModel : public AbstractColonnesModel {
     Q_OBJECT
 protected:
     enum DialogSelection{NoDialog,
@@ -120,35 +109,96 @@ public:
         //! Recherche les coins du plus petit rectangle contenant la selection.
         void setValidity();
     };
-
+protected:
+    std::vector<szt> m_rowToLigne;       //!< Correspondances de index.row <-> lignes.
+public:
     //! Constructeur.
-    explicit AbstractTableModel(QObject * parent = nullptr) : QAbstractTableModel(parent) {}
+    explicit TableModel(bool uniqueLigne = true, bool valideLigne = true, QObject * parent = nullptr);
 
     //! Destructeur par defaut.
-    ~AbstractTableModel() override = default;
+    ~TableModel() override = default;
+
+    //! Drapeaux d'un item
+    Qt::ItemFlags flags(const QModelIndex &index) const override;
+
+    //! Pas d'enfants sauf pour la racine.
+    bool hasChildren(const QModelIndex &parent) const override;
+
+    //! Renvoie le label des lignes et des colonnes.
+    QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
+
+    //! Renvoie l'index correxpondant à la ligne et colonne de parent.
+    QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const override;
+
+    //! Insert count lignes dans le model juste avant la ligne row.
+    bool insertRows(int row, int count, const QModelIndex & parent = QModelIndex()) override;
+
+    //! Renvoie l'index du parent.
+    QModelIndex parent(const QModelIndex &/*index*/) const override
+        {return QModelIndex();}
+
+    //! Supprime count lignes en commençant par la ligne row.
+    bool removeRows(int row, int count, const QModelIndex & parent = QModelIndex()) override;
+
+    //! Supprime une selection de lignes entières.
+    bool removeRowsSelected(const QModelIndexList &selection) override;
+
+    //! Renvoie le nombre de lignes.
+    int rowCount(const QModelIndex & parent = QModelIndex()) const override
+        {return parent.isValid() ? 0 : static_cast<int>(m_rowToLigne.size());}
+
+    QModelIndex sibling(int row, int column, const QModelIndex &) const override
+        {return index(row, column);}
+
+    //! Tri le model par colonne.
+    void sort(int column, Qt::SortOrder order = Qt::AscendingOrder) override;
+
+public slots:
+    //! Effectue l'action coller.
+    void coller(const QModelIndexList &selection) override;
 
     //! Effectue l'action coller.
-    virtual void coller(const QModelIndexList &selection);
+    void copier(const QModelIndexList &selection) override;
 
     //! Effectue l'action coller.
-    virtual void copier(const QModelIndexList &selection);
+    void couper(const QModelIndexList &selection) override;
 
     //! Effectue l'action coller.
-    virtual void couper(const QModelIndexList &selection);
-
-    //! Effectue l'action coller.
-    virtual void effacer(const QModelIndexList &selection);
+    void effacer(const QModelIndexList &selection) override;
 
     //! Enregistre les données du model dans la base de donnée.
-    virtual void save() {}
+    void save() override;
+
+    //! Mets à jour l'état de toutes les lignes.
+    void updateAllEtats() override;
+
+    //! Mets à jour l'état d'une ligne.
+    void updateEtats(int first, int last, const QModelIndex & parent = QModelIndex()) override;
 
 protected:
     //! Ouvre une fenêtre de dialogue pour demander si l'insertion doit être faite à l'intérieur de la selection ou non.
     DialogSelection dialogColler() const;
 
-signals:
+    //! Fait la correspondance entre l'index et la ligne de donnée.
+    szt ligne(const QModelIndex & index) const override
+        {return rowToLigne(index.row());}
 
-public slots:
+    //! Fait la correspondance entre la ligne de donnée et la ligne d'index.
+    int ligneToRow(szt ligne) const;
+
+    //! Nombre de ligne afficher en szt.
+    szt nbrRow() const override
+        {return static_cast<szt>(m_rowToLigne.size());}
+
+    //! Met le vecteur des correspondance de ligne à l'identitée.
+    void resetRowToLigne() override;
+
+    //! Fait la correspondance entre la ligne d'index et la ligne de donnée.
+    szt rowToLigne(int row) const
+        {return m_rowToLigne[static_cast<szt>(row)];}
+
+    //! Renvoie un vecteur contenant l'ensemble des identifiants des lignes visibles ou de toutes les lignes.
+    std::vector<szt> statOnLignes(bool lignesVisibles = true) const override;
 };
 }
-#endif // MABSTRACTTABLEMODEL_H
+#endif // TABLEMODEL_H
