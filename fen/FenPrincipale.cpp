@@ -69,7 +69,6 @@ void FenPrincipale::createMenu() {
     m_editMenu->addAction(m_effacerAction);
     m_editMenu->addSeparator();
     m_editMenu->addAction(m_chercherAction);
-
     m_newModifMenu = menuBar()->addMenu(tr("&Créer / Modifier"));
 }
 

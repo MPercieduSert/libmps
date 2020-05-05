@@ -80,6 +80,7 @@ HEADERS += \
     AbstractColonnesModel.h \
     TableModel.h \
     AbstractEntityTableau.h
+
 unix {
     target.path = /usr/lib
     INSTALLS += target
