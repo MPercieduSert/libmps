@@ -4,6 +4,7 @@
 #ifndef ENTITY_H
 #define ENTITY_H
 
+#include <memory>
 #include <string>
 #include <stdexcept>
 
@@ -127,7 +128,7 @@ protected:
 
 class EntityException : public std::exception {
 protected:
-    QString m_txt;
+    QString m_txt;      //! Texte de l'exception.
 public:
     //! Constructeur par default.
     EntityException() = default;
@@ -179,6 +180,34 @@ public:
 
     //!Destructeur.
     ~InvalideEntityException();
+};
+
+template<class Ent, class Exception> class TempEntityException : public Exception {
+protected:
+    std::unique_ptr<Ent> m_entity;      //! Entity levant l'exception.
+public:
+    //! Constructeur par default.
+    TempEntityException() = default;
+
+    //! Constructeur.
+    template<class... Args> TempEntityException(const QString & txt, const Ent & entity, Args... args)
+        : Exception(txt,entity,args...), m_entity(std::make_unique<Ent>(entity)) {}
+
+    //! Constructeur de recopie.
+    TempEntityException(const TempEntityException & exception)
+        : Exception(exception), m_entity(std::make_unique<Ent>(*exception.m_entity)) {}
+
+    //! Constructeur de déplacement.
+    TempEntityException(TempEntityException<Ent,Exception> &&) = default;
+
+    //! Accesseur de l'entité.
+    const Ent & entity() const {return *m_entity;}
+
+    //! Accesseur de l'entité.
+    Ent & entity() {return *m_entity;}
+
+    //! Accesseur du pointeur intéllignet.
+    std::unique_ptr<Ent> && unique_ptr() {return std::move(m_entity);}
 };
 
 /*! \ingroup groupeEntity

@@ -30,9 +30,9 @@
             Ent entBdd(entity); \
             entBdd.setId(0); \
             getUnique(entBdd); \
-            throw UniqueEntityException(QString("void ManagerSql<").append(name()).append(">::saveValide(") \
+            throw TempUniqueEntityException<Ent>(QString("void ManagerSql<").append(name()).append(">::saveValide(") \
                                                        .append(name()).append("&)"),entity,entBdd);} \
-        else throw UniqueEntityException(QString("void ManagerSql<").append(name()).append(">::saveValide(") \
+        else throw TempUniqueEntityException<Ent>(QString("void ManagerSql<").append(name()).append(">::saveValide(") \
                                         .append(name()).append("&)"),entity);}
 
 // Macro pour manageur.
@@ -733,7 +733,7 @@ public:
                     del(id);
             }
             else
-                throw UniqueEntityException(QString("void ManagerSql<").append(name()).append(">::saveUnique(") \
+                throw TempUniqueEntityException<Ent>(QString("void ManagerSql<").append(name()).append(">::saveUnique(") \
                                             .append(name()).append("&)"), entity);
         }
         else
@@ -766,7 +766,7 @@ public:
                     del(entity.id());
             }
             else
-                throw UniqueEntityException(QString("void ManagerSql<").append(name()).append(">::saveUnique(const ") \
+                throw TempUniqueEntityException<Ent>(QString("void ManagerSql<").append(name()).append(">::saveUnique(const ") \
                                             .append(name()).append("&)"),entity);
         }
         else
@@ -779,9 +779,6 @@ public:
         {return m_info.table();}
 
 protected:
-    /*//! Constructeur sans argument pour en faire une classe virtuelle.
-    ManagerSql();*/
-
     //! Insert la nouvelle entité entity dans la base de donnée
     //! et assigne l'identifiant de l'entité insérée en base de donnée à entity.
     virtual void add(Ent & entity) {
@@ -837,9 +834,6 @@ protected:
 
     //! Message d'erreurs si l'entité entity n'est pas valide.
     QString messageErreurs(const Entity & entity) const override;
-
-    //! Message d'erreurs s'il existe déjà en base de donnée une entité ayant les mêmes valeurs d'attributs uniques que entity.
-    //QString messageErreursUnique(const Entity & entity) const override;
 
     //! Met à jour l'entité entity en base de donnée.
     virtual void modify(const Ent & entity) {

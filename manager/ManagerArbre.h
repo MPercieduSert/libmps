@@ -215,11 +215,11 @@ protected:
                 Ent entBdd(entity);
                 entBdd.setId(0);
                 getUnique(entBdd);
-                throw UniqueEntityException(QString("void ManagerArbre<").append(name()).append(">::saveValideConst(const")
+                throw TempUniqueEntityException<Ent>(QString("void ManagerArbre<").append(name()).append(">::saveValideConst(const")
                                                                             .append(name()).append("&):\n"),entity,entBdd);
             }
             else
-                throw UniqueEntityException(QString("void ManagerArbre<").append(name()).append(">::saveValideConst(const")
+                throw TempUniqueEntityException<Ent>(QString("void ManagerArbre<").append(name()).append(">::saveValideConst(const")
                                                                             .append(name()).append("&):\n"),entity);
         }
     }

@@ -54,6 +54,7 @@ public:
     ~UniqueEntityException();
 };
 
+template<class Ent> using TempUniqueEntityException = entityMPS::TempEntityException<Ent,UniqueEntityException>;
 
 /*! \ingroup groupeManager
  * \brief Classe abstraite de base des manageurs.
@@ -637,6 +638,9 @@ public:
 //    void saveByPass(Entity & entity)
 //        {save(Ent::Convert(entity));}
 
+    //! Enregistre un vecteur d'entity en résolvant les problèmes d'unicité interne au vecteur.
+    void save(const VectorPtr<Entity> & vec);
+
     //! Enregistre l'entity dans la base de donnée, s'il existe en base de donnée une entité d'identifiant idU
     //! ayant les mêmes attributs unique,
     //! deux cas se présentent, soit entity à un identifiant nul alors l'entité d'identifiant idU est mise à jour
@@ -702,5 +706,10 @@ template<class Ent> void AbstractManagerTemp<Ent>::save(const Ent & /*entity*/, 
 template<class Ent> void AbstractManagerTemp<Ent>::save(tree<Ent> & /*arbre*/, bmps::treeSave /*n*/)
     {throw std::invalid_argument(QString("La méthode 'save(tree<Ent>,...)' n'est pas définie pour le manager des : ")
                                  .append(Ent::Name()).append(".").toStdString());}
+
+template<class Ent> void AbstractManagerTemp<Ent>::save(const VectorPtr<Entity> & vec) {
+
+}
+
 }
 #endif // ABSTRACTMANAGER_H
