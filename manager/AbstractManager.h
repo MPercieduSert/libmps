@@ -4,6 +4,7 @@
 #ifndef ABSTRACTMANAGER_H
 #define ABSTRACTMANAGER_H
 
+#include <algorithm>
 #include <exception>
 #include <map>
 #include <memory>
@@ -639,7 +640,7 @@ public:
 //        {save(Ent::Convert(entity));}
 
     //! Enregistre un vecteur d'entity en résolvant les problèmes d'unicité interne au vecteur.
-    void save(const VectorPtr<Entity> & vec);
+    void save(VectorPtr<Entity> &vec);
 
     //! Enregistre l'entity dans la base de donnée, s'il existe en base de donnée une entité d'identifiant idU
     //! ayant les mêmes attributs unique,
@@ -707,9 +708,55 @@ template<class Ent> void AbstractManagerTemp<Ent>::save(tree<Ent> & /*arbre*/, b
     {throw std::invalid_argument(QString("La méthode 'save(tree<Ent>,...)' n'est pas définie pour le manager des : ")
                                  .append(Ent::Name()).append(".").toStdString());}
 
-template<class Ent> void AbstractManagerTemp<Ent>::save(const VectorPtr<Entity> & vec) {
+template<class Ent> void AbstractManagerTemp<Ent>::save(VectorPtr<Entity> & vec) {
+    std::list<typename conteneurMPS::VectorPtr<Ent>::iterator> doubles;
+    for (auto iter = vec.begin(); iter != vec.end(); ++iter) {
+        try
+            {save(*iter);}
+        catch (UniqueEntityException & /*exception*/)
+            {doubles.push_back(iter);}
+    }
+    if(!doubles.empty()) {
+        std::list<Ent> externe;
+        std::map<szt,typename conteneurMPS::VectorPtr<Ent>::iterator> permutation;
+        for(auto iterDouble = doubles.cbegin(); iterDouble != doubles.cend();){
+            auto pairBdd= existsUniqueId(**iterDouble);
+            bool ext = false;
+            if(pairBdd.first == bddMPS::Aucun || pairBdd.first == bddMPS::Tous) {
+                save(iterDouble);
+                doubles.erase(iterDouble++);
+                auto iterPermutation = permutation.find(pairBdd.second);
+                while (iterPermutation != permutation.end()) {
+                    save(**iterPermutation.second);
+                    auto id = (**iterPermutation.second).id();
+                    permutation.erase(iterPermutation);
+                    iterPermutation = permutation.find(id);
+                }
+            }
+            else if (pairBdd.first == bddMPS::Meme) {
+                auto iterFind = std::find_if(doubles.cbegin(),doubles.cend(),
+                      [&pairBdd](const typename conteneurMPS::VectorPtr<Ent>::iterator & iter){iter->id() == pairBdd.second;});
+                if(iterFind != doubles.cend()) {
+                    permutation[pairBdd.second] = *iterDouble;
+                    ++iterDouble;
+                }
+                else
+                    ext = true;
+            }
+            else
+                    ext = true;
+            if(ext) {
+                externe.push_back(**iterDouble);
+                doubles.erase(iterDouble++);
+            }
+        }
+        // Permutation
+        while(!permutation.empty()){
 
+        }
+        if(!externe.empty())
+            throw UniqueEntityException ("void AbstractManagerTemp<Ent>::save(VectorPtr<Entity> & vec)",externe.front());
+    }
 }
-
 }
 #endif // ABSTRACTMANAGER_H
