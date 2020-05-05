@@ -1,0 +1,9 @@
+*.directory
+*.user
+*.aux
+*.bbl
+*.blg
+*.log
+*.pdf
+*.gz
+Optimisation
