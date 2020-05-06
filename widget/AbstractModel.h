@@ -1,8 +1,8 @@
 /*Auteur: PERCIE DU SERT Maxime
  *Date: 03/04/2019
  */
-#ifndef MABSTRACTTREEMODEL_H
-#define MABSTRACTTREEMODEL_H
+#ifndef ABSTRACTMODEL_H
+#define ABSTRACTMODEL_H
 
 #include <forward_list>
 #include <QAbstractItemModel>
@@ -19,11 +19,13 @@
     int rowCount(const QModelIndex &parent = QModelIndex()) const override {return TREE.rowCount(parent);}
 
 namespace modelMPS {
+namespace cmps = conteneurMPS;
+
 template<class T> class ReadableTreeForModel;
 /*! \ingroup groupeModel
  * \brief Classe Abstraite mère des model de type arbre utilisant le contenant treeFroModel.
  */
-class AbstractTreeModel : public QAbstractItemModel {
+class AbstractModel : public QAbstractItemModel {
     Q_OBJECT
     template<class T> friend class ReadableTreeForModel;
 public:
@@ -31,7 +33,6 @@ public:
 };
 
 
-namespace cmps = conteneurMPS;
 /*! \ingroup groupeModel
  * \brief Classe template des données des models de type arbre de structure non-modifiable.
  */
@@ -43,12 +44,12 @@ protected:
     using const_iterator = typename Tree::const_iterator;
     //! Poiteur sur les noeuds de l'arbre.
     using iterator = typename Tree::iterator;
-    AbstractTreeModel * m_parent;      //!< Model contenant l'arbre.
-    const bool m_racine;      //!< Racine permise.
-    Tree m_tree;        //!< Arbre de donnée.
+    AbstractModel * m_parent;       //!< Model contenant l'arbre.
+    const bool m_racine;            //!< Racine permise.
+    Tree m_tree;                    //!< Arbre de donnée.
 public:
     //! Constructeur.
-    ReadableTreeForModel(AbstractTreeModel * parent, bool racine = false)
+    ReadableTreeForModel(AbstractModel * parent, bool racine = false)
         : m_parent(parent), m_racine(racine) {}
 
     //! Renvoie une référence sur la donné coorespondant à l'index (en supposant la validité).
@@ -93,18 +94,60 @@ public:
 
     //! Renvoie le nombre de d'enfants.
     int rowCount(const QModelIndex &parent = QModelIndex()) const {
-        if(m_racine && !parent.isValid())
-            return 1;
+        if(!parent.isValid())
+            return m_tree.cbegin().sizeChild();
+        if(parent.column() != 0)
+            return 0;
         return getIter(parent).sizeChild();
     }
 
-    //! Modifie l'arbre de donnée.
-    void setTree(const cmps::tree<T> & tree)
-        {m_tree = tree;}
+    //! Renvoie une référence sur la donnée de la racine.
+    const T & getRootData() const
+        {return *m_tree.cbegin();}
+
+    //! Renvoie une référence sur la donnée de la racine.
+    T & getRootData()
+        {return *m_tree.begin();}
+
+    //! Renvoie un itérateur sur la racine.
+    const_iterator getRootIter() const
+        {return m_tree.cbegin();}
+
+    //! Renvoie un itérateur sur la racine.
+    iterator getRootIter()
+        {return m_tree.begin();}
+
+    //! Acceseur de la racine.
+    bool racine() const
+        {return m_racine;}
 
     //! Modifie l'arbre de donnée.
-    void setTree(cmps::tree<T> && tree)
-        {m_tree = std::move(tree);}
+    void setTree(const cmps::tree<T> & tree) {
+        if(m_racine){
+            m_tree.clear();
+            m_tree.push_back(m_tree.begin(),tree.cbegin());
+        }
+        else
+            m_tree = tree;
+    }
+
+    //! Modifie l'arbre de donnée.
+    void setTree(cmps::tree<T> && tree){
+        if(m_racine){
+            m_tree.clear();
+            m_tree.push_back(m_tree.begin(),std::move(tree));
+        }
+        else
+            m_tree = std::move(tree);
+    }
+
+    //! Accesseur de l'arbre.
+    const cmps::tree<T> & tree() const
+        {return m_tree;}
+
+    //! Accesseur de l'arbre.
+    cmps::tree<T> & tree()
+        {return m_tree;}
 };
 
 /*! \ingroup groupeModel
@@ -120,7 +163,7 @@ public:
     using ReadableTreeForModel<T>::getIter;
     using ReadableTreeForModel<T>::rowCount;
 
-    //! Insert des lignes dans le model.
+    //! Insert des lignes dans le model, ne vérifie pas les arguments.
     template<class Factory> bool insertRows(Factory factory,int row, int count, const QModelIndex &parent = QModelIndex());
 
     //! Supprime des lignes dans le model.
@@ -137,11 +180,7 @@ template<class T> QModelIndex ReadableTreeForModel<T>::index(int row, int column
                 return m_parent->createIndex(row, column, iter.ptr());
         }
     }
-    else if(m_racine){
-        if(row == 0)
-            return m_parent->createIndex(0,column,m_tree.cbegin().ptr());
-    }
-    else {
+    else if (!m_racine || row == 0){
         auto iter = m_tree.cbegin().toChild(row);
         if (iter)
             return m_parent->createIndex(row, column, iter.ptr());
@@ -153,7 +192,7 @@ template<class T> QModelIndex ReadableTreeForModel<T>::parent(const QModelIndex 
     if (index.isValid()) {
         auto iter = getIter(index);
         iter.toParent();
-        if(iter)
+        if(iter && !iter.root())
             return m_parent->createIndex(iter.indexBrother(), 0, iter.ptr());
     }
     return QModelIndex();
@@ -162,8 +201,6 @@ template<class T> QModelIndex ReadableTreeForModel<T>::parent(const QModelIndex 
 //////////////////////////////////// TreeForModel /////////////////////////////
 template<class T> template<class Factory> bool TreeForModel<T>::insertRows(Factory factory, int row, int count,
                                                                            const QModelIndex &parent) {
-    if(m_racine && !parent.isValid())
-        return false;
     auto iter = getIter(parent);
     if(row == rowCount(parent))
         for(int i = 0; i != count; ++i)
@@ -204,4 +241,4 @@ template<class T> template<class Deleter> bool TreeForModel<T>::removeRows(Delet
     return comp == count;
 }
 }
-#endif // MABSTRACTTREEMODEL_H
+#endif // ABSTRACTMODEL_H

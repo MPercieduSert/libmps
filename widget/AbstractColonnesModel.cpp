@@ -5,7 +5,7 @@ using namespace modelMPS;
 AbstractColonnesModel::AbstractColonne::~AbstractColonne() = default;
 
 AbstractColonnesModel::AbstractColonnesModel(bool uniqueLigne, bool valideLigne, QObject * parent)
-    : QAbstractItemModel(parent), m_uniqueLigne(uniqueLigne), m_valideLigne(valideLigne) {
+    : AbstractModel(parent), m_uniqueLigne(uniqueLigne), m_valideLigne(valideLigne) {
     if(m_valideLigne || m_uniqueLigne) {
     connect(this,&AbstractColonnesModel::rowsRemoved,this,&AbstractColonnesModel::resizeEtats);
     connect(this,&AbstractColonnesModel::rowsInserted,this,

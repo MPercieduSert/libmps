@@ -28,7 +28,7 @@ using namespace typeMPS;
 /*! \ingroup groupeModel
  * \brief Classe mère des models de colonnes homogènes.
  */
-class AbstractColonnesModel : public QAbstractItemModel {
+class AbstractColonnesModel : public AbstractModel {
     Q_OBJECT
 public:
     enum {NoType = -1};
@@ -67,7 +67,7 @@ public:
         const int m_type;           //!< Type de la colonne.
     public:
         //! Constructeur.
-        AbstractColonne(const QString & name, Qt::ItemFlags flags, int type)
+        AbstractColonne(const QString & name, Qt::ItemFlags flags, int type = NoType)
             : m_flags(flags), m_header(name), m_type(type) {}
 
         //! Destructeur.

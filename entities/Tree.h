@@ -924,9 +924,12 @@ public:
     /*! \ingroup groupeConteneur
      * \brief Itérateur sur une fratrie.
      */
-    class brother_iterator : public abstract_iterator, public const_brother_iterator {
-        using abstract_iterator::abstract_iterator;
+    class brother_iterator : public abstract_iterator, public virtual const_brother_iterator {
+        friend tree;
+    protected:
+        using abstract_iterator::m_ptr;
     public:
+        using abstract_iterator::abstract_iterator;
         using abstract_iterator::operator*;
         TREE_ITER_NOCONST(brother_iterator)
     };
@@ -935,8 +938,11 @@ public:
      * \brief Itérateur sur l'arbre parcourant les noeuds uniquement à la descente en commeçant par les ainés.
      */
     class iterator : public abstract_iterator, public const_iterator {
-        using abstract_iterator::abstract_iterator;
+        friend tree;
+    protected:
+        using abstract_iterator::m_ptr;
     public:
+        using abstract_iterator::abstract_iterator;
         using abstract_iterator::operator*;
         TREE_ITER_NOCONST(iterator)
     };
@@ -945,8 +951,11 @@ public:
      * \brief Itérateursur l'arbre parcourant les noeuds à la descente et à la remonté en commeçant par les ainés.
      */
     class prevsuiv_iterator : public abstract_iterator, public const_prevsuiv_iterator {
-        using abstract_iterator::abstract_iterator;
+        friend tree;
+    protected:
+        using abstract_iterator::m_ptr;
     public:
+        using abstract_iterator::abstract_iterator;
         using abstract_iterator::operator*;
         TREE_ITER_NOCONST(prevsuiv_iterator)
     };
@@ -955,8 +964,11 @@ public:
      * \brief Itérateur inverse sur une fratrie.
      */
     class reverse_brother_iterator : public abstract_iterator, public const_brother_iterator {
-        using abstract_iterator::abstract_iterator;
+        friend tree;
+    protected:
+        using abstract_iterator::m_ptr;
     public:
+        using abstract_iterator::abstract_iterator;
         using abstract_iterator::operator*;
         TREE_ITER_NOCONST(reverse_brother_iterator)
     };
@@ -965,8 +977,11 @@ public:
      * \brief Itérateur inverse sur l'arbre parcourant les noeuds uniquement à la descente en commeçant par les ainés.
      */
     class reverse_iterator : public abstract_iterator, public const_reverse_iterator {
-        using abstract_iterator::abstract_iterator;
+        friend tree;
+    protected:
+        using abstract_iterator::m_ptr;
     public:
+        using abstract_iterator::abstract_iterator;
         using abstract_iterator::operator*;
         TREE_ITER_NOCONST(reverse_iterator)
     };
@@ -992,11 +1007,11 @@ public:
     }
 
     //! Constructeur, crée une racine de donnée associée data et initialise l'itérateur sur cette racine.
-    tree(const T & data)
+    explicit tree(const T & data)
         : tree(new Item(data)){}
 
     //! Constructeur, crée une racine de donnée associée data et initialise l'itérateur sur cette racine.
-    tree(T && data)
+    explicit tree(T && data)
         : tree(new Item(std::move(data))){}
 
     //! Constructeur, créer un arbre possédant la même structure et les même valeur que tree,
@@ -1180,6 +1195,18 @@ public:
         return node;
     }
 
+    //! Insert un nouveau noeud de donnée coorespondant à la racine de tree (avec ses descendants) avant le noeud pointé par pos
+    //! dans la fratrie sauf si le noeud pointé est la racine,
+    //! dans ce cas le nouveau noeud est inseré en tant que fils ainé. Retourne un itérateur sur ce nouveau noeud.
+    //! La racine tree devient nulle.
+    iterator insert(abstract_iterator & pos, tree<T> && tree) {
+        auto * node = tree.m_root;
+        pos.m_ptr->insert(node);
+        tree.m_root = nullptr;
+        return node;
+    }
+
+
     //! Insert count nouveaux noeuds de donnée data avant le noeud pointé par pos dans la fratrie sauf si le noeud pointé est la racine,
     //! dans ce cas les nouveaux noeuds sont inserés en tant que fils ainé. Retourne un itérateur sur le premier des nouveaux noeuds.
     iterator insert(abstract_iterator & pos, size_type count, const T & data)
@@ -1218,6 +1245,16 @@ public:
     iterator insert_after(abstract_iterator & pos, const const_abstract_iterator & other) {
         auto * node = new Item(other.item());
         pos.m_ptr->insert_after(node);
+        return node;
+    }
+
+    //! Insert un nouveau noeud de donnée coorespondant à la racine de tree (avec ses descendants) après le noeud pointé par pos
+    //! dans la fratrie sauf si le pointé est la racine,
+    //! dans ce cas le nouveau noeud est inseré en tant que fils benjamin. Retourne un itérateur sur ce nouveau noeud.
+    iterator insert_after(abstract_iterator & pos, tree<T> && tree) {
+        auto * node = tree.m_root;
+        pos.m_ptr->insert_after(node);
+        tree.m_root = nullptr;
         return node;
     }
 
@@ -1269,7 +1306,7 @@ public:
     }
 
     //! Ajoute un fils benjamin au noeud pointé par pos de donnée data. Retourne un itérateur sur ce nouveau noeud.
-    iterator push_back(abstract_iterator & pos, T && data) {
+    template<class iter_tree> iterator push_back(iter_tree pos, T && data) {
         auto * node = new Item(std::move(data));
         pos.m_ptr->push_back(node);
         return node;
@@ -1280,6 +1317,15 @@ public:
     iterator push_back(abstract_iterator & pos, const const_abstract_iterator & other) {
         auto * node = new Item(other.item());
         pos.m_ptr->push_back(node);
+        return node;
+    }
+
+    //! Ajoute un fils benjamin au noeud pointé par pos correspondant à la racine de tree (avec ses descendants).
+    //! Retourne un itérateur sur ce nouveau noeud.
+    template<class iter_tree> iterator push_back(iter_tree pos, tree<T> && tree) {
+        auto * node = tree.m_root;
+        pos.m_ptr->push_back(node);
+        tree.m_root = nullptr;
         return node;
     }
 
@@ -1316,6 +1362,15 @@ public:
     iterator push_front(abstract_iterator & pos, const const_abstract_iterator & other) {
         auto * node = new Item(other.item());
         pos.m_ptr->push_front(node);
+        return node;
+    }
+
+    //! Ajoute un fils ainé au noeud pointé par pos correspondant à la racine de tree (avec ses descendants).
+    //! Retourne un itérateur sur ce nouveau noeud.
+    iterator push_front(abstract_iterator & pos, tree<T> && tree) {
+        auto * node = tree.m_root;
+        pos.m_ptr->push_front(node);
+        tree.m_root = nullptr;
         return node;
     }
 

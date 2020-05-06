@@ -10,7 +10,7 @@
 #include <vector>
 #include "typemps.h"
 
-/*! \defgroup groupeConteneurs Conteneur
+/*! \defgroup groupeConteneur Conteneur
  * \brief Ensemble de classes conteneurs.
  */
 

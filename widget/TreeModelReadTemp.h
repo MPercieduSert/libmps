@@ -7,7 +7,7 @@
 #include <QItemSelection>
 #include <QMessageBox>
 
-#include "AbstractTreeModel.h"
+#include "AbstractModel.h"
 #include "Tree.h"
 
 namespace modelMPS {
@@ -15,18 +15,18 @@ namespace cmps = conteneurMPS;
 /*! \ingroup groupeModel
  * \brief Classe template des models de type arbre non-modifiable.
  */
-template<class T> class TreeModelReadTemp : public AbstractTreeModel {
+template<class T> class TreeModelReadTemp : public AbstractModel {
 protected:
     QStringList m_header;   //!< Liste des noms des colonnes.
     cmps::tree<T> m_tree;       //!< Arbre de donnée.
 
 public:
-    using AbstractTreeModel::AbstractTreeModel;
-    using AbstractTreeModel::setHeaderData;
+    using AbstractModel::AbstractModel;
+    using AbstractModel::setHeaderData;
 
     //! Constructeur.
     explicit TreeModelReadTemp(QObject *parent = nullptr)
-        : AbstractTreeModel(parent) {}
+        : AbstractModel(parent) {}
 
     //! Destructeur par defaut.
     ~TreeModelReadTemp() override = default;

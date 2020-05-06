@@ -41,7 +41,6 @@ SOURCES += \
     TreeModelReadEntity.cpp \
     TreeModelReadTemp.cpp \
     TreeModelTemp.cpp \
-    AbstractTreeModel.cpp \
     NewModifDialog.cpp \
     Checklist.cpp \
     TableEntityView.cpp \
@@ -49,7 +48,9 @@ SOURCES += \
     FindWidget.cpp \
     AbstractColonnesModel.cpp \
     TableModel.cpp \
-    AbstractEntityTableau.cpp
+    AbstractEntityTableau.cpp \
+    AbstractModel.cpp \
+    TreeNodeModel.cpp
 
 HEADERS += \
     BarPlotter.h \
@@ -71,7 +72,6 @@ HEADERS += \
     TreeModelReadEntity.h \
     TreeModelReadTemp.h \
     TreeModelTemp.h \
-    AbstractTreeModel.h \
     NewModifDialog.h \
     Checklist.h \
     TableEntityView.h \
@@ -79,7 +79,9 @@ HEADERS += \
     FindWidget.h \
     AbstractColonnesModel.h \
     TableModel.h \
-    AbstractEntityTableau.h
+    AbstractEntityTableau.h \
+    AbstractModel.h \
+    TreeNodeModel.h
 
 unix {
     target.path = /usr/lib
