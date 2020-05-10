@@ -10,13 +10,17 @@
 #include <QVBoxLayout>
 #include "AbstractFindModel.h"
 
+namespace widgetMPS {
+/*! \ingroup groupeWidget
+ * \brief Widget de recherche définissant un arbre de filtres à appliquer à un model de type AbstractColonnesModel.
+ */
 class FindWidget : public QWidget {
     Q_OBJECT
 protected:
     // Model & delegate
     using Delegate = delegateMPS::FindDelegate;
-    using Model = modelMPS::AbstractFindModel;
-    Model * m_model = nullptr;                //!< Model de recherche.
+    using FindModel = modelMPS::AbstractFindModel;
+    FindModel * m_model = nullptr;                //!< Model de recherche.
     // Widget
     QPushButton * m_addButton;      //!< Bouton d'ajout d'une condition de recherche.
     QPushButton * m_delButton;      //!< Bouton de suppresion d'une condition.
@@ -28,20 +32,26 @@ protected:
     QHBoxLayout * m_buttonsLayout;  //!< Claque des boutton.
 public:
     //! Constructeur.
-    FindWidget(Model * model = new Model(),QWidget * parent = nullptr);
+    FindWidget(FindModel * model = new FindModel(),QWidget * parent = nullptr);
 
     //! Accesseur du Model.
-    Model * model() const
+    FindModel * findModel() const
         {return m_model;}
 
-    //! Mutateur du model.
-    void setModel(Model * model) {
+    //! Mutateur du model de recheche.
+    void setFindModel(FindModel * model) {
         m_view->setModel(model);
         if(m_model)
             delete m_model;
         m_model = model;
         m_model->setParent(this);
     }
-};
 
+    //! Mutateur du model filtré.
+    void setModel(modelMPS::AbstractColonnesModel * model) {
+        if(m_model)
+            m_model->setModel(model);
+    }
+};
+}
 #endif // FINDWIDGET_H

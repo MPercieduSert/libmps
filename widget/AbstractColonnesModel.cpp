@@ -3,6 +3,7 @@
 using namespace modelMPS;
 
 AbstractColonnesModel::AbstractColonne::~AbstractColonne() = default;
+AbstractBoolColonne::~AbstractBoolColonne() = default;
 
 AbstractColonnesModel::AbstractColonnesModel(bool uniqueLigne, bool valideLigne, QObject * parent)
     : AbstractModel(parent), m_uniqueLigne(uniqueLigne), m_valideLigne(valideLigne) {

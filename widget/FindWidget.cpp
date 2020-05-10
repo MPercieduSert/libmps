@@ -1,15 +1,18 @@
 #include "FindWidget.h"
 
-FindWidget::FindWidget(Model *model, QWidget *parent)
+using namespace widgetMPS;
+
+FindWidget::FindWidget(FindModel *model, QWidget *parent)
  : QWidget (parent){
     // Widget
     m_view = new QTreeView;
-    setModel(model);
+    setFindModel(model);
     auto * delegateOld = m_view->itemDelegate();
     m_view->setItemDelegate(new Delegate(this));
     delete delegateOld;
-    m_view->setSelectionBehavior(QAbstractItemView::SelectRows);
+    m_view->setSelectionBehavior(QAbstractItemView::SelectItems);
     m_view->setSelectionMode(QAbstractItemView::SingleSelection);
+    m_view->setEditTriggers(QAbstractItemView::CurrentChanged | QAbstractItemView::DoubleClicked);
     connect(m_model,&modelMPS::AbstractFindModel::rowsInserted,m_view,&QTreeView::expand);
     m_addButton = new QPushButton("+");
     m_delButton = new QPushButton("-");

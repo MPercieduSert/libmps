@@ -31,7 +31,17 @@ using namespace typeMPS;
 class AbstractColonnesModel : public AbstractModel {
     Q_OBJECT
 public:
-    enum {NoType = -1};
+    //! Type des colonnes du modèle.
+    enum colonneType {NoType = -1,
+                      BoolColonne = findNodeModel::BoolNodeType,
+                      ConstanteColonne = findNodeModel::ConstanteNodeType,
+                      DateColonne = findNodeModel::DateNodeType,
+                      DateTimeColonne = findNodeModel::DateTimeNodeType,
+                      DoubleColonne = findNodeModel::DoubleNodeType,
+                      IntColonne = findNodeModel::IntNodeType,
+                      TexteColonne = findNodeModel::TexteNodeType,
+                      UIntColonne = findNodeModel::UIntNodeType};
+                      //NbrTypeColonne};
 
     //! État des lignes.auto & e1 =static_cast<const Eleve &>(m_data.front()[row1]);
     enum etat {Sauver,
@@ -49,14 +59,6 @@ public:
                               Mediane,
                               Q1,Q3,
                               D1,D9};
-
-    //! Information sur une colonne.
-    struct NewColonneInfo {
-        Qt::ItemFlags flags;
-        int id;
-        QString name;
-        int type;
-    };
 
     //////////////////////////////// AbstractColonne //////////////////////
     //! Classe abstraite d'information et d'intéraction avec les colonnes.
@@ -98,6 +100,18 @@ public:
 
         //! Acceseur du type de la colonne.
         int type() const {return m_type;}
+    };
+
+    //! Ensemble des colonnes.
+    using Colonnes = std::vector<std::unique_ptr<AbstractColonne>>;
+
+    //! Information de création d'une nouvelle colonne.
+    struct NewColonneInfo {
+        Qt::ItemFlags flags;
+        int id;
+        QString name;
+        int type;
+        std::vector<QVariant> args = std::vector<QVariant>();
     };
 
     /////////////////////////////////////// AbstractTableau ///////////////////////////////////
@@ -145,7 +159,7 @@ public:
 protected:
     int m_colonneSorted = -1;       //! Colonne trié par défaut si positive.
     // Colonnes
-    std::vector<std::unique_ptr<AbstractColonne>> m_colonnes;     //!< Contient les informations d'une colonne.
+    Colonnes m_colonnes;     //!< Contient les informations d'une colonne.
     // ByPass
     bool m_uniqueLigne;                //!< Court-circuite l'unicité si false.
     bool m_valideLigne;                //!< Court-circuite la validité si false.
@@ -168,6 +182,14 @@ public:
     //! Accesseur du vecteur des aspect des états.
     const std::vector<QBrush> & brushEtat() const noexcept
         {return m_brush;}
+
+    //! Accesseur de la colonne en position pos.
+    const AbstractColonne & colonne(szt pos) const
+        {return *m_colonnes.at(pos);}
+
+    //! Accesseur de la colonne en position pos.
+    AbstractColonne & colonne(szt pos)
+        {return *m_colonnes.at(pos);}
 
     //! Accesseur de la colonne trié lors de réinitialisation (-1 pour aucune).
     int colonneSorted() const
@@ -255,16 +277,6 @@ protected:
     AbstractColonne & colonne(const QModelIndex & index)
         {return *m_colonnes[static_cast<szt>(index.column())];}
 
-//    //! Renvoie le informations de recherche de la colonne d'indice pos.
-//    AbstractFindModel::Colonne colonneForFindModel(szt pos) const {
-//        AbstractFindModel::Colonne colonne;
-//        if(pos < m_columns.size()) {
-//            colonne.type = m_columns[pos]->type();
-//            colonne.nom = m_columns[pos]->header();
-//        }
-//        return colonne;
-//    }
-
     //! Fait la correspondance entre l'index et la ligne de donnée.
     virtual szt ligne(const QModelIndex & index) const = 0;
 
@@ -296,31 +308,18 @@ protected slots:
 /*! \ingroup groupeModel
  * \brief Classe template générique d'une colonne.
  */
-template<class T, class Vec> class BaseColonne : public AbstractColonnesModel::AbstractColonne {
+template<class Read, class Write, class Vec> class BaseColonne : public AbstractColonnesModel::AbstractColonne {
 protected:
-    QVariant (*m_get)(const T &, int);                  //!< Fonction lisant la donnée du model.
-    bool (*m_set)(const QVariant &, T &, int);          //!< Fonction modifiant la donnée du model.
+    QVariant (*m_get)(Read, int);                  //!< Fonction lisant la donnée du model.
+    bool (*m_set)(const QVariant &, Write, int);          //!< Fonction modifiant la donnée du model.
     Vec & m_vec;                                        //!< Référence sur le vecteur de donnée.
 public:
     //! Constructeur.
     BaseColonne(const QString & name, Qt::ItemFlags flags, int type,
                  Vec & vec,
-                 QVariant (*get)(const T &, int),
-                 bool (*set)(const QVariant &, T &, int))
+                 QVariant (*get)(Read, int),
+                 bool (*set)(const QVariant &, Write, int))
         : AbstractColonne(name,flags,type), m_get(get), m_set(set), m_vec(vec) {}
-};
-
-/*! \ingroup groupeModel
- * \brief Classe template générique d'une colonne associée à un vecteur de valeur.
- */
-template<class T, class Vec> class ValueColonne : public BaseColonne<T,Vec> {
-protected:
-    using BaseColonne<T,Vec>::m_get;
-    using BaseColonne<T,Vec>::m_set;
-    using BaseColonne<T,Vec>::m_vec;
-public:
-    //! Constructeur.
-    using BaseColonne<T,Vec>::BaseColonne;
 
     //! Accesseur de la donnée d'indice id dans la colonne.
     QVariant data(szt id, int role) const override
@@ -331,48 +330,84 @@ public:
         {return m_set(value,m_vec[id],role);}
 };
 
-template<class T> using VectorColonne = ValueColonne<T, std::vector<T>>;
-template<class T> using VectorPtrColonne = ValueColonne<T, conteneurMPS::VectorPtr<T>>;
+template<class T> using VectorRefColonne = BaseColonne<const T&,T&,std::vector<T>>;
+template<class T> using VectorValColonne = BaseColonne<T,T,std::vector<T>>;
+template<class T> using VectorPtrColonne = BaseColonne<const T&,T&, conteneurMPS::VectorPtr<T>>;
 
 /*! \ingroup groupeModel
- * \brief Classe template générique d'une colonne associée à un vecteur de pointeur type U ancêtre de T.
+ * \brief Classe Abstraite mère des colonnes de type booléen.
  */
-template<class T, class Vec> class PtrColonne : public BaseColonne<T,Vec> {
+class AbstractBoolColonne : public AbstractColonnesModel::AbstractColonne {
 protected:
-    using BaseColonne<T,Vec>::m_vec;
+    QString m_trueLabel;                //!< Label du booléen vraie.
+    QString m_falseLabel;               //!< Label du booléen faux.
 public:
     //! Constructeur.
-    using BaseColonne<T,Vec>::BaseColonne;
+    AbstractBoolColonne(const QString & name, Qt::ItemFlags flags, int type,
+                const QString & trueLabel = QString(), const QString & falseLabel = QString())
+        : AbstractColonne(name,flags,type),
+          m_trueLabel(trueLabel), m_falseLabel(falseLabel) {}
 
-    //! Accesseur de la donnée d'indice id dans la colonne.
-    QVariant data(szt id, int role) const override
-        {return m_get(static_cast<const T &>(*(m_vec[id])), role);}
+    //! Destructeur.
+    ~AbstractBoolColonne() override;
 
-    //! Mutateur de la donnée d'indice id dans la colonne.
-    bool setData(szt id, const QVariant & value,  int role) override
-        {return m_set(value,static_cast<T &>(*(m_vec[id])),role);}
+    //! Accesseur du label pour faux.
+    const QString & falseLabel() const
+        {return m_falseLabel;}
+
+    //! Mutateur du label pour faux.
+    void setFalseLabel(const QString & falseLabel)
+        {m_falseLabel = falseLabel;}
+
+    //! Mutateur du label pour vraie.
+    void setTrueLabel(const QString & trueLabel)
+        {m_trueLabel = trueLabel;}
+
+    //! Accesseur du label pour vraie.
+    const QString & trueLabel() const
+        {return m_trueLabel;}
 };
 
 /*! \ingroup groupeModel
- * \brief Classe template générique d'une colonne associée à un vecteur de pointeur type U ancêtre de T.
+ * \brief Classe mère des colonnes de type booléen.
  */
-template<class T, class Vec> class ConvertColonne : public BaseColonne<T,Vec> {
+template<class Read, class Write, class Vec> class BoolColonne :public AbstractBoolColonne  {
 protected:
-    using BaseColonne<T,Vec>::m_vec;
+    bool (*m_get)(Read);           //!< Fonction lisant la donnée du model.
+    void (*m_set)(bool,Write);     //!< Fonction modifiant la donnée du model.
+    Vec & m_vec;                        //!< Référence sur le vecteur de donnée.
+
 public:
     //! Constructeur.
-    using BaseColonne<T,Vec>::BaseColonne;
+    BoolColonne(const QString & name, Qt::ItemFlags flags, int type,
+                Vec & vec,
+                bool (*get)(Read),
+                void (*set)(bool, Write),
+                const QString & trueLabel = QString(), const QString & falseLabel = QString())
+        : AbstractBoolColonne(name,flags,type,trueLabel,falseLabel),
+          m_get(get), m_set(set), m_vec(vec) {}
 
     //! Accesseur de la donnée d'indice id dans la colonne.
-    QVariant data(szt id, int role) const override
-        {return m_get(static_cast<const T &>(m_vec[id]), role);}
+    QVariant data(szt id, int role) const override {
+        if(role == Qt::CheckStateRole)
+            return m_get(m_vec[id]) ? Qt::Checked : Qt::Unchecked;
+        if(role == Qt::DisplayRole)
+            return m_get(m_vec[id]) ? m_trueLabel : m_falseLabel;
+        return QVariant();
+    }
 
     //! Mutateur de la donnée d'indice id dans la colonne.
-    bool setData(szt id, const QVariant & value,  int role) override
-        {return m_set(value,static_cast<T &>(m_vec[id]),role);}
+    bool setData(szt id, const QVariant & value,  int role) override {
+        if(role == Qt::CheckStateRole) {
+            m_set(value.toBool(),m_vec[id]);
+            return true;}
+        return false;
+    }
 };
 
-template<class Ent> using EntityColonne = ConvertColonne<Ent,conteneurMPS::VectorPtr<entityMPS::Entity>>;
+template<class T> using VectorRefBoolColonne = BoolColonne<const T&,T&,std::vector<T>>;
+template<class T> using VectorValBoolColonne = BoolColonne<T,T,std::vector<T>>;
+template<class T> using VectorPtrBoolColonne = BoolColonne<const T&,T&, conteneurMPS::VectorPtr<T>>;
 
 ///////////////////////////////////////// Tableau ///////////////////////////////////////////////////////////
 /*! \ingroup groupeModel
@@ -484,15 +519,40 @@ template<class T, class Vec> void AbstractVecTableau<T,Vec>::erase(szt first, sz
 
 template <class T> std::unique_ptr<AbstractColonnesModel::AbstractColonne>
                         VectorTableau<T>::makeColonne(const AbstractColonnesModel::NewColonneInfo & info) {
-    return std::make_unique<VectorColonne>(info.name,info.flags,info.type,m_vec,
-                [](const T & element, int role){
-                    if(role == Qt::DisplayRole || role == Qt::EditRole)
-                        return element;
-                    return QVariant();},
-                [](const QVariant & value, T & element, int role){
-                    if(role == Qt::EditRole)
-                        element = value.value<T>();
-                    return QVariant();});
+    switch (info.type) {
+    case AbstractColonnesModel::BoolColonne:
+        if(info.args.size() == 0)
+            return std::make_unique<VectorValColonne<T>>(info.name,info.flags,info.type,m_vec,
+                                                         [](T element)->bool{return element;},
+                                                         [](bool value, bool element){element = value;});
+        if(info.args.size() == 2)
+            return std::make_unique<VectorValColonne<T>>(info.name,info.flags,info.type,m_vec,
+                                                         [](T element)->bool{return element;},
+                                                         [](bool value, bool element){element = value;},
+                                                         info.args[0].toString(),info.args[1].toString());
+    case AbstractColonnesModel::DoubleColonne:
+    case AbstractColonnesModel::IntColonne:
+    case AbstractColonnesModel::UIntColonne:
+        return std::make_unique<VectorValColonne<T>>(info.name,info.flags,info.type,m_vec,
+                    [](T element, int role){
+                        if(role == Qt::DisplayRole || role == Qt::EditRole)
+                            return element;
+                        return QVariant();},
+                    [](const QVariant & value, T element, int role){
+                        if(role == Qt::EditRole)
+                            element = value.value<T>();
+                        return QVariant();});
+    default:
+        return std::make_unique<VectorRefColonne<T>>(info.name,info.flags,info.type,m_vec,
+                    [](const T & element, int role){
+                        if(role == Qt::DisplayRole || role == Qt::EditRole)
+                            return element;
+                        return QVariant();},
+                    [](const QVariant & value, T & element, int role){
+                        if(role == Qt::EditRole)
+                            element = value.value<T>();
+                        return QVariant();});
+    }
 }
 }
 #endif // ABSTRACTCOLONNESMODEL_H

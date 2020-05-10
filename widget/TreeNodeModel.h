@@ -32,7 +32,7 @@ public:
         virtual QVariant data(int /*column*/, int /*role*/ = Qt::DisplayRole) const {return QVariant();}
 
         //! Accesseur des drapeaux associés à column.
-        virtual Qt::ItemFlags flags(int /*column*/) const {return Qt::ItemIsSelectable;}
+        virtual Qt::ItemFlags flags(int /*column*/) const {return  Qt::NoItemFlags;}
 
         //! Mutateur de la donnée associé à column.
         virtual bool setData(int /*column*/, const QVariant & /*value*/, int /*role*/ = Qt::EditRole) {return true;}
