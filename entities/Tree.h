@@ -228,6 +228,10 @@ protected:
         const T & data() const noexcept
             {return m_data;}
 
+        //! Supprime les noeuds appartenant à [this,last) et leurs decendants.
+        //! Le noeud last doive être de la même fratrie sauf si last est nul.
+        void erase(Item * last) noexcept;
+
         //! Test si le noeud  est l'ainé des frères.
         bool firstBrother() const noexcept
             {return !m_prevBrother;}
@@ -1151,7 +1155,9 @@ public:
     const_abstract_iterator end() const noexcept
         {return const_abstract_iterator();}
 
-    //! Supprime l'élément pointé par l'itérateur pos. Si pos pointe sur la racine, seul les descendant sont supprimés.
+    //! Supprime l'élément pointé par l'itérateur pos et ses descendants.
+    //! Si pos pointe sur la racine, seul les descendants sont supprimés.
+    //! Retourne un itérateur sur le suivant celui pointé par pos.
     iterator erase(abstract_iterator & pos) noexcept {
         if(pos.root()) {
             clear();
@@ -1162,6 +1168,14 @@ public:
             delete (iter++).itemPtr();
             return iter;
         }
+    }
+
+    //! Supprime les noeuds appartenant à [first,last) et leurs decendants.
+    //! Les noeuds pointés par first et last doivent être d'une même fratrie sauf si last est nul.
+    //! Retourne un itérateur sur le noeud suivant le dernier noeud supprimé.
+    iterator erase(abstract_iterator & first, abstract_iterator & last) noexcept {
+        first.m_ptr->erase(last.m_ptr);
+        return last;
     }
 
     //! Extrait le noeud pointer par pos de l'arbre pour en faire un nouvel arbre
@@ -1661,6 +1675,32 @@ template<class T> void tree<T>::Item::clearChilds() noexcept {
             delete (i++).itemPtr();
         }
         m_firstChild = m_lastChild = nullptr;
+    }
+}
+
+template<class T> void tree<T>::Item::erase(Item * last) noexcept {
+    if(!last && firstBrother())
+        m_parent->clearChilds();
+    else if(!last || m_parent == last->m_parent){
+        if(!last) {
+            m_prevBrother->m_nextBrother = nullptr;
+            m_parent->m_lastChild = m_prevBrother;
+        }
+        else {
+            last->m_prevBrother->m_nextBrother = nullptr;
+            last->m_prevBrother = m_prevBrother;
+            if(firstBrother())
+                m_parent->m_firstChild = last;
+            else
+                m_prevBrother->m_nextBrother = last;
+        }
+        auto * ptr = this;
+        while (ptr) {
+            auto * delPtr = ptr;
+            delPtr->m_parent = nullptr;
+            ptr = ptr->m_nextBrother;
+            delete delPtr;
+        }
     }
 }
 
