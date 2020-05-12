@@ -23,6 +23,20 @@ AbstractFindModel::AbstractFindModel(QObject *parent)
     m_data.setTree(Tree(std::move(racine)));
 }
 
+void AbstractFindModel::insertNode(int row, const QModelIndex & parent) {
+    if(getData(parent).type() == OperationNodeType)
+        insertNodes(ChoiceNodeType,row,1,parent);
+    else {
+        auto node = std::move(m_data.getData(parent));
+        m_data.getData(parent) = std::make_unique<OperationNode>();
+        dataChanged(parent,parent);
+        beginInsertRows(parent,0,1);
+            m_data.tree().push_back(m_data.getIter(parent),std::move(node));
+            m_data.tree().push_back(m_data.getIter(parent),std::make_unique<ChoiceNode>());
+        endInsertRows();
+    }
+}
+
 std::vector<QString> AbstractFindModel::nomColonnes() const {
     if(m_model) {
         std::vector<QString> vec(static_cast<szt>(m_model->columnCount()));
@@ -59,13 +73,25 @@ TreeNodeModel::Node AbstractFindModel::nodeConditionFactory(szt pos){
     }
 }
 
+void AbstractFindModel::removeNode(int row, const QModelIndex & parent){
+    if(parent.isValid() && row >= 0 && row < rowCount(parent)){
+        if(rowCount(parent) == 2) {
+            m_data.getValidData(parent) = std::move(m_data.getValidData(index(1 - row,0,parent)));
+            removeRows(0,2,parent);
+            dataChanged(parent,parent.siblingAtColumn(NbrColumn));
+        }
+        else
+            removeRows(row,1,parent);
+    }
+}
+
 bool AbstractFindModel::setData(const QModelIndex &index, const QVariant &value, int role) {
     if(index.isValid()) {
         if(role == Qt::EditRole) {
             if(index.column() == OpColumn){
                 if(getData(index).type() == ChoiceNodeType
                         && value.toInt() >= 0 && value.toInt() < NbrOperation) {
-                    *m_data.getValidIter(index) = std::make_unique<OperationNode>(value.toUInt());
+                    m_data.getValidData(index) = std::make_unique<OperationNode>(value.toUInt());
                     dataChanged(index.siblingAtColumn(0),index.siblingAtColumn(NbrColumn));
                     insertNodes(ChoiceNodeType,0,2,index);
                     return true;
@@ -75,7 +101,7 @@ bool AbstractFindModel::setData(const QModelIndex &index, const QVariant &value,
                 if(getData(index).type() != OperationNodeType
                         && value.toInt() >= 0 && value.toInt() < m_model->columnCount()) {
                     if(getData(index).type() != m_model->colonne(value.toUInt()).type())
-                        *m_data.getValidIter(index) = nodeConditionFactory(value.toUInt());
+                        m_data.getValidData(index) = nodeConditionFactory(value.toUInt());
                     else{
                         static_cast<AbstractConditionNode &>(getData(index)).setPos(value.toUInt());
                         static_cast<AbstractConditionNode &>(getData(index)).setLabel(m_model->colonne(value.toUInt()).header());

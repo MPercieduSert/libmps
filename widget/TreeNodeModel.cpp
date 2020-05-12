@@ -34,6 +34,18 @@ bool TreeNodeModel::insertNodes(int type, int row, int count, const QModelIndex 
     return true;
 }
 
+bool TreeNodeModel::removeRows(int row, int count, const QModelIndex &parent) {
+    if(row < 0 || count <= 0 || row >= rowCount(parent))
+        return false;
+    beginRemoveRows(parent, row, row + count -1);
+        if(count == 1)
+            m_data.tree().erase(m_data.getIter(parent).toChild(row));
+        else
+            m_data.tree().erase(m_data.getIter(parent).toChild(row),m_data.getIter(parent).toChild(row + count));
+    endRemoveRows();
+    return true;
+}
+
 bool TreeNodeModel::setData(const QModelIndex &index, const QVariant &value, int role) {
     if(checkIndex(index) && m_data.getValidData(index)->setData(index.column(),value,role)) {
         dataChanged(index,index);

@@ -39,13 +39,7 @@ public:
         {return m_model;}
 
     //! Mutateur du model de recheche.
-    void setFindModel(FindModel * model) {
-        m_view->setModel(model);
-        if(m_model)
-            delete m_model;
-        m_model = model;
-        m_model->setParent(this);
-    }
+    void setFindModel(FindModel * model);
 
     //! Mutateur du model filtré.
     void setModel(modelMPS::AbstractColonnesModel * model) {

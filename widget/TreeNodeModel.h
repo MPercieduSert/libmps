@@ -80,7 +80,11 @@ public:
         return QVariant();
     }
 
+    //! Insert count noeuds de nature type avant la ligne row de parent.
     bool insertNodes(int type, int row, int count, const QModelIndex &parent = QModelIndex());
+
+    //! Supprimer count ligne en commençant par la ligne row.
+    bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex()) override;
 
     //! Mutateur la donnée associé à un couple (index,role).
     bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;

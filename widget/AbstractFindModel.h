@@ -91,6 +91,12 @@ public:
     int columnCount(const QModelIndex &/*parent*/ = QModelIndex()) const override
         {return findNodeModel::NbrColumn;}
 
+    //! Insert un nouveau noeud.
+    //! Si le noeuds parent est un operationNode un noeud choiceNode est ajouté avant row.
+    //! Si le noeuds parent n'est pas un operationNode, un nouveau operationNode prend sa place
+    //! et le noeud parent devient l'ainé de ce nouveau et un noeud ChoiceNode est ajouté en cadet.
+    void insertNode(int row, const QModelIndex & parent);
+
     //! Donne la liste des noms des colonnes du model associé.
     std::vector<QString> nomColonnes() const;
 
@@ -99,6 +105,9 @@ public:
 
     //! Mutateur du model filtré.
     void setModel(AbstractColonnesModel * model);
+
+    //! Supprime le noeud de la ligne row de parent.
+    void removeNode(int row, const QModelIndex & parent);
 
 protected:
     //! Fabrique des noeuds.
