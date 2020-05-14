@@ -414,6 +414,10 @@ public:
         bool operator !=(const const_abstract_iterator & i) const noexcept
             {return m_ptr != i.m_ptr;}
 
+        //! Crée un const_brother_iterator initialisé sur le parent.
+        const_abstract_iterator parent() const noexcept
+            {return m_ptr ? m_ptr->m_parent : nullptr;}
+
         //! Acceseur du pointeur.
         void * ptr() const
             {return m_ptr;}
@@ -820,6 +824,7 @@ public:
         using const_abstract_iterator::m_ptr;
         using const_abstract_iterator::to_firstLeaf;
         using const_abstract_iterator::to_lastChild;
+        using const_abstract_iterator::to_nextBrother;
         using const_abstract_iterator::to_parent;
         using const_abstract_iterator::to_prevBrother;
         using const_abstract_iterator::to_prevBrotherIfNotUncle;
@@ -1158,17 +1163,7 @@ public:
     //! Supprime l'élément pointé par l'itérateur pos et ses descendants.
     //! Si pos pointe sur la racine, seul les descendants sont supprimés.
     //! Retourne un itérateur sur le suivant celui pointé par pos.
-    iterator erase(abstract_iterator & pos) noexcept {
-        if(pos.root()) {
-            clear();
-            return pos;
-        }
-        else {
-            brother_iterator iter = pos;
-            delete (iter++).itemPtr();
-            return iter;
-        }
-    }
+    iterator erase(abstract_iterator & pos) noexcept;
 
     //! Supprime les noeuds appartenant à [first,last) et leurs decendants.
     //! Les noeuds pointés par first et last doivent être d'une même fratrie sauf si last est nul.
@@ -1219,7 +1214,6 @@ public:
         tree.m_root = nullptr;
         return node;
     }
-
 
     //! Insert count nouveaux noeuds de donnée data avant le noeud pointé par pos dans la fratrie sauf si le noeud pointé est la racine,
     //! dans ce cas les nouveaux noeuds sont inserés en tant que fils ainé. Retourne un itérateur sur le premier des nouveaux noeuds.
@@ -1458,6 +1452,10 @@ public:
     template<class U> size_type removeLeafIfData(U predicat) noexcept
         {return removeLeafIf([&predicat](const const_abstract_iterator & iter)->bool{return predicat(*iter);});}
 
+    //! Teste si l'arbre est réduit à sa racine (valide).
+    bool rootLeaf() const noexcept
+        {return m_root && m_root->leaf();}
+
     //! Retourne le nombre de noeuds de l'arbre.
     size_type size() const noexcept
         {return m_root->size();}
@@ -1504,6 +1502,18 @@ template<class T> template<class InputIt, class Ajout> typename tree<T>::iterato
         ++first;
     }
     return node.m_ptr;
+}
+
+template<class T> typename tree<T>::iterator tree<T>::erase(abstract_iterator & pos) noexcept {
+    if(pos.root()) {
+        clear();
+        return pos;
+    }
+    else {
+        brother_iterator iter = pos;
+        delete (iter++).itemPtr();
+        return iter;
+    }
 }
 
 template<class T> tree<T> tree<T>::parentWithChilds(const_abstract_iterator & pos) {
@@ -1975,7 +1985,7 @@ template<class T> typename tree<T>::const_reverse_iterator & tree<T>::const_reve
         if(m_ptr->lastBrother())
             to_parent();
         else {
-            to_prevBrother();
+            to_nextBrother();
             to_firstLeaf();
         }
     }
