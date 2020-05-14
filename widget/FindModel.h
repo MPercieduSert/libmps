@@ -1,8 +1,8 @@
 /*Auteur: PERCIE DU SERT Maxime
  *Date: 26/04/2020
  */
-#ifndef ABSTRACTFINDMODEL_H
-#define ABSTRACTFINDMODEL_H
+#ifndef FINDMODEL_H
+#define FINDMODEL_H
 
 #include <memory>
 #include <QComboBox>
@@ -71,7 +71,7 @@ enum comparaison {Egal,
 /*! \ingroup groupeModel
  * \brief Classe mère des model de recherche.
  */
-class AbstractFindModel : public TreeNodeModel {
+class FindModel : public TreeNodeModel {
     Q_OBJECT
 public:
    //! Structure d'informations sur une colonne du model.
@@ -86,7 +86,7 @@ protected:
     using QAbstractItemModel::createIndex;
 public:
     //! Constructeur.
-    AbstractFindModel(QObject * parent = nullptr);
+    FindModel(QObject * parent = nullptr);
 
     //! Renvoie le nombre de column pour un parent donné.
     int columnCount(const QModelIndex &/*parent*/ = QModelIndex()) const override
@@ -452,8 +452,6 @@ public:
 namespace delegateMPS {
 class FindDelegate : public QStyledItemDelegate {
     Q_OBJECT
-protected:
-    using Afm = modelMPS::AbstractFindModel;
 public:
     //! Constructeur.
     FindDelegate(QObject * parent = nullptr)
@@ -473,4 +471,4 @@ public:
     void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const override;
 };
 }
-#endif // ABSTRACTFINDMODEL_H
+#endif // FINDMODEL_H

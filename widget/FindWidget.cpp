@@ -17,7 +17,7 @@ FindWidget::FindWidget(FindModel *model, QWidget *parent)
     m_view->setSelectionBehavior(QAbstractItemView::SelectRows);
     m_view->setSelectionMode(QAbstractItemView::SingleSelection);
     m_view->setEditTriggers(QAbstractItemView::CurrentChanged | QAbstractItemView::DoubleClicked);
-    connect(m_model,&modelMPS::AbstractFindModel::rowsInserted,m_view,&QTreeView::expand);
+    connect(m_model,&modelMPS::FindModel::rowsInserted,m_view,&QTreeView::expand);
 
     // Calque
     m_buttonsLayout = new QHBoxLayout;

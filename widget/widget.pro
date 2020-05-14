@@ -44,13 +44,13 @@ SOURCES += \
     NewModifDialog.cpp \
     Checklist.cpp \
     TableEntityView.cpp \
-    AbstractFindModel.cpp \
     FindWidget.cpp \
     AbstractColonnesModel.cpp \
     TableModel.cpp \
     AbstractEntityTableau.cpp \
     AbstractModel.cpp \
-    TreeNodeModel.cpp
+    TreeNodeModel.cpp \
+    FindModel.cpp
 
 HEADERS += \
     BarPlotter.h \
@@ -75,13 +75,13 @@ HEADERS += \
     NewModifDialog.h \
     Checklist.h \
     TableEntityView.h \
-    AbstractFindModel.h \
     FindWidget.h \
     AbstractColonnesModel.h \
     TableModel.h \
     AbstractEntityTableau.h \
     AbstractModel.h \
-    TreeNodeModel.h
+    TreeNodeModel.h \
+    FindModel.h
 
 unix {
     target.path = /usr/lib

@@ -8,7 +8,7 @@
 #include <QPushButton>
 #include <QTreeView>
 #include <QVBoxLayout>
-#include "AbstractFindModel.h"
+#include "FindModel.h"
 
 namespace widgetMPS {
 /*! \ingroup groupeWidget
@@ -19,7 +19,7 @@ class FindWidget : public QWidget {
 protected:
     // Model & delegate
     using Delegate = delegateMPS::FindDelegate;
-    using FindModel = modelMPS::AbstractFindModel;
+    using FindModel = modelMPS::FindModel;
     FindModel * m_model = nullptr;                //!< Model de recherche.
     // Widget
     QPushButton * m_addButton;      //!< Bouton d'ajout d'une condition de recherche.

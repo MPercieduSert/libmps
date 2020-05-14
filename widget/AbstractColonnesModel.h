@@ -7,7 +7,7 @@
 #include <memory>
 #include <QAbstractItemModel>
 #include <QBrush>
-#include "AbstractFindModel.h"
+#include "FindModel.h"
 #include "Bdd.h"
 #include "ConteneurPtr.h"
 #include "Entity.h"
@@ -206,7 +206,7 @@ public:
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
 
     //! Recherche les lignes de données vérifiant les conditions d'un modéle de recherche donné.
-    virtual void find(AbstractFindModel * findModel) = 0;
+    virtual void find(FindModel * findModel) = 0;
 
     //! Renvoie les drapeaux associés à un index.
     Qt::ItemFlags flags(const QModelIndex & index) const override;

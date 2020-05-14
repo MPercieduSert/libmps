@@ -1,4 +1,4 @@
-#include "AbstractFindModel.h"
+#include "FindModel.h"
 #include "AbstractColonnesModel.h"
 
 using namespace  delegateMPS;
@@ -10,7 +10,7 @@ const std::array<QString, NbrComparaison> AbstractComparaisonNode::Strings = {"=
 
 AbstractFindNode::~AbstractFindNode() = default;
 
-AbstractFindModel::AbstractFindModel(QObject *parent)
+FindModel::FindModel(QObject *parent)
     :   TreeNodeModel (true,parent) {
     // Entête
     m_header.resize(NbrColumn);
@@ -23,12 +23,12 @@ AbstractFindModel::AbstractFindModel(QObject *parent)
     m_data.setTree(Tree(std::move(racine)));
 }
 
-void AbstractFindModel::find(){
+void FindModel::find(){
     if(m_model)
         m_model->find(this);
 }
 
-void AbstractFindModel::insertNode(int row, const QModelIndex & parent) {
+void FindModel::insertNode(int row, const QModelIndex & parent) {
     if(getData(parent).type() == OperationNodeType)
         insertNodes(ChoiceNodeType,row,1,parent);
     else {
@@ -42,7 +42,7 @@ void AbstractFindModel::insertNode(int row, const QModelIndex & parent) {
     }
 }
 
-std::vector<QString> AbstractFindModel::nomColonnes() const {
+std::vector<QString> FindModel::nomColonnes() const {
     if(m_model) {
         std::vector<QString> vec(static_cast<szt>(m_model->columnCount()));
         for (szt i = 0; i != vec.size(); ++i)
@@ -53,7 +53,7 @@ std::vector<QString> AbstractFindModel::nomColonnes() const {
         return std::vector<QString>();
 }
 
-TreeNodeModel::Node AbstractFindModel::nodeFactory(int type, int row, const QModelIndex & parent) {
+TreeNodeModel::Node FindModel::nodeFactory(int type, int row, const QModelIndex & parent) {
     switch (type) {
     case ChoiceNodeType:
         return std::make_unique<ChoiceNode>();
@@ -63,7 +63,7 @@ TreeNodeModel::Node AbstractFindModel::nodeFactory(int type, int row, const QMod
     return TreeNodeModel::nodeFactory(type,row,parent);
 }
 
-TreeNodeModel::Node AbstractFindModel::nodeConditionFactory(szt pos){
+TreeNodeModel::Node FindModel::nodeConditionFactory(szt pos){
     const auto & colonne = m_model->colonne(pos);
     switch (m_model->colonne(pos).type()) {
     case BoolNodeType:
@@ -78,7 +78,7 @@ TreeNodeModel::Node AbstractFindModel::nodeConditionFactory(szt pos){
     }
 }
 
-void AbstractFindModel::removeNode(int row, const QModelIndex & parent){
+void FindModel::removeNode(int row, const QModelIndex & parent){
     if(parent.isValid() && row >= 0 && row < rowCount(parent)){
         if(rowCount(parent) == 2) {
             m_data.getValidData(parent) = std::move(m_data.getValidData(index(1 - row,0,parent)));
@@ -90,7 +90,7 @@ void AbstractFindModel::removeNode(int row, const QModelIndex & parent){
     }
 }
 
-bool AbstractFindModel::setData(const QModelIndex &index, const QVariant &value, int role) {
+bool FindModel::setData(const QModelIndex &index, const QVariant &value, int role) {
     if(index.isValid()) {
         if(role == Qt::EditRole) {
             if(index.column() == OpColumn){
@@ -122,16 +122,16 @@ bool AbstractFindModel::setData(const QModelIndex &index, const QVariant &value,
     return false;
 }
 
-void AbstractFindModel::setModel(AbstractColonnesModel * model)
+void FindModel::setModel(AbstractColonnesModel * model)
     {m_model = model;}
 
-bool AbstractFindModel::testRoot(szt id) const{
+bool FindModel::testRoot(szt id) const{
     auto & root = static_cast<const AbstractConditionNode &>(**m_data.tree().cbegin().toFirstChild());
     return root.negation() ? !root.test(id,m_model)
                            : root.test(id,m_model);
 }
 
-bool AbstractFindModel::testTree(szt id) const{
+bool FindModel::testTree(szt id) const{
     auto iter = m_data.tree().crbegin();
     iter.toFirstLeaf();
     auto test = true;
@@ -354,7 +354,7 @@ QWidget * FindDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem
         }
         if(index.column() == ColonneColumn) {
             auto * comboBox = new QComboBox(parent);
-            auto vec = static_cast<const modelMPS::AbstractFindModel *>(index.model())->nomColonnes();
+            auto vec = static_cast<const modelMPS::FindModel *>(index.model())->nomColonnes();
             for (szt i = 0; i != vec.size(); ++i)
                 comboBox->addItem(vec[i],i);
             return comboBox;
