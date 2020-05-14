@@ -7,6 +7,7 @@ FindWidget::FindWidget(FindModel *model, QWidget *parent)
     // Widget
     m_addButton = new QPushButton("+");
     m_delButton = new QPushButton("-");
+    m_findButton = new QPushButton(tr("Chercher"));
     m_resetButton = new QPushButton(tr("Réinitialiser"));
     m_view = new QTreeView;
     setFindModel(model);
@@ -20,6 +21,7 @@ FindWidget::FindWidget(FindModel *model, QWidget *parent)
 
     // Calque
     m_buttonsLayout = new QHBoxLayout;
+    m_buttonsLayout->addWidget(m_findButton);
     m_buttonsLayout->addWidget(m_addButton);
     m_buttonsLayout->addWidget(m_delButton);
     m_buttonsLayout->addWidget(m_resetButton);
@@ -33,6 +35,8 @@ void FindWidget::setFindModel(FindModel * model) {
     if(m_model) {
         m_addButton->disconnect(this);
         m_delButton->disconnect(this);
+        m_findButton->disconnect(this);
+        m_resetButton->disconnect(this);
         delete m_model;
     }
     m_model = model;
@@ -44,6 +48,7 @@ void FindWidget::setFindModel(FindModel * model) {
                 [this](){if(m_view->selectionModel()->hasSelection())
                             m_model->removeNode(m_view->selectionModel()->currentIndex().row(),
                                                 m_view->selectionModel()->currentIndex().parent().siblingAtColumn(0));});
+        connect(m_findButton,&QPushButton::clicked,m_model,&FindModel::find);
     }
     m_model->setParent(this);
 }

@@ -82,6 +82,9 @@ public:
         //! Accesseur de la donnée d'indice id dans la colonne.
         virtual QVariant data(szt /*id*/, int /*role*/ = Qt::DisplayRole) const {return QVariant();}
 
+        //! Accesseut de la donnée pour le test de recherche.
+        virtual QVariant dataTest(szt /*id*/) const {return QVariant();}
+
         //! Accesseur des drapeaux associés à la donnée.
         virtual Qt::ItemFlags flags(szt /*id*/) const {return m_flags;}
 
@@ -158,6 +161,7 @@ public:
 
 protected:
     int m_colonneSorted = -1;       //! Colonne trié par défaut si positive.
+    Qt::SortOrder m_orderSort = Qt::AscendingOrder;
     // Colonnes
     Colonnes m_colonnes;     //!< Contient les informations d'une colonne.
     // ByPass
@@ -201,6 +205,9 @@ public:
     //! Renvoie la donnée d'index et de role spécifié.
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
 
+    //! Recherche les lignes de données vérifiant les conditions d'un modéle de recherche donné.
+    virtual void find(AbstractFindModel * findModel) = 0;
+
     //! Renvoie les drapeaux associés à un index.
     Qt::ItemFlags flags(const QModelIndex & index) const override;
 
@@ -225,8 +232,10 @@ public:
     bool setData(const QModelIndex & index, const QVariant & value, int role = Qt::EditRole) override;
 
     //! Mutateur de la colonne trié lors de réinitialisation (-1 pour aucune).
-    void setColonneSorted(int col)
-        {m_colonneSorted = col;}
+    void setColonneSorted(int col, Qt::SortOrder order = Qt::AscendingOrder) {
+        m_colonneSorted = col;
+        m_orderSort = order;
+    }
 
     //! Mutateur du tableau de donnée.
     void setTableau(std::unique_ptr<AbstractTableau> && tableau);
@@ -310,20 +319,26 @@ protected slots:
  */
 template<class Read, class Write, class Vec> class BaseColonne : public AbstractColonnesModel::AbstractColonne {
 protected:
-    QVariant (*m_get)(Read, int);                  //!< Fonction lisant la donnée du model.
-    bool (*m_set)(const QVariant &, Write, int);          //!< Fonction modifiant la donnée du model.
-    Vec & m_vec;                                        //!< Référence sur le vecteur de donnée.
+    QVariant (*m_get)(Read, int);                   //!< Fonction lisant la donnée du model.
+    bool (*m_set)(const QVariant &, Write, int);    //!< Fonction modifiant la donnée du model.
+    QVariant (*m_test)(Read);                       //!< Fonction lisant la donnée du model pour les tests de recherche.
+    Vec & m_vec;                                    //!< Référence sur le vecteur de donnée.
 public:
     //! Constructeur.
     BaseColonne(const QString & name, Qt::ItemFlags flags, int type,
                  Vec & vec,
                  QVariant (*get)(Read, int),
+                 QVariant (*test)(Read),
                  bool (*set)(const QVariant &, Write, int))
-        : AbstractColonne(name,flags,type), m_get(get), m_set(set), m_vec(vec) {}
+        : AbstractColonne(name,flags,type), m_get(get), m_set(set), m_test(test), m_vec(vec) {}
 
     //! Accesseur de la donnée d'indice id dans la colonne.
     QVariant data(szt id, int role) const override
         {return m_get(m_vec[id], role);}
+
+    //! Accesseut de la donnée pour le test de recherche.
+    QVariant dataTest(szt id) const
+        {return m_test(m_vec[id]);}
 
     //! Mutateur de la donnée d'indice id dans la colonne.
     bool setData(szt id, const QVariant & value,  int role) override
@@ -395,6 +410,10 @@ public:
             return m_get(m_vec[id]) ? m_trueLabel : m_falseLabel;
         return QVariant();
     }
+
+    //! Accesseut de la donnée pour le test de recherche.
+    QVariant dataTest(szt id) const
+        {return m_get(m_vec[id]);}
 
     //! Mutateur de la donnée d'indice id dans la colonne.
     bool setData(szt id, const QVariant & value,  int role) override {

@@ -24,6 +24,7 @@ protected:
     // Widget
     QPushButton * m_addButton;      //!< Bouton d'ajout d'une condition de recherche.
     QPushButton * m_delButton;      //!< Bouton de suppresion d'une condition.
+    QPushButton * m_findButton;     //!< Bouton de recherche.
     QPushButton * m_resetButton;    //!< Bouton de réinitialisation de la recherche.
     QTreeView * m_view;             //!< Vue de l'arbre de recherche.
 

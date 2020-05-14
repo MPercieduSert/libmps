@@ -131,6 +131,26 @@ void TableModel::effacer(const QModelIndexList &selection) {
         setData(*i,QVariant());
 }
 
+void TableModel::find(AbstractFindModel * findModel) {
+    if(findModel){
+        beginResetModel();
+            m_rowToLigne.clear();
+            if(findModel->rootLeaf()){
+                for (szt id = 0; id != nbrLignes(); ++id)
+                    if(findModel->testRoot(id))
+                        m_rowToLigne.push_back(id);
+            }
+            else {
+                for (szt id = 0; id != nbrLignes(); ++id)
+                    if(findModel->testTree(id))
+                        m_rowToLigne.push_back(id);
+            }
+            if(m_colonneSorted >=0 && m_colonneSorted < columnCount())
+                sort(m_colonneSorted,m_orderSort);
+        endResetModel();
+    }
+}
+
 Qt::ItemFlags TableModel::flags(const QModelIndex &index) const {
     Qt::ItemFlags f = AbstractColonnesModel::flags(index);
     if (index.isValid())
@@ -154,9 +174,9 @@ QVariant TableModel::headerData(int section, Qt::Orientation orientation, int ro
     return AbstractColonnesModel::headerData(section,orientation,role);
 }
 
-QModelIndex TableModel::index(int row, int column, const QModelIndex &parent) const{
-    return hasIndex(row, column, parent) ? createIndex(row, column) : QModelIndex();
-}
+QModelIndex TableModel::index(int row, int column, const QModelIndex &parent) const
+    {return hasIndex(row, column, parent) ? createIndex(row, column) : QModelIndex();}
+
 
 bool TableModel::insertRows(int row, int count, const QModelIndex & parent) {
     if (count <= 0 || row < 0 || row > rowCount())
@@ -279,6 +299,7 @@ void TableModel::save() {
 }
 
 void TableModel::sort(int column, Qt::SortOrder order){
+    setColonneSorted(column,order);
     beginResetModel();
         auto col = static_cast<szt>(column);
         if(order == Qt::AscendingOrder)

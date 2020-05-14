@@ -118,6 +118,9 @@ public:
     //! Destructeur par defaut.
     ~TableModel() override = default;
 
+    //! Recherche les lignes de données vérifiant les conditions d'un modéle de recherche donné.
+    void find(AbstractFindModel * findModel) override;
+
     //! Drapeaux d'un item
     Qt::ItemFlags flags(const QModelIndex &index) const override;
 

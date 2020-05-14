@@ -2,6 +2,8 @@
 
 using namespace modelMPS;
 
+TreeNodeModel::AbstractNode::~AbstractNode() = default;
+
 TreeNodeModel::TreeNodeModel(bool racine, QObject *parent) : AbstractModel (parent), m_data(this,racine){}
 
 int TreeNodeModel::columnCount(const QModelIndex & parent) const {

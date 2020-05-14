@@ -8,7 +8,7 @@ using namespace findNodeModel;
 const std::array<QString, NbrOperation> OperationNode::Strings = {"Et","Ou","Ou Exclusif"};
 const std::array<QString, NbrComparaison> AbstractComparaisonNode::Strings = {"=","\u2260","<",">","\u2264","\u2265"};
 
-AbstractFindModel::AbstractNode::~AbstractNode() = default;
+AbstractFindNode::~AbstractFindNode() = default;
 
 AbstractFindModel::AbstractFindModel(QObject *parent)
     :   TreeNodeModel (true,parent) {
@@ -21,6 +21,11 @@ AbstractFindModel::AbstractFindModel(QObject *parent)
     // Arbre par défaut.
     auto racine = std::make_unique<ChoiceNode>();
     m_data.setTree(Tree(std::move(racine)));
+}
+
+void AbstractFindModel::find(){
+    if(m_model)
+        m_model->find(this);
 }
 
 void AbstractFindModel::insertNode(int row, const QModelIndex & parent) {
@@ -120,6 +125,33 @@ bool AbstractFindModel::setData(const QModelIndex &index, const QVariant &value,
 void AbstractFindModel::setModel(AbstractColonnesModel * model)
     {m_model = model;}
 
+bool AbstractFindModel::testRoot(szt id) const{
+    auto & root = static_cast<const AbstractConditionNode &>(**m_data.tree().cbegin().toFirstChild());
+    return root.negation() ? !root.test(id,m_model)
+                           : root.test(id,m_model);
+}
+
+bool AbstractFindModel::testTree(szt id) const{
+    auto iter = m_data.tree().crbegin();
+    iter.toFirstLeaf();
+    auto test = true;
+    while (!iter.parent().root()) {
+        if(iter.leaf())
+            test = static_cast<const AbstractConditionNode &>(**iter).test(id,m_model);
+        if(static_cast<const AbstractNegationNode &>(**iter).negation())
+            test = !test;
+        if((test && static_cast<const OperationNode &>(**iter.parent()).operation() == Ou)
+                || (!test && static_cast<const OperationNode &>(**iter.parent()).operation() == Et)){
+            iter.toParent();
+        }
+        else
+            --iter;
+    }
+    if(static_cast<const AbstractNegationNode &>(**iter).negation())
+        test = !test;
+    return test;
+}
+
 ///////////////////////////// AbstractNegationNode//////////////////////
 QVariant AbstractNegationNode::data(int column, int role) const {
     if(column == NegColumn) {
@@ -150,7 +182,7 @@ QVariant AbstractComparaisonNode::data(int column, int role) const{
     return AbstractConditionNode::data(column,role);
 }
 bool AbstractComparaisonNode::setData(int column, const QVariant & value, int role) {
-    if(column == ColonneColumn && role == Qt::EditRole) {
+    if(column == ComparaisonColumn && role == Qt::EditRole) {
         m_comp = value.toUInt();
         return true;
     }
@@ -173,6 +205,8 @@ bool AbstractConditionNode::setData(int column, const QVariant & value, int role
     }
     return AbstractNegationNode::setData(column,value,role);
 }
+bool AbstractConditionNode::test(szt id, AbstractColonnesModel * model) const
+    {return testValue(model->colonne(m_pos).dataTest(id));}
 ////////////////////////////// BoolNode /////////////////////////////
 QVariant BoolNode::data(int column, int role) const {
     if(column == TrueColumn){
@@ -223,6 +257,24 @@ bool DateNode::setData(int column, const QVariant & value, int role) {
     }
     return AbstractComparaisonNode::setData(column,value,role);
 }
+bool DateNode::testValue(const QVariant & value) const {
+    switch (m_comp) {
+    case Egal:
+        return m_date == value.toDate();
+    case Different:
+        return m_date != value.toDate();
+    case Inferieure:
+        return m_date > value.toDate();
+    case Superieure:
+        return m_date < value.toDate();
+    case InfEgal:
+        return m_date >= value.toDate();
+    case SupEgal:
+        return m_date <= value.toDate();
+    default:
+        return false;
+    }
+}
 ///////////////////////////// OperationNode ///////////////////////////
 QVariant OperationNode::data(int column, int role) const {
     if(column == OpColumn) {
@@ -265,19 +317,31 @@ QVariant TexteNode::data(int column, int role) const {
 bool TexteNode::setData(int column, const QVariant & value, int role) {
     switch (column) {
     case TexteColumn:
-        if(role == Qt::EditRole)
+        if(role == Qt::EditRole) {
                 m_texte = value.toString();
+                if(m_regex)
+                    m_regular.setPattern(m_texte);
+        }
         break;
     case CaseColumn:
         if(role == Qt::CheckStateRole)
-            return m_case = value.toBool();
+            m_regular.setPatternOptions((m_case = value.toBool())? QRegularExpression::NoPatternOption
+                                                                 : QRegularExpression::CaseInsensitiveOption);
         break;
     case RegexColumn:
-        if(role == Qt::CheckStateRole)
-            return m_regex = value.toBool();
+        if(role == Qt::CheckStateRole
+                && (m_regex = value.toBool()))
+            m_regular.setPattern(m_texte);
+
         break;
     }
     return AbstractConditionNode::setData(column,value,role);
+}
+bool TexteNode::testValue(const QVariant & value) const {
+    if(m_regex)
+        return m_regular.match(value.toString(),0).hasMatch();
+    else
+        return value.toString().contains(m_texte, m_case ? Qt::CaseSensitive : Qt::CaseInsensitive);
 }
 ///////////////////////////// FindDelegate ////////////////////////////
 QWidget * FindDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const {

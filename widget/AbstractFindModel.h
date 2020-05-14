@@ -8,6 +8,7 @@
 #include <QComboBox>
 #include <QDate>
 #include <QMouseEvent>
+#include <QRegularExpression>
 #include <QStyledItemDelegate>
 #include "TreeNodeModel.h"
 
@@ -81,7 +82,7 @@ public:
 
 protected:
     std::vector<Colonne> m_colonnes;        //!< Informations sur les colonnes.
-    AbstractColonnesModel * m_model;        //!< Model filtré.
+    AbstractColonnesModel * m_model = nullptr;        //!< Model filtré.
     using QAbstractItemModel::createIndex;
 public:
     //! Constructeur.
@@ -100,14 +101,28 @@ public:
     //! Donne la liste des noms des colonnes du model associé.
     std::vector<QString> nomColonnes() const;
 
+    //! Supprime le noeud de la ligne row de parent.
+    void removeNode(int row, const QModelIndex & parent);
+
+    //! Teste si l'arbre est réduit à sa racine.
+    bool rootLeaf() const
+        {return m_data.tree().cbegin().toFirstChild().leaf();}
+
     //! Mutateur des données du model.
     bool setData(const QModelIndex &index, const QVariant &value, int role) override;
 
     //! Mutateur du model filtré.
     void setModel(AbstractColonnesModel * model);
 
-    //! Supprime le noeud de la ligne row de parent.
-    void removeNode(int row, const QModelIndex & parent);
+    //! Teste si la ligne d'indice id vérifie la condition de la racine.
+    bool testRoot(szt id) const;
+
+    //! Teste si la ligne d'indice id vérifie l'arbre des conditions.
+    bool testTree(szt id) const;
+
+public slots:
+    //! Applique la recherche au model à filtré.
+    void find();
 
 protected:
     //! Fabrique des noeuds.
@@ -121,14 +136,31 @@ protected:
 
 namespace findNodeModel {
 /*! \ingroup groupeModel
+ * \brief Classe mère des feuilles de recherche (héritage multiple).
+ */
+class AbstractFindNode : public TreeNodeModel::AbstractNode {
+public:
+    //! Constructeur.
+    using AbstractNode::AbstractNode;
+
+    //! Destructeur.
+    virtual ~AbstractFindNode();
+
+    //! Test si le noeud n'intervient pas dans la recherche.
+    virtual bool empty() const
+        {return false;}
+};
+
+
+/*! \ingroup groupeModel
  * \brief Classe mère des noeuds de recherche avec négation.
  */
-class AbstractNegationNode : public TreeNodeModel::AbstractNode {
+class AbstractNegationNode : public AbstractFindNode {
 protected:
     bool m_negation;        //!< Négation.
 public:
     //! Constructeur.
-    using AbstractNode::AbstractNode;
+    using AbstractFindNode::AbstractFindNode;
 
     //! Accesseur de la donnée associé à column.
     QVariant data(int column, int role = Qt::DisplayRole) const override;
@@ -141,6 +173,10 @@ public:
             return Qt::ItemIsSelectable;
         return AbstractNode::flags(column);
     }
+
+    //! Accesseur de la négation.
+    bool negation() const
+        {return m_negation;}
 
     //! Mutateur de la donnée associé à column.
     bool setData(int column, const QVariant & value, int role = Qt::EditRole) override;
@@ -166,7 +202,9 @@ public:
 
     //! Accesseur des drapeaux associés à column.
     Qt::ItemFlags flags(int column) const override {
-        if(column == OpColumn || column == ColonneColumn)
+        if(column == OpColumn)
+            return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
+        if(column == ColonneColumn)
             return AbstractNegationNode::flags(column) | Qt::ItemIsEnabled | Qt::ItemIsEditable;
         return AbstractNegationNode::flags(column);
     }
@@ -189,6 +227,12 @@ public:
     //! Mutateur de position.
     void setPos(szt pos)
         {m_pos = pos;}
+
+    //! Teste si la ligne d'indice id vérifie la condition du noeud.
+    bool test(szt id, AbstractColonnesModel * model) const;
+
+    //! Teste si la ligne d'indice id vérifie la condition du noeud.
+    virtual bool testValue(const QVariant & value) const = 0;
 };
 
 /*! \ingroup groupeModel
@@ -241,6 +285,10 @@ public:
     //! Accesseur de la donnée associé à column.
     QVariant data(int column, int role = Qt::DisplayRole) const override;
 
+    //! Test si le noeud intervient dans la recherche.
+    bool empty() const override
+        {return m_true && m_false;}
+
     //! Accesseur des drapeaux associés à column.
     Qt::ItemFlags flags(int column) const override {
         if(column == TrueColumn || column == FalseColumn)
@@ -250,18 +298,26 @@ public:
 
     //! Mutateur de la donnée associé à column.
     bool setData(int column, const QVariant & value, int role = Qt::EditRole) override;
+
+    //! Teste si la ligne d'indice id vérifie la condition du noeud.
+    bool testValue(const QVariant & value) const override
+        {return value.toBool() ? m_true : m_false;}
 };
 
 /*! \ingroup groupeModel
  * \brief Classe des noeuds de recherche indéterminé.
  */
-class ChoiceNode : public TreeNodeModel::AbstractNode {
+class ChoiceNode : public AbstractFindNode {
 public:
     //! Constructeur.
-    ChoiceNode() : TreeNodeModel::AbstractNode(ChoiceNodeType) {}
+    ChoiceNode() : AbstractFindNode(ChoiceNodeType) {}
 
     //! Accesseur de la donnée associé à column.
     QVariant data(int column, int role = Qt::DisplayRole) const override;
+
+    //! Test si le noeud intervient dans la recherche.
+    bool empty() const override
+        {return true;}
 
     //! Accesseur des drapeaux associés à column.
     Qt::ItemFlags flags(int column) const override {
@@ -288,6 +344,10 @@ public:
     //! Accesseur de la donnée associé à column.
     QVariant data(int column, int role = Qt::DisplayRole) const override;
 
+    //! Test si le noeud intervient dans la recherche.
+    bool empty() const override
+        {return !m_date.isValid();}
+
     //! Accesseur des drapeaux associés à column.
     Qt::ItemFlags flags(int column) const override {
         if(column == DateColumn)
@@ -297,6 +357,9 @@ public:
 
     //! Mutateur de la donnée associé à column.
     bool setData(int column, const QVariant & value, int role = Qt::EditRole) override;
+
+    //! Teste si la ligne d'indice id vérifie la condition du noeud.
+    bool testValue(const QVariant & value) const override;
 };
 
 /*! \ingroup groupeModel
@@ -323,6 +386,10 @@ public:
         return AbstractNegationNode::flags(column);
     }
 
+    //! Accesseur de l'opération.
+    szt operation() const
+        {return m_operation;}
+
     //! Mutateur de la donnée associé à column.
     bool setData(int column, const QVariant & value, int role = Qt::EditRole) override;
 };
@@ -333,18 +400,29 @@ public:
 class TexteNode : public AbstractConditionNode {
 protected:
     QString m_texte;         //!< Texte de filtrage.
+    QRegularExpression m_regular;   //!< Texte de l'expression regulière.
     bool m_case;            //!< Recherche sensible à la case.
     bool m_regex;           //!< La recherche est une expression régulière.
 public:
     //! Constructeur.
     TexteNode(szt pos, const QString & label,const QString & texte = QString(), bool c = false,bool regex = false)
-        : AbstractConditionNode(pos,label,TexteNodeType), m_texte(texte), m_case(c), m_regex(regex) {}
+        : AbstractConditionNode(pos,label,TexteNodeType), m_texte(texte), m_case(c), m_regex(regex) {
+        if(m_regex){
+            m_regular.setPattern(m_texte);
+            if(!m_case)
+                m_regular.setPatternOptions(QRegularExpression::CaseInsensitiveOption);
+        }
+    }
 
     //! Destructeur.
     ~TexteNode() override = default;
 
     //! Accesseur de la donnée associé à column.
     QVariant data(int column, int role = Qt::DisplayRole) const override;
+
+    //! Test si le noeud intervient dans la recherche.
+    bool empty() const override
+        {return m_texte.isEmpty();}
 
     //! Accesseur des drapeaux associés à column.
     Qt::ItemFlags flags(int column) const override {
@@ -357,9 +435,12 @@ public:
 
     //! Mutateur de la donnée associé à column.
     bool setData(int column, const QVariant & value, int role = Qt::EditRole) override;
+
+    //! Teste si la ligne d'indice id vérifie la condition du noeud.
+    bool testValue(const QVariant & value) const override;
 };
-}
-}
+}// end namespace findNodeModel
+}// end namespace modelMPS
 //////////////////////////////////////// FindDelegate /////////////////////////
 /*! \defgroup groupeDelegate Delegate
  * \brief Ensemble des classes des delegates.
