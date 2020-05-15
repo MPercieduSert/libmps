@@ -99,18 +99,6 @@
     /*! Affecte à data la donnée associée au noeud courant puis replace ce dernier sur le noeud suivant.*/ \
     ITER & operator >> (T & data) noexcept {data = const_##ITER::operator * (); return operator ++ ();} \
 
-
-///*! \brief Positionne l'itérateur sur le noeud correspond au chemin transmis en argument (sans vérification).*/
-///*! La postion souhaitée de l'itérateur est transmise par la liste des noeuds qu'il faut parcourir. Ces noeuds sont référencés
-// * par leurs indices dans la liste des descendants directs du noeuds précédemment atteint. Ne lève pas d'exception si le chemin
-// * est invalide mais rend l'iérateur nul dans ce cas.
-// */
-//ITER & operator [](const std::list<int> & pos) noexcept {return std::for_each(pos.cbegin(), pos.cend(), this->operator[]);}
-///*! Déplace l'itérateur en suivant le chemin pos (avec vérification pouvant conduire à une exception std::out_of_range).*/
-//ITER & to(std::list<int> pos) {return std::for_each(pos.cbegin(), pos.cend(), this->to);}
-
-
-
 namespace conteneurMPS {
 
 /*! \ingroup groupeConteneur
@@ -129,6 +117,7 @@ public:
     class const_iterator;
 
 protected:
+    //////////////////////////////////// Item//////////////////////////////////////
     /*! \ingroup groupeConteneur
      * \brief Cette classe est une représentation des noeuds d'un arbre.
      *
@@ -196,10 +185,6 @@ protected:
         }
 
         ///////////////// begin ////////////
-
-//        //! Crée un iterator initialisé sur ce noeud.
-//        iterator begin() noexcept
-//            {return this;}
 
         //! Crée un brother_iterator initialisé sur le fils ainé.
         brother_iterator beginChild() noexcept
@@ -330,9 +315,6 @@ protected:
          */
         void push_front(Item *child) noexcept;
 
-//        //! Renvoie un pointeur sur la racine de l'arbre.
-//        Item * root() const noexcept;
-
         //! Modifie la donnée associée au noeud.
         void setData(const T & data) noexcept(noexcept (T::operateur = (data)))
             {m_data = data;}
@@ -353,6 +335,7 @@ protected:
     };
 
 public:
+    ///////////////////////////////////// const_abstract_iterator //////////////////////////
     /*! \ingroup groupeConteneur
      * \brief Classe parente des itérateurs sur un arbre.
      */
@@ -621,38 +604,9 @@ public:
             if(m_ptr)
                 to_root();
         }
-
-//        //! Déplace l'itérateur sur le fils de position pos (avec vérification pouvant conduire à une exception std::out_of_range).
-//        template<class iter, class broIter> iter & toTemp(int pos) {
-//            broIter j(m_ptr);
-//            j += pos;
-//            if(j)
-//                this->operator=(j);
-//            else
-//                throw std::out_of_range(std::string("tree<T>::iterator & tree<T>::iterator::to(std::list<int> pos)\n"
-//                                        "Indices invalides:").append(std::to_string(pos)).append(" et le nombre de descendants est ")
-//                                        .append(std::to_string(m_ptr->sizeChild())));
-//            return *this;
-//        }
     };
 
-//    /*! \ingroup groupeConteneur
-//     * \brief Classe parente des itérateurs sur un arbre non constant mais préservant l'existence des noeuds.
-//     */
-//    class struct_abstract_iterator : public virtual const_abstract_iterator
-//    {
-//    protected:
-//        using const_abstract_iterator::m_ptr;
-
-//    public:
-//        //! Constructeur par defaut.
-//        struct_abstract_iterator() = default;
-
-//        //! Renvoie une référence sur la donnée du noeud courant.
-//        T & operator *() noexcept
-//            {return m_ptr->data();}
-//    };
-
+    ////////////////////////////////////// abstract_iterator ////////////////////////////
     /*! \ingroup groupeConteneur
      * \brief Classe parente des itérateurs sur un arbre non constant.
      */
@@ -692,7 +646,7 @@ public:
         Item * itemPtr() const
             {return m_ptr;}
     };
-
+    ///////////////////////////////////// const_brother_iterator /////////////////////////
     /*! \ingroup groupeConteneur
      * \brief Itérateur constant sur une fratrie.
      */
@@ -722,16 +676,8 @@ public:
         //! Appelle +=(-n).
         const_brother_iterator & operator -=(int n) noexcept
             {return operator +=(-n);}
-
-//        //! Déplace l'itérateur sur le fils de position pos (sans vérification).
-//        const_brother_iterator & operator [](int & pos) noexcept
-//            {return const_abstract_iterator::template opSubscrip<const_brother_iterator,const_brother_iterator>(pos);}
-
-//        //! Déplace l'itérateur sur le fils de position pos (avec vérification pouvant conduire à une exception std::out_of_range).
-//        const_brother_iterator & to(int pos)
-//            {return const_abstract_iterator::template toTemp<const_brother_iterator,const_brother_iterator>(pos);}
     };
-
+    //////////////////////////////////// const_reverse_brother_iterator //////////////////////////
     /*! \ingroup groupeConteneur
      * \brief Itérateur-inverse constant sur une fratrie.
      */
@@ -760,16 +706,8 @@ public:
         //! Décrémente n fois l'itérateur. Si n est négatif, +=-n est appliqué.
         const_reverse_brother_iterator & operator -=(int n) noexcept
             {return operator +=(-n);}
-
-//        //! Déplace l'itérateur sur le fils de position pos (sans vérification).
-//        const_reverse_brother_iterator & operator [](int & pos) noexcept
-//            {return const_abstract_iterator::template opSubscrip<const_reverse_brother_iterator,const_reverse_brother_iterator>(pos);}
-
-//        //! Déplace l'itérateur sur le fils de position pos (avec vérification pouvant conduire à une exception std::out_of_range).
-//        const_brother_iterator & to(int pos)
-//            {return const_abstract_iterator::template toTemp<const_reverse_brother_iterator,const_reverse_brother_iterator>(pos);}
     };
-
+    ////////////////////////////////////////// const_iterator //////////////////////////////////
     /*! \ingroup groupeConteneur
      * \brief Itérateur constant sur l'arbre parcourant les noeuds uniquement à la descente en commeçant par les ainés.
      */
@@ -805,16 +743,8 @@ public:
          * a ce moment l'itérateur est positionné sur le noeud virtuel nullptr.
          */
         const_iterator & operator -=(int n) noexcept;
-
-//        //! Déplace l'itérateur sur le fils de position pos (sans vérification).
-//        const_iterator & operator [](int & pos) noexcept
-//            {return const_abstract_iterator::template opSubscrip<const_iterator,const_brother_iterator>(pos);}
-
-//        //! Déplace l'itérateur sur le fils de position pos (avec vérification pouvant conduire à une exception std::out_of_range).
-//        const_iterator & to(int pos)
-//            {return const_abstract_iterator::template toTemp<const_iterator,const_brother_iterator>(pos);}
     };
-
+    //////////////////////////////////////// const_reverse_iterator /////////////////////////////////
     /*! \ingroup groupeConteneur
      * \brief Itérateur-inverse constant sur l'arbre parcourant les noeuds uniquement à la descente en commeçant par les benjamins.
      */
@@ -851,16 +781,8 @@ public:
          * a ce moment l'itérateur est positionné sur le noeud virtuel nullptr.
          */
         const_reverse_iterator & operator -=(int n) noexcept;
-
-//        //! Déplace l'itérateur sur le fils de position pos (sans vérification).
-//        const_reverse_iterator & operator [](int & pos) noexcept
-//            {return const_abstract_iterator::template opTemp<const_reverse_iterator,const_reverse_brother_iterator>(pos);}
-
-//        //! Déplace l'itérateur sur le fils de position pos (avec vérification pouvant conduire à une exception std::out_of_range).
-//        const_reverse_iterator & to(int pos)
-//            {return const_abstract_iterator::template toTemp<const_reverse_iterator,const_reverse_brother_iterator>(pos);}
     };
-
+    /////////////////////////////////////////// const_prevsuiv_iterator ///////////////////////////////////
     /*! \ingroup groupeConteneur
      * \brief Itérateur constant sur l'arbre parcourant les noeuds à la descente et à la remonté en commeçant par les ainés.
      */
@@ -903,33 +825,7 @@ public:
         void setSens(bool sens) noexcept
             {m_sens = sens;}
     };
-
-//    /*! \ingroup groupeConteneur
-//     * \brief Itérateur sur une fratrie préservant les noeuds existant.
-//     */
-//    class struct_brother_iterator : public struct_abstract_iterator, const_brother_iterator
-//    {
-//        TREE_ITER_CONSTR_AFFEC(struct_brother_iterator)
-//    };
-
-//    /*! \ingroup groupeConteneur
-//     * \brief Itérateur sur l'arbre parcourant les noeuds uniquement à la descente en commeçant par les ainés,
-//     * préservant les noeuds existant.
-//     */
-//    class struct_iterator : public struct_abstract_iterator, const_iterator
-//    {
-//        TREE_ITER_CONSTR_AFFEC(struct_iterator)
-//    };
-
-//    /*! \ingroup groupeConteneur
-//     * \brief Itérateursur l'arbre parcourant les noeuds à la descente et à la remonté en commeçant par les ainés,
-//     * préservant les noeuds existant.
-//     */
-//    class struct_prevsuiv_iterator : public struct_abstract_iterator, const_prevsuiv_iterator
-//    {
-//        TREE_ITER_CONSTR_AFFEC(struct_prevsuiv_iterator)
-//    };
-
+    //////////////////////////////////////// brother_iterator /////////////////////////////////
     /*! \ingroup groupeConteneur
      * \brief Itérateur sur une fratrie.
      */
@@ -942,7 +838,7 @@ public:
         using abstract_iterator::operator*;
         TREE_ITER_NOCONST(brother_iterator)
     };
-
+    ////////////////////////////////////// iterator ///////////////////////////////////////////
     /*! \ingroup groupeConteneur
      * \brief Itérateur sur l'arbre parcourant les noeuds uniquement à la descente en commeçant par les ainés.
      */
@@ -955,7 +851,7 @@ public:
         using abstract_iterator::operator*;
         TREE_ITER_NOCONST(iterator)
     };
-
+    /////////////////////////////////////// prevsuiv_iterator //////////////////////////////////////
     /*! \ingroup groupeConteneur
      * \brief Itérateursur l'arbre parcourant les noeuds à la descente et à la remonté en commeçant par les ainés.
      */
@@ -968,7 +864,7 @@ public:
         using abstract_iterator::operator*;
         TREE_ITER_NOCONST(prevsuiv_iterator)
     };
-
+    //////////////////////////////////////// reverse_brother_iterator /////////////////////////////////
     /*! \ingroup groupeConteneur
      * \brief Itérateur inverse sur une fratrie.
      */
@@ -981,7 +877,7 @@ public:
         using abstract_iterator::operator*;
         TREE_ITER_NOCONST(reverse_brother_iterator)
     };
-
+    /////////////////////////////////////////// reverse_iterator //////////////////////////////////////
     /*! \ingroup groupeConteneur
      * \brief Itérateur inverse sur l'arbre parcourant les noeuds uniquement à la descente en commeçant par les ainés.
      */
@@ -995,7 +891,7 @@ public:
         TREE_ITER_NOCONST(reverse_iterator)
     };
 
-    ///// Tree//////////
+    ///////////////////////////////////////////// Tree/////////////////////////////////////////////////////
     template<typename> friend class tree;
 protected:
     Item * m_root;      //!< Pointeur sur la racine de l'arbre.
