@@ -19,7 +19,7 @@ conteneurMPS::tree<XmlElement>::prevsuiv_iterator XmlDoc::seek(const QString & c
             else {
                 controle = false;
                 while(i != list.cend()) {
-                    iter = push_back(iter,*i);
+                    iter = push_back(iter,XmlElement(*i));
                     ++i;
                 }
             }
@@ -41,11 +41,6 @@ QString XmlDoc::toString() const
             auto elt = *iter;
             string.append(tab).append(elt.name()).append("\n");
             tab.prepend("-");
-//            if(elt.hasAttributes())
-//                for(auto i = elt.attributes().cbegin(); i != elt.attributes().cend(); ++i)
-//                    writeAttribute(i->first,i->second);
-//            if(elt.hasText())
-//                writeCharacters(elt.text());
         }
         else
             tab.remove(0,1);

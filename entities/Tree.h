@@ -1059,25 +1059,25 @@ public:
     //! Supprime l'élément pointé par l'itérateur pos et ses descendants.
     //! Si pos pointe sur la racine, seul les descendants sont supprimés.
     //! Retourne un itérateur sur le suivant celui pointé par pos.
-    iterator erase(abstract_iterator & pos) noexcept;
+    template<class iter_tree> iter_tree erase(iter_tree pos) noexcept;
 
     //! Supprime les noeuds appartenant à [first,last) et leurs decendants.
     //! Les noeuds pointés par first et last doivent être d'une même fratrie sauf si last est nul.
     //! Retourne un itérateur sur le noeud suivant le dernier noeud supprimé.
-    iterator erase(abstract_iterator & first, abstract_iterator & last) noexcept {
+    template<class iter_tree> iter_tree erase(iter_tree first, iter_tree last) noexcept {
         first.m_ptr->erase(last.m_ptr);
         return last;
     }
 
     //! Extrait le noeud pointer par pos de l'arbre pour en faire un nouvel arbre
-    tree extract(abstract_iterator & pos) {
+    template<class iter_tree> tree extract(iter_tree pos) {
         pos.m_ptr->becomeRoot();
         return tree(pos.m_ptr);
     }
 
     //! Insert un nouveau noeud de donnée data avant le noeud pointé par pos dans la fratrie sauf si le pointé est la racine,
     //! dans ce cas le nouveau noeud est inseré en tant que fils ainé. Retourne un itérateur sur ce nouveau noeud.
-    iterator insert(abstract_iterator & pos, const T & data = T()) {
+    template<class iter_tree> iter_tree insert(iter_tree pos, const T & data = T()) {
         auto * node = new Item(data);
         pos.m_ptr->insert(node);
         return node;
@@ -1085,7 +1085,7 @@ public:
 
     //! Insert un nouveau noeud de donnée data avant le noeud pointé par pos dans la fratrie sauf si le noeud pointé est la racine,
     //! dans ce cas le nouveau noeud est inseré en tant que fils ainé. Retourne un itérateur sur ce nouveau noeud.
-    iterator insert(abstract_iterator & pos, T && data) {
+    template<class iter_tree> iter_tree insert(iter_tree pos, T && data) {
         auto * node = new Item(std::move(data));
         pos.m_ptr->insert(node);
         return node;
@@ -1094,7 +1094,7 @@ public:
     //! Insert une copie du noeud (et des descendant) pointé par other avant le noeud pointé par pos dans la fratrie
     //!  sauf si le pointé est la racine,
     //! dans ce cas le nouveau noeud est inseré en tant que fils ainé. Retourne un itérateur sur ce nouveau noeud.
-    iterator insert(abstract_iterator & pos, const const_abstract_iterator & other) {
+    template<class iter_tree, class const_iter_tree> iter_tree insert(iter_tree pos, const_iter_tree  other) {
         auto * node = new Item(other.item());
         pos.m_ptr->insert(node);
         return node;
@@ -1104,7 +1104,7 @@ public:
     //! dans la fratrie sauf si le noeud pointé est la racine,
     //! dans ce cas le nouveau noeud est inseré en tant que fils ainé. Retourne un itérateur sur ce nouveau noeud.
     //! La racine tree devient nulle.
-    iterator insert(abstract_iterator & pos, tree<T> && tree) {
+    template<class iter_tree> iter_tree insert(iter_tree pos, tree<T> && tree) {
         auto * node = tree.m_root;
         pos.m_ptr->insert(node);
         tree.m_root = nullptr;
@@ -1113,23 +1113,23 @@ public:
 
     //! Insert count nouveaux noeuds de donnée data avant le noeud pointé par pos dans la fratrie sauf si le noeud pointé est la racine,
     //! dans ce cas les nouveaux noeuds sont inserés en tant que fils ainé. Retourne un itérateur sur le premier des nouveaux noeuds.
-    iterator insert(abstract_iterator & pos, size_type count, const T & data)
+    template<class iter_tree> iter_tree insert(iter_tree pos, size_type count, const T & data)
         {return add(pos, count, data, this->insert);}
 
     //! Insert de nouveaux noeuds de donnée correspondant au la plage d'itérateur [first, last)
     //! avant le noeud pointé par pos dans la fratrie sauf si le noeud pointé est la racine,
     //! dans ce cas les nouveaux noeuds sont inserés en tant que fils ainé. Retourne un itérateur sur le premier des nouveaux noeuds.
-    template<class InputIt> iterator insert(abstract_iterator & pos, InputIt first, InputIt last)
+    template<class iter_tree, class InputIt> iter_tree insert(iter_tree pos, InputIt first, InputIt last)
         {return add(pos, first, last, this->insert);}
     //! Insert de nouveaux noeuds de donnée contenu dans ilist
     //! avant le noeud pointé par pos dans la fratrie sauf si le noeud pointé est la racine,
     //! dans ce cas les nouveaux noeuds sont inserés en tant que fils ainé. Retourne un itérateur sur le premier des nouveaux noeuds.
-    iterator insert(abstract_iterator & pos, std::initializer_list<T> ilist)
+    template<class iter_tree> iter_tree insert(iter_tree pos, std::initializer_list<T> ilist)
         {return insert(pos,ilist.begin(),ilist.end());}
 
     //! Insert un nouveau noeud de donnée data après le noeud pointé par pos dans la fratrie sauf si le pointé est la racine,
     //! dans ce cas le nouveau noeud est inseré en tant que fils benjamin. Retourne un itérateur sur ce nouveau noeud.
-    iterator insert_after(abstract_iterator & pos, const T & data = T()) {
+    template<class iter_tree> iter_tree insert_after(iter_tree pos, const T & data = T()) {
         auto * node = new Item(data);
         pos.m_ptr->insert_after(node);
         return node;
@@ -1137,7 +1137,7 @@ public:
 
     //! Insert un nouveau noeud de donnée data après le noeud pointé par pos dans la fratrie sauf si le noeud pointé est la racine,
     //! dans ce cas le nouveau noeud est inseré en tant que fils benjamin. Retourne un itérateur sur ce nouveau noeud.
-    iterator insert_after(abstract_iterator & pos, T && data) {
+    template<class iter_tree> iter_tree insert_after(iter_tree pos, T && data) {
         auto * node = new Item(std::move(data));
         pos.m_ptr->insert_after(node);
         return node;
@@ -1146,7 +1146,7 @@ public:
     //! Insert une copie du noeud (et des descendants) pointé par other après le noeud pointé par pos dans la fratrie
     //!  sauf si le pointé est la racine,
     //! dans ce cas le nouveau noeud est inseré en tant que fils benjamin. Retourne un itérateur sur ce nouveau noeud.
-    iterator insert_after(abstract_iterator & pos, const const_abstract_iterator & other) {
+    template<class iter_tree, class const_iter_tree> iter_tree insert_after(iter_tree pos, const_iter_tree other) {
         auto * node = new Item(other.item());
         pos.m_ptr->insert_after(node);
         return node;
@@ -1155,7 +1155,7 @@ public:
     //! Insert un nouveau noeud de donnée coorespondant à la racine de tree (avec ses descendants) après le noeud pointé par pos
     //! dans la fratrie sauf si le pointé est la racine,
     //! dans ce cas le nouveau noeud est inseré en tant que fils benjamin. Retourne un itérateur sur ce nouveau noeud.
-    iterator insert_after(abstract_iterator & pos, tree<T> && tree) {
+    template<class iter_tree> iter_tree insert_after(iter_tree pos, tree<T> && tree) {
         auto * node = tree.m_root;
         pos.m_ptr->insert_after(node);
         tree.m_root = nullptr;
@@ -1164,53 +1164,53 @@ public:
 
     //! Insert count nouveaux noeuds de donnée data après le noeud pointé par pos dans la fratrie sauf si le noeud pointé est la racine,
     //! dans ce cas les nouveaux noeuds sont inserés en tant que fils benjamin. Retourne un itérateur sur le dernier des nouveaux noeuds.
-    iterator insert_after(abstract_iterator & pos, size_type count, const T & data)
+    template<class iter_tree> iter_tree insert_after(iter_tree pos, size_type count, const T & data)
         {return add(pos, count, data, this->insert_after);}
 
     //! Insert de nouveaux noeuds de donnée correspondant au la plage d'itérateur [first, last)
     //! après le noeud pointé par pos dans la fratrie sauf si le noeud pointé est la racine,
     //! dans ce cas les nouveaux noeuds sont inserés en tant que fils benjamin. Retourne un itérateur sur le dernier des nouveaux noeuds.
-    template<class InputIt> iterator insert_after(abstract_iterator & pos, InputIt first, InputIt last)
+    template<class iter_tree, class InputIt> iter_tree insert_after(iter_tree pos, InputIt first, InputIt last)
         {return add(pos, first, last, this->insert_after);}
 
     //! Insert de nouveaux noeuds de donnée contenu dans ilist
     //! après le noeud pointé par pos dans la fratrie sauf si le noeud pointé est la racine,
     //! dans ce cas les nouveaux noeuds sont inserés en tant que fils benjamin. Retourne un itérateur sur le dernier des nouveaux noeuds.
-    iterator insert_after(abstract_iterator & pos, std::initializer_list<T> ilist)
+    template<class iter_tree> iter_tree insert_after(iter_tree pos, std::initializer_list<T> ilist)
         {return insert_after(pos,ilist.begin(),ilist.end());}
 
     //! Déplace le noeud pointé par other avant le noeud pointé par pos dans la fratrie
     //!  sauf si le pointé est la racine,
     //! dans ce cas le noeud est inseré en tant que fils ainé.
-    void move(abstract_iterator & pos, abstract_iterator & other)
+    template<class iter_tree> void move(iter_tree pos, iter_tree other)
         {pos.m_ptr->move(other.m_ptr);}
 
     //! Déplace le noeud pointé par other avant le noeud pointé par pos dans la fratrie
     //!  sauf si le pointé est la racine,
     //! dans ce cas le noeud est inseré en tant que fils benjamin.
-    void move_after(abstract_iterator & pos, abstract_iterator & other)
+    template<class iter_tree> void move_after(iter_tree pos, iter_tree other)
         {pos.m_ptr->move_after(other.m_ptr);}
 
     //! Déplace le noeud pointé par other en fils benjamin du noeud pointé par pos.
-    void move_back(abstract_iterator & pos, abstract_iterator & other)
+    template<class iter_tree> void move_back(iter_tree pos, iter_tree other)
         {pos.m_ptr->move_back(other.m_ptr);}
 
     //! Déplace le noeud pointé par other en fils ainé du noeud pointé par pos.
-    void move_front(abstract_iterator & pos, abstract_iterator & other)
+    template<class iter_tree> void move_front(iter_tree pos, iter_tree other)
         {pos.m_ptr->move_front(other.m_ptr);}
 
     //! Renvoie un arbre contenant seulement une copie du noeud pointé par pos et de ses enfants directs.
-    tree<T> parentWithChilds(const_abstract_iterator & pos);
+    template<class iter_tree> tree<T> parentWithChilds(iter_tree pos);
 
-    //! Ajoute un fils benjamin au noeud pointé par pos de donnée data. Retourne un itérateur sur ce nouveau noeud.
-    iterator push_back(abstract_iterator & pos, const T & data = T()) {
+    //! Ajoute un fils benjamin au noeud pointé par pos de donnée data.iterator Retourne un itérateur sur ce nouveau noeud.
+    template<class iter_tree> iter_tree push_back(iter_tree pos, const T & data = T()) {
         auto * node = new Item(data);
         pos.m_ptr->push_back(node);
         return node;
     }
 
     //! Ajoute un fils benjamin au noeud pointé par pos de donnée data. Retourne un itérateur sur ce nouveau noeud.
-    template<class iter_tree> iterator push_back(iter_tree pos, T && data) {
+    template<class iter_tree> iter_tree push_back(iter_tree pos, T && data) {
         auto * node = new Item(std::move(data));
         pos.m_ptr->push_back(node);
         return node;
@@ -1218,7 +1218,7 @@ public:
 
     //! Ajoute un fils benjamin au noeud pointé par pos correspondant à une copie du noeud (et des descendants) pointé par other.
     //! Retourne un itérateur sur ce nouveau noeud.
-    iterator push_back(abstract_iterator & pos, const const_abstract_iterator & other) {
+    template<class iter_tree, class const_iter_tree > iter_tree push_back(iter_tree pos, const const_iter_tree other) {
         auto * node = new Item(other.item());
         pos.m_ptr->push_back(node);
         return node;
@@ -1234,28 +1234,28 @@ public:
     }
 
     //! Ajoute count fils benjamins au noeud pointé par pos de donnée data. Retourne un itérateur sur le dernier des nouveaux noeuds.
-    iterator push_back(abstract_iterator & pos, size_type count, const T & data)
+    template<class iter_tree> iter_tree push_back(iter_tree pos, size_type count, const T & data)
         {return add(pos, count, data, this->push_back);}
 
     //! Ajoute de nouveaux fils benjamins au noeud pointé par pos de donnée correspondant au la plage d'itérateur [first, last).
     //! Retourne un itérateur sur le dernier des nouveaux noeuds.
-    template<class InputIt> iterator push_back(abstract_iterator & pos, InputIt first, InputIt last)
+    template<class iter_tree, class InputIt> iter_tree push_back(iter_tree pos, InputIt first, InputIt last)
         {return add(pos, first, last, this->push_back);}
 
     //! Ajoute de nouveaux fils benjamins au noeud pointé par pos de donnée contenu dans ilist.
     //! Retourne un itérateur sur le dernier des nouveaux noeuds.
-    iterator push_back(abstract_iterator & pos, std::initializer_list<T> ilist)
+    template<class iter_tree> iter_tree push_back(iter_tree pos, std::initializer_list<T> ilist)
         {return push_back(pos,ilist.begin(),ilist.end());}
 
     //! Ajoute un fils ainé au noeud pointé par pos de donnée data. Retourne un itérateur sur ce nouveau noeud.
-    iterator push_front(abstract_iterator & pos, const T & data = T()) {
+    template<class iter_tree> iter_tree push_front(iter_tree pos, const T & data = T()) {
         auto * node = new Item(data);
         pos.m_ptr->push_front(node);
         return node;
     }
 
     //! Ajoute un fils ainé au noeud pointé par pos de donnée data. Retourne un itérateur sur ce nouveau noeud.
-    iterator push_front(abstract_iterator & pos, T && data) {
+    template<class iter_tree> iter_tree push_front(iter_tree pos, T && data) {
         auto * node = new Item(std::move(data));
         pos.m_ptr->push_front(node);
         return node;
@@ -1263,7 +1263,7 @@ public:
 
     //! Ajoute un fils ainé au noeud pointé par pos correspondant à une copie du noeud (et des descendants) pointé par other.
     //! Retourne un itérateur sur ce nouveau noeud.
-    iterator push_front(abstract_iterator & pos, const const_abstract_iterator & other) {
+    template<class iter_tree, class const_iter_tree> iter_tree push_front(iter_tree pos, const_iter_tree other) {
         auto * node = new Item(other.item());
         pos.m_ptr->push_front(node);
         return node;
@@ -1271,7 +1271,7 @@ public:
 
     //! Ajoute un fils ainé au noeud pointé par pos correspondant à la racine de tree (avec ses descendants).
     //! Retourne un itérateur sur ce nouveau noeud.
-    iterator push_front(abstract_iterator & pos, tree<T> && tree) {
+    template<class iter_tree> iter_tree push_front(iter_tree pos, tree<T> && tree) {
         auto * node = tree.m_root;
         pos.m_ptr->push_front(node);
         tree.m_root = nullptr;
@@ -1279,17 +1279,17 @@ public:
     }
 
     //! Ajoute count fils ainés au noeud pointé par pos de donnée data. Retourne un itérateur sur le dernier des nouveaux noeuds.
-    iterator push_front(abstract_iterator & pos, size_type count, const T & data)
+    template<class iter_tree> iter_tree push_front(iter_tree pos, size_type count, const T & data)
         {return add(pos, count, data, this->push_front);}
 
     //! Ajoute de nouveaux fils ainés au noeud pointé par pos de donnée correspondant au la plage d'itérateur [first, last).
     //! Retourne un itérateur sur le dernier des nouveaux noeuds.
-    template<class InputIt> iterator push_front(abstract_iterator & pos, InputIt first, InputIt last)
+    template<class iter_tree, class InputIt> iter_tree push_front(iter_tree pos, InputIt first, InputIt last)
         {return add(pos, first, last, this->push_front);}
 
     //! Ajoute de nouveaux fils ainés au noeud pointé par pos de donnée contenu dans ilist.
     //! Retourne un itérateur sur le dernier des nouveaux noeuds.
-    iterator push_front(abstract_iterator & pos, std::initializer_list<T> ilist)
+    template<class iter_tree> iter_tree push_front(iter_tree pos, std::initializer_list<T> ilist)
         {return push_front(pos,ilist.begin(),ilist.end());}
 
     //! Affectation par recopie.
@@ -1361,7 +1361,7 @@ public:
         {std::swap(m_root,other.m_root);}
 
     //! Echange les positions des noeuds pointé par pos1 et pos2, ainsi que leurs descendant.
-    void swap(abstract_iterator & pos1, abstract_iterator & pos2) noexcept;
+    template<class iter_tree> void swap(iter_tree pos1, iter_tree pos2) noexcept;
 
 protected:
     //! Constructeur, prend le neud transmis pour racine (doit être créer dynamiquement et ne doit pas avoir de parent).
@@ -1370,18 +1370,18 @@ protected:
 
     //! Ajoute count nouveaux noeuds de donnée data au noeud pointé par pos selon la méthode ajout.
     //! Renvoie un pointeur sur le dernier noeud créé.
-    template<class Ajout> iterator add(abstract_iterator & pos, size_type count, const T & data, Ajout ajout);
+    template<class iter_tree, class Ajout> iter_tree add(iter_tree pos, size_type count, const T & data, Ajout ajout);
 
     //! Ajoute de nouveaux noeuds de donnée correspondant au la plage d'itérateur [first, last)
     //! au noeud pointé par pos selon la méthode ajout.
     //! Renvoie un pointeur sur le dernier noeud créé.
-    template<class InputIt, class Ajout> iterator add(abstract_iterator & pos, InputIt first, InputIt last, Ajout ajout);
+    template<class iter_tree, class InputIt, class Ajout> iter_tree add(iter_tree pos, InputIt first, InputIt last, Ajout ajout);
 };
 
 //////////////// tree //////////////////
 
-template<class T> template<class Ajout> typename tree<T>::iterator
-                                            tree<T>::add(abstract_iterator & pos, size_type count, const T & data, Ajout ajout) {
+template<class T> template<class iter_tree, class Ajout> iter_tree
+                        tree<T>::add(iter_tree pos, size_type count, const T & data, Ajout ajout) {
     abstract_iterator node = pos;
     while(count) {
         node = ajout(node,data);
@@ -1390,8 +1390,8 @@ template<class T> template<class Ajout> typename tree<T>::iterator
     return node.m_ptr;
 }
 
-template<class T> template<class InputIt, class Ajout> typename tree<T>::iterator
-                        tree<T>::add(abstract_iterator & pos, InputIt first, InputIt last, Ajout ajout) {
+template<class T> template<class iter_tree, class InputIt, class Ajout> iter_tree
+                        tree<T>::add(iter_tree pos, InputIt first, InputIt last, Ajout ajout) {
     abstract_iterator node = pos;
     while(first != last) {
         node = ajout(node,*first);
@@ -1400,7 +1400,7 @@ template<class T> template<class InputIt, class Ajout> typename tree<T>::iterato
     return node.m_ptr;
 }
 
-template<class T> typename tree<T>::iterator tree<T>::erase(abstract_iterator & pos) noexcept {
+template<class T> template<class iter_tree> iter_tree tree<T>::erase(iter_tree pos) noexcept {
     if(pos.root()) {
         clear();
         return pos;
@@ -1412,7 +1412,7 @@ template<class T> typename tree<T>::iterator tree<T>::erase(abstract_iterator & 
     }
 }
 
-template<class T> tree<T> tree<T>::parentWithChilds(const_abstract_iterator & pos) {
+template<class T> template<class iter_tree> tree<T> tree<T>::parentWithChilds(iter_tree pos) {
     tree<T> tree(*pos);
     auto root = tree.begin();
     if(!pos.leaf()) {
@@ -1488,7 +1488,7 @@ template<class T> template<class U> typename tree<T>::size_type tree<T>::removeL
     return comp;
 }
 
-template<class T> void tree<T>::swap(abstract_iterator & pos1, abstract_iterator & pos2) noexcept {
+template<class T> template<class iter_tree> void tree<T>::swap(iter_tree pos1, iter_tree pos2) noexcept {
     if(pos1.root() || pos2.root()){
         std::swap(pos1.m_ptr->m_data,pos2.m_ptr->m_data);
         for(auto i = pos1.beginChild(); i; ++i)

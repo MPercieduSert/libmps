@@ -37,7 +37,7 @@ void FindModel::insertNode(int row, const QModelIndex & parent) {
         dataChanged(parent,parent);
         beginInsertRows(parent,0,1);
             m_data.tree().push_back(m_data.getIter(parent),std::move(node));
-            m_data.tree().push_back(m_data.getIter(parent),std::make_unique<ChoiceNode>());
+            m_data.tree().push_back(m_data.getIter(parent),static_cast<Node &&>(std::make_unique<ChoiceNode>()));
         endInsertRows();
     }
 }
