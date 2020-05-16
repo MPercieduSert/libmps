@@ -18,7 +18,7 @@ AbstractNomNewModifForm::AbstractNomNewModifForm(bddMPS::Bdd & bdd, const QStrin
         m_mainLayout->addWidget(m_nameLine);
     }
     else {
-        m_nameCB = new QComboBox();
+        m_nameCB = new widgetMPS::IdComboBox();
         m_nameCB->setInsertPolicy(QComboBox::NoInsert);
         m_nameLabel->setBuddy(m_nameCB);
         m_mainLayout->addWidget(m_nameCB);
@@ -33,12 +33,6 @@ void AbstractNomNewModifForm::connexion() {
             updateData();
             emit savePermis(valide());
         });
-}
-
-void AbstractNomNewModifForm::setNoms(const std::vector<std::pair<idt,QString>> & noms) {
-    if(!m_new)
-        for(auto i = noms.cbegin(); i != noms.cend(); ++i)
-            m_nameCB->addItem(i->second,i->first);
 }
 
 //AbstractNcNomForm

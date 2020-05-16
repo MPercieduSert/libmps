@@ -4,7 +4,6 @@
 #ifndef NEWMODIFDIALOG_H
 #define NEWMODIFDIALOG_H
 
-#include <QComboBox>
 #include <QDialog>
 #include <QHBoxLayout>
 #include <QLabel>
@@ -17,6 +16,7 @@
 #include <QVBoxLayout>
 #include "BddPredef.h"
 #include "EntityPredef.h"
+#include "IdComboBox.h"
 
 /*! \defgroup groupeDialogue Fenêtre de Dialogue
  * \brief Ensemble de classes représentant des fenêtres de dialogue.
@@ -92,7 +92,7 @@ class AbstractNomNewModifForm : public AbstractNewModifForm {
 protected:
     QLabel * m_nameLabel;               //!< Label du nom.
     QLineEdit * m_nameLine;             //!< Ligne d'édition du nom.
-    QComboBox * m_nameCB;               //!< Liste à choix du nom.
+    widgetMPS::IdComboBox * m_nameCB;   //!< Liste à choix du nom.
     QVBoxLayout * m_mainLayout;         //!< Calque principal du formulaire.
 
 public:
@@ -113,28 +113,23 @@ public:
 
     //! Renvoie l'identifiant du nom sélectionné.
     idt id() const
-        {return m_new ? 0 : m_nameCB->currentData().toUInt();}
+        {return m_new ? 0 : m_nameCB->id();}
 
     //! Renvoie le nom selectionné.
     QString nom() const
         {return m_new ? m_nameLine->text() : m_nameCB->currentText();}
 
     //! Mutateur de la liste des noms.
-    void setNoms(const std::vector<std::pair<idt,QString>> & noms);
+    void setNoms(const std::vector<std::pair<idt,QString>> & noms)
+        {m_nameCB->setText(noms);}
 
     //! Mutateur de la liste des noms.
-    template<class Ent> void setNoms(const conteneurMPS::VectorPtr<Ent> & vec) {
-        if(!m_new)
-            for(auto i = vec.cbegin(); i != vec.cend(); ++i)
-                m_nameCB->addItem(i->nom(),i->id());
-    }
+    template<class Ent> void setNoms(const conteneurMPS::VectorPtr<Ent> & vec)
+        {m_nameCB->setText(vec,[](const Ent & entity)->const QString &{return entity.nom();});}
 
     //! Mutateur de la liste des noms.
-    template<class Ent> void setNoms(conteneurMPS::VectorPtr<Ent> && vec) {
-        if(!m_new)
-            for(auto i = vec.cbegin(); i != vec.cend(); ++i)
-                m_nameCB->addItem(i->nom(),i->id());
-    }
+    template<class Ent> void setNoms(conteneurMPS::VectorPtr<Ent> && vec)
+        {m_nameCB->setText(std::move(vec),[](const Ent & entity)->const QString &{return entity.nom();});}
 
     //! Teste si le formulaire est valide.
     bool valide() const override
