@@ -50,7 +50,8 @@ SOURCES += \
     AbstractEntityTableau.cpp \
     AbstractModel.cpp \
     TreeNodeModel.cpp \
-    FindModel.cpp
+    FindModel.cpp \
+    IdComboBox.cpp
 
 HEADERS += \
     BarPlotter.h \
@@ -81,7 +82,8 @@ HEADERS += \
     AbstractEntityTableau.h \
     AbstractModel.h \
     TreeNodeModel.h \
-    FindModel.h
+    FindModel.h \
+    IdComboBox.h
 
 unix {
     target.path = /usr/lib
