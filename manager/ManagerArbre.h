@@ -161,7 +161,7 @@ protected:
     }
 
     //! Sauve un arbre où le changement de structure consite seulement l'ajout de nouveaux noeuds.
-    void saveAddLeaf(typename tree<Ent>::iterator iter);
+    void saveAddLeaf(typename tree<Ent>::iterator iter) override;
 
     //! Enregistre l'entité entity en base de donnée.
     void saveConst(const Ent & entity) {
@@ -179,7 +179,7 @@ protected:
 
     //! Sauve un arbre où le changement de structure consite en l'ajout de nouveaux noeuds,
     //! des permutations à l'interieur de l'arbre et le déplasement de noeuds extérieur à l'arbre.
-    void saveExt(typename tree<Ent>::iterator iter, idt idRoot);
+    void saveExt(typename tree<Ent>::iterator iter, idt idRoot) override;
 
     //! Sauve la racine de l'arbre (donnée et structure).
     void saveRoot(tree<Ent> & tree) override;
@@ -226,7 +226,7 @@ protected:
 
     //! Sauve un arbre où le changement de structure consite seulement
     //! l'ajout de nouveaux noeuds et des permutations à l'interieur de l'arbre.
-    void saveWithoutDelete(typename tree<Ent>::iterator iter);
+    void saveWithoutDelete(typename tree<Ent>::iterator iter) override;
 
     //! Réécrie la chaine de requète m_sqlAdd.
     void writeStringSql();

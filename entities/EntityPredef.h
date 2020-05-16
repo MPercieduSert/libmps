@@ -34,8 +34,15 @@ namespace donnee {
                   Date = 5,
                   DateTime = 6};
 
-    enum prog {NoId,
-               defaultValueId};
+    //! Identifiant de programmation
+    enum prog {NoId};
+
+    //! Exact
+    enum cardinalCode {Exact,
+                       Auplus,
+                       AuMoins,
+    };
+
     /*//! Identifiant de programation
     enum prog {NoId,
               ContactIdProg,
