@@ -120,16 +120,28 @@ public:
         {return m_new ? m_nameLine->text() : m_nameCB->currentText();}
 
     //! Mutateur de la liste des noms.
-    void setNoms(const std::vector<std::pair<idt,QString>> & noms)
-        {m_nameCB->setText(noms);}
+    void setNoms(const std::vector<std::pair<idt,QString>> & noms) {
+        if(!m_new){
+            m_nameCB->clear();
+            m_nameCB->addText(noms);
+        }
+    }
 
     //! Mutateur de la liste des noms.
-    template<class Ent> void setNoms(const conteneurMPS::VectorPtr<Ent> & vec)
-        {m_nameCB->setText(vec,[](const Ent & entity)->const QString &{return entity.nom();});}
+    template<class Ent> void setNoms(const conteneurMPS::VectorPtr<Ent> & vec) {
+        if(!m_new){
+            m_nameCB->clear();
+            m_nameCB->addText(vec,[](const Ent & entity)->const QString &{return entity.nom();});
+        }
+    }
 
     //! Mutateur de la liste des noms.
-    template<class Ent> void setNoms(conteneurMPS::VectorPtr<Ent> && vec)
-        {m_nameCB->setText(std::move(vec),[](const Ent & entity)->const QString &{return entity.nom();});}
+    template<class Ent> void setNoms(conteneurMPS::VectorPtr<Ent> && vec) {
+        if(!m_new){
+            m_nameCB->clear();
+            m_nameCB->addText(std::move(vec),[](const Ent & entity)->const QString &{return entity.nom();});
+        }
+    }
 
     //! Teste si le formulaire est valide.
     bool valide() const override

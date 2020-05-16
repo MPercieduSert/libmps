@@ -24,19 +24,19 @@ public:
         {return currentData().toUInt();}
 
     //! Mutateur de la liste des labels et identifiants.
-    void setText(const std::vector<std::pair<idt,QString>> & noms){
+    void addText(const std::vector<std::pair<idt,QString>> & noms){
         for(auto i = noms.cbegin(); i != noms.cend(); ++i)
             addItem(i->second,i->first);
     }
 
     //! Mutateur de la liste des labels et identifiants.
-    template<class Ent, class ExtractText> void setText(const conteneurMPS::VectorPtr<Ent> & vec, ExtractText text) {
+    template<class Ent, class ExtractText> void addText(const conteneurMPS::VectorPtr<Ent> & vec, ExtractText text) {
         for(auto i = vec.cbegin(); i != vec.cend(); ++i)
                 addItem(text(*i),i->id());
     }
 
     //! Mutateur de la liste des labels et identifiants.
-    template<class Ent, class ExtractText> void setText(conteneurMPS::VectorPtr<Ent> && vec, ExtractText text) {
+    template<class Ent, class ExtractText> void addText(conteneurMPS::VectorPtr<Ent> && vec, ExtractText text) {
         for(auto i = vec.cbegin(); i != vec.cend(); ++i)
                 addItem(text(*i),i->id());
     }
