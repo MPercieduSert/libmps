@@ -128,6 +128,7 @@ protected:
 class EntityException : public std::exception {
 protected:
     QString m_txt;
+    mutable std::string m_string;
 public:
     //! Constructeur par default.
     EntityException() = default;
@@ -140,11 +141,13 @@ public:
     }
 
     //!Destructeur.
-    ~EntityException();
+    ~EntityException() override;
 
     //! Renvoie un pointeur sur la chaine expliquant l'exception.
-    const char * what() const noexcept
-        {return qPrintable(m_txt);}
+    const char * what() const noexcept override {
+        m_string = m_txt.toStdString();
+        return m_string.data();
+    }
 };
 
 class ConvertEntityException : public EntityException {
