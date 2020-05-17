@@ -782,6 +782,86 @@ public:
          */
         const_reverse_iterator & operator -=(int n) noexcept;
     };
+    ////////////////////////////////////////// const_leaf_iterator //////////////////////////////////
+    /*! \ingroup groupeConteneur
+     * \brief Itérateur constant sur les feuilles de l'arbre.
+     */
+    class const_leaf_iterator : public virtual const_abstract_iterator {
+    protected:
+        using const_abstract_iterator::m_ptr;
+        using const_abstract_iterator::to_nextBrotherIfNotUncle;
+        using const_abstract_iterator::to_prevBrotherIfNotUncle;
+
+    public:
+        using const_abstract_iterator::const_abstract_iterator;
+        using const_abstract_iterator::operator*;
+        TREE_ITER_CONST(const_leaf_iterator)
+
+        //! Opératateur de pré-incrémentation.
+        //! Positionne l'itérateur sur la feuille suivante.
+        const_leaf_iterator & operator ++() noexcept {
+            to_nextBrotherIfNotUncle();
+            return toFirstLeaf();
+        }
+
+        //! Opérateur de pré-décrémentation.
+        const_leaf_iterator & operator --() noexcept {
+            to_prevBrotherIfNotUncle();
+            return toLastLeaf();
+        }
+
+        //! \brief Incrémente n fois l'itérateur. Si n est négatif, -=-n est appliqué.
+        const_leaf_iterator & operator +=(int n) noexcept
+            {return const_abstract_iterator::template opAddAssign<const_leaf_iterator>(n);}
+
+        /*! \brief Décrémente n fois l'itérateur. Si n est négatif, +=-n est appliqué.
+         * Cet opérateur applique n fois l'opérateur de décrémemtation, sauf si
+         * l'itérateur est décrémenté alors qu'il est positionné sur la racine,
+         * a ce moment l'itérateur est positionné sur le noeud virtuel nullptr.
+         */
+        const_leaf_iterator & operator -=(int n) noexcept
+            {return operator +=(-n);}
+    };
+    //////////////////////////////////////// const_reverse_leaf_iterator /////////////////////////////////
+    /*! \ingroup groupeConteneur
+     * \brief Itérateur-inverse constant sur les feuilles de l'arbre.
+     */
+    class const_reverse_leaf_iterator : public const_leaf_iterator
+    {
+    protected:
+        using const_abstract_iterator::m_ptr;
+        using const_abstract_iterator::to_nextBrotherIfNotUncle;
+        using const_abstract_iterator::to_prevBrotherIfNotUncle;
+
+    public:
+        using const_iterator::const_iterator;
+        using const_iterator::operator*;
+        TREE_ITER_CONST(const_reverse_leaf_iterator)
+
+        //! Opérateur de pré-incrémentation.
+        const_reverse_leaf_iterator & operator ++() noexcept {
+            to_prevBrotherIfNotUncle();
+            return toLastLeaf();
+        }
+
+        //! Opérateur de pré-décrémentation.
+        const_reverse_leaf_iterator & operator --() noexcept {
+            to_nextBrotherIfNotUncle();
+            return toFirstLeaf();
+        }
+
+        //! \brief Incrémente n fois l'itérateur. Si n est négatif, -=-n est appliqué.
+        const_reverse_leaf_iterator & operator +=(int n) noexcept
+            {return const_abstract_iterator::template opAddAssign<const_reverse_leaf_iterator>(n);}
+
+        /*! \brief Décrémente n fois l'itérateur. Si n est négatif, +=-n est appliqué.
+         * Cet opérateur applique n fois l'opérateur de décrémemtation, sauf si
+         * l'itérateur est décrémenté alors qu'il est positionné sur la racine,
+         * a ce moment l'itérateur est positionné sur le noeud virtuel nullptr.
+         */
+        const_reverse_leaf_iterator & operator -=(int n) noexcept
+            {return operator +=(-n);}
+    };
     /////////////////////////////////////////// const_prevsuiv_iterator ///////////////////////////////////
     /*! \ingroup groupeConteneur
      * \brief Itérateur constant sur l'arbre parcourant les noeuds à la descente et à la remonté en commeçant par les ainés.
@@ -851,6 +931,19 @@ public:
         using abstract_iterator::operator*;
         TREE_ITER_NOCONST(iterator)
     };
+    ////////////////////////////////////// leaf_iterator ///////////////////////////////////////////
+    /*! \ingroup groupeConteneur
+     * \brief Itérateur sur l'arbre parcourant les feuilles.
+     */
+    class leaf_iterator : public abstract_iterator, public const_leaf_iterator {
+        friend tree;
+    protected:
+        using abstract_iterator::m_ptr;
+    public:
+        using abstract_iterator::abstract_iterator;
+        using abstract_iterator::operator*;
+        TREE_ITER_NOCONST(leaf_iterator)
+    };
     /////////////////////////////////////// prevsuiv_iterator //////////////////////////////////////
     /*! \ingroup groupeConteneur
      * \brief Itérateursur l'arbre parcourant les noeuds à la descente et à la remonté en commeçant par les ainés.
@@ -889,6 +982,19 @@ public:
         using abstract_iterator::abstract_iterator;
         using abstract_iterator::operator*;
         TREE_ITER_NOCONST(reverse_iterator)
+    };
+    /////////////////////////////////////////// reverse_iterator //////////////////////////////////////
+    /*! \ingroup groupeConteneur
+     * \brief Itérateur inverse sur l'arbre parcourant les noeuds uniquement à la descente en commeçant par les ainés.
+     */
+    class reverse_leaf_iterator : public abstract_iterator, public const_reverse_leaf_iterator {
+        friend tree;
+    protected:
+        using abstract_iterator::m_ptr;
+    public:
+        using abstract_iterator::abstract_iterator;
+        using abstract_iterator::operator*;
+        TREE_ITER_NOCONST(reverse_leaf_iterator)
     };
 
     ///////////////////////////////////////////// Tree/////////////////////////////////////////////////////
@@ -992,6 +1098,24 @@ public:
     //! Renvoie un itérateur de frère inverse constant initialisé sur la racine.
     const_reverse_brother_iterator crbeginBrother() const noexcept
         {return m_root;}
+
+    /////// begin brother_iterator ////////
+
+    //! Renvoie un itérateur de feuille initialisé sur la première feuille.
+    leaf_iterator beginLeaf() const noexcept
+        {return const_abstract_iterator(m_root).toFirstLeaf();}
+
+    //! Renvoie un itérateur de feuille constant initialisé sur la première feuille.
+    const_leaf_iterator cbeginLeaf() const noexcept
+        {return const_abstract_iterator(m_root).toFirstLeaf();}
+
+    //! Renvoie un itérateur de feuille inverse initialisé sur la dernière feuille.
+    reverse_brother_iterator rbeginLeaf() const noexcept
+        {return const_abstract_iterator(m_root).toLastLeaf();}
+
+    //! Renvoie un itérateur de feuille inverse constant initialisé sur la dernière feuille.
+    const_reverse_brother_iterator crbeginLeaf() const noexcept
+        {return const_abstract_iterator(m_root).toLastLeaf();}
 
     /////// begin prevsuiv_iterator ////////
 
