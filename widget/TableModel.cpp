@@ -210,7 +210,7 @@ bool TableModel::removeRows(int row, int count, const QModelIndex & parent) {
         // Suppression d'une ligne.
         if (count == 1) {
             auto ligne = rowToLigne(row);
-            if(m_data->removeInternalData(ligne)){
+            if(!m_data->existsInternalData(ligne) || m_data->removeInternalData(ligne)){
                 m_rowToLigne.erase(std::next(m_rowToLigne.cbegin(),row));
                 for (auto write = m_rowToLigne.begin(); write != m_rowToLigne.end(); ++write) {
                     if(*write > ligne)
@@ -229,7 +229,7 @@ bool TableModel::removeRows(int row, int count, const QModelIndex & parent) {
             auto last = read;
             auto newPlage = false;
             for(auto i = 0; i != count; ++i, ++read){
-                if(m_data->removeInternalData(*read)){
+                if(!m_data->existsInternalData(*read) ||m_data->removeInternalData(*read)){
                     if(newPlage)
                         first = last = read;
                     vecId.push_back(*read);
@@ -268,6 +268,10 @@ bool TableModel::removeRows(int row, int count, const QModelIndex & parent) {
                     firstLigne = lastLigne = *iter;
                 }
             }
+            if(firstLigne == lastLigne)
+                m_data->erase(firstLigne);
+            else
+                m_data->erase(firstLigne, lastLigne);
         }
     endRemoveRows();
     return true;

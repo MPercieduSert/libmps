@@ -139,6 +139,9 @@ public:
         //! Supprime les lignes [first,last] des données du model.
         virtual void erase(szt /*first*/, szt /*last*/);
 
+        //! Teste si la ligne correspond à une donnée interne.
+        virtual bool existsInternalData(szt /*ligne*/) {return false;}
+
         //! Fabrique une colonne lié aux données du tableau.
         virtual std::unique_ptr<AbstractColonne> makeColonne(const NewColonneInfo & info) = 0;
 
@@ -488,6 +491,9 @@ public:
 
     // Ajoute count lignes au tableau.
     void add(szt count) override {m_vec.resize(m_vec.size() + count, [](){return new Ent();});}
+
+    //! Teste si la ligne correspond à une donnée interne.
+    bool existsInternalData(szt ligne) override {return !m_vec[ligne].isNew();}
 
     //! Teste si la ligne de donnée est valide.
     bool valide(szt ligne) const {return m_vec[ligne].isValid();}
