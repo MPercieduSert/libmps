@@ -315,6 +315,14 @@ protected:
          */
         void push_front(Item *child) noexcept;
 
+        /*!
+         * \brief Remplace le noeud par le noeud node dans l'arbre ainsi que leur déscendants.
+         *
+         * Remplace le noeud par le noeud node dans l'arbre ainsi que leur déscendants.
+         * Le noeud et ses descendants, privée éventuellemment de node et de ses descendants, sont détruits.
+         */
+        void replace(Item * node) noexcept;
+
         //! Modifie la donnée associée au noeud.
         void setData(const T & data) noexcept(noexcept (T::operateur = (data)))
             {m_data = data;}
@@ -1472,6 +1480,17 @@ public:
     template<class U> size_type removeLeafIfData(U predicat) noexcept
         {return removeLeafIf([&predicat](const const_abstract_iterator & iter)->bool{return predicat(*iter);});}
 
+    //! Remplace le noeud old par le noeud new ainsi que leur déscendants.
+    //! Le noeud old et ses descendants, privée éventuellemment de new de ses descendants, sont détruits.
+    //! Si old pointe sur la racine, la racine est remplacé par le noeud new.
+    //! Attention new ne doit pas être la racine d'un arbre.
+    template<class iter_tree> iter_tree replace(iter_tree oldIter, iter_tree newIter) noexcept {
+        if(oldIter.root())
+            m_root = newIter.m_ptr();
+        oldIter.m_ptr->replace(newIter->m_ptr);
+        return newIter;
+    }
+
     //! Teste si l'arbre est réduit à sa racine (valide).
     bool rootLeaf() const noexcept
         {return m_root && m_root->leaf();}
@@ -1810,6 +1829,24 @@ template<class T> void tree<T>::Item::push_front(Item * child) noexcept {
         m_firstChild = m_firstChild->m_prevBrother = child;
     else
         m_firstChild = m_lastChild = child;
+}
+
+template<class T> void tree<T>::Item::replace(Item * node) noexcept{
+    node->changeHeredite(m_parent);
+    if(m_parent) {
+        if(m_prevBrother)
+            m_prevBrother->m_nextBrother = node;
+        else
+            m_parent->m_firstChild = node;
+        if(m_nextBrother)
+            m_nextBrother->m_prevBrother = node;
+        else
+            m_parent->m_lastChild = node;
+    }
+    node->m_prevBrother = m_prevBrother;
+    node->m_nextBrother= m_nextBrother;
+    m_parent = nullptr;
+    delete this;
 }
 
 template<class T> typename tree<T>::size_type tree<T>::Item::size() const noexcept {
