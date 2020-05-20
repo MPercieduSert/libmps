@@ -114,6 +114,7 @@ public:
         int id;
         QString name;
         int type;
+        szt tableau = 0;
         std::vector<QVariant> args = std::vector<QVariant>();
     };
 
@@ -136,11 +137,11 @@ public:
         //! Supprime une ligne des données du model.
         virtual void erase(szt /*ligne*/) {}
 
-        //! Supprime les lignes [first,last] des données du model.
+        //! Supprime les lignes [first,last) des données du model.
         virtual void erase(szt /*first*/, szt /*last*/);
 
         //! Teste si la ligne correspond à une donnée interne.
-        virtual bool existsInternalData(szt /*ligne*/) {return false;}
+        virtual bool existsInternalData(szt /*ligne*/) const {return false;}
 
         //! Fabrique une colonne lié aux données du tableau.
         virtual std::unique_ptr<AbstractColonne> makeColonne(const NewColonneInfo & info) = 0;
@@ -456,7 +457,7 @@ public:
     //! Supprime une ligne des données du model.
     void erase(szt ligne) override {m_vec.erase(std::next(m_vec.cbegin(),ligne));}
 
-    //! Supprime les lignes [first,last] des données du model.
+    //! Supprime les lignes [first,last) des données du model.
     void erase(szt first, szt last) override;
 
     //! Taille (nombre de lignes).
@@ -493,7 +494,7 @@ public:
     void add(szt count) override {m_vec.resize(m_vec.size() + count, [](){return new Ent();});}
 
     //! Teste si la ligne correspond à une donnée interne.
-    bool existsInternalData(szt ligne) override {return !m_vec[ligne].isNew();}
+    bool existsInternalData(szt ligne) const override {return !m_vec[ligne].isNew();}
 
     //! Teste si la ligne de donnée est valide.
     bool valide(szt ligne) const {return m_vec[ligne].isValid();}
@@ -533,6 +534,73 @@ public:
     void save(szt ligne) {m_bdd.save(m_vec[ligne]);}
 };
 
+////////////////////////////////////////////////////////// CompositionTableau /////////////////////////////////////
+//! Macro de définition des menbres test de CompositionTableaux
+#define TEST_COMPOSITION_TABLEAUX(VECBOOL,MEMBRE){auto iterTableau = m_tableaux.cbegin(); \
+    auto iterTest = VECBOOL.cbegin(); \
+    while(iterTableau != m_tableaux.cend() && (!*iterTest || (*iterTableau)->MEMBRE)){ \
+        ++iterTableau; ++iterTest;} \
+    return iterTableau == m_tableaux.cend();}
+
+
+/*! \ingroup groupeModel
+ * \brief Classe de composition paramétrée de plusieurs tableaux en un.
+ */
+class CompositionTableaux : public AbstractColonnesModel::AbstractTableau {
+protected:
+    std::vector<std::unique_ptr<AbstractTableau>> m_tableaux;   //! Vecteur des pointeurs de tableau.
+    std::vector<bool> m_egalActif;                              //! Vecteur de l'activation du test d'égalité pour un tableau.
+    std::vector<bool> m_existsActif;                            //! Vecteur de l'activation du test d'existence pour un tableau.
+    std::vector<bool> m_newOrModifActif;                        //! Vecteur de l'activation du test newOrModif pour un tableau.
+    std::vector<bool> m_removeActif;                    //! Vecteur de l'activation de suppresion des données internes pour un tableau.
+    std::vector<bool> m_saveActif;                      //! Vecteur de l'activation de sauvegarde pour un tableau.
+    std::vector<bool> m_valideActif;                    //! Vecteur de l'activation du test de validité pour un tableau.
+public:
+    //! Constructeur.
+    CompositionTableaux() = default;
+
+    //!Destructeur.
+    ~CompositionTableaux() override = default;
+
+    // Ajoute count lignes au tableau.
+    void add(szt count) override;
+
+    //! Comparaison d'égalité de deux ligne.
+    bool egal(szt ligne1, szt ligne2) const override;
+
+    //! Supprime une ligne des données du model.
+    void erase(szt ligne) override;
+
+    //! Supprime les lignes [first,last) des données du model.
+    void erase(szt first, szt last) override;
+
+    //! Teste si la ligne correspond à une donnée interne.
+    bool existsInternalData(szt ligne) const override;
+
+    //! Fabrique une colonne lié aux données du tableau.
+    std::unique_ptr<AbstractColonnesModel::AbstractColonne> makeColonne(const AbstractColonnesModel::NewColonneInfo & info) override
+        {return m_tableaux.at(info.tableau)->makeColonne(info);}
+
+    //! Teste si la ligne est nouvelle ou modifiée.
+    bool newOrModif(szt ligne) const override;
+
+    //! Ajoute un tableau à la composition. Le nouveau tableau doit avoir la même taille que ceux auquel il est associé.
+    void push_back(std::unique_ptr<AbstractTableau> && tableau);
+
+    //! Supprime les données correspondant à la ligne dans la base de donnée.
+    //! Ne doit pas supprimer de ligne de donnée du model.
+    bool removeInternalData(szt ligne) override;
+
+    //! Sauve la ligne dans la base de donnée.
+    void save(szt ligne) override;
+
+    //! Taille (nombre de lignes).
+    szt size() const override
+        {return m_tableaux.empty() ? 0 : m_tableaux.front()->size();}
+
+    //! Teste si la ligne de donnée est valide.
+    bool valide(szt ligne) const override;
+};
 template<class T, class Vec> template<class Factory> AbstractVecTableau<T,Vec>::AbstractVecTableau(szt size, Factory factory) {
     m_vec.reserve(size);
     for(szt i = 0; i != size; ++i)
@@ -540,7 +608,7 @@ template<class T, class Vec> template<class Factory> AbstractVecTableau<T,Vec>::
 }
 
 template<class T, class Vec> void AbstractVecTableau<T,Vec>::erase(szt first, szt last)
-    {m_vec.erase(std::next(m_vec.cbegin(),first),std::next(m_vec.cbegin(),last + 1));}
+    {m_vec.erase(std::next(m_vec.cbegin(),first),std::next(m_vec.cbegin(),last));}
 
 template <class T> std::unique_ptr<AbstractColonnesModel::AbstractColonne>
                         VectorTableau<T>::makeColonne(const AbstractColonnesModel::NewColonneInfo & info) {

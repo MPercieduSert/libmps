@@ -216,9 +216,54 @@ void AbstractColonnesModel::updateUniqueLigne(szt ligne, bool update){
 }
 
 ///////////////////////////////////////// Tableau /////////////////////////
-
 void AbstractColonnesModel::AbstractTableau::erase(szt first, szt last) {
-    ++last;
     for (auto ligne = first; ligne != last; ++ligne)
         erase(ligne);
 }
+
+/////////////////////////////////////// CompositionTableaux /////////////////////
+void CompositionTableaux::add(szt count) {
+    for(auto iter = m_tableaux.begin(); iter != m_tableaux.end(); ++iter)
+        (*iter)->add(count);
+}
+
+bool CompositionTableaux::egal(szt ligne1, szt ligne2) const
+    TEST_COMPOSITION_TABLEAUX(m_egalActif,egal(ligne1,ligne2))
+
+void CompositionTableaux::erase(szt ligne) {
+    for(auto iter = m_tableaux.begin(); iter != m_tableaux.end(); ++iter)
+        (*iter)->erase(ligne);
+}
+
+void CompositionTableaux::erase(szt first, szt last) {
+    for(auto iter = m_tableaux.begin(); iter != m_tableaux.end(); ++iter)
+        (*iter)->erase(first, last);
+}
+
+bool CompositionTableaux::existsInternalData(szt ligne) const
+    TEST_COMPOSITION_TABLEAUX(m_existsActif,existsInternalData(ligne))
+
+bool CompositionTableaux::newOrModif(szt ligne) const
+    TEST_COMPOSITION_TABLEAUX(m_newOrModifActif,newOrModif(ligne))
+
+void CompositionTableaux::push_back(std::unique_ptr<AbstractTableau> && tableau){
+    if(!m_tableaux.empty() && tableau->size() != size())
+        throw std::runtime_error(QString("void CompositionTableaux::push_back(std::unique_ptr<AbstractTableau> && )\n"
+                                 "La taille du nouveau tableau (").append(QString::number(tableau->size()))
+                                 .append(") ne correspond pas à ceux déjà présents (").append(QString::number(size())).toStdString());
+    m_tableaux.push_back(std::move(tableau));
+}
+
+bool CompositionTableaux::removeInternalData(szt ligne)
+    TEST_COMPOSITION_TABLEAUX(m_existsActif,removeInternalData(ligne))
+
+void CompositionTableaux::save(szt ligne) {
+    auto iterActif = m_saveActif.cbegin();
+    for(auto iter = m_tableaux.begin(); iter != m_tableaux.end(); ++iter, ++iterActif)
+        if(*iterActif)
+            (*iter)->save(ligne);
+}
+
+bool CompositionTableaux::valide(szt ligne) const
+    TEST_COMPOSITION_TABLEAUX(m_valideActif,valide(ligne))
+

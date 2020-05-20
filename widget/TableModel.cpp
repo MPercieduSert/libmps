@@ -264,14 +264,14 @@ bool TableModel::removeRows(int row, int count, const QModelIndex & parent) {
                     if(firstLigne == lastLigne)
                         m_data->erase(firstLigne);
                     else
-                        m_data->erase(firstLigne, lastLigne);
+                        m_data->erase(firstLigne, lastLigne + 1);
                     firstLigne = lastLigne = *iter;
                 }
             }
             if(firstLigne == lastLigne)
                 m_data->erase(firstLigne);
             else
-                m_data->erase(firstLigne, lastLigne);
+                m_data->erase(firstLigne, lastLigne + 1);
         }
     endRemoveRows();
     return true;
