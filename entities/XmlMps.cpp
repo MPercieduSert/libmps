@@ -168,7 +168,7 @@ std::vector<varAtts> XmlReader::getVarsAtts(QString nameVar, const std::map<QStr
                 for(QXmlStreamAttributes::const_iterator j = atts.constBegin(); j != atts.constEnd(); ++j)
                     var.second.insert({j->name().toString(),j->value().toString()});
                 var.first = readElementText();
-                varsAtts.push_back(var);
+                varsAtts.push_back(std::move(var));
             }
             else
                 skipCurrentElement();

@@ -27,12 +27,12 @@ public:
         tree<Ent> tree;
         auto iter = tree.begin();
         for(auto i = racines.cbegin(); i != racines.cend(); ++i)
-            get(*tree.push_back(iter,Ent(*i)));
+            get(*tree.emplace_back(iter,*i));
         while(iter){
             if(!optiLeaf(iter->id())){
                 auto listChilds = getListChildsId(iter->id());
                 for(auto i = listChilds.cbegin(); i != listChilds.cend(); ++i)
-                    get(*tree.push_back(iter,Ent(*i)));
+                    get(*tree.emplace_back(iter,*i));
             }
             ++iter;
         }
@@ -53,7 +53,7 @@ public:
                 if(!optiLeaf(iter->id())){
                     auto listChilds = getListChildsId(iter->id());
                     for(auto i = listChilds.cbegin(); i != listChilds.cend(); ++i)
-                        get(*tree.push_back(iter,Ent(*i)));
+                        get(*tree.emplace_back(iter,*i));
                 }
                 ++iter;
             }
