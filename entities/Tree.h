@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <list>
 #include <stdexcept>
+#include <type_traits>
 #include <utility>
 
 #define TREE_ITER_COMMUN(ITER)protected: \
@@ -99,25 +100,12 @@
     /*! Affecte à data la donnée associée au noeud courant puis replace ce dernier sur le noeud suivant.*/ \
     ITER & operator >> (T & data) noexcept {data = const_##ITER::operator * (); return operator ++ ();} \
 
-
-///*! \brief Positionne l'itérateur sur le noeud correspond au chemin transmis en argument (sans vérification).*/
-///*! La postion souhaitée de l'itérateur est transmise par la liste des noeuds qu'il faut parcourir. Ces noeuds sont référencés
-// * par leurs indices dans la liste des descendants directs du noeuds précédemment atteint. Ne lève pas d'exception si le chemin
-// * est invalide mais rend l'iérateur nul dans ce cas.
-// */
-//ITER & operator [](const std::list<int> & pos) noexcept {return std::for_each(pos.cbegin(), pos.cend(), this->operator[]);}
-///*! Déplace l'itérateur en suivant le chemin pos (avec vérification pouvant conduire à une exception std::out_of_range).*/
-//ITER & to(std::list<int> pos) {return std::for_each(pos.cbegin(), pos.cend(), this->to);}
-
-
-
 namespace conteneurMPS {
 
 /*! \ingroup groupeConteneur
  *  \brief Cette classe represente un arbre dont les noeuds sont constitués par des Item<T>.
  *
- * Cette classe represente un arbre. Elle est constituée de la racine d'un arbre dont les noeuds sont constitués par des Item<T>
- * et d'un itérateur sur cet arbre jouant le role d'un curseur, ce qui munit l'arbre d'un noeud courant.
+ * Cette classe represente un arbre. Elle est constituée de la racine d'un arbre dont les noeuds sont constitués par des Item<T>.
  */
 template<class T> class tree {
 public:
@@ -129,6 +117,7 @@ public:
     class const_iterator;
 
 protected:
+    //////////////////////////////////// Item//////////////////////////////////////
     /*! \ingroup groupeConteneur
      * \brief Cette classe est une représentation des noeuds d'un arbre.
      *
@@ -171,13 +160,10 @@ protected:
         Item(const T & data) noexcept(noexcept(T(data)))
             : m_data(data) {}
 
-        //! Constructeur avec une donnée associée au noeud. Par défaut un noeud est la racine d'un arbre.
-        Item(T && data) noexcept(noexcept(T(std::move(data))))
-            : m_data(std::move(data)) {}
-
-//        //! Constructeur de donné en place.
-//        template< class... Args > Item(Args && ... args)
-//            : m_data(std::forward<Args>(args)...) {}
+        //! Constructeur de donné en place.
+        template< class... Args, typename = std::enable_if_t<std::is_convertible<T, Args...>::value
+                                                             && !std::is_same<Item, Args...>::value>>
+                    Item(Args && ... args) : m_data(std::forward<Args>(args)...) {}
 
         //! Constructeur de recopie. Recopie également récursivement l'ensemble des descendants,
         //! T doit posséder un constructeur à partie de U.
@@ -196,10 +182,6 @@ protected:
         }
 
         ///////////////// begin ////////////
-
-//        //! Crée un iterator initialisé sur ce noeud.
-//        iterator begin() noexcept
-//            {return this;}
 
         //! Crée un brother_iterator initialisé sur le fils ainé.
         brother_iterator beginChild() noexcept
@@ -330,8 +312,13 @@ protected:
          */
         void push_front(Item *child) noexcept;
 
-//        //! Renvoie un pointeur sur la racine de l'arbre.
-//        Item * root() const noexcept;
+        /*!
+         * \brief Remplace le noeud par le noeud node dans l'arbre ainsi que leur déscendants.
+         *
+         * Remplace le noeud par le noeud node dans l'arbre ainsi que leur déscendants.
+         * Le noeud et ses descendants, privée éventuellemment de node et de ses descendants, sont détruits.
+         */
+        void replace(Item * node) noexcept;
 
         //! Modifie la donnée associée au noeud.
         void setData(const T & data) noexcept(noexcept (T::operateur = (data)))
@@ -353,6 +340,7 @@ protected:
     };
 
 public:
+    ///////////////////////////////////// const_abstract_iterator //////////////////////////
     /*! \ingroup groupeConteneur
      * \brief Classe parente des itérateurs sur un arbre.
      */
@@ -621,38 +609,9 @@ public:
             if(m_ptr)
                 to_root();
         }
-
-//        //! Déplace l'itérateur sur le fils de position pos (avec vérification pouvant conduire à une exception std::out_of_range).
-//        template<class iter, class broIter> iter & toTemp(int pos) {
-//            broIter j(m_ptr);
-//            j += pos;
-//            if(j)
-//                this->operator=(j);
-//            else
-//                throw std::out_of_range(std::string("tree<T>::iterator & tree<T>::iterator::to(std::list<int> pos)\n"
-//                                        "Indices invalides:").append(std::to_string(pos)).append(" et le nombre de descendants est ")
-//                                        .append(std::to_string(m_ptr->sizeChild())));
-//            return *this;
-//        }
     };
 
-//    /*! \ingroup groupeConteneur
-//     * \brief Classe parente des itérateurs sur un arbre non constant mais préservant l'existence des noeuds.
-//     */
-//    class struct_abstract_iterator : public virtual const_abstract_iterator
-//    {
-//    protected:
-//        using const_abstract_iterator::m_ptr;
-
-//    public:
-//        //! Constructeur par defaut.
-//        struct_abstract_iterator() = default;
-
-//        //! Renvoie une référence sur la donnée du noeud courant.
-//        T & operator *() noexcept
-//            {return m_ptr->data();}
-//    };
-
+    ////////////////////////////////////// abstract_iterator ////////////////////////////
     /*! \ingroup groupeConteneur
      * \brief Classe parente des itérateurs sur un arbre non constant.
      */
@@ -692,7 +651,7 @@ public:
         Item * itemPtr() const
             {return m_ptr;}
     };
-
+    ///////////////////////////////////// const_brother_iterator /////////////////////////
     /*! \ingroup groupeConteneur
      * \brief Itérateur constant sur une fratrie.
      */
@@ -722,16 +681,8 @@ public:
         //! Appelle +=(-n).
         const_brother_iterator & operator -=(int n) noexcept
             {return operator +=(-n);}
-
-//        //! Déplace l'itérateur sur le fils de position pos (sans vérification).
-//        const_brother_iterator & operator [](int & pos) noexcept
-//            {return const_abstract_iterator::template opSubscrip<const_brother_iterator,const_brother_iterator>(pos);}
-
-//        //! Déplace l'itérateur sur le fils de position pos (avec vérification pouvant conduire à une exception std::out_of_range).
-//        const_brother_iterator & to(int pos)
-//            {return const_abstract_iterator::template toTemp<const_brother_iterator,const_brother_iterator>(pos);}
     };
-
+    //////////////////////////////////// const_reverse_brother_iterator //////////////////////////
     /*! \ingroup groupeConteneur
      * \brief Itérateur-inverse constant sur une fratrie.
      */
@@ -760,16 +711,8 @@ public:
         //! Décrémente n fois l'itérateur. Si n est négatif, +=-n est appliqué.
         const_reverse_brother_iterator & operator -=(int n) noexcept
             {return operator +=(-n);}
-
-//        //! Déplace l'itérateur sur le fils de position pos (sans vérification).
-//        const_reverse_brother_iterator & operator [](int & pos) noexcept
-//            {return const_abstract_iterator::template opSubscrip<const_reverse_brother_iterator,const_reverse_brother_iterator>(pos);}
-
-//        //! Déplace l'itérateur sur le fils de position pos (avec vérification pouvant conduire à une exception std::out_of_range).
-//        const_brother_iterator & to(int pos)
-//            {return const_abstract_iterator::template toTemp<const_reverse_brother_iterator,const_reverse_brother_iterator>(pos);}
     };
-
+    ////////////////////////////////////////// const_iterator //////////////////////////////////
     /*! \ingroup groupeConteneur
      * \brief Itérateur constant sur l'arbre parcourant les noeuds uniquement à la descente en commeçant par les ainés.
      */
@@ -805,16 +748,8 @@ public:
          * a ce moment l'itérateur est positionné sur le noeud virtuel nullptr.
          */
         const_iterator & operator -=(int n) noexcept;
-
-//        //! Déplace l'itérateur sur le fils de position pos (sans vérification).
-//        const_iterator & operator [](int & pos) noexcept
-//            {return const_abstract_iterator::template opSubscrip<const_iterator,const_brother_iterator>(pos);}
-
-//        //! Déplace l'itérateur sur le fils de position pos (avec vérification pouvant conduire à une exception std::out_of_range).
-//        const_iterator & to(int pos)
-//            {return const_abstract_iterator::template toTemp<const_iterator,const_brother_iterator>(pos);}
     };
-
+    //////////////////////////////////////// const_reverse_iterator /////////////////////////////////
     /*! \ingroup groupeConteneur
      * \brief Itérateur-inverse constant sur l'arbre parcourant les noeuds uniquement à la descente en commeçant par les benjamins.
      */
@@ -851,16 +786,88 @@ public:
          * a ce moment l'itérateur est positionné sur le noeud virtuel nullptr.
          */
         const_reverse_iterator & operator -=(int n) noexcept;
-
-//        //! Déplace l'itérateur sur le fils de position pos (sans vérification).
-//        const_reverse_iterator & operator [](int & pos) noexcept
-//            {return const_abstract_iterator::template opTemp<const_reverse_iterator,const_reverse_brother_iterator>(pos);}
-
-//        //! Déplace l'itérateur sur le fils de position pos (avec vérification pouvant conduire à une exception std::out_of_range).
-//        const_reverse_iterator & to(int pos)
-//            {return const_abstract_iterator::template toTemp<const_reverse_iterator,const_reverse_brother_iterator>(pos);}
     };
+    ////////////////////////////////////////// const_leaf_iterator //////////////////////////////////
+    /*! \ingroup groupeConteneur
+     * \brief Itérateur constant sur les feuilles de l'arbre.
+     */
+    class const_leaf_iterator : public virtual const_abstract_iterator {
+    protected:
+        using const_abstract_iterator::m_ptr;
+        using const_abstract_iterator::to_nextBrotherIfNotUncle;
+        using const_abstract_iterator::to_prevBrotherIfNotUncle;
 
+    public:
+        using const_abstract_iterator::const_abstract_iterator;
+        using const_abstract_iterator::operator*;
+        TREE_ITER_CONST(const_leaf_iterator)
+
+        //! Opératateur de pré-incrémentation.
+        //! Positionne l'itérateur sur la feuille suivante.
+        const_leaf_iterator & operator ++() noexcept {
+            to_nextBrotherIfNotUncle();
+            return toFirstLeaf();
+        }
+
+        //! Opérateur de pré-décrémentation.
+        const_leaf_iterator & operator --() noexcept {
+            to_prevBrotherIfNotUncle();
+            return toLastLeaf();
+        }
+
+        //! \brief Incrémente n fois l'itérateur. Si n est négatif, -=-n est appliqué.
+        const_leaf_iterator & operator +=(int n) noexcept
+            {return const_abstract_iterator::template opAddAssign<const_leaf_iterator>(n);}
+
+        /*! \brief Décrémente n fois l'itérateur. Si n est négatif, +=-n est appliqué.
+         * Cet opérateur applique n fois l'opérateur de décrémemtation, sauf si
+         * l'itérateur est décrémenté alors qu'il est positionné sur la racine,
+         * a ce moment l'itérateur est positionné sur le noeud virtuel nullptr.
+         */
+        const_leaf_iterator & operator -=(int n) noexcept
+            {return operator +=(-n);}
+    };
+    //////////////////////////////////////// const_reverse_leaf_iterator /////////////////////////////////
+    /*! \ingroup groupeConteneur
+     * \brief Itérateur-inverse constant sur les feuilles de l'arbre.
+     */
+    class const_reverse_leaf_iterator : public const_leaf_iterator
+    {
+    protected:
+        using const_abstract_iterator::m_ptr;
+        using const_abstract_iterator::to_nextBrotherIfNotUncle;
+        using const_abstract_iterator::to_prevBrotherIfNotUncle;
+
+    public:
+        using const_iterator::const_iterator;
+        using const_iterator::operator*;
+        TREE_ITER_CONST(const_reverse_leaf_iterator)
+
+        //! Opérateur de pré-incrémentation.
+        const_reverse_leaf_iterator & operator ++() noexcept {
+            to_prevBrotherIfNotUncle();
+            return toLastLeaf();
+        }
+
+        //! Opérateur de pré-décrémentation.
+        const_reverse_leaf_iterator & operator --() noexcept {
+            to_nextBrotherIfNotUncle();
+            return toFirstLeaf();
+        }
+
+        //! \brief Incrémente n fois l'itérateur. Si n est négatif, -=-n est appliqué.
+        const_reverse_leaf_iterator & operator +=(int n) noexcept
+            {return const_abstract_iterator::template opAddAssign<const_reverse_leaf_iterator>(n);}
+
+        /*! \brief Décrémente n fois l'itérateur. Si n est négatif, +=-n est appliqué.
+         * Cet opérateur applique n fois l'opérateur de décrémemtation, sauf si
+         * l'itérateur est décrémenté alors qu'il est positionné sur la racine,
+         * a ce moment l'itérateur est positionné sur le noeud virtuel nullptr.
+         */
+        const_reverse_leaf_iterator & operator -=(int n) noexcept
+            {return operator +=(-n);}
+    };
+    /////////////////////////////////////////// const_prevsuiv_iterator ///////////////////////////////////
     /*! \ingroup groupeConteneur
      * \brief Itérateur constant sur l'arbre parcourant les noeuds à la descente et à la remonté en commeçant par les ainés.
      */
@@ -903,33 +910,7 @@ public:
         void setSens(bool sens) noexcept
             {m_sens = sens;}
     };
-
-//    /*! \ingroup groupeConteneur
-//     * \brief Itérateur sur une fratrie préservant les noeuds existant.
-//     */
-//    class struct_brother_iterator : public struct_abstract_iterator, const_brother_iterator
-//    {
-//        TREE_ITER_CONSTR_AFFEC(struct_brother_iterator)
-//    };
-
-//    /*! \ingroup groupeConteneur
-//     * \brief Itérateur sur l'arbre parcourant les noeuds uniquement à la descente en commeçant par les ainés,
-//     * préservant les noeuds existant.
-//     */
-//    class struct_iterator : public struct_abstract_iterator, const_iterator
-//    {
-//        TREE_ITER_CONSTR_AFFEC(struct_iterator)
-//    };
-
-//    /*! \ingroup groupeConteneur
-//     * \brief Itérateursur l'arbre parcourant les noeuds à la descente et à la remonté en commeçant par les ainés,
-//     * préservant les noeuds existant.
-//     */
-//    class struct_prevsuiv_iterator : public struct_abstract_iterator, const_prevsuiv_iterator
-//    {
-//        TREE_ITER_CONSTR_AFFEC(struct_prevsuiv_iterator)
-//    };
-
+    //////////////////////////////////////// brother_iterator /////////////////////////////////
     /*! \ingroup groupeConteneur
      * \brief Itérateur sur une fratrie.
      */
@@ -942,7 +923,7 @@ public:
         using abstract_iterator::operator*;
         TREE_ITER_NOCONST(brother_iterator)
     };
-
+    ////////////////////////////////////// iterator ///////////////////////////////////////////
     /*! \ingroup groupeConteneur
      * \brief Itérateur sur l'arbre parcourant les noeuds uniquement à la descente en commeçant par les ainés.
      */
@@ -955,7 +936,20 @@ public:
         using abstract_iterator::operator*;
         TREE_ITER_NOCONST(iterator)
     };
-
+    ////////////////////////////////////// leaf_iterator ///////////////////////////////////////////
+    /*! \ingroup groupeConteneur
+     * \brief Itérateur sur l'arbre parcourant les feuilles.
+     */
+    class leaf_iterator : public abstract_iterator, public const_leaf_iterator {
+        friend tree;
+    protected:
+        using abstract_iterator::m_ptr;
+    public:
+        using abstract_iterator::abstract_iterator;
+        using abstract_iterator::operator*;
+        TREE_ITER_NOCONST(leaf_iterator)
+    };
+    /////////////////////////////////////// prevsuiv_iterator //////////////////////////////////////
     /*! \ingroup groupeConteneur
      * \brief Itérateursur l'arbre parcourant les noeuds à la descente et à la remonté en commeçant par les ainés.
      */
@@ -968,7 +962,7 @@ public:
         using abstract_iterator::operator*;
         TREE_ITER_NOCONST(prevsuiv_iterator)
     };
-
+    //////////////////////////////////////// reverse_brother_iterator /////////////////////////////////
     /*! \ingroup groupeConteneur
      * \brief Itérateur inverse sur une fratrie.
      */
@@ -981,7 +975,7 @@ public:
         using abstract_iterator::operator*;
         TREE_ITER_NOCONST(reverse_brother_iterator)
     };
-
+    /////////////////////////////////////////// reverse_iterator //////////////////////////////////////
     /*! \ingroup groupeConteneur
      * \brief Itérateur inverse sur l'arbre parcourant les noeuds uniquement à la descente en commeçant par les ainés.
      */
@@ -994,8 +988,21 @@ public:
         using abstract_iterator::operator*;
         TREE_ITER_NOCONST(reverse_iterator)
     };
+    /////////////////////////////////////////// reverse_iterator //////////////////////////////////////
+    /*! \ingroup groupeConteneur
+     * \brief Itérateur inverse sur l'arbre parcourant les noeuds uniquement à la descente en commeçant par les ainés.
+     */
+    class reverse_leaf_iterator : public abstract_iterator, public const_reverse_leaf_iterator {
+        friend tree;
+    protected:
+        using abstract_iterator::m_ptr;
+    public:
+        using abstract_iterator::abstract_iterator;
+        using abstract_iterator::operator*;
+        TREE_ITER_NOCONST(reverse_leaf_iterator)
+    };
 
-    ///// Tree//////////
+    ///////////////////////////////////////////// Tree/////////////////////////////////////////////////////
     template<typename> friend class tree;
 protected:
     Item * m_root;      //!< Pointeur sur la racine de l'arbre.
@@ -1097,6 +1104,24 @@ public:
     const_reverse_brother_iterator crbeginBrother() const noexcept
         {return m_root;}
 
+    /////// begin brother_iterator ////////
+
+    //! Renvoie un itérateur de feuille initialisé sur la première feuille.
+    leaf_iterator beginLeaf() const noexcept
+        {return const_abstract_iterator(m_root).toFirstLeaf();}
+
+    //! Renvoie un itérateur de feuille constant initialisé sur la première feuille.
+    const_leaf_iterator cbeginLeaf() const noexcept
+        {return const_abstract_iterator(m_root).toFirstLeaf();}
+
+    //! Renvoie un itérateur de feuille inverse initialisé sur la dernière feuille.
+    reverse_brother_iterator rbeginLeaf() const noexcept
+        {return const_abstract_iterator(m_root).toLastLeaf();}
+
+    //! Renvoie un itérateur de feuille inverse constant initialisé sur la dernière feuille.
+    const_reverse_brother_iterator crbeginLeaf() const noexcept
+        {return const_abstract_iterator(m_root).toLastLeaf();}
+
     /////// begin prevsuiv_iterator ////////
 
     //! Renvoie un itérateur de type prevSuiv initialisé sur la racine.
@@ -1123,37 +1148,37 @@ public:
     bool empty() const noexcept
         {return m_root;}
 
-//    //! Insert un nouveau noeud de donnée crée en place à partir de args
-//    //! avant le noeud pointé par pos dans la fratrie sauf si le pointé est la racine,
-//    //! dans ce cas le nouveau noeud est inseré en tant que fils ainé. Retourne un itérateur sur ce nouveau noeud.
-//    template< class... Args > iterator emplace( abstract_iterator & pos, Args&&... args ) {
-//        auto * node = new Item(std::forward<Args>(args)...);
-//        pos.m_ptr->insert(node);
-//        return node;
-//    }
+    //! Insert un nouveau noeud de donnée crée en place à partir de args
+    //! avant le noeud pointé par pos dans la fratrie sauf si le pointé est la racine,
+    //! dans ce cas le nouveau noeud est inseré en tant que fils ainé. Retourne un itérateur sur ce nouveau noeud.
+    template<class iter_tree, class... Args> iter_tree emplace(iter_tree pos, Args&&... args ) {
+        auto * node = new Item(std::forward<Args>(args)...);
+        pos.m_ptr->insert(node);
+        return node;
+    }
 
-//    //! Insert un nouveau noeud de donnée crée en place à partir de args
-//    //! après le noeud pointé par pos dans la fratrie sauf si le pointé est la racine,
-//    //! dans ce cas le nouveau noeud est inseré en tant que fils ainé. Retourne un itérateur sur ce nouveau noeud.
-//    template< class... Args > iterator emplace_after( abstract_iterator & pos, Args&&... args ) {
-//        auto * node = new Item(std::forward<Args>(args)...);
-//        pos.m_ptr->insert_after(node);
-//        return node;
-//    }
+    //! Insert un nouveau noeud de donnée crée en place à partir de args
+    //! après le noeud pointé par pos dans la fratrie sauf si le pointé est la racine,
+    //! dans ce cas le nouveau noeud est inseré en tant que fils ainé. Retourne un itérateur sur ce nouveau noeud.
+    template<class iter_tree, class... Args> iter_tree emplace_after(iter_tree pos, Args&&... args ) {
+        auto * node = new Item(std::forward<Args>(args)...);
+        pos.m_ptr->insert_after(node);
+        return node;
+    }
 
-//    //! Insert un fils benjamin de donnée crée en place à partir de args. Retourne un itérateur sur ce nouveau noeud.
-//    template< class... Args > iterator emplace_back( abstract_iterator & pos, Args&&... args ) {
-//        auto * node = new Item(std::forward<Args>(args)...);
-//        pos.m_ptr->push_back(node);
-//        return node;
-//    }
+    //! Insert un fils benjamin de donnée crée en place à partir de args. Retourne un itérateur sur ce nouveau noeud.
+    template<class iter_tree, class... Args> iter_tree emplace_back(iter_tree pos, Args&&... args ) {
+        auto * node = new Item(std::forward<Args>(args)...);
+        pos.m_ptr->push_back(node);
+        return node;
+    }
 
-//    //! Insert un fils ainé de donnée crée en place à partir de args. Retourne un itérateur sur ce nouveau noeud.
-//    template< class... Args > iterator emplace_front( abstract_iterator & pos, Args&&... args ) {
-//        auto * node = new Item(std::forward<Args>(args)...);
-//        pos.m_ptr->push_front(node);
-//        return node;
-//    }
+    //! Insert un fils ainé de donnée crée en place à partir de args. Retourne un itérateur sur ce nouveau noeud.
+    template<class iter_tree, class... Args> iter_tree emplace_front(iter_tree pos, Args&&... args ) {
+        auto * node = new Item(std::forward<Args>(args)...);
+        pos.m_ptr->push_front(node);
+        return node;
+    }
 
     //! Crée un itérateur initialisé sur le noeud virtuel nul. Cette fonction permet la compatibilité avec les algorithmes standards.
     //! Utiliser de préférence la conversion de l'itérateur en booléen.
@@ -1163,25 +1188,25 @@ public:
     //! Supprime l'élément pointé par l'itérateur pos et ses descendants.
     //! Si pos pointe sur la racine, seul les descendants sont supprimés.
     //! Retourne un itérateur sur le suivant celui pointé par pos.
-    iterator erase(abstract_iterator & pos) noexcept;
+    template<class iter_tree> iter_tree erase(iter_tree pos) noexcept;
 
     //! Supprime les noeuds appartenant à [first,last) et leurs decendants.
     //! Les noeuds pointés par first et last doivent être d'une même fratrie sauf si last est nul.
     //! Retourne un itérateur sur le noeud suivant le dernier noeud supprimé.
-    iterator erase(abstract_iterator & first, abstract_iterator & last) noexcept {
+    template<class iter_tree> iter_tree erase(iter_tree first, iter_tree last) noexcept {
         first.m_ptr->erase(last.m_ptr);
         return last;
     }
 
     //! Extrait le noeud pointer par pos de l'arbre pour en faire un nouvel arbre
-    tree extract(abstract_iterator & pos) {
+    template<class iter_tree> tree extract(iter_tree pos) {
         pos.m_ptr->becomeRoot();
         return tree(pos.m_ptr);
     }
 
     //! Insert un nouveau noeud de donnée data avant le noeud pointé par pos dans la fratrie sauf si le pointé est la racine,
     //! dans ce cas le nouveau noeud est inseré en tant que fils ainé. Retourne un itérateur sur ce nouveau noeud.
-    iterator insert(abstract_iterator & pos, const T & data = T()) {
+    template<class iter_tree> iter_tree insert(iter_tree pos, const T & data = T()) {
         auto * node = new Item(data);
         pos.m_ptr->insert(node);
         return node;
@@ -1189,7 +1214,7 @@ public:
 
     //! Insert un nouveau noeud de donnée data avant le noeud pointé par pos dans la fratrie sauf si le noeud pointé est la racine,
     //! dans ce cas le nouveau noeud est inseré en tant que fils ainé. Retourne un itérateur sur ce nouveau noeud.
-    iterator insert(abstract_iterator & pos, T && data) {
+    template<class iter_tree> iter_tree insert(iter_tree pos, T && data) {
         auto * node = new Item(std::move(data));
         pos.m_ptr->insert(node);
         return node;
@@ -1198,7 +1223,9 @@ public:
     //! Insert une copie du noeud (et des descendant) pointé par other avant le noeud pointé par pos dans la fratrie
     //!  sauf si le pointé est la racine,
     //! dans ce cas le nouveau noeud est inseré en tant que fils ainé. Retourne un itérateur sur ce nouveau noeud.
-    iterator insert(abstract_iterator & pos, const const_abstract_iterator & other) {
+    template<class iter_tree, class const_iter_tree,
+             typename = std::enable_if_t<std::is_base_of<const_abstract_iterator,const_iter_tree>::value>>
+                iter_tree insert(iter_tree pos, const_iter_tree  other) {
         auto * node = new Item(other.item());
         pos.m_ptr->insert(node);
         return node;
@@ -1208,7 +1235,7 @@ public:
     //! dans la fratrie sauf si le noeud pointé est la racine,
     //! dans ce cas le nouveau noeud est inseré en tant que fils ainé. Retourne un itérateur sur ce nouveau noeud.
     //! La racine tree devient nulle.
-    iterator insert(abstract_iterator & pos, tree<T> && tree) {
+    template<class iter_tree> iter_tree insert(iter_tree pos, tree<T> && tree) {
         auto * node = tree.m_root;
         pos.m_ptr->insert(node);
         tree.m_root = nullptr;
@@ -1217,23 +1244,24 @@ public:
 
     //! Insert count nouveaux noeuds de donnée data avant le noeud pointé par pos dans la fratrie sauf si le noeud pointé est la racine,
     //! dans ce cas les nouveaux noeuds sont inserés en tant que fils ainé. Retourne un itérateur sur le premier des nouveaux noeuds.
-    iterator insert(abstract_iterator & pos, size_type count, const T & data)
+    template<class iter_tree> iter_tree insert(iter_tree pos, size_type count, const T & data)
         {return add(pos, count, data, this->insert);}
 
     //! Insert de nouveaux noeuds de donnée correspondant au la plage d'itérateur [first, last)
     //! avant le noeud pointé par pos dans la fratrie sauf si le noeud pointé est la racine,
     //! dans ce cas les nouveaux noeuds sont inserés en tant que fils ainé. Retourne un itérateur sur le premier des nouveaux noeuds.
-    template<class InputIt> iterator insert(abstract_iterator & pos, InputIt first, InputIt last)
+    template<class iter_tree, class InputIt> iter_tree insert(iter_tree pos, InputIt first, InputIt last)
         {return add(pos, first, last, this->insert);}
+
     //! Insert de nouveaux noeuds de donnée contenu dans ilist
     //! avant le noeud pointé par pos dans la fratrie sauf si le noeud pointé est la racine,
     //! dans ce cas les nouveaux noeuds sont inserés en tant que fils ainé. Retourne un itérateur sur le premier des nouveaux noeuds.
-    iterator insert(abstract_iterator & pos, std::initializer_list<T> ilist)
+    template<class iter_tree> iter_tree insert(iter_tree pos, std::initializer_list<T> ilist)
         {return insert(pos,ilist.begin(),ilist.end());}
 
     //! Insert un nouveau noeud de donnée data après le noeud pointé par pos dans la fratrie sauf si le pointé est la racine,
     //! dans ce cas le nouveau noeud est inseré en tant que fils benjamin. Retourne un itérateur sur ce nouveau noeud.
-    iterator insert_after(abstract_iterator & pos, const T & data = T()) {
+    template<class iter_tree> iter_tree insert_after(iter_tree pos, const T & data = T()) {
         auto * node = new Item(data);
         pos.m_ptr->insert_after(node);
         return node;
@@ -1241,7 +1269,7 @@ public:
 
     //! Insert un nouveau noeud de donnée data après le noeud pointé par pos dans la fratrie sauf si le noeud pointé est la racine,
     //! dans ce cas le nouveau noeud est inseré en tant que fils benjamin. Retourne un itérateur sur ce nouveau noeud.
-    iterator insert_after(abstract_iterator & pos, T && data) {
+    template<class iter_tree> iter_tree insert_after(iter_tree pos, T && data) {
         auto * node = new Item(std::move(data));
         pos.m_ptr->insert_after(node);
         return node;
@@ -1250,7 +1278,9 @@ public:
     //! Insert une copie du noeud (et des descendants) pointé par other après le noeud pointé par pos dans la fratrie
     //!  sauf si le pointé est la racine,
     //! dans ce cas le nouveau noeud est inseré en tant que fils benjamin. Retourne un itérateur sur ce nouveau noeud.
-    iterator insert_after(abstract_iterator & pos, const const_abstract_iterator & other) {
+    template<class iter_tree, class const_iter_tree,
+                typename = std::enable_if_t<std::is_base_of<const_abstract_iterator,const_iter_tree>::value>>
+                    iter_tree insert_after(iter_tree pos, const_iter_tree other) {
         auto * node = new Item(other.item());
         pos.m_ptr->insert_after(node);
         return node;
@@ -1259,7 +1289,7 @@ public:
     //! Insert un nouveau noeud de donnée coorespondant à la racine de tree (avec ses descendants) après le noeud pointé par pos
     //! dans la fratrie sauf si le pointé est la racine,
     //! dans ce cas le nouveau noeud est inseré en tant que fils benjamin. Retourne un itérateur sur ce nouveau noeud.
-    iterator insert_after(abstract_iterator & pos, tree<T> && tree) {
+    template<class iter_tree> iter_tree insert_after(iter_tree pos, tree<T> && tree) {
         auto * node = tree.m_root;
         pos.m_ptr->insert_after(node);
         tree.m_root = nullptr;
@@ -1268,53 +1298,53 @@ public:
 
     //! Insert count nouveaux noeuds de donnée data après le noeud pointé par pos dans la fratrie sauf si le noeud pointé est la racine,
     //! dans ce cas les nouveaux noeuds sont inserés en tant que fils benjamin. Retourne un itérateur sur le dernier des nouveaux noeuds.
-    iterator insert_after(abstract_iterator & pos, size_type count, const T & data)
+    template<class iter_tree> iter_tree insert_after(iter_tree pos, size_type count, const T & data)
         {return add(pos, count, data, this->insert_after);}
 
     //! Insert de nouveaux noeuds de donnée correspondant au la plage d'itérateur [first, last)
     //! après le noeud pointé par pos dans la fratrie sauf si le noeud pointé est la racine,
     //! dans ce cas les nouveaux noeuds sont inserés en tant que fils benjamin. Retourne un itérateur sur le dernier des nouveaux noeuds.
-    template<class InputIt> iterator insert_after(abstract_iterator & pos, InputIt first, InputIt last)
+    template<class iter_tree, class InputIt> iter_tree insert_after(iter_tree pos, InputIt first, InputIt last)
         {return add(pos, first, last, this->insert_after);}
 
     //! Insert de nouveaux noeuds de donnée contenu dans ilist
     //! après le noeud pointé par pos dans la fratrie sauf si le noeud pointé est la racine,
     //! dans ce cas les nouveaux noeuds sont inserés en tant que fils benjamin. Retourne un itérateur sur le dernier des nouveaux noeuds.
-    iterator insert_after(abstract_iterator & pos, std::initializer_list<T> ilist)
+    template<class iter_tree> iter_tree insert_after(iter_tree pos, std::initializer_list<T> ilist)
         {return insert_after(pos,ilist.begin(),ilist.end());}
 
     //! Déplace le noeud pointé par other avant le noeud pointé par pos dans la fratrie
     //!  sauf si le pointé est la racine,
     //! dans ce cas le noeud est inseré en tant que fils ainé.
-    void move(abstract_iterator & pos, abstract_iterator & other)
+    template<class iter_tree> void move(iter_tree pos, iter_tree other)
         {pos.m_ptr->move(other.m_ptr);}
 
     //! Déplace le noeud pointé par other avant le noeud pointé par pos dans la fratrie
     //!  sauf si le pointé est la racine,
     //! dans ce cas le noeud est inseré en tant que fils benjamin.
-    void move_after(abstract_iterator & pos, abstract_iterator & other)
+    template<class iter_tree> void move_after(iter_tree pos, iter_tree other)
         {pos.m_ptr->move_after(other.m_ptr);}
 
     //! Déplace le noeud pointé par other en fils benjamin du noeud pointé par pos.
-    void move_back(abstract_iterator & pos, abstract_iterator & other)
+    template<class iter_tree> void move_back(iter_tree pos, iter_tree other)
         {pos.m_ptr->move_back(other.m_ptr);}
 
     //! Déplace le noeud pointé par other en fils ainé du noeud pointé par pos.
-    void move_front(abstract_iterator & pos, abstract_iterator & other)
+    template<class iter_tree> void move_front(iter_tree pos, iter_tree other)
         {pos.m_ptr->move_front(other.m_ptr);}
 
     //! Renvoie un arbre contenant seulement une copie du noeud pointé par pos et de ses enfants directs.
-    tree<T> parentWithChilds(const_abstract_iterator & pos);
+    template<class iter_tree> tree<T> parentWithChilds(iter_tree pos);
 
-    //! Ajoute un fils benjamin au noeud pointé par pos de donnée data. Retourne un itérateur sur ce nouveau noeud.
-    iterator push_back(abstract_iterator & pos, const T & data = T()) {
+    //! Ajoute un fils benjamin au noeud pointé par pos de donnée data.iterator Retourne un itérateur sur ce nouveau noeud.
+    template<class iter_tree> iter_tree push_back(iter_tree pos, const T & data = T()) {
         auto * node = new Item(data);
         pos.m_ptr->push_back(node);
         return node;
     }
 
     //! Ajoute un fils benjamin au noeud pointé par pos de donnée data. Retourne un itérateur sur ce nouveau noeud.
-    template<class iter_tree> iterator push_back(iter_tree pos, T && data) {
+    template<class iter_tree> iter_tree push_back(iter_tree pos, T && data) {
         auto * node = new Item(std::move(data));
         pos.m_ptr->push_back(node);
         return node;
@@ -1322,7 +1352,9 @@ public:
 
     //! Ajoute un fils benjamin au noeud pointé par pos correspondant à une copie du noeud (et des descendants) pointé par other.
     //! Retourne un itérateur sur ce nouveau noeud.
-    iterator push_back(abstract_iterator & pos, const const_abstract_iterator & other) {
+    template<class iter_tree, class const_iter_tree,
+             typename = std::enable_if_t<std::is_base_of<const_abstract_iterator,const_iter_tree>::value>>
+                iter_tree push_back(iter_tree pos, const const_iter_tree other) {
         auto * node = new Item(other.item());
         pos.m_ptr->push_back(node);
         return node;
@@ -1338,28 +1370,28 @@ public:
     }
 
     //! Ajoute count fils benjamins au noeud pointé par pos de donnée data. Retourne un itérateur sur le dernier des nouveaux noeuds.
-    iterator push_back(abstract_iterator & pos, size_type count, const T & data)
+    template<class iter_tree> iter_tree push_back(iter_tree pos, size_type count, const T & data)
         {return add(pos, count, data, this->push_back);}
 
     //! Ajoute de nouveaux fils benjamins au noeud pointé par pos de donnée correspondant au la plage d'itérateur [first, last).
     //! Retourne un itérateur sur le dernier des nouveaux noeuds.
-    template<class InputIt> iterator push_back(abstract_iterator & pos, InputIt first, InputIt last)
+    template<class iter_tree, class InputIt> iter_tree push_back(iter_tree pos, InputIt first, InputIt last)
         {return add(pos, first, last, this->push_back);}
 
     //! Ajoute de nouveaux fils benjamins au noeud pointé par pos de donnée contenu dans ilist.
     //! Retourne un itérateur sur le dernier des nouveaux noeuds.
-    iterator push_back(abstract_iterator & pos, std::initializer_list<T> ilist)
+    template<class iter_tree> iter_tree push_back(iter_tree pos, std::initializer_list<T> ilist)
         {return push_back(pos,ilist.begin(),ilist.end());}
 
     //! Ajoute un fils ainé au noeud pointé par pos de donnée data. Retourne un itérateur sur ce nouveau noeud.
-    iterator push_front(abstract_iterator & pos, const T & data = T()) {
+    template<class iter_tree> iter_tree push_front(iter_tree pos, const T & data = T()) {
         auto * node = new Item(data);
         pos.m_ptr->push_front(node);
         return node;
     }
 
     //! Ajoute un fils ainé au noeud pointé par pos de donnée data. Retourne un itérateur sur ce nouveau noeud.
-    iterator push_front(abstract_iterator & pos, T && data) {
+    template<class iter_tree> iter_tree push_front(iter_tree pos, T && data) {
         auto * node = new Item(std::move(data));
         pos.m_ptr->push_front(node);
         return node;
@@ -1367,7 +1399,9 @@ public:
 
     //! Ajoute un fils ainé au noeud pointé par pos correspondant à une copie du noeud (et des descendants) pointé par other.
     //! Retourne un itérateur sur ce nouveau noeud.
-    iterator push_front(abstract_iterator & pos, const const_abstract_iterator & other) {
+    template<class iter_tree, class const_iter_tree,
+             typename = std::enable_if_t<std::is_base_of<const_abstract_iterator,const_iter_tree>::value>>
+                        iter_tree push_front(iter_tree pos, const_iter_tree other) {
         auto * node = new Item(other.item());
         pos.m_ptr->push_front(node);
         return node;
@@ -1375,7 +1409,7 @@ public:
 
     //! Ajoute un fils ainé au noeud pointé par pos correspondant à la racine de tree (avec ses descendants).
     //! Retourne un itérateur sur ce nouveau noeud.
-    iterator push_front(abstract_iterator & pos, tree<T> && tree) {
+    template<class iter_tree> iter_tree push_front(iter_tree pos, tree<T> && tree) {
         auto * node = tree.m_root;
         pos.m_ptr->push_front(node);
         tree.m_root = nullptr;
@@ -1383,17 +1417,17 @@ public:
     }
 
     //! Ajoute count fils ainés au noeud pointé par pos de donnée data. Retourne un itérateur sur le dernier des nouveaux noeuds.
-    iterator push_front(abstract_iterator & pos, size_type count, const T & data)
+    template<class iter_tree> iter_tree push_front(iter_tree pos, size_type count, const T & data)
         {return add(pos, count, data, this->push_front);}
 
     //! Ajoute de nouveaux fils ainés au noeud pointé par pos de donnée correspondant au la plage d'itérateur [first, last).
     //! Retourne un itérateur sur le dernier des nouveaux noeuds.
-    template<class InputIt> iterator push_front(abstract_iterator & pos, InputIt first, InputIt last)
+    template<class iter_tree, class InputIt> iter_tree push_front(iter_tree pos, InputIt first, InputIt last)
         {return add(pos, first, last, this->push_front);}
 
     //! Ajoute de nouveaux fils ainés au noeud pointé par pos de donnée contenu dans ilist.
     //! Retourne un itérateur sur le dernier des nouveaux noeuds.
-    iterator push_front(abstract_iterator & pos, std::initializer_list<T> ilist)
+    template<class iter_tree> iter_tree push_front(iter_tree pos, std::initializer_list<T> ilist)
         {return push_front(pos,ilist.begin(),ilist.end());}
 
     //! Affectation par recopie.
@@ -1452,6 +1486,17 @@ public:
     template<class U> size_type removeLeafIfData(U predicat) noexcept
         {return removeLeafIf([&predicat](const const_abstract_iterator & iter)->bool{return predicat(*iter);});}
 
+    //! Remplace le noeud old par le noeud new ainsi que leur déscendants.
+    //! Le noeud old et ses descendants, privée éventuellemment de new de ses descendants, sont détruits.
+    //! Si old pointe sur la racine, la racine est remplacé par le noeud new.
+    //! Attention new ne doit pas être la racine d'un arbre.
+    template<class iter_tree> iter_tree replace(iter_tree oldIter, iter_tree newIter) noexcept {
+        if(oldIter.root())
+            m_root = newIter.m_ptr();
+        oldIter.m_ptr->replace(newIter->m_ptr);
+        return newIter;
+    }
+
     //! Teste si l'arbre est réduit à sa racine (valide).
     bool rootLeaf() const noexcept
         {return m_root && m_root->leaf();}
@@ -1465,7 +1510,7 @@ public:
         {std::swap(m_root,other.m_root);}
 
     //! Echange les positions des noeuds pointé par pos1 et pos2, ainsi que leurs descendant.
-    void swap(abstract_iterator & pos1, abstract_iterator & pos2) noexcept;
+    template<class iter_tree> void swap(iter_tree pos1, iter_tree pos2) noexcept;
 
 protected:
     //! Constructeur, prend le neud transmis pour racine (doit être créer dynamiquement et ne doit pas avoir de parent).
@@ -1474,18 +1519,18 @@ protected:
 
     //! Ajoute count nouveaux noeuds de donnée data au noeud pointé par pos selon la méthode ajout.
     //! Renvoie un pointeur sur le dernier noeud créé.
-    template<class Ajout> iterator add(abstract_iterator & pos, size_type count, const T & data, Ajout ajout);
+    template<class iter_tree, class Ajout> iter_tree add(iter_tree pos, size_type count, const T & data, Ajout ajout);
 
     //! Ajoute de nouveaux noeuds de donnée correspondant au la plage d'itérateur [first, last)
     //! au noeud pointé par pos selon la méthode ajout.
     //! Renvoie un pointeur sur le dernier noeud créé.
-    template<class InputIt, class Ajout> iterator add(abstract_iterator & pos, InputIt first, InputIt last, Ajout ajout);
+    template<class iter_tree, class InputIt, class Ajout> iter_tree add(iter_tree pos, InputIt first, InputIt last, Ajout ajout);
 };
 
 //////////////// tree //////////////////
 
-template<class T> template<class Ajout> typename tree<T>::iterator
-                                            tree<T>::add(abstract_iterator & pos, size_type count, const T & data, Ajout ajout) {
+template<class T> template<class iter_tree, class Ajout> iter_tree
+                        tree<T>::add(iter_tree pos, size_type count, const T & data, Ajout ajout) {
     abstract_iterator node = pos;
     while(count) {
         node = ajout(node,data);
@@ -1494,8 +1539,8 @@ template<class T> template<class Ajout> typename tree<T>::iterator
     return node.m_ptr;
 }
 
-template<class T> template<class InputIt, class Ajout> typename tree<T>::iterator
-                        tree<T>::add(abstract_iterator & pos, InputIt first, InputIt last, Ajout ajout) {
+template<class T> template<class iter_tree, class InputIt, class Ajout> iter_tree
+                        tree<T>::add(iter_tree pos, InputIt first, InputIt last, Ajout ajout) {
     abstract_iterator node = pos;
     while(first != last) {
         node = ajout(node,*first);
@@ -1504,7 +1549,7 @@ template<class T> template<class InputIt, class Ajout> typename tree<T>::iterato
     return node.m_ptr;
 }
 
-template<class T> typename tree<T>::iterator tree<T>::erase(abstract_iterator & pos) noexcept {
+template<class T> template<class iter_tree> iter_tree tree<T>::erase(iter_tree pos) noexcept {
     if(pos.root()) {
         clear();
         return pos;
@@ -1516,7 +1561,7 @@ template<class T> typename tree<T>::iterator tree<T>::erase(abstract_iterator & 
     }
 }
 
-template<class T> tree<T> tree<T>::parentWithChilds(const_abstract_iterator & pos) {
+template<class T> template<class iter_tree> tree<T> tree<T>::parentWithChilds(iter_tree pos) {
     tree<T> tree(*pos);
     auto root = tree.begin();
     if(!pos.leaf()) {
@@ -1592,7 +1637,7 @@ template<class T> template<class U> typename tree<T>::size_type tree<T>::removeL
     return comp;
 }
 
-template<class T> void tree<T>::swap(abstract_iterator & pos1, abstract_iterator & pos2) noexcept {
+template<class T> template<class iter_tree> void tree<T>::swap(iter_tree pos1, iter_tree pos2) noexcept {
     if(pos1.root() || pos2.root()){
         std::swap(pos1.m_ptr->m_data,pos2.m_ptr->m_data);
         for(auto i = pos1.beginChild(); i; ++i)
@@ -1790,6 +1835,24 @@ template<class T> void tree<T>::Item::push_front(Item * child) noexcept {
         m_firstChild = m_firstChild->m_prevBrother = child;
     else
         m_firstChild = m_lastChild = child;
+}
+
+template<class T> void tree<T>::Item::replace(Item * node) noexcept{
+    node->changeHeredite(m_parent);
+    if(m_parent) {
+        if(m_prevBrother)
+            m_prevBrother->m_nextBrother = node;
+        else
+            m_parent->m_firstChild = node;
+        if(m_nextBrother)
+            m_nextBrother->m_prevBrother = node;
+        else
+            m_parent->m_lastChild = node;
+    }
+    node->m_prevBrother = m_prevBrother;
+    node->m_nextBrother= m_nextBrother;
+    m_parent = nullptr;
+    delete this;
 }
 
 template<class T> typename tree<T>::size_type tree<T>::Item::size() const noexcept {

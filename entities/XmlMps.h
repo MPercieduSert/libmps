@@ -47,6 +47,10 @@ public:
     XmlElement(const QString & name)
         {m_name = name;}
 
+    //! Constructeur.
+    XmlElement(const char * name)
+        {m_name = name;}
+
     //! Renvoie les attributs du noeud sous la forme d'un map<clé,valeur>.
     const std::map<QString,QString> & attributes() const
         {return m_attributes;}

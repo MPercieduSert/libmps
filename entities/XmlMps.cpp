@@ -19,7 +19,7 @@ conteneurMPS::tree<XmlElement>::prevsuiv_iterator XmlDoc::seek(const QString & c
             else {
                 controle = false;
                 while(i != list.cend()) {
-                    iter = push_back(iter,*i);
+                    iter = emplace_back(iter,std::move(*i));
                     ++i;
                 }
             }
@@ -41,11 +41,6 @@ QString XmlDoc::toString() const
             auto elt = *iter;
             string.append(tab).append(elt.name()).append("\n");
             tab.prepend("-");
-//            if(elt.hasAttributes())
-//                for(auto i = elt.attributes().cbegin(); i != elt.attributes().cend(); ++i)
-//                    writeAttribute(i->first,i->second);
-//            if(elt.hasText())
-//                writeCharacters(elt.text());
         }
         else
             tab.remove(0,1);
@@ -173,7 +168,7 @@ std::vector<varAtts> XmlReader::getVarsAtts(QString nameVar, const std::map<QStr
                 for(QXmlStreamAttributes::const_iterator j = atts.constBegin(); j != atts.constEnd(); ++j)
                     var.second.insert({j->name().toString(),j->value().toString()});
                 var.first = readElementText();
-                varsAtts.push_back(var);
+                varsAtts.push_back(std::move(var));
             }
             else
                 skipCurrentElement();

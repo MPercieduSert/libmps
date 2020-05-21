@@ -18,9 +18,9 @@ void PredefFenPrincipale::addMenuBdd(){
     vec.reserve(m_noyau->bdd().nbrEntity());
     for(szt i = 0; i < m_noyau->bdd().nbrEntity(); ++i) {
         if(m_noyau->bdd().managers().valide(i)) {
-            vec.push_back({i,m_noyau->bdd().managers().info(i).name()});
+            vec.emplace_back(i,m_noyau->bdd().managers().info(i).name());
             if(!m_noyau->bdd().managers().get(i).infoArbre().name().isEmpty())
-                vec.push_back({-i,m_noyau->bdd().managers().get(i).infoArbre().name()});
+                vec.emplace_back(-i,m_noyau->bdd().managers().get(i).infoArbre().name());
         }
     }
     std::sort(vec.begin(),vec.end(),

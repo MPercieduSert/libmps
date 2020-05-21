@@ -68,7 +68,7 @@ template<class Ent> bool TreeModelEditEntity<Ent>::insertRows(int row, int count
             beginInsertRows(parent,row,row);
                 typename cmps::tree<Ent>::iterator iter = getIter(parent);
                 iter.toChild(row);
-                m_tree.insert(iter,entity);
+                m_tree.insert(iter,std::move(entity));
             endInsertRows();
             ++row;
             ++comp;

@@ -223,48 +223,48 @@ fichierMPS::XmlDoc Bdd::schemaXmlForImport() const{
     iter->setName("xs:schema");
     iter->setAttribut("xmlns:xs","http://www.w3.org/2001/XMLSchema");
     iter->setAttribut("elementFormDefault","qualified");
-    iter = schema.push_back(iter,XmlElement("xs:element"));
+    iter = schema.emplace_back(iter,"xs:element");
     iter->setAttribut("name","entities");
-    iter = schema.push_back(iter,XmlElement("xs:complexType"));
-    iter = schema.push_back(iter,XmlElement("xs:choice"));
+    iter = schema.emplace_back(iter,"xs:complexType");
+    iter = schema.emplace_back(iter,"xs:choice");
     iter->setAttribut("maxOccurs","unbounded");
     for (szt i = 0; i <nbrEntity(); ++i) {
         if(managers().valide(i)) {
-            auto iter_entity = schema.push_back(iter,XmlElement("xs:element"));
+            auto iter_entity = schema.emplace_back(iter,"xs:element");
             iter_entity->setAttribut("ref",managers().info(i).name());
         }
     }
     iter.toRoot();
     for (szt i = 0; i < nbrEntity(); ++i) {
         if(managers().valide(i)) {
-            auto iter_entity = schema.push_back(iter,XmlElement("xs:element"));
+            auto iter_entity = schema.emplace_back(iter,"xs:element");
             iter_entity->setAttribut("name",managers().info(i).name());
-            iter_entity = schema.push_back(iter_entity,XmlElement("xs:complexType"));
-            iter_entity = schema.push_back(iter_entity,XmlElement("xs:all"));
+            iter_entity = schema.emplace_back(iter_entity,"xs:complexType");
+            iter_entity = schema.emplace_back(iter_entity,"xs:all");
             auto namesAtt = managers().get(i).namesAttributs();
             for (szt j = 1; j != namesAtt.size(); ++j) {
-                auto iter_att = schema.push_back(iter_entity,XmlElement("xs:element"));
+                auto iter_att = schema.emplace_back(iter_entity,"xs:element");
                 iter_att->setAttribut("name",namesAtt.at(j));
                 auto iter_key = managers().info(i).foreignKeyName().find(j);
                 if(iter_key != managers().info(i).foreignKeyName().cend()){
                     if(iter_key->second.isEmpty()) {
-                        iter_att = schema.push_back(iter_att,XmlElement("xs:complexType"));
-                        iter_att = schema.push_back(iter_att,XmlElement("xs:element"));
+                        iter_att = schema.emplace_back(iter_att,"xs:complexType");
+                        iter_att = schema.emplace_back(iter_att,"xs:element");
                         iter_att->setAttribut("ref","one_Unique");
                     }
                     else {
                         auto k = managers().find(iter_key->second);
                         auto str = iter_key->second;
                         if(managers().info(k).nbrSetUnique() != 0) {
-                            iter_att = schema.push_back(iter_att,XmlElement("xs:complexType"));
+                            iter_att = schema.emplace_back(iter_att,"xs:complexType");
                             if(managers().info(k).nbrSetUnique() == 1) {
-                                iter_att = schema.push_back(iter_att,XmlElement("xs:element"));
+                                iter_att = schema.emplace_back(iter_att,"xs:element");
                                 iter_att->setAttribut("ref",iter_key->second + "_Unique");
                             }
                             else {
-                                iter_att = schema.push_back(iter_att,XmlElement("xs:choice"));
+                                iter_att = schema.emplace_back(iter_att,"xs:choice");
                                 for(szt l = 0; l != managers().info(k).nbrSetUnique(); ++l) {
-                                    auto iter_unique = schema.push_back(iter_att,XmlElement("xs:element"));
+                                    auto iter_unique = schema.emplace_back(iter_att,"xs:element");
                                     iter_unique->setAttribut("ref",iter_key->second + "_Unique"+QString::number(l));
                                 }
                             }
@@ -275,7 +275,7 @@ fichierMPS::XmlDoc Bdd::schemaXmlForImport() const{
             iter_entity.toParent();
             auto restriction = managers().get(i).restriction();
             for (auto iter_restriction = restriction.cbegin(); iter_restriction != restriction.cend(); ++iter_restriction) {
-                auto iter_rest = schema.push_back(iter_entity,XmlElement("xs:attribute"));
+                auto iter_rest = schema.emplace_back(iter_entity,"xs:attribute");
                 iter_rest->setAttribut("name",restToStr.at(*iter_restriction));
             }
         }
@@ -284,18 +284,18 @@ fichierMPS::XmlDoc Bdd::schemaXmlForImport() const{
     for (szt i = 0; i < nbrEntity(); ++i){
         if(managers().valide(i)) {
             for(szt j = 0; j != managers().info(i).nbrSetUnique(); ++j) {
-                auto iter_unique = schema.push_back(iter,XmlElement("xs:element"));
+                auto iter_unique = schema.emplace_back(iter,"xs:element");
                 iter_unique->setAttribut("name",managers().info(i).name()  + "_Unique"+QString::number(j));
-                iter_unique = schema.push_back(iter_unique,XmlElement("xs:complexType"));
+                iter_unique = schema.emplace_back(iter_unique,"xs:complexType");
                 auto attUnique = managers().info(i).attributUnique(j);
                 if(attUnique.size() == 1){
-                    iter_unique = schema.push_back(iter_unique,XmlElement("xs:element"));
+                    iter_unique = schema.emplace_back(iter_unique,"xs:element");
                     iter_unique->setAttribut("name",managers().get(i).namesAttributs().at(attUnique.at(0)));
                 }
                 else {
-                    iter_unique = schema.push_back(iter_unique,XmlElement("xs:all"));
+                    iter_unique = schema.emplace_back(iter_unique,"xs:all");
                     for (auto iter_num = attUnique.cbegin(); iter_num != attUnique.cend(); ++iter_num) {
-                        auto iter_att = schema.push_back(iter_unique,XmlElement("xs:element"));
+                        auto iter_att = schema.emplace_back(iter_unique,"xs:element");
                         iter_att->setAttribut("name",managers().get(i).namesAttributs().at(*iter_num));
                     }
                 }
