@@ -19,7 +19,7 @@ conteneurMPS::tree<XmlElement>::prevsuiv_iterator XmlDoc::seek(const QString & c
             else {
                 controle = false;
                 while(i != list.cend()) {
-                    iter = push_back(iter,XmlElement(*i));
+                    iter = push_back(iter,*i);
                     ++i;
                 }
             }

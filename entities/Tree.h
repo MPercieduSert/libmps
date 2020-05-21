@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <list>
 #include <stdexcept>
+#include <type_traits>
 #include <utility>
 
 #define TREE_ITER_COMMUN(ITER)protected: \
@@ -1226,7 +1227,9 @@ public:
     //! Insert une copie du noeud (et des descendant) pointé par other avant le noeud pointé par pos dans la fratrie
     //!  sauf si le pointé est la racine,
     //! dans ce cas le nouveau noeud est inseré en tant que fils ainé. Retourne un itérateur sur ce nouveau noeud.
-    template<class iter_tree, class const_iter_tree> iter_tree insert(iter_tree pos, const_iter_tree  other) {
+    template<class iter_tree, class const_iter_tree,
+             typename = std::enable_if_t<std::is_base_of<const_abstract_iterator,const_iter_tree>::value>>
+                iter_tree insert(iter_tree pos, const_iter_tree  other) {
         auto * node = new Item(other.item());
         pos.m_ptr->insert(node);
         return node;
@@ -1278,7 +1281,9 @@ public:
     //! Insert une copie du noeud (et des descendants) pointé par other après le noeud pointé par pos dans la fratrie
     //!  sauf si le pointé est la racine,
     //! dans ce cas le nouveau noeud est inseré en tant que fils benjamin. Retourne un itérateur sur ce nouveau noeud.
-    template<class iter_tree, class const_iter_tree> iter_tree insert_after(iter_tree pos, const_iter_tree other) {
+    template<class iter_tree, class const_iter_tree,
+                typename = std::enable_if_t<std::is_base_of<const_abstract_iterator,const_iter_tree>::value>>
+                    iter_tree insert_after(iter_tree pos, const_iter_tree other) {
         auto * node = new Item(other.item());
         pos.m_ptr->insert_after(node);
         return node;
@@ -1350,7 +1355,9 @@ public:
 
     //! Ajoute un fils benjamin au noeud pointé par pos correspondant à une copie du noeud (et des descendants) pointé par other.
     //! Retourne un itérateur sur ce nouveau noeud.
-    template<class iter_tree, class const_iter_tree > iter_tree push_back(iter_tree pos, const const_iter_tree other) {
+    template<class iter_tree, class const_iter_tree,
+             typename = std::enable_if_t<std::is_base_of<const_abstract_iterator,const_iter_tree>::value>>
+                iter_tree push_back(iter_tree pos, const const_iter_tree other) {
         auto * node = new Item(other.item());
         pos.m_ptr->push_back(node);
         return node;
@@ -1395,7 +1402,9 @@ public:
 
     //! Ajoute un fils ainé au noeud pointé par pos correspondant à une copie du noeud (et des descendants) pointé par other.
     //! Retourne un itérateur sur ce nouveau noeud.
-    template<class iter_tree, class const_iter_tree> iter_tree push_front(iter_tree pos, const_iter_tree other) {
+    template<class iter_tree, class const_iter_tree,
+             typename = std::enable_if_t<std::is_base_of<const_abstract_iterator,const_iter_tree>::value>>
+                        iter_tree push_front(iter_tree pos, const_iter_tree other) {
         auto * node = new Item(other.item());
         pos.m_ptr->push_front(node);
         return node;
