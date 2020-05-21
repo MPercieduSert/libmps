@@ -105,8 +105,7 @@ namespace conteneurMPS {
 /*! \ingroup groupeConteneur
  *  \brief Cette classe represente un arbre dont les noeuds sont constitués par des Item<T>.
  *
- * Cette classe represente un arbre. Elle est constituée de la racine d'un arbre dont les noeuds sont constitués par des Item<T>
- * et d'un itérateur sur cet arbre jouant le role d'un curseur, ce qui munit l'arbre d'un noeud courant.
+ * Cette classe represente un arbre. Elle est constituée de la racine d'un arbre dont les noeuds sont constitués par des Item<T>.
  */
 template<class T> class tree {
 public:
@@ -161,13 +160,10 @@ protected:
         Item(const T & data) noexcept(noexcept(T(data)))
             : m_data(data) {}
 
-        //! Constructeur avec une donnée associée au noeud. Par défaut un noeud est la racine d'un arbre.
-        Item(T && data) noexcept(noexcept(T(std::move(data))))
-            : m_data(std::move(data)) {}
-
-//        //! Constructeur de donné en place.
-//        template< class... Args > Item(Args && ... args)
-//            : m_data(std::forward<Args>(args)...) {}
+        //! Constructeur de donné en place.
+        template< class... Args, typename = std::enable_if_t<std::is_convertible<T, Args...>::value
+                                                             && !std::is_same<Item, Args...>::value>>
+                    Item(Args && ... args) : m_data(std::forward<Args>(args)...) {}
 
         //! Constructeur de recopie. Recopie également récursivement l'ensemble des descendants,
         //! T doit posséder un constructeur à partie de U.
@@ -1152,37 +1148,37 @@ public:
     bool empty() const noexcept
         {return m_root;}
 
-//    //! Insert un nouveau noeud de donnée crée en place à partir de args
-//    //! avant le noeud pointé par pos dans la fratrie sauf si le pointé est la racine,
-//    //! dans ce cas le nouveau noeud est inseré en tant que fils ainé. Retourne un itérateur sur ce nouveau noeud.
-//    template< class... Args > iterator emplace( abstract_iterator & pos, Args&&... args ) {
-//        auto * node = new Item(std::forward<Args>(args)...);
-//        pos.m_ptr->insert(node);
-//        return node;
-//    }
+    //! Insert un nouveau noeud de donnée crée en place à partir de args
+    //! avant le noeud pointé par pos dans la fratrie sauf si le pointé est la racine,
+    //! dans ce cas le nouveau noeud est inseré en tant que fils ainé. Retourne un itérateur sur ce nouveau noeud.
+    template<class iter_tree, class... Args> iter_tree emplace(iter_tree pos, Args&&... args ) {
+        auto * node = new Item(std::forward<Args>(args)...);
+        pos.m_ptr->insert(node);
+        return node;
+    }
 
-//    //! Insert un nouveau noeud de donnée crée en place à partir de args
-//    //! après le noeud pointé par pos dans la fratrie sauf si le pointé est la racine,
-//    //! dans ce cas le nouveau noeud est inseré en tant que fils ainé. Retourne un itérateur sur ce nouveau noeud.
-//    template< class... Args > iterator emplace_after( abstract_iterator & pos, Args&&... args ) {
-//        auto * node = new Item(std::forward<Args>(args)...);
-//        pos.m_ptr->insert_after(node);
-//        return node;
-//    }
+    //! Insert un nouveau noeud de donnée crée en place à partir de args
+    //! après le noeud pointé par pos dans la fratrie sauf si le pointé est la racine,
+    //! dans ce cas le nouveau noeud est inseré en tant que fils ainé. Retourne un itérateur sur ce nouveau noeud.
+    template<class iter_tree, class... Args> iter_tree emplace_after(iter_tree pos, Args&&... args ) {
+        auto * node = new Item(std::forward<Args>(args)...);
+        pos.m_ptr->insert_after(node);
+        return node;
+    }
 
-//    //! Insert un fils benjamin de donnée crée en place à partir de args. Retourne un itérateur sur ce nouveau noeud.
-//    template< class... Args > iterator emplace_back( abstract_iterator & pos, Args&&... args ) {
-//        auto * node = new Item(std::forward<Args>(args)...);
-//        pos.m_ptr->push_back(node);
-//        return node;
-//    }
+    //! Insert un fils benjamin de donnée crée en place à partir de args. Retourne un itérateur sur ce nouveau noeud.
+    template<class iter_tree, class... Args> iter_tree emplace_back(iter_tree pos, Args&&... args ) {
+        auto * node = new Item(std::forward<Args>(args)...);
+        pos.m_ptr->push_back(node);
+        return node;
+    }
 
-//    //! Insert un fils ainé de donnée crée en place à partir de args. Retourne un itérateur sur ce nouveau noeud.
-//    template< class... Args > iterator emplace_front( abstract_iterator & pos, Args&&... args ) {
-//        auto * node = new Item(std::forward<Args>(args)...);
-//        pos.m_ptr->push_front(node);
-//        return node;
-//    }
+    //! Insert un fils ainé de donnée crée en place à partir de args. Retourne un itérateur sur ce nouveau noeud.
+    template<class iter_tree, class... Args> iter_tree emplace_front(iter_tree pos, Args&&... args ) {
+        auto * node = new Item(std::forward<Args>(args)...);
+        pos.m_ptr->push_front(node);
+        return node;
+    }
 
     //! Crée un itérateur initialisé sur le noeud virtuel nul. Cette fonction permet la compatibilité avec les algorithmes standards.
     //! Utiliser de préférence la conversion de l'itérateur en booléen.
@@ -1256,6 +1252,7 @@ public:
     //! dans ce cas les nouveaux noeuds sont inserés en tant que fils ainé. Retourne un itérateur sur le premier des nouveaux noeuds.
     template<class iter_tree, class InputIt> iter_tree insert(iter_tree pos, InputIt first, InputIt last)
         {return add(pos, first, last, this->insert);}
+
     //! Insert de nouveaux noeuds de donnée contenu dans ilist
     //! avant le noeud pointé par pos dans la fratrie sauf si le noeud pointé est la racine,
     //! dans ce cas les nouveaux noeuds sont inserés en tant que fils ainé. Retourne un itérateur sur le premier des nouveaux noeuds.
