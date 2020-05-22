@@ -161,8 +161,7 @@ protected:
             : m_data(data) {}
 
         //! Constructeur de donné en place.
-        template< class... Args, typename = std::enable_if_t<std::is_convertible<T, Args...>::value
-                                                             && !std::is_same<Item, Args...>::value>>
+        template< class... Args, typename = std::enable_if_t<std::is_convertible<T, Args...>::value>>
                     Item(Args && ... args) : m_data(std::forward<Args>(args)...) {}
 
         //! Constructeur de recopie. Recopie également récursivement l'ensemble des descendants,
