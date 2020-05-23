@@ -314,8 +314,12 @@ public:
 
 protected:
     //! Redimension en ajoutant des pointeur nul.
-    void resizeNull(size_type count)
-        {Vptr::resize(count,nullptr);}
+    void resizeNull(size_type count) {
+        if(count < size())
+            for (auto iter = std::next(Vptr::cbegin(),count); iter != Vptr::cend(); ++iter)
+                delete *iter;
+        Vptr::resize(count,nullptr);
+    }
 };
 
 //////////////////// VectPtr //////////////////
@@ -363,6 +367,8 @@ template<class T> VectorPtr<T> & VectorPtr<T>::operator =(const ListPtr<T> & lis
         for(auto j = liste.cbegin(); j != liste.cend(); ++i, ++j)
             *i = new T(**j);
     }
+    else
+        clear();
     return *this;
 }
 
@@ -374,6 +380,8 @@ template<class T> VectorPtr<T> & VectorPtr<T>::operator =(ListPtr<T> && liste) n
             *i = *j;
         liste.clearPtr();
     }
+    else
+        clear();
     return *this;
 }
 
@@ -384,6 +392,8 @@ template<class T> VectorPtr<T> & VectorPtr<T>::operator =(const VectorPtr<T> & v
         for(auto j = vector.cbegin(); j != vector.cend(); ++j, ++i)
             *i = new T(*j);
     }
+    else
+        clear();
     return *this;
 }
 
@@ -395,6 +405,8 @@ template<class T> VectorPtr<T> & VectorPtr<T>::operator =(VectorPtr<T> && vector
             *i = *j;
         vector.Vptr::clear();
     }
+    else
+        clear();
     return *this;
 }
 
