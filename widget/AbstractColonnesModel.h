@@ -43,6 +43,9 @@ public:
                       UIntColonne = findNodeModel::UIntNodeType};
                       //NbrTypeColonne};
 
+    //! Role des donnés du model.
+    enum itemDataRole {IdRole = 0x0111};
+
     //! État des lignes.auto & e1 =static_cast<const Eleve &>(m_data.front()[row1]);
     enum etat {Sauver,
                Valide,
@@ -128,7 +131,7 @@ public:
         //!Destructeur.
         virtual ~AbstractTableau() = default;
 
-        // Ajoute count lignes au tableau.
+        //! Ajoute count lignes au tableau.
         virtual void add(szt /*count*/) {}
 
         //! Comparaison d'égalité de deux ligne.
@@ -142,6 +145,9 @@ public:
 
         //! Teste si la ligne correspond à une donnée interne.
         virtual bool existsInternalData(szt /*ligne*/) const {return false;}
+
+        //! Hydrate la donnée d'une ligne du tableau et retourne le succés de l'opération.
+        virtual void hydrate(szt /*ligne*/) {}
 
         //! Fabrique une colonne lié aux données du tableau.
         virtual std::unique_ptr<AbstractColonne> makeColonne(const NewColonneInfo & info) = 0;
@@ -324,16 +330,16 @@ protected slots:
 template<class Read, class Write, class Vec> class BaseColonne : public AbstractColonnesModel::AbstractColonne {
 protected:
     QVariant (*m_get)(Read, int);                   //!< Fonction lisant la donnée du model.
-    bool (*m_set)(const QVariant &, Write, int);    //!< Fonction modifiant la donnée du model.
+    bool (*m_set)(Write,const QVariant &,int);    //!< Fonction modifiant la donnée du model.
     QVariant (*m_test)(Read);                       //!< Fonction lisant la donnée du model pour les tests de recherche.
     Vec & m_vec;                                    //!< Référence sur le vecteur de donnée.
 public:
     //! Constructeur.
     BaseColonne(const QString & name, Qt::ItemFlags flags, int type,
                  Vec & vec,
-                 QVariant (*get)(Read, int),
+                 QVariant (*get)(Read,int),
                  QVariant (*test)(Read),
-                 bool (*set)(const QVariant &, Write, int))
+                 bool (*set)(Write,const QVariant &,int))
         : AbstractColonne(name,flags,type), m_get(get), m_set(set), m_test(test), m_vec(vec) {}
 
     //! Accesseur de la donnée d'indice id dans la colonne.
@@ -346,12 +352,45 @@ public:
 
     //! Mutateur de la donnée d'indice id dans la colonne.
     bool setData(szt id, const QVariant & value,  int role) override
-        {return m_set(value,m_vec[id],role);}
+        {return m_set(m_vec[id],value,role);}
 };
 
 template<class T> using VectorRefColonne = BaseColonne<const T&,T&,std::vector<T>>;
 template<class T> using VectorValColonne = BaseColonne<T,T,std::vector<T>>;
 template<class T> using VectorPtrColonne = BaseColonne<const T&,T&, conteneurMPS::VectorPtr<T>>;
+
+/*! \ingroup groupeModel
+ * \brief Classe template générique d'une colonne avec identifiant.
+ */
+template<class Read, class Write, class Vec> class IdBaseColonne : public BaseColonne<Read,Write,Vec> {
+protected:
+    using Base = BaseColonne<Read,Write,Vec>;
+    using Base::m_vec;
+public:
+    //! Constructeur.
+    //using BaseColonne<Read,Write,Vec>::BaseColonne;
+    using Base::BaseColonne;
+
+    //! Accesseur de la donnée d'indice id dans la colonne.
+    QVariant data(szt id, int role) const override {
+        if(role == AbstractColonnesModel::IdRole)
+            return m_vec[id].id();
+        return Base::data(id,role);
+    }
+
+
+    //! Mutateur de la donnée d'indice id dans la colonne.
+    bool setData(szt id, const QVariant & value,  int role) override {
+        if(role == AbstractColonnesModel::IdRole) {
+            m_vec[id].setId(value.toUInt());
+            return true;
+        }
+        return Base::setData(id,value,role);}
+};
+
+template<class T> using IdVectorRefColonne = IdBaseColonne<const T&,T&,std::vector<T>>;
+template<class T> using IdVectorValColonne = IdBaseColonne<T,T,std::vector<T>>;
+template<class T> using IdVectorPtrColonne = IdBaseColonne<const T&,T&, conteneurMPS::VectorPtr<T>>;
 
 /*! \ingroup groupeModel
  * \brief Classe Abstraite mère des colonnes de type booléen.
@@ -390,10 +429,10 @@ public:
 /*! \ingroup groupeModel
  * \brief Classe mère des colonnes de type booléen.
  */
-template<class Read, class Write, class Vec> class BoolColonne :public AbstractBoolColonne  {
+template<class Read, class Write, class Vec> class BoolColonne : public AbstractBoolColonne  {
 protected:
     bool (*m_get)(Read);           //!< Fonction lisant la donnée du model.
-    void (*m_set)(bool,Write);     //!< Fonction modifiant la donnée du model.
+    void (*m_set)(Write,bool);     //!< Fonction modifiant la donnée du model.
     Vec & m_vec;                        //!< Référence sur le vecteur de donnée.
 
 public:
@@ -401,7 +440,7 @@ public:
     BoolColonne(const QString & name, Qt::ItemFlags flags, int type,
                 Vec & vec,
                 bool (*get)(Read),
-                void (*set)(bool, Write),
+                void (*set)(Write,bool),
                 const QString & trueLabel = QString(), const QString & falseLabel = QString())
         : AbstractBoolColonne(name,flags,type,trueLabel,falseLabel),
           m_get(get), m_set(set), m_vec(vec) {}
@@ -422,7 +461,7 @@ public:
     //! Mutateur de la donnée d'indice id dans la colonne.
     bool setData(szt id, const QVariant & value,  int role) override {
         if(role == Qt::CheckStateRole) {
-            m_set(value.toBool(),m_vec[id]);
+            m_set(m_vec[id],value.toBool());
             return true;}
         return false;
     }
@@ -460,6 +499,26 @@ public:
     //! Supprime les lignes [first,last) des données du model.
     void erase(szt first, szt last) override;
 
+    //! Accesseur de la donnée d'une ligne.
+    const T & internalData(szt ligne) const
+        {return m_vec.at(ligne);}
+
+    //! Accesseur de la donnée d'une ligne.
+    T & internalData(szt ligne)
+        {return m_vec.at(ligne);}
+
+    //! Mutateur de la donnée d'une ligne.
+    void setInternalData(szt ligne, const T & data)
+        {m_vec.at(ligne) = data;}
+
+    //! Mutateur du vecteur de donné.
+    void setVecData(const Vec & data)
+        {m_vec = data;}
+
+    //! Mutateur du vecteur de donné.
+    void setVecData(Vec && data)
+        {m_vec = std::move(data);}
+
     //! Taille (nombre de lignes).
     szt size() const override {return m_vec.size();}
 };
@@ -471,7 +530,7 @@ public:
     //! Constructeur.
     using AbstractVecTableau<T,std::vector<T>>::AbstractVecTableau;
 
-    // Ajoute count lignes au tableau.
+    //! Ajoute count lignes au tableau.
     void add(szt count) override {m_vec.resize(m_vec.size() + count);}
 
     //! Fabrique une colonne lié aux données du tableau.
@@ -490,7 +549,7 @@ public:
     //! Constructeur.
     using AbstractVecTableau<Ent,conteneurMPS::VectorPtr<Ent>>::AbstractVecTableau;
 
-    // Ajoute count lignes au tableau.
+    //! Ajoute count lignes au tableau.
     void add(szt count) override {m_vec.resize(m_vec.size() + count, [](){return new Ent();});}
 
     //! Teste si la ligne correspond à une donnée interne.
@@ -523,19 +582,22 @@ public:
     template<class Factory> AbstractBddVectorEntTableau(bddMPS::Bdd & bdd, szt size, Factory factory)
         : AbstractVectorEntTableau<Ent>(size,factory), m_bdd(bdd) {}
 
+    //! Hydrate la donnée d'une ligne du tableau et retourne le succés de l'opération.
+    void hydrate(szt ligne) override {m_bdd.get(m_vec[ligne]);}
+
     //! Teste si la ligne est nouvelle ou modifiée.
-    bool newOrModif(szt ligne) const {return m_vec[ligne].isNew() || !m_bdd.sameInBdd(m_vec[ligne]);}
+    bool newOrModif(szt ligne) const override {return m_vec[ligne].isNew() || !m_bdd.sameInBdd(m_vec[ligne]);}
 
     //! Supprime les données correspondant à la ligne dans la base de donnée.
     //! Ne doit pas supprimer de ligne de donnée du model.
-    bool removeInternalData(szt ligne)  {return m_bdd.del(m_vec[ligne]);}
+    bool removeInternalData(szt ligne) override {return m_bdd.del(m_vec[ligne]);}
 
     //! Sauve la ligne dans la base de donnée.
-    void save(szt ligne) {m_bdd.save(m_vec[ligne]);}
+    void save(szt ligne) override {m_bdd.save(m_vec[ligne]);}
 };
 
 ////////////////////////////////////////////////////////// CompositionTableau /////////////////////////////////////
-//! Macro de définition des menbres test de CompositionTableaux
+//! Macro de définition des menbres test de CompositionTableau
 #define TEST_COMPOSITION_TABLEAUX(VECBOOL,MEMBRE){auto iterTableau = m_tableaux.cbegin(); \
     auto iterTest = VECBOOL.cbegin(); \
     while(iterTableau != m_tableaux.cend() && (!*iterTest || (*iterTableau)->MEMBRE)){ \
@@ -546,23 +608,24 @@ public:
 /*! \ingroup groupeModel
  * \brief Classe de composition paramétrée de plusieurs tableaux en un.
  */
-class CompositionTableaux : public AbstractColonnesModel::AbstractTableau {
+class CompositionTableau : public AbstractColonnesModel::AbstractTableau {
 protected:
     std::vector<std::unique_ptr<AbstractTableau>> m_tableaux;   //! Vecteur des pointeurs de tableau.
     std::vector<bool> m_egalActif;                              //! Vecteur de l'activation du test d'égalité pour un tableau.
     std::vector<bool> m_existsActif;                            //! Vecteur de l'activation du test d'existence pour un tableau.
+    std::vector<bool> m_hydrateActif;                           //! Vecteur de l'activation de l'hydratation pour un tableau.
     std::vector<bool> m_newOrModifActif;                        //! Vecteur de l'activation du test newOrModif pour un tableau.
     std::vector<bool> m_removeActif;                    //! Vecteur de l'activation de suppresion des données internes pour un tableau.
     std::vector<bool> m_saveActif;                      //! Vecteur de l'activation de sauvegarde pour un tableau.
     std::vector<bool> m_valideActif;                    //! Vecteur de l'activation du test de validité pour un tableau.
 public:
     //! Constructeur.
-    CompositionTableaux() = default;
+    CompositionTableau() = default;
 
     //!Destructeur.
-    ~CompositionTableaux() override = default;
+    ~CompositionTableau() override = default;
 
-    // Ajoute count lignes au tableau.
+    //! Ajoute count lignes au tableau.
     void add(szt count) override;
 
     //! Comparaison d'égalité de deux ligne.
@@ -576,6 +639,9 @@ public:
 
     //! Teste si la ligne correspond à une donnée interne.
     bool existsInternalData(szt ligne) const override;
+
+    //! Hydrate la donnée d'une ligne du tableau et retourne le succés de l'opération.
+    void hydrate(szt ligne) override;
 
     //! Fabrique une colonne lié aux données du tableau.
     std::unique_ptr<AbstractColonnesModel::AbstractColonne> makeColonne(const AbstractColonnesModel::NewColonneInfo & info) override
@@ -597,6 +663,14 @@ public:
     //! Taille (nombre de lignes).
     szt size() const override
         {return m_tableaux.empty() ? 0 : m_tableaux.front()->size();}
+
+    //! Accesseur des tableaux.
+    AbstractTableau & tableau(szt pos)
+        {return *m_tableaux.at(pos);}
+
+    //! Accesseur des tableaux.
+    const AbstractTableau & tableau(szt pos) const
+        {return *m_tableaux.at(pos);}
 
     //! Teste si la ligne de donnée est valide.
     bool valide(szt ligne) const override;
