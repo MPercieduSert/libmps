@@ -19,8 +19,8 @@ public:
     template<class T> using tree = conteneurMPS::tree<T>;
     using Arbre = TreeForModel<szt>;
 protected:
-    Arbre m_tree;       //! Arbre de correspondance des lignes.
-
+    Arbre m_tree;           //! Arbre de correspondance des lignes visibles.
+    tree<szt> m_fullTree;   //! Arbre de correspondance de toutes les lignes.
 public:
     TREE_FOR_MODEL_INDEX_PARENT_ROWCOUNT(m_tree)    // Implémentation des méthodes virtuelles index, parent, rowCount.
 
@@ -30,6 +30,11 @@ public:
     //! Destructeur.
     ~TreeColonnesModel() override = default;
 
+    //! Recherche les lignes de données vérifiant les conditions d'un modéle de recherche donné.
+    void find(FindModel * findModel) override;
+
+    //! Insert count lignes dans le model juste avant la ligne row.
+    bool insertRows(int row, int count, const QModelIndex & parent = QModelIndex()) override;
 protected:
     //! Fait la correspondance entre l'index et la ligne de donnée.
     szt ligne(const QModelIndex & index) const override

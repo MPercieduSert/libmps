@@ -188,7 +188,7 @@ protected:
 
         //! Crée un const_iterator initialisé sur ce noeud.
         const_iterator cbegin() const noexcept
-            {return this;}
+            {return const_cast<Item *>(this);}
 
         //! Crée un const_brother_iterator initialisé sur le fils ainé.
         const_brother_iterator cbeginChild() const noexcept
@@ -404,6 +404,16 @@ public:
         //! Crée un const_brother_iterator initialisé sur le parent.
         const_abstract_iterator parent() const noexcept
             {return m_ptr ? m_ptr->m_parent : nullptr;}
+
+        //! Renvoie la liste des données de la racine jusqu'au noeud inclus.
+        std::list<T> path() {
+            std::list<T> list;
+            while(m_ptr){
+                list.push_front(m_ptr->data());
+                to_parent();
+            }
+            return list;
+        }
 
         //! Acceseur du pointeur.
         void * ptr() const
@@ -1088,7 +1098,7 @@ public:
     /////// begin brother_iterator ////////
 
     //! Renvoie un itérateur de frère initialisé sur la racine.
-    brother_iterator beginBrother() const noexcept
+    brother_iterator beginBrother() noexcept
         {return m_root;}
 
     //! Renvoie un itérateur de frère constant initialisé sur la racine.
@@ -1096,30 +1106,30 @@ public:
         {return m_root;}
 
     //! Renvoie un itérateur de frère inverse initialisé sur la racine.
-    reverse_brother_iterator rbeginBrother() const noexcept
+    reverse_brother_iterator rbeginBrother() noexcept
         {return m_root;}
 
     //! Renvoie un itérateur de frère inverse constant initialisé sur la racine.
     const_reverse_brother_iterator crbeginBrother() const noexcept
         {return m_root;}
 
-    /////// begin brother_iterator ////////
+    /////// begin leaf_iterator ////////
 
     //! Renvoie un itérateur de feuille initialisé sur la première feuille.
-    leaf_iterator beginLeaf() const noexcept
-        {return const_abstract_iterator(m_root).toFirstLeaf();}
+    leaf_iterator beginLeaf() noexcept
+        {return leaf_iterator(m_root).toFirstLeaf();}
 
     //! Renvoie un itérateur de feuille constant initialisé sur la première feuille.
     const_leaf_iterator cbeginLeaf() const noexcept
-        {return const_abstract_iterator(m_root).toFirstLeaf();}
+        {return const_leaf_iterator(m_root).toFirstLeaf();}
 
     //! Renvoie un itérateur de feuille inverse initialisé sur la dernière feuille.
-    reverse_brother_iterator rbeginLeaf() const noexcept
-        {return const_abstract_iterator(m_root).toLastLeaf();}
+    reverse_leaf_iterator rbeginLeaf() noexcept
+        {return reverse_leaf_iterator(m_root).toLastLeaf();}
 
     //! Renvoie un itérateur de feuille inverse constant initialisé sur la dernière feuille.
-    const_reverse_brother_iterator crbeginLeaf() const noexcept
-        {return const_abstract_iterator(m_root).toLastLeaf();}
+    const_reverse_leaf_iterator crbeginLeaf() const noexcept
+        {return const_reverse_leaf_iterator(m_root).toLastLeaf();}
 
     /////// begin prevsuiv_iterator ////////
 
@@ -1611,27 +1621,20 @@ template<class T> template<class U> typename tree<T>::size_type tree<T>::removeI
 }
 
 template<class T> template<class U> typename tree<T>::size_type tree<T>::removeLeafIf(U predica) noexcept {
-    auto i = begin();
+    auto i = beginLeaf();
     size_type comp = 0;
-    i.to_firstLeaf();
     while (i) {
         if(predica(i)) {
             auto j = i;
             if(i.firstBrother() && i.lastBrother())
                     i.to_parent();
-            else {
-                i.to_nextBrotherIfNotUncle();
-                if(i)
-                    i.to_firstLeaf();
-            }
+            else
+                ++i;
             erase(j);
             ++comp;
         }
-        else {
-            i.to_nextBrotherIfNotUncle();
-            if(i)
-                i.to_firstLeaf();
-        }
+        else
+            ++i;
     }
     return comp;
 }
@@ -1859,7 +1862,7 @@ template<class T> typename tree<T>::size_type tree<T>::Item::size() const noexce
     if(!leaf()) {
         auto i = cbegin();
         auto fin = cbegin();
-        fin.to_lastLeaf();
+        fin.toLastLeaf();
         while(i != fin) {
             ++compteur;
             ++i;
