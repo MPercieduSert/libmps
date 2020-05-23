@@ -17,7 +17,8 @@ class IdComboBox : public QComboBox {
     Q_OBJECT
 public:
     //! Constructeur.
-    using QComboBox::QComboBox;
+    IdComboBox(QWidget * parent = nullptr) : QComboBox(parent)
+        {connect(this,qOverload<int>(&IdComboBox::currentIndexChanged),this,[this](){emit idChanged(id());});}
 
     //! Renvoie l'identifiant du nom sélectionné.
     idt id() const
@@ -40,6 +41,9 @@ public:
         for(auto i = vec.cbegin(); i != vec.cend(); ++i)
                 addItem(text(*i),i->id());
     }
+signals:
+    //! La valeur de l'identifiant change.
+    void idChanged(szt id);
 };
 }
 #endif // IDCOMBOBOX_H
