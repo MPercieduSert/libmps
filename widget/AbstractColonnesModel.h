@@ -597,33 +597,47 @@ public:
 };
 
 ////////////////////////////////////////////////////////// CompositionTableau /////////////////////////////////////
-//! Macro de définition des menbres test de CompositionTableau
-#define TEST_COMPOSITION_TABLEAUX(VECBOOL,MEMBRE){auto iterTableau = m_tableaux.cbegin(); \
-    auto iterTest = VECBOOL.cbegin(); \
+//! Macro de définition des membres test de CompositionTableau.
+#define TEST_COMPOSITION_TABLEAU(MODULE,MEMBRE){auto iterTableau = m_tableaux.cbegin(); \
+    auto iterTest = m_module[MODULE].cbegin(); \
     while(iterTableau != m_tableaux.cend() && (!*iterTest || (*iterTableau)->MEMBRE)){ \
         ++iterTableau; ++iterTest;} \
     return iterTableau == m_tableaux.cend();}
 
+//! Macro de définition des membres modulaires de CompotionTableau.
+#define OPERATION_COMPOSITION_TABLEAU(MODULE,MEMBRE){auto iterActif = m_module[MODULE].cbegin(); \
+    for(auto iter = m_tableaux.begin(); iter != m_tableaux.end(); ++iter, ++iterActif)  \
+        if(*iterActif) (*iter)->MEMBRE;}
 
 /*! \ingroup groupeModel
  * \brief Classe de composition paramétrée de plusieurs tableaux en un.
  */
 class CompositionTableau : public AbstractColonnesModel::AbstractTableau {
 protected:
-    std::vector<std::unique_ptr<AbstractTableau>> m_tableaux;   //! Vecteur des pointeurs de tableau.
-    std::vector<bool> m_egalActif;                              //! Vecteur de l'activation du test d'égalité pour un tableau.
-    std::vector<bool> m_existsActif;                            //! Vecteur de l'activation du test d'existence pour un tableau.
-    std::vector<bool> m_hydrateActif;                           //! Vecteur de l'activation de l'hydratation pour un tableau.
-    std::vector<bool> m_newOrModifActif;                        //! Vecteur de l'activation du test newOrModif pour un tableau.
-    std::vector<bool> m_removeActif;                    //! Vecteur de l'activation de suppresion des données internes pour un tableau.
-    std::vector<bool> m_saveActif;                      //! Vecteur de l'activation de sauvegarde pour un tableau.
-    std::vector<bool> m_valideActif;                    //! Vecteur de l'activation du test de validité pour un tableau.
+    //! Type du tableau des modules actifs par tableaux.
+    using ModuleActif = std::vector<std::vector<bool>>;
+    std::vector<std::unique_ptr<AbstractTableau>> m_tableaux;   //!< Vecteur des pointeurs de tableau.
+    ModuleActif m_module;                                       //!< Tableau des modules actif.
 public:
+    //! Module
+    enum module {EgalModule,
+                 ExistsModule,
+                 HydrateModule,
+                 NewOrModifModule,
+                 RemoveModule,
+                 SaveModule,
+                 ValideModule,
+                 NbrModule};
+
     //! Constructeur.
-    CompositionTableau() = default;
+    CompositionTableau() : m_module(NbrModule) {}
 
     //!Destructeur.
     ~CompositionTableau() override = default;
+
+    //! Acceseur des modules actif.
+    bool actif(szt module, szt tableau) const
+        {return m_module.at(module).at(tableau);}
 
     //! Ajoute count lignes au tableau.
     void add(szt count) override;
@@ -651,7 +665,7 @@ public:
     bool newOrModif(szt ligne) const override;
 
     //! Ajoute un tableau à la composition. Le nouveau tableau doit avoir la même taille que ceux auquel il est associé.
-    void push_back(std::unique_ptr<AbstractTableau> && tableau);
+    void push_back(std::unique_ptr<AbstractTableau> && tableau, bool actif = true);
 
     //! Supprime les données correspondant à la ligne dans la base de donnée.
     //! Ne doit pas supprimer de ligne de donnée du model.
@@ -659,6 +673,10 @@ public:
 
     //! Sauve la ligne dans la base de donnée.
     void save(szt ligne) override;
+
+    //! Mutateurs des modules actifs.
+    void setActif(szt module, szt tableau, bool actif = true)
+        {m_module.at(module).at(tableau) = actif;}
 
     //! Taille (nombre de lignes).
     szt size() const override
