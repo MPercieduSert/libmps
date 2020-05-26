@@ -35,6 +35,10 @@ public:
 
     //! Insert count lignes dans le model juste avant la ligne row.
     bool insertRows(int row, int count, const QModelIndex & parent = QModelIndex()) override;
+
+    //! Supprime count lignes en commençant par la ligne row.
+    bool removeRows(int row, int count, const QModelIndex & parent = QModelIndex()) override;
+
 protected:
     //! Fait la correspondance entre l'index et la ligne de donnée.
     szt ligne(const QModelIndex & index) const override
