@@ -19,3 +19,11 @@ void AbstractTabTableau::couper()
 
 void AbstractTabTableau::effacer()
     {m_model->effacer(m_view->selectionModel()->selectedIndexes());}
+
+void AbstractTabTableau::supprimer() {
+    if(model()->removeRowsSelected(m_view->selectionModel()->selectedIndexes()))
+        m_view->selectionModel()->clear();
+    else
+        QMessageBox::warning(this,tr("Erreur de sélection"),
+                             tr("Vous devez séléctioner des lignes entières pour supprimer des éléves"));
+}

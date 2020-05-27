@@ -65,7 +65,11 @@ public slots:
     void removeTab(const std::pair<int, int> &pair);
 
     //! Demande à l'onglet actif de sauvegarder.
-    void save()     {static_cast<AbstractTabModule*>(currentWidget())->save();}
+    void sauver()     {static_cast<AbstractTabModule*>(currentWidget())->sauver();}
+
+    //! Demande à l'onglet actif de supprimer.
+    void supprimer()    {static_cast<AbstractTabModule*>(currentWidget())->supprimer();}
+
 };
 }
 #endif // TABMODULE_H

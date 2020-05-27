@@ -14,9 +14,11 @@ enum actionFlags {NoActions = 0x0,
                  CollerAction = 0x2,
                  CouperAction = 0x4,
                  EffacerAction = 0x8,
-                 EditerActions = 0xF,
-                 SauverAction = 0x10,
-                 ChercherAction = 0x12};
+                 SupprimerAction = 0x10,
+                 EditerActions = 0x1F,
+                 SauverAction = 0x20,
+                 SauverCommeAction = 0x40,
+                 ChercherAction = 0x80};
 
 Q_DECLARE_FLAGS(Action,actionFlags)
 }

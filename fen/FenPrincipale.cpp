@@ -48,10 +48,15 @@ void FenPrincipale::createAction() {
     m_effacerAction->setShortcut(QKeySequence::Delete);
     connect(m_effacerAction,&QAction::triggered,m_zoneCentrale,&AbstractZoneCentrale::effacer);
 
-    // Save
+    // Sauver
     m_sauverAction = new QAction(tr("Sauvegarder"),this);
     m_sauverAction->setShortcut(QKeySequence::Save);
-    connect(m_sauverAction,&QAction::triggered,m_zoneCentrale,&AbstractZoneCentrale::save);
+    connect(m_sauverAction,&QAction::triggered,m_zoneCentrale,&AbstractZoneCentrale::sauver);
+
+    // Supprimer
+    m_supprimerAction = new QAction(tr("Supprimer"),this);
+    //m_supprimerAction->setShortcut(QKeySequence::);
+    connect(m_supprimerAction,&QAction::triggered,m_zoneCentrale,&AbstractZoneCentrale::supprimer);
 
     setAction(NoActions);
     connect(m_zoneCentrale,&AbstractZoneCentrale::actionPermise,this,&FenPrincipale::setAction);
@@ -67,6 +72,7 @@ void FenPrincipale::createMenu() {
     m_editMenu->addAction(m_copierAction);
     m_editMenu->addAction(m_couperAction);
     m_editMenu->addAction(m_effacerAction);
+    m_editMenu->addAction(m_supprimerAction);
     m_editMenu->addSeparator();
     m_editMenu->addAction(m_chercherAction);
     m_newModifMenu = menuBar()->addMenu(tr("&Créer / Modifier"));
@@ -91,6 +97,7 @@ void FenPrincipale::setAction(Action action) {
         m_couperAction->setEnabled(action.testFlag(CouperAction));
         m_effacerAction->setEnabled(action.testFlag(EffacerAction));
         m_sauverAction->setEnabled(action.testFlag(SauverAction));
+        m_supprimerAction->setEnabled(action.testFlag(SupprimerAction));
         m_chercherAction->setEnabled(action.testFlag(ChercherAction));
     }
 }

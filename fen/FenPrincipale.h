@@ -36,6 +36,7 @@ protected:
     QAction *m_couperAction;    //!< Action couper.
     QAction *m_effacerAction;   //!< Action effacer.
     QAction *m_sauverAction;    //!< Action sauvegarder.
+    QAction *m_supprimerAction; //!< Action supprimer.
 
     // Menu
     QMenu *m_editMenu;              //!< Menu édition.

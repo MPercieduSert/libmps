@@ -64,20 +64,20 @@ public:
     virtual void setConfigByPath(const QString & configPath, QWidget * modalParent = nullptr) = 0;
 
 signals:
-    //! Signal d'activation/désactivation de l'action effacer.
-    void effacerPermis(bool);
+//    //! Signal d'activation/désactivation de l'action effacer.
+//    void effacerPermis(bool);
 
-    //! Signal d'activation/désactivation de l'action coller.
-    void collerPermis(bool);
+//    //! Signal d'activation/désactivation de l'action coller.
+//    void collerPermis(bool);
 
-    //! Signal d'activation/désactivation de l'action copier.
-    void copierPermis(bool);
+//    //! Signal d'activation/désactivation de l'action copier.
+//    void copierPermis(bool);
 
-    //! Signal d'activation/désactivation de l'action couper.
-    void couperPermis(bool);
+//    //! Signal d'activation/désactivation de l'action couper.
+//    void couperPermis(bool);
 
-    //! Signal d'activation/désactivation de l'action saugarder.
-    void savePermis(bool);
+//    //! Signal d'activation/désactivation de l'action saugarder.
+//    void savePermis(bool);
 
 protected:
     //! Hydrate l'entité à partire d'un itérateur sur un docXml.

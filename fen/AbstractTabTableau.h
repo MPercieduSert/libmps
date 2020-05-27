@@ -48,7 +48,9 @@ public slots:
     //! Slot coorepondant à l'action effacer.
     void effacer() override;
     //! Slot coorepondant à l'action sauver.
-    void save() override   {m_model->save();}
+    void sauver() override   {m_model->save();}
+    //! Slot coorepondant à l'action supprimer.
+    void supprimer() override;
 };
 }
 #endif // TABABSTRACTTABLEAU_H

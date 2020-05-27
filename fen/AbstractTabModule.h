@@ -58,10 +58,13 @@ public slots:
     virtual void effacer()   {}
 
     //! A réimplémenter pour effectuer l'action sauvegarder.
-    virtual void save()   {}
+    virtual void sauver()   {}
 
     //! A réimplémenter pour effectuer l'action sauvegarder comme.
-    virtual void saveAs()   {}
+    virtual void sauverAs()   {}
+
+    //! A réimplémenter pour effectuer l'action supprimer.
+    virtual void supprimer()   {}
 };
 }
 #endif // ABSTRACTTABMODULE_H

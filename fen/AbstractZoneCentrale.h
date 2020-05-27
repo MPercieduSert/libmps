@@ -41,7 +41,10 @@ public slots:
     virtual void effacer() = 0;
 
     //! Demande à l'onglet actif de sauvegarder.
-    virtual void save() = 0;
+    virtual void sauver() = 0;
+
+    //! Demande à l'onglet actif de sauvegarder.
+    virtual void supprimer() = 0;
 };
 }
 #endif // ABSTRACTZONECENTRALE_H

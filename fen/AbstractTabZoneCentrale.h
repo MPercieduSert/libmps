@@ -39,11 +39,16 @@ public slots:
     //! Demande à l'onglet actif d'effacer.
     void effacer() override {m_tab->effacer();}
 
-    //! Demande à l'onglet actif de sauvegarder.
-    void save() override    {m_tab->save();}
-
     //! Demande l'ouverture d'un onglet.
     void openTab(const std::pair<int,int> & pair, const std::vector<QVariant> & args = std::vector<QVariant>()) {m_tab->openTab(pair,args);}
+
+    //! Demande à l'onglet actif de sauvegarder.
+    void sauver() override    {m_tab->sauver();}
+
+    //! Demande à l'onglet actif de sauvegarder.
+    void supprimer() override    {m_tab->supprimer();}
+
+
 };
 }
 #endif // ABSTRACTTABZONECENTRALE_H
