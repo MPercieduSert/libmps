@@ -197,7 +197,7 @@ protected:
     void resetRowToLigne() override;
 
     //! Fait la correspondance entre la ligne d'index et la ligne de donnée.
-    szt rowToLigne(int row) const
+    szt rowToLigne(int row, const QModelIndex & /*parent*/ = QModelIndex()) const override
         {return m_rowToLigne[static_cast<szt>(row)];}
 
     //! Renvoie un vecteur contenant l'ensemble des identifiants des lignes visibles ou de toutes les lignes.

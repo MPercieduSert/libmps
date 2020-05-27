@@ -169,7 +169,7 @@ QVariant TableModel::headerData(int section, Qt::Orientation orientation, int ro
         if(role == Qt::DisplayRole)
             return section + 1;
         if((m_valideLigne || m_uniqueLigne) && role == Qt::BackgroundRole)
-            return m_brush[m_etats[rowToLigne(section)]];
+            return m_brush[m_etats[m_rowToLigne[static_cast<szt>(section)]]];
     }
     return AbstractColonnesModel::headerData(section,orientation,role);
 }

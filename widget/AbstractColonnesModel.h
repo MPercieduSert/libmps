@@ -224,6 +224,9 @@ public:
     //! Renvoie le label des lignes et des colonnes.
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
 
+    //! Hydrate la row.
+    void hydrate(int row, const QModelIndex & parent = QModelIndex());
+
     //! Insert une nouvelle colonne à la postion pos.
     virtual bool insertColonne(int pos, const NewColonneInfo & info, bool allParent = false);
 
@@ -307,6 +310,9 @@ protected:
 
     //! Met le vecteur des correspondance de ligne à l'identitée.
     virtual void resetRowToLigne() = 0;
+
+    //! Fait la correspondance entre la ligne d'index et la ligne de donnée.
+    virtual szt rowToLigne(int row, const QModelIndex & parent = QModelIndex()) const = 0;
 
     //! Renvoie un vecteur contenant l'ensemble des identifiants des lignes visibles ou de toutes les lignes.
     virtual std::vector<szt> statOnLignes(bool /*lignesVisibles*/ = true) const {return std::vector<szt>();}

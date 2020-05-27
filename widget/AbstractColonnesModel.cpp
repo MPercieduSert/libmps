@@ -8,18 +8,18 @@ AbstractBoolColonne::~AbstractBoolColonne() = default;
 AbstractColonnesModel::AbstractColonnesModel(bool uniqueLigne, bool valideLigne, QObject * parent)
     : AbstractModel(parent), m_uniqueLigne(uniqueLigne), m_valideLigne(valideLigne) {
     if(m_valideLigne || m_uniqueLigne) {
-    connect(this,&AbstractColonnesModel::rowsRemoved,this,&AbstractColonnesModel::resizeEtats);
-    connect(this,&AbstractColonnesModel::rowsInserted,this,
-            [this](const QModelIndex & parent,int first,int last){
-                resizeEtats();
-                updateEtats(first,last,parent);});
-    connect(this,&AbstractColonnesModel::dataChanged,this,
-            [this](const QModelIndex & topLeft, const QModelIndex & bottomRight) {
-                if(topLeft.isValid() && bottomRight.isValid())
-                    updateEtats(topLeft.row(), bottomRight.row(), topLeft.parent());});
-    connect(this,&AbstractColonnesModel::modelReset,this,
-            [this](){resizeEtats();
-            updateAllEtats();});
+        connect(this,&AbstractColonnesModel::rowsRemoved,this,&AbstractColonnesModel::resizeEtats);
+        connect(this,&AbstractColonnesModel::rowsInserted,this,
+                [this](const QModelIndex & parent,int first,int last){
+                    resizeEtats();
+                    updateEtats(first,last,parent);});
+        connect(this,&AbstractColonnesModel::dataChanged,this,
+                [this](const QModelIndex & topLeft, const QModelIndex & bottomRight) {
+                    if(topLeft.isValid() && bottomRight.isValid())
+                        updateEtats(topLeft.row(), bottomRight.row(), topLeft.parent());});
+        connect(this,&AbstractColonnesModel::modelReset,this,
+                [this](){resizeEtats();
+                updateAllEtats();});
     m_brush.resize(NbrEtat);
     m_brush[Sauver] = QBrush();
     m_brush[Valide] = QBrush(QColor(Qt::green));
@@ -45,6 +45,11 @@ QVariant AbstractColonnesModel::headerData(int section, Qt::Orientation orientat
     if (role == Qt::DisplayRole && orientation == Qt::Horizontal)
         return m_colonnes[static_cast<szt>(section)]->header();
     return QVariant();
+}
+
+void AbstractColonnesModel::hydrate(int row, const QModelIndex & parent){
+    m_data->hydrate(rowToLigne(row,parent));
+    emit dataChanged(index(row,0,parent),index(row,columnCount() - 1,parent));
 }
 
 bool AbstractColonnesModel::insertColonne(int pos, const NewColonneInfo & info, bool allParent){
@@ -81,7 +86,7 @@ void AbstractColonnesModel::save() {
 
 bool AbstractColonnesModel::setData(const QModelIndex &index, const QVariant &value, int role) {
     if(checkIndex(index) && colonne(index).setData(ligne(index),value,role)) {
-        dataChanged(index,index);
+        emit dataChanged(index,index);
         return true;
     }
     return false;
