@@ -627,6 +627,7 @@
 		fin\\
 		nc\\
 		nom\\
+		code\\
 		type
 	}
 	\&
@@ -646,6 +647,7 @@
 		idCible\\
 		cible\\
 		num\\
+		valeur
 	}\\
 	\hline\\
 };
@@ -659,10 +661,11 @@
 \matrix[ampersand replacement=\&,column sep =1cm, row sep =0.5cm]{
 		\tableEntity{Evenement}{
 		idStyle&uint&idSup1&idSt\\
+		code&uint&code&cd\\
 		creation&dateTime&dtValide&crea\\
-		modification&dateTime&dtCurrent&modif\\
 		debut&dateTime&dtValide&deb\\
 		fin&deteTime&dtValide&fin\\
+		modification&dateTime&dtCurrent&modif\\
 		nc&text&stringNotEmpty&nc\\
 		nom&text&stringNotEmpty&nm\\
 		type&uint&idSup1&tp
@@ -676,6 +679,7 @@
 		idCible&uint&idSup1&idCb\\
 		cible&int&int&cb\\
 		num&int&intSup0&num\\
+		valeur&blod&variant&val
 	}{
 		\fkey{idEvenement}{Evenement}\\
 		\unique{idCilbe, cible, num}
@@ -1088,6 +1092,7 @@
 		nc\\
 		nom\\
 		type\\
+		code\\
 		alpha
 	}[below=0.9cm of groupePour]
 	
@@ -1314,7 +1319,7 @@
 		\fkey{idClasse}{Classe}\\
 		\fkey{idEleve}{Eleve}\\
 		\unique{idClasse, idEleve}
-	}[below=0.25cm of Niveau,\bdd]
+	}[below=0.25cm of Niveau,\gui]
 
 	\tableEntity{Classe}{
 		idAn&uint&idSup1&idAn\\
@@ -1345,6 +1350,7 @@
 	
 	\tableEntity{Groupe}{
 		alpha&int&int&al\\
+		code&uint&code&cd\\
 		nc&text&stringNotEmpty&nc&\\
 		nom&text&stringNotEmpty&nm&\\
 		type&uint&idSup1&tp\\
@@ -1371,7 +1377,7 @@
 	}{
 		\unique{nom, prenom, date}\\
 		ModifControle
-	}[below=0.5cm of ClasseEleve,\bdd]
+	}[below=0.5cm of ClasseEleve,\gui]
 	
 	\tableEntity{Note}{
 		idControle&uint&idSup1&idCtr\\
