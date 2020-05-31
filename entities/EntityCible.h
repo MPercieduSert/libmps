@@ -1262,7 +1262,7 @@ public:
     BASE_ENTITY(IdCibleCodeEntityTemp)
 
     //! Constructeur à partir des valeurs attributs.
-    IdCibleCodeEntityTemp(Id1Trans id1, int cible, codeType code = 0, idt id = 0)
+    IdCibleCodeEntityTemp(Id1Trans id1, int cible, flag code = 0, idt id = 0)
         : EAID(id) {
         setId1(id1);
         setCible(cible);
@@ -1352,7 +1352,7 @@ public:
     }
 
     //! Constructeur à partir des valeurs attributs.
-    CibleSimpleCodeEntity(idt idCible, int cible, codeType code, idt id = 0)
+    CibleSimpleCodeEntity(idt idCible, int cible, flag code, idt id = 0)
         : EAID(id) {
         setIdCible(idCible);
         setCible(cible);

@@ -180,7 +180,7 @@ public:
     }
 
     //! Constructeur à partir des valeurs attributs.
-    DonneeCard(int idDn, int card, int cible, codeType exact = 0, idt id = 0)
+    DonneeCard(int idDn, int card, int cible, flag exact = 0, idt id = 0)
         : DonneeCard(idDn, cible, id) {
         setCard(card);
         setExact(exact);

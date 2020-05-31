@@ -210,7 +210,7 @@ public:
     }
 
     //! Constructeur à partir des valeurs attributs.
-    RelationCibleAttCodeEntityTemp(Id1Trans id1, Id2Trans id2, int cible, codeType code, idt id = 0)
+    RelationCibleAttCodeEntityTemp(Id1Trans id1, Id2Trans id2, int cible, flag code, idt id = 0)
         : RelationCibleAttCodeEntityTemp(id1,id2,id) {
         setCible(cible);
         setCode(code);
@@ -598,7 +598,7 @@ public:
     {setValeur(valeur);}
 
     //! Constructeur à partir des valeurs attributs.
-    RelationCodeDateTimeValeurEntityTemp(idt id1, idt id2, codeType code, const QDateTime & dateTime, ValTrans valeur, idt id = 0)
+    RelationCodeDateTimeValeurEntityTemp(idt id1, idt id2, flag code, const QDateTime & dateTime, ValTrans valeur, idt id = 0)
         : RelationCodeDateTimeValeurEntityTemp(id1, id2, id) {
         setCode(code);
         setDateTime(dateTime);
@@ -674,7 +674,7 @@ public:
     {setValeur(valeur);}
 
     //! Constructeur à partir des valeurs attributs.
-    RelationDateTimeSaisieValeurEntityTemp(idt id1, idt id2, const QDateTime & dateTime, codeType saisie, ValTrans valeur, idt id = 0)
+    RelationDateTimeSaisieValeurEntityTemp(idt id1, idt id2, const QDateTime & dateTime, flag saisie, ValTrans valeur, idt id = 0)
         : RelationDateTimeSaisieValeurEntityTemp(id1, id2, id) {
         setDateTime(dateTime);
         setSaisie(saisie);
@@ -739,6 +739,7 @@ public:
 
     using EntityIDs<IDM,RelationAttribut,CodeAtt,DateTimeAtt,NumAttribut,ValeurAtt>
                         ::EntityIDs;
+    using EAID::setCode;
     using EAID::setId1;
     using EAID::setId2;
     using EAID::setDateTime;
@@ -760,9 +761,9 @@ public:
         {setValeur(valeur);}
 
     //! Constructeur à partir des valeurs attributs.
-    RelationCodeDateTimeNumValeurEntityTemp(idt id1, idt id2, codeType code, const QDateTime & dateTime, int num, ValTrans valeur, idt id = 0)
+    RelationCodeDateTimeNumValeurEntityTemp(idt id1, idt id2, flag code, const QDateTime & dateTime, int num, ValTrans valeur, idt id = 0)
         : RelationCodeDateTimeNumValeurEntityTemp(id1, id2, num, id) {
-        CodeAtt::set(code);
+        setCode(code);
         setDateTime(dateTime);
         setValeur(valeur);
     }

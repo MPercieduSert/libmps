@@ -8,7 +8,7 @@
 //! Type des attributs
 namespace typeMPS {
 using idt = unsigned;
-using codeType = unsigned;
+//using codeType = unsigned;
 using szt = unsigned;
 
 class flag {
@@ -70,6 +70,14 @@ public:
         m_value = value;
         return *this;
     }
+
+    //! Test d'égalité.
+    bool operator ==(const flag & value)
+        {return m_value == value.m_value;}
+
+    //! Test d'égalité.
+    bool operator ==(flag_type  value)
+        {return m_value == value;}
 
     //! Mutateur de la valeur.
     void setValue(flag_type value) noexcept

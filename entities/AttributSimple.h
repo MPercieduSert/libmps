@@ -186,8 +186,7 @@ public:
 
     //! Modifie la donnée à partir d'un QVariant.
     void setDataP(szt /*pos*/, const QVariant & value) override
-        {auto at = affiche();
-        set(value.value<AttType>());}
+        {set(value.value<AttType>());}
 
     //! Renvoie une chaine de caractère contenant la valeur de l'attribut.
     QString toStringAttribut() const override
@@ -460,36 +459,77 @@ public:
 /*! \ingroup groupeAttributEntity
  * \brief Classe mère des attributs de type code.
  */
-class AttributCode : public AttributEntityVal<codeType> {
+class AttributCode : public AttributEntity {
 public:
+    using AttType = flag;
+    using AttTrans = flag;
+protected:
+    AttType m_valeur;     //!< Valeur de l'attribut.
+
+public:
+    using flag_type =flag::flag_type;
     CONSTR_DEFAUT(AttributCode)
     CONSTR_AFFECT_DEFAUT(AttributCode)
 
     //! Destructeur.
     ~AttributCode() override;
 
-    //! Ajoute une valeur.
-    void add(unsigned valeur)
-        {m_valeur = valeur ? m_valeur | 1<<(valeur-1) : 0;}
+    //! Ajout de valeurs.
+    void add(flag_type valeur)
+        {m_valeur |= valeur;}
 
-    //! Retire une valeur.
-    void del(unsigned valeur) {
+    //! Retourne un QVariant contenant la donnée souhaitée, pos doit être valide.
+    QVariant dataP(szt /*pos*/) const override
+        {return m_valeur.value();}
+
+    //! Accesseur de l'attribut.
+    flag get() const
+        {return m_valeur;}
+
+    //! Retrait de valeur.
+    void del(flag_type valeur) {
         if(valeur)
-            m_valeur &=~(1<<(valeur-1));
+            m_valeur &= ~valeur;
     }
 
-    //! Teste si la valeur est contenue.
-    bool in(unsigned valeur) const
-        {return m_valeur & 1<<(valeur-1);}
+    //! Accesseur de l'attribut pour la base de données.
+    flag_type getToBdd() const
+        {return m_valeur.value();}
 
     //! retourne la liste des valeurs contenue
     std::vector<unsigned> list() const {
         std::vector<unsigned> L;
-        for(unsigned i = 1; i <= sizeof (unsigned); ++i)
-            if(in(i))
-                L.push_back(i);
+        for(unsigned i = 1; i <= sizeof (unsigned); ++i) {
+            flag::flag_type val = 1<<i;
+            if(test(val))
+                L.push_back(val);
+        }
         return L;
     }
+
+    //! Mutateur de l'attribut.
+    void set(flag valeur)
+        {m_valeur = valeur;}
+
+    //! Modifie la donnée à partir d'un QVariant.
+    void setDataP(szt /*pos*/, const QVariant & value) override
+        {set(value.toUInt());}
+
+    //! Teste si l'intersection est non vide.
+    bool test(flag_type valeur) const
+        {return m_valeur.test(valeur);}
+
+    //! Renvoie une chaine de caractère contenant la valeur de l'attribut.
+    QString toStringAttribut() const override
+        {return QVariant(m_valeur.value()).toString();}
+
+    //! Teste l'égalité entre les deux attributs.
+    bool operator == (const AttributCode & att) const
+        {return m_valeur == att.m_valeur;}
+
+    //! Teste l'égalité entre les deux attributs.
+    bool operator == (flag valeur) const
+        {return m_valeur == valeur;}
 };
 
 /*! \ingroup groupeAttributEntity
