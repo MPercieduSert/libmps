@@ -4,12 +4,13 @@
 #ifndef FENFLAGS_H
 #define FENFLAGS_H
 
-#include <QFlags>
+#include "typemps.h"
 
 namespace fenMPS {
+using namespace typeMPS;
 
 //! Enumeration des actions
-enum actionFlags {NoActions = 0x0,
+enum actionFlags : flag::flag_type {NoActions = 0x0,
                  CopierAction = 0x1,
                  CollerAction = 0x2,
                  CouperAction = 0x4,
@@ -19,8 +20,5 @@ enum actionFlags {NoActions = 0x0,
                  SauverAction = 0x20,
                  SauverCommeAction = 0x40,
                  ChercherAction = 0x80};
-
-Q_DECLARE_FLAGS(Action,actionFlags)
 }
-Q_DECLARE_OPERATORS_FOR_FLAGS(fenMPS::Action)
 #endif // FENFLAGS_H

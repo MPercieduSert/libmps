@@ -67,7 +67,7 @@ public:
 
 public slots:
     //! Mutateur des actions.
-    void setAction(Action action);
+    void setAction(flag action);
 
 protected:
     //! Crée le menu Bdd.

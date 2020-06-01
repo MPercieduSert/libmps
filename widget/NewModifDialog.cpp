@@ -92,7 +92,7 @@ void AbstractTypeNcNomNewModifForm::connexion() {
     connect(m_typeTree->selectionModel(),&QItemSelectionModel::selectionChanged,this,[this](){
         Permission perm(idType(),m_cible);
         m_bdd.getUnique(perm);
-        m_valide = perm.in(bddMPS::code::Attribuable);
+        m_valide = perm.test(bddMPS::code::Attribuable);
         emit savePermis(valide());
     });
 }
@@ -100,7 +100,7 @@ void AbstractTypeNcNomNewModifForm::connexion() {
 void AbstractTypeNcNomNewModifForm::setFlags(QTreeWidgetItem * item) {
     Permission perm(item->data(nomType,Qt::UserRole).toUInt(),m_cible);
     m_bdd.getUnique(perm);
-    if(perm.in(bddMPS::code::Attribuable))
+    if(perm.test(bddMPS::code::Attribuable))
         item->setFlags(Qt::ItemIsSelectable);
     else
         item->setFlags(Qt::ItemIsEnabled);

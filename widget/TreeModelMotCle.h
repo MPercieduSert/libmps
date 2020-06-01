@@ -46,7 +46,7 @@ protected:
     bmps::BddPredef & m_bdd;                              //!< Pointeur vers la base de donnée.
     std::vector<int> m_cibleList;                       //!< Liste des valeurs de cible associé à chaque index de colonnes.
     QStringList m_headerPerm;                       //!< Noms des colonnes.
-    std::map<idt,std::vector<codeType>> m_permission;            //!< Map des permitions indexé par l'identifiant du mot clé associé.
+    std::map<idt,flag> m_permission;            //!< Map des permitions indexé par l'identifiant du mot clé associé.
 
     using TreeModelEditEntity<MotCle>::m_tree;
     using TreeModelEditEntity<MotCle>::getIter;
@@ -60,7 +60,7 @@ public:
     ~TreeModelMotCle() override = default;
 
     //! Renvoie les autorisations de modification pour un index donné.
-    bool autorisation(const QModelIndex & index, bmps::autorisation autoris) const override;
+    bool autorisation(const QModelIndex & index, flag autoris) const override;
 
     //! Renvoie le numero de cible correspond à l'index
     int cible(const QModelIndex & index) const {

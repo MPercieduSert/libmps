@@ -279,13 +279,13 @@ public slots:
 template<class Ent> void AbstractNomNewModifForm::updateTemp(Ent & entity) {
     entity.setId(id());
     m_bdd.get(entity);
-    m_nameCB->setEditable(m_bdd.getAutorisation(entity,bddMPS::Modif));
-    emit effacerPermis(m_bdd.getAutorisation(entity,bddMPS::Suppr));
+    m_nameCB->setEditable(m_bdd.testAutorisation(entity,bddMPS::Modif));
+    emit effacerPermis(m_bdd.testAutorisation(entity,bddMPS::Suppr));
 }
 
 template<class Ent> void AbstractNcNomNewModifForm::updateTemp(Ent & entity) {
     AbstractNomNewModifForm::updateTemp<Ent>(entity);
-    m_ncLine->setReadOnly(!m_bdd.getAutorisation(entity,bddMPS::Modif));
+    m_ncLine->setReadOnly(!m_bdd.testAutorisation(entity,bddMPS::Modif));
     setNc(entity.nc());
 }
 

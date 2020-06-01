@@ -25,7 +25,7 @@ public:
     //virtual void init(QWidget * parent) = 0;
 signals:
     //! Signal d'activation/désactivation des actions.
-    void actionPermise(const Action & action);
+    void actionPermise(flag);
 
 public slots:
     //! Demande à l'onglet actif de coller.

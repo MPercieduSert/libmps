@@ -7,10 +7,8 @@
 #include <QVBoxLayout>
 #include <QWidget>
 #include "FenFlags.h"
-#include "typemps.h"
 
 namespace fenMPS {
-using namespace typeMPS;
 /*! \ingroup groupeFen
  * \brief Classe mère des onglets.
  */
@@ -36,7 +34,7 @@ public:
 
 signals:
     //! Signal d'activation/désactivation des actions.
-    void actionPermise(const Action & action);
+    void actionPermise(flag);
 
     //! Demande l'ouverture d'un onglet.
     void openTabRequested(const std::pair<int,int> &);

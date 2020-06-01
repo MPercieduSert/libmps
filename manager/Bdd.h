@@ -443,7 +443,6 @@ public:
     bool isValid() noexcept override
         {return true;}
 
-
     //! Fabrique d'entité de classe nomée entity.
     std::unique_ptr<Entity> makeEntity(const QString & entity) const
         {return m_manager->makeEntity(entity);}
@@ -581,6 +580,10 @@ public:
     //! Convertit la chaine de caractères représentant une restriction.
     static flag strToRestriction(const QString & str) noexcept;
 
+    //! Teste l'autorisation de modification de l'entité donnée en argument.
+    bool testAutorisation(const Entity & entity, flag autoris)
+        {return testAutorisationP(entity.id(),entity.idEntity(),autoris);}
+
 protected:
     //! Création de la table de l'entité en base de donnée.
     template<class Ent> void creerTable()
@@ -602,21 +605,6 @@ protected:
     virtual bool delP(idt id, szt idEntity)
         {return m_manager->get(idEntity).del(id);}
 
-    //! Renvoie l'autorisation de modification de l'entité donnée en argument.
-    virtual bool getAutorisationP(idt id, szt idEntity, flag autoris);
-
-    //! Vérifie les autorisations des entités dont l'identifiant est dans liste.
-    template<class Ent> bool getAutorisation(const std::list<idt> & liste, flag autoris) {
-        auto i = liste.cbegin();
-        while(i != liste.cend() && getAutorisationP(*i,Ent::ID, autoris))
-            ++i;
-        return i == liste.cend();
-    }
-
-    //! //! Vérifie les autorisations des entités de la liste vérifiant les conditions donnée en arguments.
-    template<class Ent, class... Args> bool getAutorisationList(flag autoris, Args... args)
-        {return getAutorisation<Ent>(getListId<Ent>(args...), autoris);}
-
     //! Hydrate un attribut de l'entité par la valeur contenue dans le XmlDox à l'endroit pointé par iter.
     virtual QString hydrateAttributXml(entityMPS::Entity & entity, szt pos, fichierMPS::XmlDoc::const_brother_iterator iter);
 
@@ -631,6 +619,21 @@ protected:
 
     //! Enregistre les entités de vector dans la base de donnée.
     template<class Ent,class Conteneur> void saveConteneur(const Conteneur & vector);
+
+    //! Renvoie l'autorisation de modification de l'entité donnée en argument.
+    virtual bool testAutorisationP(idt id, szt idEntity, flag autoris);
+
+    //! Vérifie les autorisations des entités dont l'identifiant est dans liste.
+    template<class Ent> bool testAutorisation(const std::list<idt> & liste, flag autoris) {
+        auto i = liste.cbegin();
+        while(i != liste.cend() && testAutorisationP(*i,Ent::ID, autoris))
+            ++i;
+        return i == liste.cend();
+    }
+
+    //! //! Vérifie les autorisations des entités de la liste vérifiant les conditions donnée en arguments.
+    template<class Ent, class... Args> bool testAutorisationList(flag autoris, Args... args)
+        {return testAutorisation<Ent>(getListId<Ent>(args...), autoris);}
 };
 
 template<class Ent> bool Bdd::exists(const Ent & entity)

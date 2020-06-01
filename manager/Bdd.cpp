@@ -41,7 +41,7 @@ std::pair<existeUni,idt> Bdd::existsUniqueId(const Entity & entity)
 bool Bdd::get(Entity & entity)
     {return m_manager->get(entity.idEntity()).get(entity);}
 
-bool Bdd::getAutorisationP(idt id, szt idEntity, flag autoris)
+bool Bdd::testAutorisationP(idt id, szt idEntity, flag autoris)
     {return !(m_manager->get(idEntity).getRestriction(id) & autoris);}
 
 flag Bdd::getRestriction(const Entity & entity)

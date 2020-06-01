@@ -27,8 +27,8 @@ TreeModelMotCle::TreeModelMotCle(bddMPS::BddPredef &bdd, const std::map<int,QStr
     }
 }
 
-bool TreeModelMotCle::autorisation(const QModelIndex & index, bmps::autorisation autoris) const {
-    if(autoris == bmps::autorisation::Suppr)
+bool TreeModelMotCle::autorisation(const QModelIndex & index, flag autoris) const {
+    if(autoris & bmps::Suppr)
         return m_bdd.getAutorisation(getData(index),autoris);
     if(autoris == bmps::autorisation::Modif) {
         if(index.column() < NbrColumnMotCle)

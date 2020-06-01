@@ -19,7 +19,7 @@ public:
     ~TreeModelEditEntity() override = default;
 
     //! Renvoie les autorisations de modification pour un index donné.
-    virtual bool autorisation(const QModelIndex & /*index*/, bmps::autorisation /*role*/) const
+    virtual bool autorisation(const QModelIndex & /*index*/, flag /*role*/) const
         {return true;}
 
     //! Renvoie les drapeaux de l'index spécifié.

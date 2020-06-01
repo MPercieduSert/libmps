@@ -126,49 +126,49 @@ void BddPredef::delEntityInDonnee(idt idCible, int cible, int num) {
     }
 }
 
-bool BddPredef::getAutorisationP(idt id, szt idEntity, flag autoris) {
-    auto controle = Bdd::getAutorisationP(id,idEntity,autoris);
+bool BddPredef::testAutorisationP(idt id, szt idEntity, flag autoris) {
+    auto controle = Bdd::testAutorisationP(id,idEntity,autoris);
     if(autoris & Suppr) {
         // Cible
         controle = controle && (!managers().commentaireIsEnabled()
-            || getAutorisationList<CommentaireCible>(autoris,
+            || testAutorisationList<CommentaireCible>(autoris,
                                                      CommentaireCible::Cible,cible(idEntity),
                                                      CommentaireCible::IdCible,id
                                                      ))
         && (!managers().donneeIsEnabled()
-            || getAutorisationList<DonneeCible>(autoris, DonneeCible::Cible,cible(idEntity),
+            || testAutorisationList<DonneeCible>(autoris, DonneeCible::Cible,cible(idEntity),
                                                 DonneeCible::IdCible,id
                                                 ))
         && (!managers().motCleIsEnabled()
-            || getAutorisationList<MotCleCible>(autoris,
+            || testAutorisationList<MotCleCible>(autoris,
                                                 MotCleCible::Cible,cible(idEntity),
                                                 MotCleCible::IdCible,id
                                                 ))
         && (!managers().texteIsEnabled()
-            || getAutorisationList<TexteCible>(autoris,
+            || testAutorisationList<TexteCible>(autoris,
                                                TexteCible::Cible,cible(idEntity),
                                                TexteCible::IdCible,id
                                                ))
         && (!managers().restrictionModificationIsEnabled()
-            || getAutorisationList<Restriction>(autoris,
+            || testAutorisationList<Restriction>(autoris,
                                                 Restriction::Cible,cible(idEntity),
                                                 Restriction::IdCible,id
                                                 ))
         && (!managers().historiqueIsEnabled()
-            || (getAutorisationList<Historique>(autoris,
+            || (testAutorisationList<Historique>(autoris,
                                                 Historique::Cible,cible(idEntity),
                                                 Historique::IdCible,id
                                                 )
-                && getAutorisationList<Historique>(autoris,
+                && testAutorisationList<Historique>(autoris,
                                                    Historique::Etat,cible(idEntity),
                                                    Historique::IdEtat,id
                                                    )))
         && (!managers().utilisationIsEnabled()
-            ||  (getAutorisationList<Utilisation>(autoris,
+            ||  (testAutorisationList<Utilisation>(autoris,
                                                   Utilisation::Cible,cible(idEntity),
                                                   Utilisation::IdCible,id
                                                   )
-                && getAutorisationList<Utilisation>(autoris,
+                && testAutorisationList<Utilisation>(autoris,
                                                     Utilisation::Etat,cible(idEntity),
                                                     Utilisation::IdEtat,id
                                                     )));
@@ -176,46 +176,46 @@ bool BddPredef::getAutorisationP(idt id, szt idEntity, flag autoris) {
         if(controle) {
             switch (idEntity) {
             case Commentaire::ID:
-                controle = controle && getAutorisationList<CommentaireCible>(autoris,
+                controle = controle && testAutorisationList<CommentaireCible>(autoris,
                                                                              CommentaireCible::IdCommentaire,id);
                 break;
             case Donnee::ID:
                 controle = controle && foreachBeginChild<Donnee>(id,
                         [this,autoris](idt id)->bool {
-                        return getAutorisationP(id,Donnee::ID,autoris)
-                                && getAutorisationList<DonneeCible>(autoris,
+                        return testAutorisationP(id,Donnee::ID,autoris)
+                                && testAutorisationList<DonneeCible>(autoris,
                                                                     DonneeCible::IdDonnee,id)
-                                && getAutorisationList<DonneeCard>(autoris,
+                                && testAutorisationList<DonneeCard>(autoris,
                                                                    DonneeCard::IdDonnee,id);}
                       ,false);
                 break;
             case MotCle::ID:
                 controle = controle && foreachBeginChild<MotCle>(id,
                         [this,autoris](idt id)->bool {
-                        return getAutorisationP(id,MotCle::ID,autoris)
-                            && getAutorisationList<MotCleCible>(autoris,
+                        return testAutorisationP(id,MotCle::ID,autoris)
+                            && testAutorisationList<MotCleCible>(autoris,
                                                                 MotCleCible::IdMotCle,id)
-                            && getAutorisationList<MotClePermission>(autoris,
+                            && testAutorisationList<MotClePermission>(autoris,
                                                                      MotClePermission::IdMotCle,id)
-                            && getAutorisationList<MotProgCible>(autoris,
+                            && testAutorisationList<MotProgCible>(autoris,
                                                                  MotProgCible::IdMotCle,id)
-                            && getAutorisationList<MotProgPermission>(autoris,
+                            && testAutorisationList<MotProgPermission>(autoris,
                                                                       MotProgPermission::IdMotCle,id);}
                         ,false);
                 break;
             case Source::ID:
-                controle = controle && getAutorisationList<SourceTexte>(autoris,
+                controle = controle && testAutorisationList<SourceTexte>(autoris,
                                                                         SourceTexte::IdSource,id);
                 break;
             case Texte::ID:
-                controle = controle && getAutorisationList<SourceTexte>(autoris,
+                controle = controle && testAutorisationList<SourceTexte>(autoris,
                                                                         SourceTexte::IdTexte,id)
-                            && getAutorisationList<TexteCible>(autoris,
+                            && testAutorisationList<TexteCible>(autoris,
                                                                TexteCible::IdTexte,id);
                 break;
             case Type::ID:
                 controle = foreachBeginChild<Type>(id,
-                                [this,autoris](idt id)->bool{return getAutorisationP(id,Type::ID,autoris);}
+                                [this,autoris](idt id)->bool{return testAutorisationP(id,Type::ID,autoris);}
                      ,false);
                 break;
             }

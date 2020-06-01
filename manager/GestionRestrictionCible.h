@@ -42,7 +42,7 @@ public:
 /*! \ingroup groupeManager
  * \brief Classe template d'un gestionnaire d'autorisation de type cible et code.
  */
-template<class Ent, class Restrict> class GestionAutorisationCibleCode : public AbstractGestionRestrictionCible<Ent,Restrict> {
+template<class Ent, class Restrict> class GestionRestrictionCibleCode : public AbstractGestionRestrictionCible<Ent,Restrict> {
 protected:
     using AbstractGestionRestrictionCible<Ent, Restrict>::m_cible;
     using AbstractGestionRestrictionCible<Ent, Restrict>::m_managerRestriction;
@@ -51,15 +51,15 @@ public:
     using AbstractGestionRestrictionCible<Ent,Restrict>::AbstractGestionRestrictionCible;
 
     //! Destructeur.
-    ~GestionAutorisationCibleCode() override = default;
+    ~GestionRestrictionCibleCode() override = default;
 
     //! Ajoute des restrictions de modification pour l'entité d'identifiant id.
-    void AddRestriction(idt id, flag restrict) override {
+    void addRestriction(idt id, flag restrict) override {
         AbstractGestionRestrictionCible<Ent,Restrict>::setRestriction(id,restrict);
         Restrict restriction(id, m_cible);
         if(m_managerRestriction.getUnique(restriction)) {
             if(~restriction.code() & restrict){
-                restriction.setCode(restriction.code() |= restriction);
+                restriction.setCode(restriction.code() |= restrict);
                 m_managerRestriction.save(restriction);
             }
         }

@@ -82,7 +82,7 @@ void FenPrincipale::createToolBar()
     {m_toolBar = addToolBar(tr("Module"));}
 
 
-void FenPrincipale::setAction(Action action) {
+void FenPrincipale::setAction(flag action) {
     if(!action) {
         m_copierAction->setEnabled(false);
         m_collerAction->setEnabled(false);
@@ -92,12 +92,12 @@ void FenPrincipale::setAction(Action action) {
         m_chercherAction->setEnabled(false);
     }
     else {
-        m_copierAction->setEnabled(action.testFlag(CopierAction));
-        m_collerAction->setEnabled(action.testFlag(CollerAction));
-        m_couperAction->setEnabled(action.testFlag(CouperAction));
-        m_effacerAction->setEnabled(action.testFlag(EffacerAction));
-        m_sauverAction->setEnabled(action.testFlag(SauverAction));
-        m_supprimerAction->setEnabled(action.testFlag(SupprimerAction));
-        m_chercherAction->setEnabled(action.testFlag(ChercherAction));
+        m_copierAction->setEnabled(action.test(CopierAction));
+        m_collerAction->setEnabled(action.test(CollerAction));
+        m_couperAction->setEnabled(action.test(CouperAction));
+        m_effacerAction->setEnabled(action.test(EffacerAction));
+        m_sauverAction->setEnabled(action.test(SauverAction));
+        m_supprimerAction->setEnabled(action.test(SupprimerAction));
+        m_chercherAction->setEnabled(action.test(ChercherAction));
     }
 }

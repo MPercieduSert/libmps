@@ -87,9 +87,6 @@ protected:
     //! Supprime l'entité d'identifiant id de type d'identifiant idEntity de la base de données.
     bool delP(idt id, szt idEntity) override;
 
-    //! Renvoie l'autorisation de modification de l'entité donnée en argument.
-    bool getAutorisationP(idt id, szt idEntity, flag autoris) override;
-
     //! Hydrate un attribut de l'entité par la valeur contenue dans le XmlDox à l'endroit pointé par iter.
     QString hydrateAttributXml(entityMPS::Entity & entity, szt pos, fichierMPS::XmlDoc::const_brother_iterator iter) override;
 
@@ -106,15 +103,10 @@ protected:
     //! Acceseur du manageur.
     managerMPS::ManagersPredef & managers()
         {return static_cast<managerMPS::ManagersPredef &>(*m_manager);}
+
+    //! Renvoie l'autorisation de modification de l'entité donnée en argument.
+    bool testAutorisationP(idt id, szt idEntity, flag autoris) override;
 };
-
-//DEF_DEL_METHODE(BddPredef)
-
-//template<class Ent> bool BddPredef::del(idt id)
-//    {return delSimple<Ent>(id);}
-
-//template<class Ent> bool BddPredef::delSimple(idt id)
-//    {return getAutorisation(Ent(id),Suppr) && delCible(id, cible<Ent>()) && Bdd::del<Ent>(id);}
 
 template<class Ent> Ent BddPredef::getEntityInDonnee(idt idCible, int Cible, int num)
 {

@@ -22,25 +22,25 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-    BarPlotter.cpp \
-    EditTreeWidget.cpp \
-    Histogramme.cpp \
-    MotCleDelegate.cpp \
-    MotCleModel.cpp \
-    MotCleWidget.cpp \
-    NewMotCleDialog.cpp \
-    Plotter.cpp \
-    ReadTreeWidget.cpp \
-    SelectDonneeDialog.cpp \
+    #BarPlotter.cpp \
+    #EditTreeWidget.cpp \
+    #Histogramme.cpp \
+    #MotCleDelegate.cpp \
+    #MotCleModel.cpp \
+    #MotCleWidget.cpp \
+    #NewMotCleDialog.cpp \
+    #Plotter.cpp \
+    #ReadTreeWidget.cpp \
+    #SelectDonneeDialog.cpp \
     SelectInListBox.cpp \
     SpinBoxAnnee.cpp \
     SpinBoxDecimale.cpp \
     SpinBoxNumExclu.cpp \
-    TreeModelEditEntity.cpp \
-    TreeModelMotCle.cpp \
-    TreeModelReadEntity.cpp \
-    TreeModelReadTemp.cpp \
-    TreeModelTemp.cpp \
+    #TreeModelEditEntity.cpp \
+    #TreeModelMotCle.cpp \
+    #TreeModelReadEntity.cpp \
+    #TreeModelReadTemp.cpp \
+    #TreeModelTemp.cpp \
     NewModifDialog.cpp \
     Checklist.cpp \
     TableEntityView.cpp \
@@ -54,25 +54,25 @@ SOURCES += \
     IdComboBox.cpp
 
 HEADERS += \
-    BarPlotter.h \
-    EditTreeWidget.h \
-    Histogramme.h \
-    MotCleDelegate.h \
-    MotCleModel.h \
-    MotCleWidget.h \
-    NewMotCleDialog.h \
-    Plotter.h \
-    ReadTreeWidget.h \
-    SelectDonneeDialog.h \
+    #BarPlotter.h \
+    #EditTreeWidget.h \
+    #Histogramme.h \
+    #MotCleDelegate.h \
+    #MotCleModel.h \
+    #MotCleWidget.h \
+    #NewMotCleDialog.h \
+    #Plotter.h \
+    #ReadTreeWidget.h \
+    #SelectDonneeDialog.h \
     SelectInListBox.h \
     SpinBoxAnnee.h \
     SpinBoxDecimale.h \
     SpinBoxNumExclu.h \
-    TreeModelEditEntity.h \
-    TreeModelMotCle.h \
-    TreeModelReadEntity.h \
-    TreeModelReadTemp.h \
-    TreeModelTemp.h \
+    #TreeModelEditEntity.h \
+    #TreeModelMotCle.h \
+    #TreeModelReadEntity.h \
+    #TreeModelReadTemp.h \
+    #TreeModelTemp.h \
     NewModifDialog.h \
     Checklist.h \
     TableEntityView.h \
