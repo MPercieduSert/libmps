@@ -89,7 +89,7 @@ public:
     }
 
     //! Retourne le type du manager.
-    virtual unsigned typeManager() const
+    virtual flag typeManager() const
         {return bmps::ArbreSimpleTypeManager;}
 
 protected:

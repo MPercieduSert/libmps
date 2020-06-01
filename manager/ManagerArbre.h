@@ -130,7 +130,7 @@ public:
     void save(const Ent & entity, const Ent & parent, int num = 0) override;
 
     //! Retourne le type du manager.
-    virtual unsigned typeManager() const override
+    virtual flag typeManager() const override
         {return bmps::ArbreTypeManager;}
 
 protected:

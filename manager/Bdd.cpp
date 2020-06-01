@@ -41,10 +41,10 @@ std::pair<existeUni,idt> Bdd::existsUniqueId(const Entity & entity)
 bool Bdd::get(Entity & entity)
     {return m_manager->get(entity.idEntity()).get(entity);}
 
-bool Bdd::getAutorisationP(idt id, szt idEntity, autorisation autoris)
-    {return m_manager->get(idEntity).getAutorisation(id,autoris);}
+bool Bdd::getAutorisationP(idt id, szt idEntity, flag autoris)
+    {return !(m_manager->get(idEntity).getRestriction(id) & autoris);}
 
-std::vector<unsigned> Bdd::getRestriction(const Entity & entity)
+flag Bdd::getRestriction(const Entity & entity)
     {return m_manager->get(entity.idEntity()).getRestriction(entity.id());}
 
 bool Bdd::getUnique(Entity & entity)
@@ -87,7 +87,7 @@ QString Bdd::hydrateEntityXml(entityMPS::Entity & entity, fichierMPS::XmlDoc::co
 QString Bdd::importXml(const fichierMPS::XmlDoc & doc){
     auto iter = doc.cbegin().cbeginChild();
     QString controle;
-    const auto restriction = RestrictionStr();
+    const auto restriction = RestrictionToStr();
     while(controle.isEmpty() && iter) {
         auto entity = makeEntity(iter->name());
         if(!entity)
@@ -105,12 +105,15 @@ QString Bdd::importXml(const fichierMPS::XmlDoc & doc){
                     if(entity->isValid()) {
                         existsUnique(*entity);
                         save(*entity);
-                        if(typeManager & bddMPS::ModifControleTypeManager)
+                        if(typeManager & bddMPS::ModifControleTypeManager) {
+                            flag restrict = bddMPS::Aucune;
                             for (auto iter_restrict = restriction.cbegin(); iter_restrict != restriction.cend(); ++iter_restrict) {
                                 auto iter_att = iter->attributes().find(iter_restrict->second);
                                 if(iter_att != iter->attributes().end())
-                                    setAutorisation(*entity, iter_restrict->first, iter_att->second == "oui");
+                                    restrict |=iter_restrict->first;
                             }
+                            setRestriction(*entity,restrict);
+                        }
                     }
                     else
                         controle = QString("Entité invalide :\n").append(entity->affiche());
@@ -159,10 +162,10 @@ bool Bdd::openBdd() {
     return false;
 }
 
-std::map<autorisation,QString> Bdd::RestrictionStr() {
-    std::map<autorisation,QString> map;
-    map[autorisation::Modif] = "modification";
-    map[autorisation::Suppr] = "suppression";
+std::map<flag::flag_type, QString> Bdd::RestrictionToStr() {
+    std::map<flag::flag_type,QString> map;
+    map[Modif] = "modification";
+    map[Suppr] = "suppression";
     return map;
 }
 
@@ -175,23 +178,8 @@ void Bdd::save(Entity & entity)
 void Bdd::save(const Entity & entity)
     {m_manager->get(entity.idEntity()).save(entity);}
 
-void Bdd::save(Entity & entity, autorisation autoris, bool bb)
-    {m_manager->get(entity.idEntity()).save(entity, autoris, bb);}
-
-//void Bdd::save(const Entity & entity, autorisation autoris, bool bb)
-//    {m_manager->get(entity.idEntity()).save(entity, autoris, bb);}
-
-void Bdd::save(Entity & entity, const std::map<autorisation,bool> & autorisations)
-    {m_manager->get(entity.idEntity()).save(entity, autorisations);}
-
-//void Bdd::save(const Entity & entity, const std::map<autorisation,bool> & autorisations)
-//    {m_manager->get(entity.idEntity()).save(entity, autorisations);}
-
-void Bdd::save(Entity & entity, const std::vector<autorisation> & restriction)
-    {m_manager->get(entity.idEntity()).save(entity, restriction);}
-
-//void Bdd::save(const Entity & entity, const std::vector<autorisation> & restriction)
-//    {m_manager->get(entity.idEntity()).save(entity, restriction);}
+void Bdd::save(Entity & entity, flag restrict)
+    {m_manager->get(entity.idEntity()).save(entity, restrict);}
 
 void Bdd::save(Entity & entity, const Entity & parent, int num)
     {m_manager->get(entity.idEntity()).save(entity,parent,num);}
@@ -217,7 +205,7 @@ void Bdd::saveUnique(const Entity & entity)
 
 fichierMPS::XmlDoc Bdd::schemaXmlForImport() const{
     using namespace fichierMPS;
-    const auto restToStr = RestrictionStr();
+    const auto restToStr = RestrictionToStr();
     XmlDoc schema;
     auto iter = schema.begin();
     iter->setName("xs:schema");
@@ -273,10 +261,12 @@ fichierMPS::XmlDoc Bdd::schemaXmlForImport() const{
                 }
             }
             iter_entity.toParent();
-            auto restriction = managers().get(i).restriction();
-            for (auto iter_restriction = restriction.cbegin(); iter_restriction != restriction.cend(); ++iter_restriction) {
-                auto iter_rest = schema.emplace_back(iter_entity,"xs:attribute");
-                iter_rest->setAttribut("name",restToStr.at(*iter_restriction));
+            auto restriction = managers().get(i).enableRestriction();
+            for (auto iter_restriction = restToStr.cbegin(); iter_restriction != restToStr.cend(); ++iter_restriction) {
+                if(restriction & iter_restriction->first) {
+                    auto iter_rest = schema.emplace_back(iter_entity,"xs:attribute");
+                    iter_rest->setAttribut("name",iter_restriction->second);
+                }
             }
         }
 
@@ -305,11 +295,8 @@ fichierMPS::XmlDoc Bdd::schemaXmlForImport() const{
     return schema;
 }
 
-void Bdd::setAutorisation(const Entity & entity, autorisation autoris, bool bb)
-    {m_manager->get(entity.idEntity()).setAutorisation(entity.id(), autoris, bb);}
-
-void Bdd::setAutorisation(const Entity & entity, const std::map<autorisation,bool> & autorisations)
-    {m_manager->get(entity.idEntity()).setAutorisation(entity.id(), autorisations);}
+void Bdd::setRestriction(const Entity & entity, flag restrict)
+    {m_manager->get(entity.idEntity()).setRestriction(entity.id(), restrict);}
 
 void Bdd::setBdd() {
     m_bdd.exec("PRAGMA foreign_keys = ON;");
@@ -325,13 +312,13 @@ void Bdd::setFileName(const QString & fileName) {
     m_bdd.setDatabaseName(fileName);
 }
 
-void Bdd::setRestriction(const Entity & entity, const std::vector<autorisation> & restriction)
-    {m_manager->get(entity.idEntity()).setRestriction(entity.id(), restriction);}
+void Bdd::addRestriction(const Entity & entity, flag restrict)
+    {m_manager->get(entity.idEntity()).addRestriction(entity.id(), restrict);}
 
-autorisation Bdd::strToAutorisation(const QString & str) noexcept {
+flag Bdd::strToRestriction(const QString &str) noexcept {
     if(str == QString("modification"))
-        return bddMPS::autorisation::Modif;
+        return bddMPS::Modif;
     if(str == QString("suppression"))
-        return bddMPS::autorisation::Suppr;
-    return bddMPS::autorisation::Toute;
+        return bddMPS::Suppr;
+    return bddMPS::Aucune;
 }

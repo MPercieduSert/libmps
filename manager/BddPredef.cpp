@@ -3,7 +3,7 @@
 using namespace bddMPS;
 using namespace entityMPS;
 
-codeType BddPredef::code(const QString & str) const {
+flag BddPredef::code(const QString & str) const {
     if(str == "Interdit")
         return code::Interdit;
     if(str == "Visible")
@@ -126,9 +126,9 @@ void BddPredef::delEntityInDonnee(idt idCible, int cible, int num) {
     }
 }
 
-bool BddPredef::getAutorisationP(idt id, szt idEntity, autorisation autoris) {
+bool BddPredef::getAutorisationP(idt id, szt idEntity, flag autoris) {
     auto controle = Bdd::getAutorisationP(id,idEntity,autoris);
-    if(autoris == autorisation::Suppr) {
+    if(autoris & Suppr) {
         // Cible
         controle = controle && (!managers().commentaireIsEnabled()
             || getAutorisationList<CommentaireCible>(autoris,
@@ -246,7 +246,7 @@ QString BddPredef::hydrateAttributXml(entityMPS::Entity & entity, szt pos, fichi
                 controle = QString("Code Invalide : ").append(*iter_list);
         }
         if(controle.isEmpty())
-            entity.setData(pos, codeAtt.get());
+            entity.setData(pos, codeAtt.getToBdd());
         return controle;
     }
 

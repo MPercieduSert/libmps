@@ -24,18 +24,14 @@ public:
 
     //! Constructeur
     ManagerPermissionModifControle (const InfoBdd & info,
-                                    std::unique_ptr<AbstractGestionAutorisation<Ent>> && gestionAutorisation
-                                                = std::make_unique<GestionAutorisationNoRestrictif<Ent>>(),
+                                    std::unique_ptr<AbstractGestionRestriction<Ent>> && gestionAutorisation
+                                                = std::make_unique<AbstractGestionRestriction<Ent>>(),
                                     std::unique_ptr<AbstractUniqueSqlTemp<Ent>> && unique = std::make_unique<NoUniqueSql<Ent>>())
         : ManagerSql<Ent>(info, std::move(unique)),
           ManagerModifControle<Ent>(std::move(gestionAutorisation)) {}
 
     //! Destructeur.
     ~ManagerPermissionModifControle() override = default;
-
-    //! Renvoie la liste des restrictions gérer par le gestionérer d'autorisarion.
-    std::vector<bmps::autorisation> restriction() const override
-        {return ManagerModifControle<Ent>::restriction();}
 
     //! Enregistre l'entité entity en base de donnée.
     void save(Ent & entity) override
@@ -46,13 +42,10 @@ public:
         {ManagerPerm::save(entity);}
 
     //! Retourne le type du manager.
-    virtual unsigned typeManager() const
+    virtual flag typeManager() const
         {return ManagerPerm::typeManager() | ManagerMC::typeManager();}
 
 protected:
-    /*//! Constructeur.
-    ManagerPermissionModifControle() = default;*/
-
     //! Appelle la fonction d'insertion parent souhaitée.
     void addParent(Ent & entity) override
         {ManagerMC::add(entity);}
@@ -60,9 +53,6 @@ protected:
     //! Appelle la fonction d'insertion parent souhaitée.
     void addParent(const Ent & entity) override
         {ManagerMC::add(entity);}
-
-//    //! Supprime de la table en base de donnée l'entité d'identifiant id.
-//    bool del(idt id) override;
 
     //! Réimplemente modify.
     void modify(const Ent & entity) override
@@ -80,9 +70,6 @@ protected:
     void modifyParent(const Ent & entity, idt id) override
         {ManagerMC::modify(entity,id);}
 };
-
-//template<class Ent> bool ManagerPermissionModifControle<Ent>::del(idt id)
-//    {return ManagerMC::del(id);}
 
 //! Manager de permission de type num à modification controlé.
 template<class Ent> using ManagerPermissionNumModifControle = ManagerPermissionModifControle<ManagerPermissionNum<Ent>>;

@@ -82,6 +82,9 @@ public:
         m_bdd.close();
     }
 
+    //! Ajoute des restrictions de modification pour une entité donnée.
+    void addRestriction(const Entity & entity, flag restrict);
+
     //! Vérifie si le fichier de chemin name existe et est un fichier de base de donnée valide, si c'est le cas,
     //! le fichier de la base de donnée est remplacé par une copie du fichier de chemin name.
     bool copy(const QString & name) override;
@@ -200,10 +203,6 @@ public:
     //! ayant le même identifiant que entity.
     //! Retourne True si l'opération s'est correctement déroulée.
     template<class Ent> bool get(Ent & entity);
-
-    //! Renvoie l'autorisation de modification de l'entité donnée en argument.
-    bool getAutorisation(const Entity & entity, autorisation autoris)
-        {return getAutorisationP(entity.id(), entity.idEntity(), autoris);}
 
     //! Renvoie l'arbre de toutes les entités pour une entité de type arbre.
     template<class Ent> tree<Ent> getArbre();
@@ -409,11 +408,12 @@ public:
     template<class Ent, class Join> mapIdt<Ent> getMap(typename Join::Position cleJoin, typename Join::Position cleWhere,
                                                        const QVariant & valueWhere, typename Ent::Position cleMap = Ent::Id,
                                                        condition cond = condition::Egal);
-    //! Renvoie la liste des restrictions de modification de l'entité donnée en argument.
-    std::vector<unsigned> getRestriction(const Entity & entity);
 
-    //! Renvoie la liste des restrictions de modification de l'entité donnée en argument.
-    template<class Ent> std::vector<unsigned> getRestriction(const Ent & entity);
+    //! Renvoie les restrictions de modification de l'entité donnée en argument.
+    flag getRestriction(const Entity & entity);
+
+    //! Renvoie les restrictions de modification de l'entité donnée en argument.
+    template<class Ent> flag getRestriction(const Ent & entity);
 
     //! Hydrate l'entité entity avec les valeurs des attributs de l'entité enregistrées en base de donnée
     //! ayant les mêmes valeurs uniques.
@@ -463,7 +463,7 @@ public:
     bool open() override;
 
     //! Renvoie un vector faisant la correspondance emun <-> QString pour les restrictions.
-    static std::map<autorisation, QString> RestrictionStr();
+    static std::map<flag::flag_type, QString> RestrictionToStr();
 
     //! Teste s'il y a dans la base de donnée une entité ayant exactement les mêmes attributs (identifiant compris).
     bool sameInBdd(const Entity & entity);
@@ -485,32 +485,14 @@ public:
     //! Enregistre l'entity dans la base de donnée.
     template<class Ent> void save(const Ent & entity);
 
-    //! Enregistre l'entité entity en base de donnée ainsi que sa nouvelle autorisation de modification.
-    void save(Entity & entity, autorisation autoris, bool bb = false);
+    //! Enregistre l'entité entity en base de donnée ainsi que ses nouvelles restrictions de modification.
+    void save(Entity & entity, flag restrict);
 
-    //! Enregistre l'entité entity en base de donnée ainsi que sa nouvelle autorisation de modification.
-    template<class Ent> void save(Ent & entity, autorisation autoris, bool bb = false);
+    //! Enregistre l'entité entity en base de donnée ainsi que ses nouvelles restrictions de modification.
+    template<class Ent> void save(Ent & entity, flag restrict);
 
-    //! Enregistre l'entité entity en base de donnée ainsi que sa nouvelle autorisation de modification.
-    template<class Ent> void save(const Ent & entity, autorisation autoris, bool bb = false);
-
-    //! Enregistre l'entité entity en base de donnée ainsi que ses nouvelles autorisations de modification.
-    void save(Entity & entity, const std::map<autorisation,bool> & autorisations);
-
-    //! Enregistre l'entité entity en base de donnée ainsi que ses nouvelles autorisations de modification.
-    template<class Ent> void save(Ent & entity, const std::map<autorisation,bool> & autorisations);
-
-    //! Enregistre l'entité entity en base de donnée ainsi que ses nouvelles autorisations de modification.
-    template<class Ent> void save(const Ent & entity, const std::map<autorisation,bool> & autorisations);
-
-    //! Enregistre l'entité entity en base de donnée ainsi que ses nouvelles restriction de modification.
-    void save(Entity & entity, const std::vector<autorisation> & restriction);
-
-    //! Enregistre l'entité entity en base de donnée ainsi que ses nouvelles restriction de modification.
-    template<class Ent> void save(Ent & entity, const std::vector<autorisation> & restriction);
-
-    //! Enregistre l'entité entity en base de donnée ainsi que ses nouvelle restriction de modification.
-    template<class Ent> void save(const Ent & entity, const std::vector<autorisation> & restriction);
+    //! Enregistre l'entité entity en base de donnée ainsi que ses nouvelles restrictions de modification.
+    template<class Ent> void save(const Ent & entity, flag restrict);
 
     //! Enregistre l'entité entity en base avec le parent et la position spécifiés.
     void save(Entity & entity, const Entity & parent, int num = 0);
@@ -584,35 +566,20 @@ public:
     //! Renvoie le schema xml pour valider les fichiers d'importation de données.
     fichierMPS::XmlDoc schemaXmlForImport() const;
 
-    //! Modifie une autorisation de modification pour une entité donnée.
-    void setAutorisation(const Entity & entity, autorisation autoris, bool bb = false);
-
-    //! Modifie une autorisation de modification pour une entité donnée.
-    template<class Ent> void setAutorisation(const Ent & entity, autorisation autoris, bool bb = false);
-
-    //! Modifie les autorisations de modification pour une entité donnée.
-    void setAutorisation(const Entity & entity, const std::map<autorisation,bool> & autorisations);
-
-    //! Modifie les autorisations de modification pour une entité donnée.
-    template<class Ent> void setAutorisation(const Ent & entity, const std::map<autorisation,bool> & autorisations);
-
     //! Transmet la connexion à la base de donnée aux managers.
     void setBdd();
 
     //! Modifie le chemin de la base de donnée.
     void setFileName(const QString & fileName) override;
 
-    //! Ajoute des restrictions de modification pour une entité donnée.
-    void setRestriction(const Entity & entity, const std::vector<autorisation> & restriction);
+    //! Modifie les restrictions de modification pour une entité donnée.
+    void setRestriction(const Entity & entity, flag restrict);
 
-    //! Ajoute des restrictions de modification pour une entité donnée.
-    template<class Ent> void setRestriction(const Ent & entity, const std::vector<autorisation> & restriction);
-
-    //! Ajoute des restrictions de modification aux entités d'un arbre.
-    template<class Ent> void setRestriction(const tree<Ent> & entity, const std::vector<autorisation> & restriction);
+    //! Modifie les restrictions de modification pour une entité donnée.
+    template<class Ent> void setRestriction(const Ent & entity, flag restrict);
 
     //! Convertit la chaine de caractères représentant une restriction.
-    static autorisation strToAutorisation(const QString & str) noexcept;
+    static flag strToRestriction(const QString & str) noexcept;
 
 protected:
     //! Création de la table de l'entité en base de donnée.
@@ -636,10 +603,10 @@ protected:
         {return m_manager->get(idEntity).del(id);}
 
     //! Renvoie l'autorisation de modification de l'entité donnée en argument.
-    virtual bool getAutorisationP(idt id, szt idEntity, autorisation autoris);
+    virtual bool getAutorisationP(idt id, szt idEntity, flag autoris);
 
     //! Vérifie les autorisations des entités dont l'identifiant est dans liste.
-    template<class Ent> bool getAutorisation(const std::list<idt> & liste, autorisation autoris) {
+    template<class Ent> bool getAutorisation(const std::list<idt> & liste, flag autoris) {
         auto i = liste.cbegin();
         while(i != liste.cend() && getAutorisationP(*i,Ent::ID, autoris))
             ++i;
@@ -647,7 +614,7 @@ protected:
     }
 
     //! //! Vérifie les autorisations des entités de la liste vérifiant les conditions donnée en arguments.
-    template<class Ent, class... Args> bool getAutorisationList(autorisation autoris, Args... args)
+    template<class Ent, class... Args> bool getAutorisationList(flag autoris, Args... args)
         {return getAutorisation<Ent>(getListId<Ent>(args...), autoris);}
 
     //! Hydrate un attribut de l'entité par la valeur contenue dans le XmlDox à l'endroit pointé par iter.
@@ -916,7 +883,7 @@ template<class Ent, class Join> mapIdt<Ent> Bdd::getMap(typename Join::Position 
                                                       valueWhere, cleMap, cond);
 }
 
-template<class Ent> std::vector<unsigned> Bdd::getRestriction(const Ent & entity)
+template<class Ent> flag Bdd::getRestriction(const Ent & entity)
     {return m_manager->get<Ent>().getRestriction(entity.id());}
 
 template<class Ent> bool Bdd::getUnique(Ent & entity)
@@ -931,23 +898,11 @@ template<class Ent> void Bdd::save(Ent & entity)
 template<class Ent> void Bdd::save(const Ent & entity)
     {m_manager->get<Ent>().save(entity);}
 
-template<class Ent> void Bdd::save(Ent & entity, autorisation autoris, bool bb)
-    {m_manager->get<Ent>().save(entity, autoris, bb);}
+template<class Ent> void Bdd::save(Ent & entity, flag restrict)
+    {m_manager->get<Ent>().save(entity, restrict);}
 
-template<class Ent> void Bdd::save(const Ent & entity, autorisation autoris, bool bb)
-    {m_manager->get<Ent>().save(entity, autoris, bb);}
-
-template<class Ent> void Bdd::save(Ent & entity, const std::map<autorisation,bool> & autorisations)
-    {m_manager->get<Ent>().save(entity, autorisations);}
-
-template<class Ent> void Bdd::save(const Ent & entity, const std::map<autorisation,bool> & autorisations)
-    {m_manager->get<Ent>().save(entity, autorisations);}
-
-template<class Ent> void Bdd::save(Ent & entity, const std::vector<autorisation> & restriction)
-    {m_manager->get<Ent>().save(entity, restriction);}
-
-template<class Ent> void Bdd::save(const Ent & entity, const std::vector<autorisation> & restriction)
-    {m_manager->get<Ent>().save(entity, restriction);}
+template<class Ent> void Bdd::save(const Ent & entity, flag restrict)
+    {m_manager->get<Ent>().save(entity, restrict);}
 
 template<class Ent> void Bdd::save(Ent & entity, const Ent & parent, int num)
     {m_manager->get<Ent>().save(entity,parent,num);}
@@ -969,18 +924,7 @@ template<class Ent, class Conteneur> void Bdd::saveConteneur(const Conteneur & v
 template<class Ent> void Bdd::save(tree<Ent> & arbre, treeSave n)
     {m_manager->get<Ent>().save(arbre,n);}
 
-template<class Ent> void Bdd::setAutorisation(const Ent & entity, autorisation autoris, bool bb)
-    {m_manager->get<Ent>().setAutorisation(entity.id(), autoris, bb);}
-
-template<class Ent> void Bdd::setAutorisation(const Ent & entity, const std::map<autorisation,bool> & autorisations)
-    {m_manager->get<Ent>().setAutorisation(entity.id(), autorisations);}
-
-template<class Ent> void Bdd::setRestriction(const Ent & entity, const std::vector<autorisation> & restriction)
-    {m_manager->get<Ent>().setRestriction(entity.id(), restriction);}
-
-template<class Ent> void Bdd::setRestriction(const tree<Ent> & tree, const std::vector<autorisation> & restriction) {
-    for(auto i = tree.begin(); i != tree.end(); i++)
-        setRestriction((*i)->data().id(),restriction);
-}
+template<class Ent> void Bdd::setRestriction(const Ent & entity, flag restrict)
+    {m_manager->get<Ent>().setRestriction(entity.id(), restrict);}
 }
 #endif // BDD_H

@@ -71,8 +71,20 @@ public:
     //! Destructeur.
     virtual ~AbstractManager(); //default
 
+    //! Ajoute une restriction de modification pour l'entité d'identifiant id.
+    virtual void addRestriction(idt /*id*/, flag restrict) {
+        if(restrict)
+            throw std::invalid_argument(QString("void AbstractManager::addRestriction(idt, flag) :\n"
+                                                "Les entités du type ").append(name())
+                                        .append(" ne peuvent avoir de restriction de modification.\n").toStdString());
+    }
+
     //! Crée dans la base de donnée la table associée à l'entité du manageur.
     virtual void creer() = 0;
+
+    //! Accesseur des restrictions gérées.
+    virtual flag enableRestriction() const
+        {return bmps::Aucune;}
 
     //! Teste s'il existe une entité de même identifiant que entity en base de donnée.
     virtual bool exists(const Entity & entity) = 0;
@@ -97,13 +109,9 @@ public:
     //! Retourne True si l'opération s'est correctement déroulée.
     virtual bool get(Entity & entity) = 0;
 
-    //! Renvoie l'autorisation de modification de l'entité d'identifiant id.
-    virtual bool getAutorisation(idt /*id*/, bmps::autorisation /*autorisation*/)
-        {return true;}
-
     //! Renvoie la liste des restrictions de modification de l'entité d'identifiant id.
-    virtual std::vector<unsigned> getRestriction(idt /*id*/)
-         {return std::vector<unsigned>();}
+    virtual flag getRestriction(idt /*id*/)
+         {return bddMPS::Aucune;}
 
     //! Hydrate l'entité entity avec les valeurs des attributs de l'entité enregistrée en base de donnée
     //! ayant les mêmes valeurs pour les attributs uniques.
@@ -127,10 +135,6 @@ public:
     //! Retourne un vecteur contenant les noms des attributs.
     virtual std::vector<QString> namesAttributs() const = 0;
 
-    //! Renvoie la liste des restrictions gérer par le manageur.
-    virtual std::vector<bmps::autorisation> restriction() const
-        {return std::vector<bmps::autorisation>();}
-
     //! Teste s'il y a dans la base de donnée une entité ayant exactement les mêmes valeurs d'attributs (identifiant compris).
     virtual bool sameInBdd(const Entity & entity) = 0;
 
@@ -140,22 +144,10 @@ public:
     //! Enregistre l'entité entity en base de donnée.
     virtual void save(const Entity & entity) = 0;
 
-    //! Enregistre l'entité entity en base de donnée ainsi que sa nouvelle autorisation de modification.
-    virtual void save(Entity & entity, bmps::autorisation autorisation, bool bb = false) {
+    //! Enregistre l'entité entity en base de donnée ainsi que sa nouvelle restriction de modification.
+    virtual void save(Entity & entity, flag restict) {
         saveByPass(entity);
-        setAutorisation(entity.id(), autorisation, bb);
-    }
-
-    //! Enregistre l'entité entity en base de donnée ainsi que ses nouvelles autorisations de modification.
-    virtual void save(Entity & entity, const std::map<bmps::autorisation,bool> & autorisations) {
-        saveByPass(entity);
-        setAutorisation(entity.id(), autorisations);
-    }
-
-    //! Enregistre l'entité entity en base de donnée ainsi que ses nouvelles restriction de modification.
-    virtual void save(Entity & entity, const std::vector<bmps::autorisation> restriction) {
-        saveByPass(entity);
-        setRestriction(entity.id(), restriction);
+        setRestriction(entity.id(), restict);
     }
 
     //! Enregistre l'entité entity en base avec le parent et la position spécifiés.
@@ -184,29 +176,20 @@ public:
     //! et l'entité d'identifiant idE est supprimé.
     virtual void saveUnique(const Entity & entity) = 0;
 
-    //! Modifie une autorisation de modification pour l'entité d'identifiant id.
-    virtual void setAutorisation(idt /*id*/, bmps::autorisation /*autorisation*/, bool bb = false) {
-        if(!bb)
-            throw std::invalid_argument(QString("void AbstractManager::setAutorisation(idt id, "
-                                                "bmps::autorisation autorisation, bool bb = false) :\n"
+    //! Modifie la restriction de modification pour l'entité d'identifiant id.
+    virtual void setRestriction(idt /*id*/, flag restrict) {
+        if(restrict)
+            throw std::invalid_argument(QString("void AbstractManager::setRestriction(idt, flag) :\n"
                                                 "Les entités du type ").append(name())
                                         .append(" ne peuvent avoir de restriction de modification.\n").toStdString());
     }
 
-    //! Modifie les autorisations de modification pour l'entité d'identifiant id.
-    virtual void setAutorisation(idt id, const std::map<bmps::autorisation,bool> & autorisations) {
-        for (auto iter = autorisations.cbegin(); iter != autorisations.cend(); ++iter)
-            setAutorisation(id,iter->first,iter->second);
-    }
-
-    //! Ajoute des restrictions de modification pour l'entité d'identifiant id.
-    virtual void setRestriction(idt id, const std::vector<bmps::autorisation> restriction) {
-        for (auto iter = restriction.cbegin(); iter != restriction.cend(); ++iter)
-            setAutorisation(id,*iter,false);
-    }
+    //! Test la restriction de modification de l'entité d'identifiant id.
+    virtual bool testRestriction(idt /*id*/, flag /*restrict*/)
+        {return true;}
 
     //! Retourne le type du manager.
-    virtual unsigned typeManager() const
+    virtual flag typeManager() const
         {return bmps::NormalTypeManager;}
 
 protected:
@@ -573,43 +556,17 @@ public:
     void save(const Entity & entity) override
         {save(Ent::Convert(entity));}
 
-    //! Enregistre l'entité entity en base de donnée ainsi que sa nouvelle autorisation de modification.
-    virtual void save(Ent & entity, bmps::autorisation autorisation, bool bb = false) {
+    //! Enregistre l'entité entity en base de donnée ainsi que sa nouvelle restriction de modification.
+    virtual void save(Ent & entity, flag restrict) {
         saveByPass(entity);
-        setAutorisation(entity.id(), autorisation, bb);
+        setRestriction(entity.id(), restrict);
     }
 
-    //! Enregistre l'entité entity en base de donnée ainsi que sa nouvelle autorisation de modification.
-    virtual void save(const Ent & entity, bmps::autorisation autorisation, bool bb = false) {
+    //! Enregistre l'entité entity en base de donnée ainsi que sa nouvelle restriction de modification.
+    virtual void save(const Ent & entity, flag restrict) {
         Ent ent(entity);
         saveByPass(ent);
-        setAutorisation(ent.id(), autorisation, bb);
-    }
-
-    //! Enregistre l'entité entity en base de donnée ainsi que ses nouvelles autorisations de modification.
-    virtual void save(Ent & entity, const std::map<bmps::autorisation,bool> & autorisations) {
-        saveByPass(entity);
-        setAutorisation(entity.id(), autorisations);
-    }
-
-    //! Enregistre l'entité entity en base de donnée ainsi que ses nouvelles autorisations de modification.
-    virtual void save(const Ent & entity, const std::map<bmps::autorisation,bool> & autorisations) {
-        Ent ent(entity);
-        saveByPass(ent);
-        setAutorisation(ent.id(), autorisations);
-    }
-
-    //! Enregistre l'entité entity en base de donnée ainsi que ses nouvelles restriction de modification.
-    virtual void save(Ent & entity, const std::vector<bmps::autorisation> restriction) {
-        saveByPass(entity);
-        setRestriction(entity.id(), restriction);
-    }
-
-    //! Enregistre l'entité entity en base de donnée ainsi que ses nouvelle restriction de modification.
-    virtual void save(const Ent & entity, const std::vector<bmps::autorisation> restriction) {
-        Ent ent(entity);
-        saveByPass(ent);
-        setRestriction(ent.id(), restriction);
+        setRestriction(entity.id(), restrict);
     }
 
     //! Enregistre l'entité entity en base avec le parent et la position spécifiés.
@@ -670,6 +627,10 @@ public:
     //! et l'entité d'identifiant idE est supprimé.
     void saveUnique(const Entity & entity) override
         {saveUnique(Ent::Convert(entity));}
+
+    //! Teste la restriction de modification pour une entité d'identifiant id avec les valeurs de entity.
+    virtual bool testRestriction(idt /*id*/, flag /*restrict*/, const Ent & /*entity*/)
+        {return true;}
 };
 
 template<class Ent> tree<Ent> AbstractManagerTemp<Ent>::getArbre()

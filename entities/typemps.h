@@ -32,13 +32,25 @@ public:
     flag operator & (flag_type value) const noexcept
         {return m_value & value;}
 
+    //! Revoie un drapeaux correspondant à l'intersection.
+    flag operator & (flag f) const noexcept
+        {return m_value & f.m_value;}
+
     //! Revoie un drapeaux correspondant à l'union.
     flag operator | (flag_type value) const noexcept
         {return m_value | value;}
 
+    //! Revoie un drapeaux correspondant à l'union.
+    flag operator | (flag f) const noexcept
+        {return m_value | f.m_value;}
+
     //! Revoie un drapeaux correspondant à un ou exclusif.
     flag operator ^ (flag_type value) const noexcept
         {return m_value ^ value;}
+
+    //! Revoie un drapeaux correspondant à un ou exclusif.
+    flag operator ^ (flag f) const noexcept
+        {return m_value ^ f.m_value;}
 
     //! Revoie un drapeaux correspondant à un ou exclusif.
     flag operator ~ () const noexcept
@@ -49,9 +61,20 @@ public:
         m_value &= value;
         return *this;}
 
+    //! Revoie un drapeaux correspondant à l'intersection.
+    flag & operator &= (flag f) noexcept {
+        m_value &= f.m_value;
+        return *this;}
+
     //! Revoie un drapeaux correspondant à l'union.
     flag & operator |= (flag_type value) noexcept {
         m_value |= value;
+        return *this;
+    }
+
+    //! Revoie un drapeaux correspondant à l'union.
+    flag & operator |= (flag f) noexcept {
+        m_value |= f.m_value;
         return *this;
     }
 
@@ -61,8 +84,18 @@ public:
         return *this;
     }
 
+    //! Revoie un drapeaux correspondant à un ou exclusif.
+    flag operator ^= (flag f) noexcept {
+        m_value ^= f.m_value;
+        return *this;
+    }
+
     //! Conversion.
     operator flag_type() const noexcept
+        {return m_value;}
+
+    //! Conversion.
+    operator bool() const noexcept
         {return m_value;}
 
     //! Conversion.
@@ -72,12 +105,20 @@ public:
     }
 
     //! Test d'égalité.
-    bool operator ==(const flag & value)
+    bool operator ==(const flag & value) const
         {return m_value == value.m_value;}
 
     //! Test d'égalité.
-    bool operator ==(flag_type  value)
+    bool operator ==(flag_type  value) const
         {return m_value == value;}
+
+    //! Test de différence.
+    bool operator !=(const flag & value) const
+        {return m_value != value.m_value;}
+
+    //! Test de différence.
+    bool operator !=(flag_type  value) const
+        {return m_value != value;}
 
     //! Mutateur de la valeur.
     void setValue(flag_type value) noexcept

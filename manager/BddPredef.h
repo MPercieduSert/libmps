@@ -14,11 +14,10 @@ namespace bddMPS {
                         NbrCreationBddPredef};}
 
     namespace code {
-        enum invalide : codeType {Invalide = sizeof(codeType) + 1};
-        enum permission : codeType {Interdit = 0,
-                              Visible = 1,
-                              Attribuable = 2,
-                            NbrPermission};
+        enum invalide : flag::flag_type {Invalide = 0x1000000};
+        enum permission : flag::flag_type {Interdit = 0,
+                              Visible = 0x1,
+                              Attribuable = 0x2};
     }
 
 /*! \ingroup groupeFile
@@ -79,7 +78,7 @@ public:
         {return std::map<int,QString>();}//à finir
 
     //! renvoie le numéro permission associée à la chaine de caractères, ou NbrPermission la chaine ne correspond à aucun numéro.
-    virtual codeType code(const QString & str) const;
+    virtual flag code(const QString & str) const;
 
     //! Mutateur d'une entité enregistrée comme donnée.
     template<class Ent> void setEntityInDonnee(const Ent & entity, idt idCible, int cible, int num = 0);
@@ -89,7 +88,7 @@ protected:
     bool delP(idt id, szt idEntity) override;
 
     //! Renvoie l'autorisation de modification de l'entité donnée en argument.
-    bool getAutorisationP(idt id, szt idEntity, autorisation autoris) override;
+    bool getAutorisationP(idt id, szt idEntity, flag autoris) override;
 
     //! Hydrate un attribut de l'entité par la valeur contenue dans le XmlDox à l'endroit pointé par iter.
     QString hydrateAttributXml(entityMPS::Entity & entity, szt pos, fichierMPS::XmlDoc::const_brother_iterator iter) override;

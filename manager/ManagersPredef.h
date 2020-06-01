@@ -160,12 +160,12 @@ protected:
     
     //! Mise en place de la prise en charge des donnees.
     void enableDonnee(const QString & donnee, const QString & arbreDonnee, const QString & cibleDonnee, const QString & cardDonnee,
-                      std::unique_ptr<AbstractGestionAutorisation<emps::Donnee>> &&  gestionDonnee
-                        = std::make_unique<GestionAutorisationNoRestrictif<emps::Donnee>>(),
-                      std::unique_ptr<AbstractGestionAutorisation<emps::DonneeCible>> &&  gestionCilbeDonnee
-                        = std::make_unique<GestionAutorisationNoRestrictif<emps::DonneeCible>>(),
-                      std::unique_ptr<AbstractGestionAutorisation<emps::DonneeCard>> &&  gestionCardDonnee
-                        = std::make_unique<GestionAutorisationNoRestrictif<emps::DonneeCard>>());
+                      std::unique_ptr<AbstractGestionRestriction<emps::Donnee>> &&  gestionDonnee
+                        = std::make_unique<AbstractGestionRestriction<emps::Donnee>>(),
+                      std::unique_ptr<AbstractGestionRestriction<emps::DonneeCible>> &&  gestionCilbeDonnee
+                        = std::make_unique<AbstractGestionRestriction<emps::DonneeCible>>(),
+                      std::unique_ptr<AbstractGestionRestriction<emps::DonneeCard>> &&  gestionCardDonnee
+                        = std::make_unique<AbstractGestionRestriction<emps::DonneeCard>>());
 
     //! Mise en place de la prise en charge des historiques.
     void enableHistorique(const QString & historique);
@@ -173,12 +173,12 @@ protected:
     //! Mise en place de la prise en charge des mots Clé.
     void enableMotCle(const QString & motCle, const QString & motCleArbre, const QString & cibleMotCle,
                       const QString & cibleProg, const QString & permissionMotCle, const QString & permissionProg,
-                      std::unique_ptr<AbstractGestionAutorisation<emps::MotCle>> &&  gestionMotCle
-                        = std::make_unique<GestionAutorisationNoRestrictif<emps::MotCle>>(),
-                      std::unique_ptr<AbstractGestionAutorisation<emps::MotClePermission>> &&  gestionPermission
-                        = std::make_unique<GestionAutorisationNoRestrictif<emps::MotClePermission>>(),
-                      std::unique_ptr<AbstractGestionAutorisation<emps::MotProgPermission>> &&  gestionProgPermission
-                        = std::make_unique<GestionAutorisationNoRestrictif<emps::MotProgPermission>>());
+                      std::unique_ptr<AbstractGestionRestriction<emps::MotCle>> &&  gestionMotCle
+                        = std::make_unique<AbstractGestionRestriction<emps::MotCle>>(),
+                      std::unique_ptr<AbstractGestionRestriction<emps::MotClePermission>> &&  gestionPermission
+                        = std::make_unique<AbstractGestionRestriction<emps::MotClePermission>>(),
+                      std::unique_ptr<AbstractGestionRestriction<emps::MotProgPermission>> &&  gestionProgPermission
+                        = std::make_unique<AbstractGestionRestriction<emps::MotProgPermission>>());
 
     //! Mise en place de la prise en charge des restrictions de modification.
     void enableRestriction(const QString & restrictModification);
@@ -188,15 +188,15 @@ protected:
 
     //! Mise en place de la prise en charge des types.
     void enableType(const QString & type, const QString & permissionType,
-                    std::unique_ptr<AbstractGestionAutorisation<emps::Type>> &&  gestionType
-                        = std::make_unique<GestionAutorisationNoRestrictif<emps::Type>>(),
-                    std::unique_ptr<AbstractGestionAutorisation<emps::TypePermission>> &&  gestionPermission
-                        = std::make_unique<GestionAutorisationNoRestrictif<emps::TypePermission>>());
+                    std::unique_ptr<AbstractGestionRestriction<emps::Type>> &&  gestionType
+                        = std::make_unique<AbstractGestionRestriction<emps::Type>>(),
+                    std::unique_ptr<AbstractGestionRestriction<emps::TypePermission>> &&  gestionPermission
+                        = std::make_unique<AbstractGestionRestriction<emps::TypePermission>>());
 
     //! Mise en place de la prise en charge des utilisations.
     void enableUtilisation(const QString & utilisation, const QString & usage, const QString &usageArbre,
-                           std::unique_ptr<AbstractGestionAutorisation<emps::Usage>> && gestionUsage
-                            = std::make_unique<GestionAutorisationNoRestrictif<emps::Usage>>());
+                           std::unique_ptr<AbstractGestionRestriction<emps::Usage>> && gestionUsage
+                            = std::make_unique<AbstractGestionRestriction<emps::Usage>>());
 
     //! Mutateur du tableau de correspondance ID -> Cible.
     template<class Ent> void setCible(int cible) {

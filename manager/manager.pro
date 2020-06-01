@@ -24,13 +24,11 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-    AbstractGestionAutorisation.cpp \
     AbstractLinkSql.cpp \
     AbstractManager.cpp \
     AbstractUniqueSql.cpp \
     Bdd.cpp \
     BddPredef.cpp \
-    GestionAutorisationCible.cpp \
     InfoBdd.cpp \
     ManagerForArbre.cpp \
     Managers.cpp \
@@ -45,16 +43,16 @@ SOURCES += \
     ManagerModifControle.cpp \
     ManagerPermission.cpp \
     ManagerPermissionModifControle.cpp \
-    AbstractManagerArbre.cpp
+    AbstractManagerArbre.cpp \
+    AbstractGestionRestriction.cpp \
+    GestionRestrictionCible.cpp
 
 HEADERS += \
-    AbstractGestionAutorisation.h \
     AbstractLinkSql.h \
     AbstractManager.h \
     AbstractUniqueSql.h \
     Bdd.h \
     BddPredef.h \
-    GestionAutorisationCible.h \
     InfoBdd.h \
     ManagerForArbre.h \
     Managers.h \
@@ -69,7 +67,9 @@ HEADERS += \
     ManagerModifControle.h \
     ManagerPermission.h \
     ManagerPermissionModifControle.h \
-    AbstractManagerArbre.h
+    AbstractManagerArbre.h \
+    AbstractGestionRestriction.h \
+    GestionRestrictionCible.h
 unix {
     target.path = /usr/lib
     INSTALLS += target

@@ -116,6 +116,9 @@ protected:
 template<class T> inline T ReqSql::value(szt n) const
     {return m_requete->value(static_cast<int>(n)).value<T>();}
 
+template<> inline flag ReqSql::value<flag>(szt n) const
+    {return m_requete->value(static_cast<int>(n)).toUInt();}
+
 template<> inline QVariant ReqSql::value<QVariant>(szt n) const
     {return m_requete->value(static_cast<int>(n));}
 }

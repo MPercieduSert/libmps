@@ -21,12 +21,12 @@ protected:
 
 public:
     using ManagerArb::get;
-    using ManagerMC::getAutorisation;
+    using ManagerMC::testRestriction;
 
     //! Constructeur.
     ManagerArbreSimpleModifControle(const InfoBdd & info,
-                                    std::unique_ptr<AbstractGestionAutorisation<Ent>> && gestionAutorisation
-                                                = std::make_unique<GestionAutorisationNoRestrictif<Ent>>(),
+                                    std::unique_ptr<AbstractGestionRestriction<Ent>> && gestionAutorisation
+                                                = std::make_unique<AbstractGestionRestriction<Ent>>(),
                                       std::unique_ptr<AbstractUniqueSqlTemp<Ent>> && unique = std::make_unique<NoUniqueSql<Ent>>())
         : ManagerSql<Ent>(info,std::move(unique)),
           ManagerModifControle<Ent>(std::move(gestionAutorisation)) {}
@@ -36,11 +36,7 @@ public:
 
     //! Supprime de la table en base de donnée l'entité d'identifiant id.
     bool del(idt id) override
-        {return getAutorisation(id, bmps::Suppr) && ManagerArb::del(id);}
-
-    //! Renvoie la liste des restrictions gérer par le gestionérer d'autorisarion.
-    std::vector<bmps::autorisation> restriction() const override
-        {return ManagerModifControle<Ent>::restriction();}
+        {return testRestriction(id,bddMPS::Suppr) && ManagerArb::del(id);}
 
     //! Enregistre l'entité entity en base de donnée.
     void save(Ent & entity) override
@@ -51,13 +47,13 @@ public:
         {ManagerArb::save(entity);}
 
     //! Retourne le type du manager.
-    virtual unsigned typeManager() const
+    virtual flag typeManager() const
         {return ManagerArb::typeManager() | ManagerMC::typeManager();}
 
 protected:
     //! Constructeur.
-    ManagerArbreSimpleModifControle(std::unique_ptr<AbstractGestionAutorisation<Ent>> && gestionAutorisation
-                                    = std::make_unique<GestionAutorisationNoRestrictif<Ent>>())
+    ManagerArbreSimpleModifControle(std::unique_ptr<AbstractGestionRestriction<Ent>> && gestionAutorisation
+                                    = std::make_unique<AbstractGestionRestriction<Ent>>())
         : ManagerModifControle<Ent>(std::move(gestionAutorisation))
     {}
 };

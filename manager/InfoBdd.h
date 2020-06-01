@@ -20,11 +20,11 @@ namespace bddMPS {
 using namespace typeMPS;
 namespace emps = entityMPS;
 
-    //! Autorisation de modification d'une entité.
-    enum autorisation{Toute = 0,
-                      Modif = 1,
-                      Suppr = 2,
-                      NbrAutorisation};
+    //! Restriction de modification d'une entité.
+    enum restriction : flag::flag_type {Aucune = 0x0,
+                      Modif = 0x1,
+                      Suppr = 0x2,
+                      ModifSupr = 0x3};
 
     //! Identifiant pour les fonctions d'agrega.
     enum agrega {Max,
@@ -59,12 +59,12 @@ namespace emps = entityMPS;
                    NbrType};
 
     //! Type de Manager
-    enum typeManager : codeType {
+    enum typeManager : flag::flag_type {
         NormalTypeManager = 0,
-        ArbreTypeManager = 1,
-        ArbreSimpleTypeManager = 2,
-        ModifControleTypeManager = 4,
-        PermissionTypeManager = 8};
+        ArbreTypeManager = 0x1,
+        ArbreSimpleTypeManager = 0x2,
+        ModifControleTypeManager = 0x4,
+        PermissionTypeManager = 0x8};
 
     /*! \brief Les différents cas des résultats des tests d'existence d'unicité.
      * (concordance d'indentifiant: ou bien l'identifiant en base de donnée et le même celui de l'entité testée ou bien ce dernier est nul.)

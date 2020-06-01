@@ -4,7 +4,7 @@
 #ifndef MANAGERMODIFCONTROLE_H
 #define MANAGERMODIFCONTROLE_H
 
-#include "AbstractGestionAutorisation.h"
+#include "AbstractGestionRestriction.h"
 #include "ManagerSql.h"
 
 //! \ingroup groupeManager
@@ -21,43 +21,55 @@ namespace managerMPS {
  */
 template<class Ent> class BaseManagerModifControle {
 protected:
-    bool m_bypass = false;  //!< Booléen permettant de courtcircuité le gestionnaire d'autorisation.
-    std::unique_ptr<AbstractGestionAutorisation<Ent>>  m_gestionAutorisation;   //!< Gestionnaire d'autorisation
+    bool m_bypass = false;  //!< Booléen permettant de courtcircuité le gestionnaire de restriction.
+    std::unique_ptr<AbstractGestionRestriction<Ent>>  m_gestionRestriction;   //!< Gestionnaire de restriction.
 public:
-    //! Constructeur. (Posséde le gestionnaire d'autorisation.)
-    BaseManagerModifControle(std::unique_ptr<AbstractGestionAutorisation<Ent>> &&  gestionAutorisation)
-        : m_gestionAutorisation(std::move(gestionAutorisation)) {}
+    //! Constructeur. (Posséde le gestionnaire de restriction.)
+    BaseManagerModifControle(std::unique_ptr<AbstractGestionRestriction<Ent>> &&  gestionRestriction)
+        : m_gestionRestriction(std::move(gestionRestriction)) {}
 
     //! Destructeur.
     virtual ~BaseManagerModifControle() = default;
 
-    //! Accesseur du gestionnaire d'autorisations.
-    AbstractGestionAutorisation<Ent> & gestionAutorisation() const
-        {return *m_gestionAutorisation;}
+    //! Accesseur du gestionnaire de restriction.
+    AbstractGestionRestriction<Ent> & gestionRestriction() const
+        {return *m_gestionRestriction;}
 
-    //! Demande l'autorisation de modification pour l'entité d'identifiant id.
-    virtual bool getAutorisation(idt id, bmps::autorisation autorisation)
-        {return m_gestionAutorisation->getAutorisation(id, autorisation) || m_bypass;}
+    //! Ajoute des restrictions gérées par le gestionnaire.
+    void addEnableRestriction(flag restriction)
+        {m_gestionRestriction->addEnableRestriction(restriction);}
 
-    //! Demande l'autorisation de modification pour une entité d'identifiant id avec les valeurs de entity.
-    virtual bool getAutorisation(idt id, bmps::autorisation autorisation, const Ent & entity)
-        {return m_gestionAutorisation->getAutorisation(id, autorisation, entity) || m_bypass;}
-
-    //! Demande la liste des restrictions de modification pour l'entité didentifiant id.
-    virtual std::vector<unsigned> getRestriction(idt id)
-        {return m_gestionAutorisation->getRestriction(id);}
+    //! Ajoute des restrictions de modification pour une entité donnée.
+    virtual void addRestriction(idt id, flag restrict)
+        {m_gestionRestriction->addRestriction(id,restrict);}
 
     //! Renvoie la liste des restrictions gérer par le gestionérer d'autorisarion.
-    virtual std::vector<bmps::autorisation> restriction() const
-        {return m_gestionAutorisation->restriction();}
+    virtual flag enableRestriction() const
+        {return m_gestionRestriction->enableRestriction();}
 
-    //! Modifie une autorisation de modification pour l'entité d'identifiant id.
-    virtual void setAutorisation(idt id, bmps::autorisation autorisation, bool bb)
-        {m_gestionAutorisation->setAutorisation(id, autorisation, bb);}
+    //! Demande les restrictions de modification pour l'entité d'identifiant id.
+    virtual flag getRestriction(idt id)
+        {return m_bypass ? bddMPS::Aucune : m_gestionRestriction->getRestriction(id);}
+
+    //! Mutateur des restrictions gérées par le gestionnaire.
+    void setEnableRestriction(flag restriction)
+        {m_gestionRestriction->setEnableRestriction(restriction);}
 
     //! Mutateur du gestionnaire d'autorisations.
-    void setGestionAutorisation(AbstractGestionAutorisation<Ent> * gestionAutorisation)
-        {m_gestionAutorisation = gestionAutorisation;}
+    void setGestionRestriction(AbstractGestionRestriction<Ent> * gestionRestriction)
+        {m_gestionRestriction = gestionRestriction;}
+
+    //! Modifie les restrictions de modification pour une entité donnée.
+    virtual void setRestriction(idt id, flag restrict)
+        {m_gestionRestriction->setRestriction(id,restrict);}
+
+    //! Teste la restriction de modification pour une entité d'identifiant id.
+    virtual bool testRestriction(idt id, flag restrict)
+        {return m_bypass ? true : m_gestionRestriction->testRestriction(id, restrict);}
+
+    //! Teste la restriction de modification pour une entité d'identifiant id avec les valeurs de entity.
+    virtual bool testRestriction(idt id, flag restrict, const Ent & entity)
+        {return m_bypass ? true : m_gestionRestriction->testRestriction(id, restrict, entity);}
 
 protected:
     //! Met en place un court circuit du gestionnaire d'autorisations.
@@ -77,7 +89,7 @@ protected:
     using ManagerSqlEnt = ManagerSql<Ent>;
     using ManagerBMC = BaseManagerModifControle<Ent>;
 
-    using ManagerBMC::m_gestionAutorisation;
+    using ManagerBMC::m_gestionRestriction;
 
     using ManagerSqlEnt::add;
     using ManagerSqlEnt::messageErreurs;
@@ -95,108 +107,58 @@ public:
 
     //! Constructeur
     ManagerModifControle (const InfoBdd & info,
-                          std::unique_ptr<AbstractGestionAutorisation<Ent>> && gestionAutorisation
-                                      = std::make_unique<GestionAutorisationNoRestrictif<Ent>>(),
+                          std::unique_ptr<AbstractGestionRestriction<Ent>> && gestionRestriction
+                                      = std::make_unique<AbstractGestionRestriction<Ent>>(),
                           std::unique_ptr<AbstractUniqueSqlTemp<Ent>> && unique = std::make_unique<NoUniqueSql<Ent>>())
-        : ManagerSql<Ent>(info,std::move(unique)), BaseManagerModifControle<Ent>(std::move(gestionAutorisation)) {
-        m_gestionAutorisation->addRestriction(bmps::Modif);
-        m_gestionAutorisation->addRestriction(bmps::Suppr);
-    }
+        : ManagerSql<Ent>(info,std::move(unique)), BaseManagerModifControle<Ent>(std::move(gestionRestriction))
+            {m_gestionRestriction->setEnableRestriction(bmps::ModifSupr);}
+
     //! Destructeur.
     ~ManagerModifControle() override = default;
 
+    //! Ajoute des restrictions de modification pour l'entité d'identifiant id.
+    void addRestriction(idt id, flag restrict) override
+        {ManagerBMC::addRestriction(id, restrict);}
+
+
     //! Supprime de la table en base de donnée l'entité d'identifiant id.
     bool del(idt id) override
-        {return getAutorisation(id, bmps::Suppr) &&  ManagerSqlEnt::del(id);}
+        {return testRestriction(id,bddMPS::Suppr) &&  ManagerSqlEnt::del(id);}
 
-    //! Demande l'autorisation de modification pour l'entité d'identifiant id.
-    bool getAutorisation(idt id, bmps::autorisation autorisation) override
-        {return ManagerBMC::getAutorisation(id, autorisation);}
-
-    //! Demande l'autorisation de modification pour une entité d'identifiant id avec les valeurs de entity.
-    bool getAutorisation(idt id, bmps::autorisation autorisation, const Ent & entity) override
-        {return ManagerBMC::getAutorisation(id, autorisation, entity);}
-
-    //! Demande la liste des restrictions de modification pour l'entité d'identifiant id.
-    std::vector<unsigned> getRestriction(idt id) override
+    //! Demande les restriction de modification pour l'entité d'identifiant id.
+    flag getRestriction(idt id) override
         {return ManagerBMC::getRestriction(id);}
 
-//    //! Enregistre l'entité entity en base de donnée ainsi que sa nouvelle autorisation de modification.
-//    void save(Ent & entity, bmps::autorisation autorisation, bool bb = false) override {
-//        ouvrir();
-//        save(entity);
-//        fermer();
-//        setAutorisation(entity, autorisation, bb);
-//    }
+    //! Renvoie la liste des restrictions gérées par le manageur.
+    flag enableRestriction() const override
+        {return ManagerBMC::enableRestriction();}
 
-//    //! Enregistre l'entité entity en base de donnée ainsi que sa nouvelle autorisation de modification.
-//    void save(const Ent & entity, bmps::autorisation autorisation, bool bb = false) override {
-//        SAVE_MODIF_DEBUT
-//        setAutorisation(ent, autorisation, bb);
-//        SAVE_MODIF_MILIEU
-//        setAutorisation(entity, autorisation, bb);
-//        SAVE_MODIF_FIN
-//    }
+    //! Modifie les restrictions de modification pour l'entité d'identifiant id.
+    void setRestriction(idt id, flag restrict) override
+        {ManagerBMC::setRestriction(id, restrict);}
 
-//    //! Enregistre l'entité entity en base de donnée ainsi que ses nouvelles autorisation de modification..
-//    void save(Ent & entity, const std::map<bmps::autorisation,bool> & autorisations) override {
-//        ouvrir();
-//        save(entity);
-//        fermer();
-//        setAutorisation(entity, autorisations);
-//    }
+    //! Teste la restriction de modification pour une entité d'identifiant id.
+    bool testRestriction(idt id, flag restrict) override
+        {return ManagerBMC::testRestriction(id, restrict);}
 
-//    //! Enregistre l'entité entity en base de donnée ainsi que ses nouvelles autorisations de modification.
-//    void save(const Ent & entity, const std::map<bmps::autorisation,bool> & autorisations) override {
-//        SAVE_MODIF_DEBUT
-//        setAutorisation(ent, autorisations);
-//        SAVE_MODIF_MILIEU
-//        setAutorisation(entity, autorisations);
-//        SAVE_MODIF_FIN
-//    }
-
-//    //! Enregistre l'entité entity en base de donnée ainsi que ses nouvelles restriction de modification.
-//    void save(Ent & entity, const std::vector<bmps::autorisation> restriction) override {
-//        ouvrir();
-//        save(entity);
-//        fermer();
-//        setRestriction(entity, restriction);
-//    }
-
-//    //! Enregistre l'entité entity en base de donnée ainsi que ses nouvelles restrictions de modification..
-//    void save(const Ent & entity, const std::vector<bmps::autorisation> restriction) override {
-//        SAVE_MODIF_DEBUT
-//        setRestriction(ent, restriction);
-//        SAVE_MODIF_MILIEU
-//        setRestriction(entity, restriction);
-//        SAVE_MODIF_FIN
-//    }
-
-    //! Renvoie la liste des restrictions gérer par le manageur.
-    std::vector<bmps::autorisation> restriction() const override
-        {return ManagerBMC::restriction();}
-
-    //! Modifie une autorisation de modification pour l'entité d'identifiant id.
-    void setAutorisation(idt id, bmps::autorisation autorisation, bool bb) override
-        {ManagerBMC::setAutorisation(id, autorisation, bb);}
+    //! Teste la restriction de modification pour une entité d'identifiant id avec les valeurs de entity.
+    bool testRestriction(idt id, flag restrict, const Ent & entity) override
+        {return ManagerBMC::testRestriction(id, restrict, entity);}
 
     //! Retourne le type du manager.
-    virtual unsigned typeManager() const
+    virtual flag typeManager() const
         {return bmps::ModifControleTypeManager;}
 
 protected:
     //! Constructeur.
-    ManagerModifControle(std::unique_ptr<AbstractGestionAutorisation<Ent>> && gestionAutorisation
-                         = std::make_unique<GestionAutorisationNoRestrictif<Ent>>())
-        : BaseManagerModifControle<Ent>(std::move(gestionAutorisation)) {
-        m_gestionAutorisation->addRestriction(bmps::Modif);
-        m_gestionAutorisation->addRestriction(bmps::Suppr);
-    }
-
+    ManagerModifControle(std::unique_ptr<AbstractGestionRestriction<Ent>> && gestionRestriction
+                         = std::make_unique<AbstractGestionRestriction<Ent>>())
+        : BaseManagerModifControle<Ent>(std::move(gestionRestriction))
+        {m_gestionRestriction->setEnableRestriction(bmps::ModifSupr);}
 
     //! Met à jour l'entité entity en base de donnée.
     void modify(const Ent & entity) override {
-        if(getAutorisation(entity.id(), bmps::autorisation::Modif))
+        if(testRestriction(entity.id(), bmps::Modif,entity))
             ManagerSqlEnt::modify(entity);
         else
             throw std::invalid_argument(QString("Erreur d'autorisation de modification' : "
@@ -206,7 +168,7 @@ protected:
 
     //! Met à jour l'entité entity en base de donnée d'identifiant id avec les valeurs d'entity.
     void modify(const Ent & entity, idt id) override {
-        if(getAutorisation(id, bmps::autorisation::Modif, entity))
+        if(testRestriction(id, bmps::Modif, entity))
             ManagerSqlEnt::modify(entity,id);
         else
             throw std::invalid_argument(QString("Erreur d'autorisation de modification' : "

@@ -33,9 +33,9 @@ void ManagersPredef::enableCommentaire(const QString & commentaire, const QStrin
 
 void ManagersPredef::enableDonnee(const QString & donnee, const QString & arbreDonnee, const QString & cibleDonnee,
                                   const QString & cardDonnee,
-                                  std::unique_ptr<AbstractGestionAutorisation<Donnee>> &&  gestion,
-                                  std::unique_ptr<AbstractGestionAutorisation<DonneeCible>> && gestionCilbeDonnee,
-                                  std::unique_ptr<AbstractGestionAutorisation<DonneeCard>> && gestionCardDonnee) {
+                                  std::unique_ptr<AbstractGestionRestriction<Donnee>> &&  gestion,
+                                  std::unique_ptr<AbstractGestionRestriction<DonneeCible>> && gestionCilbeDonnee,
+                                  std::unique_ptr<AbstractGestionRestriction<DonneeCard>> && gestionCardDonnee) {
     //Donnee
     auto infoArbre = infoBddArbre(arbreDonnee);
     using UniqueDonnee = IdProgUniqueSql<Donnee>;
@@ -114,9 +114,9 @@ void ManagersPredef::enableHistorique(const QString & historique) {
 
 void ManagersPredef::enableMotCle(const QString & motCle, const QString & motCleArbre, const QString & cibleMotCle,
                                   const QString & cibleProg, const QString & permissionMotCle, const QString & permissionProg,
-                                  std::unique_ptr<AbstractGestionAutorisation<MotCle>> &&  gestionMotCle,
-                                  std::unique_ptr<AbstractGestionAutorisation<MotClePermission>> &&  gestionPermission,
-                                  std::unique_ptr<AbstractGestionAutorisation<MotProgPermission>> &&  gestionProgPermission) {
+                                  std::unique_ptr<AbstractGestionRestriction<MotCle>> &&  gestionMotCle,
+                                  std::unique_ptr<AbstractGestionRestriction<MotClePermission>> &&  gestionPermission,
+                                  std::unique_ptr<AbstractGestionRestriction<MotProgPermission>> &&  gestionProgPermission) {
     //Mot Clé
     auto infoArbre = infoBddArbre(motCleArbre);
     InfoBdd infoMC("MotCle",motCle,MotCle::NbrAtt);
@@ -268,8 +268,8 @@ void ManagersPredef::enableTexte(const QString & texte, const QString & cibleTex
 }
 
 void  ManagersPredef::enableType(const QString & typeEnt, const QString & permissionType,
-                std::unique_ptr<AbstractGestionAutorisation<Type>> &&  gestionType,
-                std::unique_ptr<AbstractGestionAutorisation<TypePermission>> &&  gestionPermission)
+                std::unique_ptr<AbstractGestionRestriction<Type>> &&  gestionType,
+                std::unique_ptr<AbstractGestionRestriction<TypePermission>> &&  gestionPermission)
 {
     //Type
     using UniqueType = IdProgNomUniqueSql<Type>;
@@ -310,7 +310,7 @@ void  ManagersPredef::enableType(const QString & typeEnt, const QString & permis
 }
 
 void ManagersPredef::enableUtilisation(const QString &utilisation, const QString &usage, const QString & usageArbre,
-                                       std::unique_ptr<AbstractGestionAutorisation<Usage>> &&  gestionUsage)
+                                       std::unique_ptr<AbstractGestionRestriction<Usage>> &&  gestionUsage)
 {
     //Usage
     auto infoArbre = infoBddArbre(usageArbre);

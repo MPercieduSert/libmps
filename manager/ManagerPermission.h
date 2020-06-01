@@ -41,13 +41,10 @@ public:
     }
 
     //! Retourne le type du manager.
-    virtual unsigned typeManager() const
+    virtual flag typeManager() const
         {return bmps::PermissionTypeManager;}
 
 protected:
-    /*//! Constructeur.
-    ManagerPermission() {}*/
-
     //! Insert la nouvelle entité entity dans la base de donnée
     //! et assigne l'identifiant de l'entité insérée en base de donnée à entity.
     void add(Ent & entity) override {
@@ -121,7 +118,6 @@ protected:
 template<class Ent> class ManagerPermissionCode : virtual public AbstractManagerPermission<Ent>
 {
 public:
-    enum {NoExists = bmps::autorisation::Toute};
     using AbstractManagerPermission<Ent>::AbstractManagerPermission;
 
     //! Destructeur.
@@ -130,7 +126,7 @@ public:
 protected:
     //! Test si l'entité doit exister dans la base de donnée.
     bool isVirtual(const Ent entity) const override
-        {return entity.code() == NoExists;}
+        {return !entity.code();}
 };
 }
 #endif // MANAGERPERMISSION_H
