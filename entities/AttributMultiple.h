@@ -117,18 +117,20 @@ namespace emps = entityMPS;
 using CibleAttributs = emps::Attributs<IdCibleAttribut, CibleAttribut>;
 using CibleDateTimeAttribut = emps::Attributs<CibleAttributs, DateTimeValideAttribut>;
 using CibleDateTimeNumAttribut = emps::Attributs<CibleDateTimeAttribut, NumAttribut>;
+using CreaModifAttribut = emps::Attributs<CreationAttribut,ModificationAttribut>;
+using DebutFinAttribut = emps::Attributs<DebutAttribut,FinAttribut>;
 using EtatAttributs = emps::Attributs<IdEtatAttribut, EtatAttribut>;
 template<class ValeurAttribut> using CibleDateTimeNumValeurAttribut = emps::Attributs<CibleDateTimeNumAttribut, ValeurAttribut>;
-using RelationAttribut = emps::Attributs<Id1Attribut, Id2Attribut>;
-using RelationDateTimeAttribut = emps::Attributs<RelationAttribut, DateTimeValideAttribut>;
-using RelationNumAttribut = emps::Attributs<RelationAttribut, NumAttribut>;
 using IdNumAttribut = emps::Attributs<Id1Attribut, NumAttribut>;
 using IdProgNomAttribut = emps::Attributs<IdProgAttribut,NomAttribut>;
 template<class ValeurAttribut> using IdNumValeurAttribut = emps::Attributs<IdNumAttribut, ValeurAttribut>;
 using NomTypeAttribut = emps::Attributs<NomAttribut, TypeAttribut>;
 using NcNomAttribut = emps::Attributs<NcAttribut, NomAttribut>;
 using NcNomTypeAttribut = emps::Attributs<NcNomAttribut, TypeAttribut>;
-using TexteAttributs = emps::Attributs<CreationAttribut,ModificationAttribut,TexteAttribut>;
+using RelationAttribut = emps::Attributs<Id1Attribut, Id2Attribut>;
+using RelationDateTimeAttribut = emps::Attributs<RelationAttribut, DateTimeValideAttribut>;
+using RelationNumAttribut = emps::Attributs<RelationAttribut, NumAttribut>;
+using TexteAttributs = emps::Attributs<CreaModifAttribut,TexteAttribut>;
 
 /*! \ingroup groupeEntity
  * \brief Attributs des entités de type arbre.

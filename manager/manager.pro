@@ -6,8 +6,6 @@
 
 QT       += sql xml
 
-QT       -= gui
-
 TARGET = manager
 TEMPLATE = lib
 CONFIG += staticlib c++17 create_prl

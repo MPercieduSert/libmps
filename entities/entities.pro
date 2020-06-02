@@ -6,8 +6,6 @@
 
 QT       += xml
 
-QT       -= gui
-
 TARGET = entities
 TEMPLATE = lib
 CONFIG += staticlib c++17 create_prl

@@ -80,6 +80,127 @@ namespace ebmps = entityBaseMPS;
 /*! \ingroup groupeEntity
  * \brief Ensemble des classes de la fonctionalité commentaire.
  */
+namespace ensembleCalendrier {
+using EvenementCible = ebmps::CibleDateTimeCurrentNumTpValValeurVariantEntity<infoEntity::EvenementCibleId>;
+/*! \ingroup groupeEntity
+ * \brief Représentation de l'entité Evenement.
+ */
+class Evenement : public EntityIDs<infoEntity::EvenementId, amps::Id1Attribut,
+                                                            amps::NcNomTypeAttribut,
+                                                            amps::CodeAttribut,
+                                                            amps::DebutFinAttribut,
+                                                            amps::CreaModifAttribut,
+                                                            amps::TitreAttribut> {
+protected:
+    template<class T> using PositionEnum = PositionEnum<T,Evenement>;
+public:
+    using EAID = EntityIDs<infoEntity::EvenementId, amps::Id1Attribut,
+                                                    amps::NcNomTypeAttribut,
+                                                    amps::CodeAttribut,
+                                                    amps::DebutFinAttribut,
+                                                    amps::CreaModifAttribut,
+                                                    amps::TitreAttribut>;
+    //! Positions des attributs.
+    enum Position:szt {Id = PositionEnum<IdAttribut>::Position,
+                       Id1 = PositionEnum<Id1Attribut>::Position,
+                       Code = PositionEnum<CodeAttribut>::Position,
+                       Creation = PositionEnum<CreationAttribut>::Position,
+                       Debut = PositionEnum<DebutAttribut>::Position,
+                       Fin = PositionEnum<FinAttribut>::Position,
+                       Modification = PositionEnum<ModificationAttribut>::Position,
+                       Nc = PositionEnum<NcAttribut>::Position,
+                       Nom = PositionEnum<NomAttribut>::Position,
+                       Titre = PositionEnum<TitreAttribut>::Position,
+                       Type = PositionEnum<TypeAttribut>::Position,
+                       NbrAtt,
+                       IdStyle = Id1};
+    using EAID::EntityID;
+    BASE_ENTITY(Evenement)
+    ALIAS_CLE(Style,1)
+
+    //! Constructeur à partir des valeurs d'un ensemble d'attributs unique.
+    Evenement(const QString & nom, idt id = 0)
+        : EAID(id)
+        {setNom(nom);}
+
+    //! Constructeur à partir des valeurs attributs.
+    Evenement(idt idStyle, flag code, const QDateTime & creation, const QDateTime & debut, const QDateTime & fin,
+              const QDateTime & modification, const QString & nc, const QString & nom, const QString & titre, idt type, idt id = 0)
+        : Evenement(nom,id) {
+        setIdStyle(idStyle);
+        setCode(code);
+        setCreation(creation);
+        setDebut(debut);
+        setFin(fin);
+        setModification(modification);
+        setNc(nc);
+        setNom(nom);
+        setTitre(titre);
+        setType(type);
+    }
+};
+/*! \ingroup groupeEntity
+ * \brief Représentation de l'entité EvenementStyle.
+ */
+class EvenementStyle : public EntityIDs<infoEntity::EvenementStyleId, amps::BordureAttribut,
+                                                                      amps::BrushAttribut,
+                                                                      amps::CouleurFondAttribut,
+                                                                      amps::CouleurTexteAttribut,
+                                                                      amps::CouleurTitreAttribut,
+                                                                      amps::FormeAttribut,
+                                                                      amps::NomAttribut,
+                                                                      amps::PoliceTexteAttribut,
+                                                                      amps::PoliceTitreAttribut>{
+protected:
+    template<class T> using PositionEnum = PositionEnum<T,EvenementStyle>;
+public:
+    using EAID = EntityIDs<infoEntity::EvenementStyleId, amps::BordureAttribut,
+                                                        amps::BrushAttribut,
+                                                        amps::CouleurFondAttribut,
+                                                        amps::CouleurTexteAttribut,
+                                                        amps::CouleurTitreAttribut,
+                                                        amps::FormeAttribut,
+                                                        amps::NomAttribut,
+                                                        amps::PoliceTexteAttribut,
+                                                        amps::PoliceTitreAttribut>;
+    //! Positions des attributs.
+    enum Position:szt {Id = PositionEnum<IdAttribut>::Position,
+                       Brush = PositionEnum<BrushAttribut>::Position,
+                       CouleurFond = PositionEnum<CouleurFondAttribut>::Position,
+                       CouleurTexte = PositionEnum<CouleurTexteAttribut>::Position,
+                       CouleurTitre = PositionEnum<CouleurTitreAttribut>::Position,
+                       Forme = PositionEnum<FormeAttribut>::Position,
+                       Nom = PositionEnum<NomAttribut>::Position,
+                       PoliceTexte = PositionEnum<PoliceTexteAttribut>::Position,
+                       PolicceTitre = PositionEnum<PoliceTitreAttribut>::Position,
+                       NbrAtt};
+    using EAID::EntityID;
+    BASE_ENTITY(EvenementStyle)
+
+    //! Constructeur à partir des valeurs d'un ensemble d'attributs unique.
+    EvenementStyle(const QString & nom, idt id = 0)
+        : EAID(id)
+        {setNom(nom);}
+
+    //! Constructeur à partir des valeurs attributs.
+    EvenementStyle(szt brush, int bordure, const QString & CouleurFond, const QString & couleurTexte, const QString & couleurTitre,
+                   int forme, const QString & nom, const QString & policeTexte, const QString & policeTitre, idt id = 0)
+        : EvenementStyle(nom,id) {
+        setBrush(brush);
+        setBordure(bordure);
+        setCouleurFond(CouleurFond);
+        setCouleurTexte(couleurTexte);
+        setCouleurTitre(couleurTitre);
+        setForme(forme);
+        setPoliceTexte(policeTexte);
+        setPoliceTitre(policeTitre);
+    }
+};
+}
+
+/*! \ingroup groupeEntity
+ * \brief Ensemble des classes de la fonctionalité commentaire.
+ */
 namespace ensembleCommentaire {
 using Commentaire = ebmps::TexteEntity<infoEntity::CommentaireId>;
 ID1_ENTITY(CommentaireCible,CibleDateTimeCurrentNum,infoEntity::CommentaireCibleId,Commentaire)
@@ -98,7 +219,6 @@ class Donnee : public EntityIDs<infoEntity::DonneeId,amps::NomTypeAttribut,
                                                              amps::TpValAttribut> {
 protected:
     template<class T> using PositionEnum = PositionEnum<T,Donnee>;
-
 public:
     using EAID = EntityIDs<infoEntity::DonneeId,amps::NomTypeAttribut,
                                                         amps::IdProgAttribut,
@@ -111,9 +231,6 @@ public:
                    IdProg = PositionEnum<IdProgAttribut>::Position,
                    TpVal = PositionEnum<TpValAttribut>::Position,
                    NbrAtt = EAID::NbrAtt};
-
-//    //! Identifiant de programation
-//    enum prog {NoId};
 
     //! Identifiant des donnée hors de l'arbre.
     enum idNegDonneProg{

@@ -1013,6 +1013,141 @@ template<szt IDM > using CibleNegDateTimeValideNumValeurVariantEntity
 #define ENUM_CibleNegDateTimeValideNumValeurVariant(ID1) ENUM_CibleDateTimeNumValeurTemp(ID1)
 
 //! \ingroup groupeMacroEntity
+//! Macro définissant les positions des attributs pour une clé, une clé de cible, une cible, une DateTime, un typeValeur et Valeur.
+#define ENUM_CibleDateTimeNumTpValValeurTemp(ID1) /*! \brief Positions des attributs */ \
+    enum Position:szt {Id = mere::Id, Id1 = mere::Id1, IdCible = mere::IdCible, Cible = mere::Cible,\
+    DateTime = mere::DateTime, Num = mere::Num, TypeVal = mere::TypeVal, Valeur = mere::Valeur, NbrAtt = mere::NbrAtt, Id ## ID1 = Id1};
+
+/*! \ingroup groupeBaseEntity
+ * \brief Classe de base des entités ayant un attribut une clé, IdCible, cible, datetime, num, typeVal et valeur.
+ */
+template<szt IDM , class DateTimeAtt, class ValeurAtt, class Id1Att> class CibleDateTimeNumTpValValeurEntityTemp :
+        public EntityIDs<IDM,Id1Att, CibleAttributs, DateTimeAtt, NumAttribut, TpValAttribut, ValeurAtt> {
+public:
+    using Id1Trans = typename Id1Att::AttTrans;
+    using ValeurTrans = typename ValeurAtt::AttTrans;
+    using EAID = EntityIDs<IDM,Id1Att, CibleAttributs, DateTimeAtt, NumAttribut, TpValAttribut, ValeurAtt>;
+    //! Positions des attributs.
+    enum Position:szt {Id = PositionEnum<IdAttribut,EAID>::Position,
+                   Id1 = PositionEnum<Id1Att,EAID>::Position,
+                   IdCible = PositionEnum<IdCibleAttribut,EAID>::Position,
+                   Cible = PositionEnum<CibleAttribut,EAID>::Position,
+                   DateTime = PositionEnum<DateTimeAtt,EAID>::Position,
+                   Num = PositionEnum<NumAttribut,EAID>::Position,
+                   TpVal = PositionEnum<TpValAttribut,EAID>::Position,
+                   Valeur = PositionEnum<ValeurAtt,EAID>::Position,
+                   NbrAtt = EAID::NbrAtt};
+
+    using EntityIDs<IDM,Id1Att, CibleAttributs, DateTimeAtt, NumAttribut, TpValAttribut, ValeurAtt>::EntityIDs;
+    using EAID::setId;
+    using EAID::setId1;
+    using EAID::setIdCible;
+    using EAID::setCible;
+    using EAID::setDateTime;
+    using EAID::setNum;
+    using EAID::setTpVal;
+    using EAID::setValeur;
+    BASE_ENTITY(CibleDateTimeNumTpValValeurEntityTemp)
+
+    //! Constructeur à partir d'un jeux de valeurs attributs unique.
+    CibleDateTimeNumTpValValeurEntityTemp(Id1Trans id1, idt idCible, int cible, int num = 0) {
+        setId1(id1);
+        setIdCible(idCible);
+        setCible(cible);
+        setNum(num);
+    }
+
+    //! Constructeur à partir des valeurs attributs.
+    CibleDateTimeNumTpValValeurEntityTemp(Id1Trans id1, idt idCible, int cible, int num, int tpVal, ValeurTrans valeur, idt id = 0)
+        : CibleDateTimeNumTpValValeurEntityTemp(id1,idCible,cible,num) {
+        setId(id);
+        setTpVal(tpVal);
+        setValeur(valeur);
+    }
+
+    //! Constructeur à partir des valeurs attributs.
+    CibleDateTimeNumTpValValeurEntityTemp(Id1Trans id1, idt idCible, int cible, const QDateTime & dateTime,
+                                          int num, int tpVal, ValeurTrans valeur, idt id = 0)
+        : CibleDateTimeNumTpValValeurEntityTemp(id1,idCible,cible,num,tpVal,valeur,id)
+        {setDateTime(dateTime);}
+};
+
+template<szt IDM , class DateTimeAtt, class ValeurAtt, class Id1Att>
+    CibleDateTimeNumTpValValeurEntityTemp<IDM,DateTimeAtt, ValeurAtt, Id1Att>::~CibleDateTimeNumTpValValeurEntityTemp() {}
+
+template<szt IDM > using CibleDateTimeCurrentNumTpValValeurDoubleEntity
+= CibleDateTimeNumTpValValeurEntityTemp<IDM,DateTimeCurrentAttribut,ValeurDoubleAttribut,Id1Attribut>;
+#define ENUM_CibleDateTimeCurrentNumTpValValeurDouble(ID1) ENUM_CibleDateTimeNumTpValValeurTemp(ID1)
+
+template<szt IDM > using CibleDateTimeCurrentNumTpValValeurIntEntity
+= CibleDateTimeNumTpValValeurEntityTemp<IDM,DateTimeCurrentAttribut,ValeurIntAttribut,Id1Attribut>;
+#define ENUM_CibleDateTimeCurrentNumTpValValeurInt(ID1) ENUM_CibleDateTimeNumTpValValeurTemp(ID1)
+
+template<szt IDM > using CibleDateTimeCurrentNumTpValValeurVariantEntity
+= CibleDateTimeNumTpValValeurEntityTemp<IDM,DateTimeCurrentAttribut,ValeurVariantAttribut,Id1Attribut>;
+#define ENUM_CibleDateTimeCurrentNumTpValValeurVariant(ID1) ENUM_CibleDateTimeNumTpValValeurTemp(ID1)
+
+template<szt IDM > using CibleDateTimeValideNumTpValValeurDoubleEntity
+= CibleDateTimeNumTpValValeurEntityTemp<IDM,DateTimeValideAttribut,ValeurDoubleAttribut,Id1Attribut>;
+#define ENUM_CibleDateTimeValideNumTpValValeurDouble(ID1) ENUM_CibleDateTimeNumTpValValeurTemp(ID1)
+
+template<szt IDM > using CibleDateTimeValideNumTpValValeurIntEntity
+= CibleDateTimeNumTpValValeurEntityTemp<IDM,DateTimeValideAttribut,ValeurIntAttribut,Id1Attribut>;
+#define ENUM_CibleDateTimeValideNumTpValValeurInt(ID1) ENUM_CibleDateTimeNumTpValValeurTemp(ID1)
+
+template<szt IDM > using CibleDateTimeValideNumTpValValeurVariantEntity
+= CibleDateTimeNumTpValValeurEntityTemp<IDM,DateTimeValideAttribut,ValeurVariantAttribut,Id1Attribut>;
+#define ENUM_CibleDateTimeValideNumTpValValeurVariant(ID1) ENUM_CibleDateTimeNumTpValValeurTemp(ID1)
+
+template<szt IDM > using CibleNullDateTimeCurrentNumTpValValeurDoubleEntity
+= CibleDateTimeNumTpValValeurEntityTemp<IDM,DateTimeCurrentAttribut,ValeurDoubleAttribut,Id1NullAttribut>;
+#define ENUM_CibleNullDateTimeCurrentNumTpValValeurDouble(ID1) ENUM_CibleDateTimeNumTpValValeurTemp(ID1)
+
+template<szt IDM > using CibleNullDateTimeCurrentNumTpValValeurIntEntity
+= CibleDateTimeNumTpValValeurEntityTemp<IDM,DateTimeCurrentAttribut,ValeurIntAttribut,Id1NullAttribut>;
+#define ENUM_CibleNullDateTimeCurrentNumTpValValeurInt(ID1) ENUM_CibleDateTimeNumTpValValeurTemp(ID1)
+
+template<szt IDM > using CibleNullDateTimeCurrentNumTpValValeurVariantEntity
+= CibleDateTimeNumTpValValeurEntityTemp<IDM,DateTimeCurrentAttribut,ValeurVariantAttribut,Id1NullAttribut>;
+#define ENUM_CibleNullDateTimeCurrentNumTpValValeurVariant(ID1) ENUM_CibleDateTimeNumTpValValeurTemp(ID1)
+
+template<szt IDM > using CibleNullDateTimeValideNumTpValValeurDoubleEntity
+= CibleDateTimeNumTpValValeurEntityTemp<IDM,DateTimeValideAttribut,ValeurDoubleAttribut,Id1NullAttribut>;
+#define ENUM_CibleNullDateTimeValideNumTpValValeurDouble(ID1) ENUM_CibleDateTimeNumTpValValeurTemp(ID1)
+
+template<szt IDM > using CibleNullDateTimeValideNumTpValValeurIntEntity
+= CibleDateTimeNumTpValValeurEntityTemp<IDM,DateTimeValideAttribut,ValeurIntAttribut,Id1NullAttribut>;
+#define ENUM_CibleNullDateTimeValideNumTpValValeurInt(ID1) ENUM_CibleDateTimeNumTpValValeurTemp(ID1)
+
+template<szt IDM > using CibleNullDateTimeValideNumTpValValeurVariantEntity
+= CibleDateTimeNumTpValValeurEntityTemp<IDM,DateTimeValideAttribut,ValeurVariantAttribut,Id1NullAttribut>;
+#define ENUM_CibleNullDateTimeValideNumTpValValeurVariant(ID1) ENUM_CibleDateTimeNumTpValValeurTemp(ID1)
+
+template<szt IDM > using CibleNegDateTimeCurrentNumTpValValeurDoubleEntity
+= CibleDateTimeNumTpValValeurEntityTemp<IDM,DateTimeCurrentAttribut,ValeurDoubleAttribut,Id1NegAttribut>;
+#define ENUM_CibleNegDateTimeCurrentNumTpValValeurDouble(ID1) ENUM_CibleDateTimeNumTpValValeurTemp(ID1)
+
+template<szt IDM > using CibleNegDateTimeCurrentNumTpValValeurIntEntity
+= CibleDateTimeNumTpValValeurEntityTemp<IDM,DateTimeCurrentAttribut,ValeurIntAttribut,Id1NegAttribut>;
+#define ENUM_CibleNegDateTimeCurrentNumTpValValeurInt(ID1) ENUM_CibleDateTimeNumTpValValeurTemp(ID1)
+
+template<szt IDM > using CibleNegDateTimeCurrentNumTpValValeurVariantEntity
+= CibleDateTimeNumTpValValeurEntityTemp<IDM,DateTimeCurrentAttribut,ValeurVariantAttribut,Id1NegAttribut>;
+#define ENUM_CibleNegDateTimeCurrentNumTpValValeurVariant(ID1) ENUM_CibleDateTimeNumTpValValeurTemp(ID1)
+
+template<szt IDM > using CibleNegDateTimeValideNumTpValValeurDoubleEntity
+= CibleDateTimeNumTpValValeurEntityTemp<IDM,DateTimeValideAttribut,ValeurDoubleAttribut,Id1NegAttribut>;
+#define ENUM_CibleNegDateTimeValideNumTpValValeurDouble(ID1) ENUM_CibleDateTimeNumTpValValeurTemp(ID1)
+
+template<szt IDM > using CibleNegDateTimeValideNumTpValValeurIntEntity
+= CibleDateTimeNumTpValValeurEntityTemp<IDM,DateTimeValideAttribut,ValeurIntAttribut,Id1NegAttribut>;
+#define ENUM_CibleNegDateTimeValideNumTpValValeurInt(ID1) ENUM_CibleDateTimeNumTpValValeurTemp(ID1)
+
+template<szt IDM > using CibleNegDateTimeValideNumTpValValeurVariantEntity
+= CibleDateTimeNumTpValValeurEntityTemp<IDM,DateTimeValideAttribut,ValeurVariantAttribut,Id1NegAttribut>;
+#define ENUM_CibleNegDateTimeValideNumTpValValeurVariant(ID1) ENUM_CibleDateTimeNumTpValValeurTemp(ID1)
+
+//! \ingroup groupeMacroEntity
 //! Macro définissant les positions des attributs pour une clé, num et Valeur.
 #define ENUM_IdNumValeurTemp(ID1) /*! \brief Positions des attributs */ \
     enum Position:szt {Id = mere::Id, Id1 = mere::Id1, Num = mere::Num, Valeur = mere::Valeur, NbrAtt = mere::NbrAtt, Id ## ID1 = Id1};

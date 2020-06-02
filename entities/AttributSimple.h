@@ -5,6 +5,7 @@
 #define ATTRIBUTSIMPLE_H
 
 #include <array>
+#include <QColor>
 #include <QDate>
 #include <QDateTime>
 #include <QString>
@@ -536,6 +537,39 @@ public:
 };
 
 /*! \ingroup groupeAttributEntity
+ * \brief Classe mère des attributs de type couleur.
+ */
+class AttributCouleur : public AttributString {
+public:
+    CONSTR_DEFAUT(AttributCouleur)
+    CONSTR_AFFECT_DEFAUT(AttributCouleur)
+
+    //!Destructeur.
+    ~AttributCouleur();
+
+    //! Teste la validité de la valeur.
+    bool isValidAttribut() const final
+        {return QColor::isValidColor(m_valeur);}
+};
+
+/*! \ingroup groupeAttributEntity
+ * \brief Classe mère des attributs de type brush.
+ */
+class AttributBrush : public AttributUnsigned {
+public:
+    enum {Max = 17};
+    CONSTR_DEFAUT(AttributBrush)
+    CONSTR_AFFECT_DEFAUT(AttributBrush)
+
+    //!Destructeur.
+    ~AttributBrush();
+
+    //! Teste la validité de la valeur.
+    bool isValidAttribut() const final
+        {return m_valeur < Max;}
+};
+
+/*! \ingroup groupeAttributEntity
  * \brief Classe mère des attributs de type QString non vide.
  */
 class AttributStringNotEmpty : public AttributString {
@@ -552,17 +586,26 @@ public:
 };
 
 SINGLE_ATTRIBUT(AlphaAttribut,AttributInt,Alpha,alpha)
+SINGLE_ATTRIBUT(BordureAttribut,AttributInt,Bordure,bordure)
+SINGLE_ATTRIBUT(BrushAttribut,AttributBrush,Brush,brush)
 SINGLE_ATTRIBUT(CardAttribut,AttributInt,Card,card)
 SINGLE_ATTRIBUT(CibleAttribut,AttributInt,Cible,cible)
 SINGLE_ATTRIBUT(CodeAttribut,AttributCode,Code,code)
+SINGLE_ATTRIBUT(CouleurAttribut,AttributCouleur,Couleur,couleur)
+SINGLE_ATTRIBUT(CouleurFondAttribut,AttributCouleur,CouleurFond,couleurFond)
+SINGLE_ATTRIBUT(CouleurTexteAttribut,AttributCouleur,CouleurTexte,couleurTexte)
+SINGLE_ATTRIBUT(CouleurTitreAttribut,AttributCouleur,CouleurTitre,couleurTitre)
 SINGLE_ATTRIBUT(CreationAttribut,AttributDateTimeValide,Creation,creation)
 SINGLE_ATTRIBUT(DateValideAttribut,AttributDateValide,Date,date)
 SINGLE_ATTRIBUT(DateTimeCurrentAttribut,AttributDateTimeCurrent,DateTime,dateTime)
 SINGLE_ATTRIBUT(DateTimeValideAttribut,AttributDateTimeValide,DateTime,dateTime)
+SINGLE_ATTRIBUT(DebutAttribut,AttributDateTimeValide,Debut,debut)
 SINGLE_ATTRIBUT(DecimaleAttribut,AttributDecimale,Decimale,decimale)
 SINGLE_ATTRIBUT(EtatAttribut,AttributInt,Etat,etat)
 SINGLE_ATTRIBUT(ExactAttribut,AttributCode,Exact,exact)
 SINGLE_ATTRIBUT(FeuilleAttribut,AttributBool,Feuille,feuille)
+SINGLE_ATTRIBUT(FinAttribut,AttributDateTimeValide,Fin,fin)
+SINGLE_ATTRIBUT(FormeAttribut,AttributInt,Forme,forme)
 SINGLE_ATTRIBUT(IdAttribut,AttributId,Id,id)
 SINGLE_ATTRIBUT(IdCibleAttribut,AttributIdSup<1>,IdCible,idCible)
 SINGLE_ATTRIBUT(IdEtatAttribut,AttributIdSup<1>,IdEtat,idEtat)
@@ -583,8 +626,12 @@ SINGLE_ATTRIBUT(ModifAttribut,AttributCode,Modif,modif)
 SINGLE_ATTRIBUT(ModificationAttribut,AttributDateTimeCurrent,Modification,modification)
 SINGLE_ATTRIBUT(NumAttribut,AttributIntSup<0>,Num,num)
 SINGLE_ATTRIBUT(ParentAttribut,AttributIdNull,Parent,parent)
+SINGLE_ATTRIBUT(PoliceAttribut,AttributStringNotEmpty,Font,font)
+SINGLE_ATTRIBUT(PoliceTexteAttribut,AttributStringNotEmpty,PoliceTexte,policeTexte)
+SINGLE_ATTRIBUT(PoliceTitreAttribut,AttributStringNotEmpty,PoliceTitre,policeTitre)
 SINGLE_ATTRIBUT(SaisieAttribut,AttributCode,Saisie,saisie)
 SINGLE_ATTRIBUT(TexteAttribut,AttributString,Texte,texte)
+SINGLE_ATTRIBUT(TitreAttribut,AttributStringNotEmpty,Titre,titre)
 SINGLE_ATTRIBUT(TotalAttribut,AttributInt,Total,total)
 SINGLE_ATTRIBUT(TpValAttribut,AttributInt,TpVal,tpVal)
 SINGLE_ATTRIBUT(TypeAttribut,AttributIdSup<1>,Type,type)

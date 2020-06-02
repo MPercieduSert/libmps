@@ -176,7 +176,7 @@
 			idProg\\
 			nom\\
 			type\\
-			typeVal
+			tpVal
 		}
 		\&
 		\relation{ciblageDonnee}
@@ -217,7 +217,7 @@
 	\tableEntity{Donnee}{
 		nom&text&stringNotEmpty&nm&\\
 		type&uint&idSup1&tp&\\
-		typeVal&int&int&tpV\\
+		tpVal&int&int&tpV\\
 		idProg&uint&idSup1NULL&idPg&NULL\\
 	}{
 		\fkey{id}{ArbreDonnee}\\
@@ -634,33 +634,34 @@
 	\&
 	\relation{affiche}
 	\&
-	\entity{Style}{
+	\entity{EvenementStyle}{
 		nom\\
 		policeNom\\
 		couleurNom\\
 		policeTexte\\
 		couleurTexte\\
 		couleur\\
-		fond\\
+		brush\\
 		forme\\
 		bordure
 	}\\
 	\&
 	\relation{ciblageEvenement}
 	\&
-	\entity{CibleEvenement}{
+	\entity{EvenementCible}{
 		idCible\\
 		cible\\
+		dateTime\\
 		num\\
-		typeVal\\
+		tpVal\\
 		valeur
 	}\\
 	\hline\\
 };
 \lien{Evenement}{affiche}{$1$}
-\lien{affiche}{Style}{$0-N$} 
+\lien{affiche}{EvenementStyle}{$0-N$} 
 \lien{Evenement}{ciblageEvenement}{$0-N$}
-\lien{ciblageEvenement}{CibleEvenement}{$1$}
+\lien{ciblageEvenement}{EvenementCible}{$1$}
 \end{tikzpicture}
 \subsubsection{Table}
 \begin{tikzpicture}[thick]
@@ -681,36 +682,37 @@
 		\unique{nom}
 	}
 	\&
-	\tableEntity{CibleEvenement}{
+	\tableEntity{EvenementCible}{
 		idEvenement&uint&idSup1&idEv\\
 		idCible&uint&idSup1&idCb\\
 		cible&int&int&cb\\
+		dateTime&dateTime&dtCurrent&dt\\
 		num&int&intSup0&num\\
-		typeValeur&int&int&tpV\\
+		tpVal&int&int&tpV\\
 		valeur&blod&variant&val
 	}{
 		\fkey{idEvenement}{Evenement}\\
 		\unique{idCilbe, cible, num}
 	}
 	\\
-	\tableEntity{Style}{
+	\tableEntity{EvenementStyle}{
 		bordure&int&int&bd\\
-		couleurFond&color&color&cf\\
-		couleurTexte&color&color&cte\\
-		couleurTitre&color&color&cti\\
-		fond&brush&brush&fd\\
+		brush&int&brush&br\\
+		couleurFond&text&couleur&cf\\
+		couleurTexte&text&couleur&cte\\
+		couleurTitre&text&couleur&cti\\
 		forme&int&int&fm\\
 		nom&text&stringNotEmpty&nm\\
-		policeTexte&font&font&pte\\
-		policeTitre&font&font&pti
+		policeTexte&text&font&pte\\
+		policeTitre&text&font&pti
 	}{
 		\unique{nom}
 	}
 	\\
 	\hline\\
 };
-\lkey{Evenement}{CibleEvenement}
-\lkey{Style}{Evenement}  
+\lkey{Evenement}{EvenementCible}
+\lkey{EvenementStyle}{Evenement}  
 \end{tikzpicture}
 
 \section{Inventaire}
