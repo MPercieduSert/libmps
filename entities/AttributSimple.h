@@ -114,6 +114,9 @@ public:
     //! Retourne un QVariant contenant la donnée souhaitée, pos doit être valide.
     virtual QVariant dataP(szt /*pos*/) const = 0;
 
+    //! Accesseur de l'attribut pour la base de données.
+    virtual QVariant getToBdd() const = 0;
+
     //! Renvoie la validité de la valeur.
     virtual bool isValid() const
         {return isValidAttribut();}
@@ -177,7 +180,7 @@ public:
         {return m_valeur;}
 
     //! Accesseur de l'attribut pour la base de données.
-    AttTrans getToBdd() const
+    QVariant getToBdd() const override
         {return m_valeur;}
 
     //! Mutateur de l'attribut.
@@ -242,7 +245,7 @@ public:
     ~AttributDateCurrent() override;
 
     //! Accesseur de l'attribut pour la base de données.
-    QDate getToBdd() const
+    QVariant getToBdd() const override
         {return QDate::currentDate();}
 
     //! Accesseur de l'attribut pour la base de données.
@@ -294,7 +297,7 @@ public:
     ~AttributDateTimeCurrent() override;
 
     //! Accesseur de l'attribut pour la base de données.
-    QDateTime getToBdd() const
+    QVariant getToBdd() const override
         {return QDateTime::currentDateTime();}
 
     //! Accesseur de l'attribut pour la base de données.
@@ -349,7 +352,7 @@ public:
     ~AttributZeroNull() override;
 
     //! Accesseur de l'attribut pour la base de données.
-    QVariant getToBdd() const
+    QVariant getToBdd() const override
         {return m_valeur == Zero ? QVariant(QVariant::UInt) : m_valeur;}
 };
 
@@ -493,7 +496,7 @@ public:
     }
 
     //! Accesseur de l'attribut pour la base de données.
-    flag_type getToBdd() const
+    QVariant getToBdd() const override
         {return m_valeur.value();}
 
     //! retourne la liste des valeurs contenue

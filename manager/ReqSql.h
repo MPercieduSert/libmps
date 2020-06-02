@@ -62,7 +62,7 @@ public:
 
 protected:
     //! Transmet une valeur à la requète.
-    template<class T> void bindValue(szt n, const T & value)
+    void bindValue(szt n, const QVariant & value)
         {m_requete->bindValue(static_cast<int>(n),value);}
 
     //! Exécute la dernière requète préparée et lance une execption si celle-ci n'est pas valide.

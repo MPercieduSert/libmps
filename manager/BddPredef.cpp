@@ -236,17 +236,17 @@ QString BddPredef::hydrateAttributXml(entityMPS::Entity & entity, szt pos, fichi
     }
     if(iter->name() == "Code") {
         auto list = iter->text().split(",");
-        attributMPS::CodeAttribut codeAtt;
+        flag fl;
         QString controle;
         for(auto iter_list = list.cbegin(); controle.isEmpty() && iter_list != list.cend(); ++iter_list) {
             auto cd = code(*iter_list);
             if (cd != code::Invalide)
-                codeAtt.add(cd);
+                fl |= cd;
             else
                 controle = QString("Code Invalide : ").append(*iter_list);
         }
         if(controle.isEmpty())
-            entity.setData(pos, codeAtt.getToBdd());
+            entity.setData(pos, fl.value());
         return controle;
     }
 

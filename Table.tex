@@ -627,6 +627,7 @@
 		fin\\
 		nc\\
 		nom\\
+		titre\\
 		code\\
 		type
 	}
@@ -635,6 +636,10 @@
 	\&
 	\entity{Style}{
 		nom\\
+		policeNom\\
+		couleurNom\\
+		policeTexte\\
+		couleurTexte\\
 		couleur\\
 		fond\\
 		forme\\
@@ -647,6 +652,7 @@
 		idCible\\
 		cible\\
 		num\\
+		typeVal\\
 		valeur
 	}\\
 	\hline\\
@@ -668,6 +674,7 @@
 		modification&dateTime&dtCurrent&modif\\
 		nc&text&stringNotEmpty&nc\\
 		nom&text&stringNotEmpty&nm\\
+		titre&text&string&tit&NULL\\
 		type&uint&idSup1&tp
 	}{
 		\fkey{idStyle}{Style}\\
@@ -679,6 +686,7 @@
 		idCible&uint&idSup1&idCb\\
 		cible&int&int&cb\\
 		num&int&intSup0&num\\
+		typeValeur&int&int&tpV\\
 		valeur&blod&variant&val
 	}{
 		\fkey{idEvenement}{Evenement}\\
@@ -686,11 +694,15 @@
 	}
 	\\
 	\tableEntity{Style}{
-		nom&text&stringNotEmpty&nm\\
-		couleur&color&color&cl\\
+		bordure&int&int&bd\\
+		couleurFond&color&color&cf\\
+		couleurTexte&color&color&cte\\
+		couleurTitre&color&color&cti\\
 		fond&brush&brush&fd\\
 		forme&int&int&fm\\
-		bordure&int&int&bd
+		nom&text&stringNotEmpty&nm\\
+		policeTexte&font&font&pte\\
+		policeTitre&font&font&pti
 	}{
 		\unique{nom}
 	}
