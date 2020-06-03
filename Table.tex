@@ -675,7 +675,7 @@
 		modification&dateTime&dtCurrent&modif\\
 		nc&text&stringNotEmpty&nc\\
 		nom&text&stringNotEmpty&nm\\
-		titre&text&string&tit&NULL\\
+		titre&text&stringNotEmpty&tit\\
 		type&uint&idSup1&tp
 	}{
 		\fkey{idStyle}{Style}\\
@@ -692,7 +692,7 @@
 		valeur&blod&variant&val
 	}{
 		\fkey{idEvenement}{Evenement}\\
-		\unique{idCilbe, cible, num}
+		\unique{idEvenement, idCible, cible, num}
 	}
 	\\
 	\tableEntity{EvenementStyle}{

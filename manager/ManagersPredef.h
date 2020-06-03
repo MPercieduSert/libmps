@@ -11,6 +11,20 @@
 #include "EntityPredef.h"
 
 namespace bddMPS {
+    //! Ensembles prédéfinis pris en charge.
+    enum ensembleFlag : flag::flag_type {
+        EnsembleDisable = 0x0,
+        CommentaireEnable = 0x1,
+        DonneeEnable = 0x2,
+        EvenementEnable = 0x4,
+        HistoriqueEnable = 0x8,
+        MotCleEnable = 0x10,
+        RestrictionEnable = 0x20,
+        TexteEnable = 0x40,
+        TypeEnable = 0x80,
+        UtilisationEnable = 0x100
+    };
+
     //! Associe un numéro de cible.
     namespace cibleId  {
         //! Numéro de cible des types de base.
@@ -22,6 +36,9 @@ namespace bddMPS {
                           Donnee,
                           DonneeCard,
                           DonneeCible,
+                          Evenement,
+                          EvenementCible,
+                          EvenementStyle,
                           Historique,
                           MotCle,
                           MotCleCible,
@@ -41,39 +58,42 @@ namespace bddMPS {
     }
 
     namespace natureId {
-    //! Idantifiant de nature des types de base.
-    enum typeBase{Vide = -1,
-          Int = -2,
-          String = -3,
-          Bool = -4,
-          Float = -5,
-          Double = -6,
-          Date = -7,
-          DateTime = -8,
-          Variant = -9};
+        //! Idantifiant de nature des types de base.
+        enum typeBase{Vide = -1,
+              Int = -2,
+              String = -3,
+              Bool = -4,
+              Float = -5,
+              Double = -6,
+              Date = -7,
+              DateTime = -8,
+              Variant = -9};
 
-    //! Idantifiant de nature des entités prédéfinies.
-    enum EntityPredef{Commentaire,
-                      CommentaireCible,
-                      Donnee,
-                      DonneeCard,
-                      DonneeCible,
-                      Historique,
-                      MotCle,
-                      MotCleCible,
-                      MotClePermission,
-                      MotProgCible,
-                      MotProgPermission,
-                      Restriction,
-                      Source,
-                      Texte,
-                      TexteCible,
-                      SourceTexte,
-                      Type,
-                      TypePermission,
-                      Utilisation,
-                      Usage,
-                      NbrCibleEntPredef};
+        //! Idantifiant de nature des entités prédéfinies.
+        enum EntityPredef{Commentaire,
+                          CommentaireCible,
+                          Donnee,
+                          DonneeCard,
+                          DonneeCible,
+                          Evenement,
+                          EvenementCible,
+                          EvenementStyle,
+                          Historique,
+                          MotCle,
+                          MotCleCible,
+                          MotClePermission,
+                          MotProgCible,
+                          MotProgPermission,
+                          Restriction,
+                          Source,
+                          Texte,
+                          TexteCible,
+                          SourceTexte,
+                          Type,
+                          TypePermission,
+                          Utilisation,
+                          Usage,
+                          NbrCibleEntPredef};
     }
 }
 
@@ -84,14 +104,7 @@ namespace emps = entityMPS;
  */
 class ManagersPredef : public Managers {
 protected:
-    bool m_commentaireEnabled = false;                   //!< Prise en charge des commentaire.
-    bool m_donneeEnabled = false;                        //!< Prise en charge des donnée.
-    bool m_historiqueEnabled = false;                    //!< Prise en charge des Historique.
-    bool m_motCleEnabled = false;                        //!< Prise en charge des MotCle.
-    bool m_restrictionModificationEnabled = false;       //!< Prise en charge des Restriction.
-    bool m_texteEnabled = false;                         //!< Prise en charge des Texte.
-    bool m_typeEnabled = false;                          //!< Prise en charge des Type.
-    bool m_utilisationEnabled = false;                   //!< Prise en charge des Uitilisation.
+    flag m_ensembleEnable = bmps::EnsembleDisable;      //!< Prise en charge d'ensembles.
     std::vector<int> m_cibleArray;                           //!< Tableau de correspondance ID -> Cible.
     std::vector<int> m_cibleNbrAttArray;                     //!< Tableau de correspondance cible -> nombre d'attributs.
 
@@ -122,37 +135,9 @@ public:
         return m_cibleNbrAttArray[static_cast<unsigned>(cible)];
     }
 
-    //! Prise en charge des commentaires?
-    bool commentaireIsEnabled() const
-        {return m_commentaireEnabled;}
-
-    //! Prise en charge des données?
-    bool donneeIsEnabled() const
-        {return m_donneeEnabled;}
-
-    //! Prise en charge des historiques?
-    bool historiqueIsEnabled() const
-        {return m_historiqueEnabled;}
-
-    //! Prise en charge des mots clé?
-    bool motCleIsEnabled() const
-        {return m_motCleEnabled;}
-
-    //! Prise en charge des restrictions de modification?
-    bool restrictionModificationIsEnabled() const
-        {return m_restrictionModificationEnabled;}
-
-    //! Prise en charge des textes?
-    bool texteIsEnabled() const
-        {return m_texteEnabled;}
-
-    //! Prise en charge des type?
-    bool typeIsEnabled() const
-        {return m_typeEnabled;}
-
-    //! Prise en charge des utilisations?
-    bool utilisationIsEnabled() const
-        {return m_utilisationEnabled;}
+    //! Teste la prise en charge d'un ensemble donnée
+    bool ensembleEnable(bmps::ensembleFlag flag) const noexcept
+        {return m_ensembleEnable.test(flag);}
 
 protected:
     //! Mise en place de la prise en charge des commentaires.
@@ -166,6 +151,9 @@ protected:
                         = std::make_unique<AbstractGestionRestriction<emps::DonneeCible>>(),
                       std::unique_ptr<AbstractGestionRestriction<emps::DonneeCard>> &&  gestionCardDonnee
                         = std::make_unique<AbstractGestionRestriction<emps::DonneeCard>>());
+
+    //! Mise en place de la prise en charge des evenements.
+    void enableEvenement(const QString & evenement, const QString & evenementCible, const QString & evenementStyle);
 
     //! Mise en place de la prise en charge des historiques.
     void enableHistorique(const QString & historique);
@@ -204,6 +192,9 @@ protected:
         m_cibleNbrAttArray[cible] = Ent::NbrAtt;
     }
 
+    void setEnsembleEnable(bmps::ensembleFlag flag) noexcept
+        {m_ensembleEnable |= flag;}
+
     //! Si les types sont pris en charge, déclare l'attribut type comme clé étrangère sur la table Type.
     template<class Ent> void setTypeForeignKey(InfoBdd & info);
 };
@@ -234,7 +225,7 @@ template<> inline int ManagersPredef::cible<QVariant>() const
 
 template<class Ent> void ManagersPredef::setTypeForeignKey(InfoBdd & info)
 {
-    if(typeIsEnabled())
+    if(ensembleEnable(bmps::TypeEnable))
         info.setForeignKey(Ent::Type,get(emps::Type::ID).info());
 }
 /*

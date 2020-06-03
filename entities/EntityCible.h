@@ -1016,7 +1016,7 @@ template<szt IDM > using CibleNegDateTimeValideNumValeurVariantEntity
 //! Macro définissant les positions des attributs pour une clé, une clé de cible, une cible, une DateTime, un typeValeur et Valeur.
 #define ENUM_CibleDateTimeNumTpValValeurTemp(ID1) /*! \brief Positions des attributs */ \
     enum Position:szt {Id = mere::Id, Id1 = mere::Id1, IdCible = mere::IdCible, Cible = mere::Cible,\
-    DateTime = mere::DateTime, Num = mere::Num, TypeVal = mere::TypeVal, Valeur = mere::Valeur, NbrAtt = mere::NbrAtt, Id ## ID1 = Id1};
+    DateTime = mere::DateTime, Num = mere::Num, TpVal = mere::TpVal, Valeur = mere::Valeur, NbrAtt = mere::NbrAtt, Id ## ID1 = Id1};
 
 /*! \ingroup groupeBaseEntity
  * \brief Classe de base des entités ayant un attribut une clé, IdCible, cible, datetime, num, typeVal et valeur.

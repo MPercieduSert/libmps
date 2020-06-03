@@ -24,21 +24,24 @@ namespace bddMPS {
  * \brief Gestionnaire de la base de donnée pour les entités prédéfinie.
  *
  * Gestionnaire de la base de donnée pour les entités prédéfinie:
- *      - CommentaireCible,
- *      - DonneeCible,
- *      - MotCleCible,
- *      - TexteCible,
  *      - Commentaire,
+ *      - CommentaireCible,
  *      - Donnee,
  *      - DonneeCard,
+ *      - DonneeCible,
+ *      - Evenement,
+ *      - EvenementCible,
+ *      - EvenementStyle,
  *      - Historique,
  *      - MotCle,
+ *      - MotCleCible,
  *      - MotClePermission,
  *      - Restriction,
  *      - Source,
- *      - Texte,
  *      - SourceTexte,
- *      - TypeEnt,
+ *      - Texte,
+ *      - TexteCible,
+ *      - Type,
  *      - TypePermission,
  *      - Utilisation
  */

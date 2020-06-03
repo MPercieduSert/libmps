@@ -35,12 +35,24 @@ bool BddPredef::delP(idt id, szt idEntity) {
                             && delList<MotClePermission>(MotClePermission::IdMotCle,id)
                             && delList<MotProgCible>(MotProgCible::IdMotCle,id)
                             && delList<MotProgPermission>(MotProgPermission::IdMotCle,id)
-                            && delP(id,MotCle::ID);
-            }
-            ,false);
+                            && delP(id,MotCle::ID); }
+                        ,false);
         break;
     case Source::ID:
         controle = delList<SourceTexte>(SourceTexte::IdSource,id);
+        break;
+    case Evenement::ID:
+        controle = delList<EvenementCible>(EvenementCible::IdEvenement,id);
+        break;
+    case EvenementStyle::ID:
+        if(id != EvenementStyle::IdStyleDefault) {
+            auto vec = getList<Evenement>(Evenement::IdStyle,id);
+            for (auto iter = vec.begin(); iter != vec.end(); ++iter)
+                iter->setIdStyle(EvenementStyle::IdStyleDefault);
+            controle = true;
+        }
+        else
+            controle = false;
         break;
     case Texte::ID:
         controle = delList<SourceTexte>(SourceTexte::IdTexte,id)
@@ -51,32 +63,42 @@ bool BddPredef::delP(idt id, szt idEntity) {
                         [this](idt id)->bool{return delP(id,Type::ID);}
              ,false);
         break;
+    case Usage::ID:
+        controle = foreachBeginChild<Usage>(id,
+                        [this](idt id)->bool {
+                         return delList<Utilisation>(Utilisation::IdUsage,id)
+                                && delP(id,Usage::ID); }
+                      ,false);
+        break;
     }
 
     // Cible
-    controle = controle && (!managers().commentaireIsEnabled()
+    controle = controle && (!managers().ensembleEnable(CommentaireEnable)
                     || del<CommentaireCible>(getListId<CommentaireCible>(CommentaireCible::Cible,cible(idEntity),
                                                                          CommentaireCible::IdCible,id)))
-                && (!managers().donneeIsEnabled()
+                && (!managers().ensembleEnable(DonneeEnable)
                     || delList<DonneeCible>(DonneeCible::Cible,cible(idEntity),
                                             DonneeCible::IdCible,id))
-                && (!managers().motCleIsEnabled()
+                && (!managers().ensembleEnable(EvenementEnable)
+                    || delList<EvenementCible>(EvenementCible::Cible,cible(idEntity),
+                                            EvenementCible::IdCible,id))
+                && (!managers().ensembleEnable(MotCleEnable)
                     || (delList<MotCleCible>(MotCleCible::Cible,cible(idEntity),
                                              MotCleCible::IdCible,id)
                         && delList<MotProgCible>(MotProgCible::Cible,cible(idEntity),
                                                  MotProgCible::IdCible,id)))
-                && (!managers().texteIsEnabled()
+                && (!managers().ensembleEnable(TexteEnable)
                     || delList<TexteCible>(TexteCible::Cible,cible(idEntity),
                                            TexteCible::IdCible,id))
-                && (!managers().restrictionModificationIsEnabled()
+                && (!managers().ensembleEnable(RestrictionEnable)
                     || delList<Restriction>(Restriction::Cible,cible(idEntity),
                                             Restriction::IdCible,id))
-                && (!managers().historiqueIsEnabled()
+                && (!managers().ensembleEnable(HistoriqueEnable)
                     || (delList<Historique>(Historique::Cible,cible(idEntity),
                                             Historique::IdCible,id)
                         && delList<Historique>(Historique::Etat,cible(idEntity),
                                                Historique::IdEtat,id)))
-                && (!managers().utilisationIsEnabled()
+                && (!managers().ensembleEnable(UtilisationEnable)
                     ||(delList<Utilisation>(Utilisation::Cible,cible(idEntity),
                                             Utilisation::IdCible,id)
                         && delList<Utilisation>(Utilisation::Etat,cible(idEntity),
@@ -130,48 +152,42 @@ bool BddPredef::testAutorisationP(idt id, szt idEntity, flag autoris) {
     auto controle = Bdd::testAutorisationP(id,idEntity,autoris);
     if(autoris & Suppr) {
         // Cible
-        controle = controle && (!managers().commentaireIsEnabled()
+        controle = controle && (!managers().ensembleEnable(CommentaireEnable)
             || testAutorisationList<CommentaireCible>(autoris,
                                                      CommentaireCible::Cible,cible(idEntity),
-                                                     CommentaireCible::IdCible,id
-                                                     ))
-        && (!managers().donneeIsEnabled()
+                                                     CommentaireCible::IdCible,id))
+        && (!managers().ensembleEnable(DonneeEnable)
             || testAutorisationList<DonneeCible>(autoris, DonneeCible::Cible,cible(idEntity),
-                                                DonneeCible::IdCible,id
-                                                ))
-        && (!managers().motCleIsEnabled()
+                                                DonneeCible::IdCible,id))
+        && (!managers().ensembleEnable(EvenementEnable)
+            || testAutorisationList<EvenementCible>(autoris, EvenementCible::Cible,cible(idEntity),
+                                                EvenementCible::IdCible,id))
+        && (!managers().ensembleEnable(MotCleEnable)
             || testAutorisationList<MotCleCible>(autoris,
                                                 MotCleCible::Cible,cible(idEntity),
-                                                MotCleCible::IdCible,id
-                                                ))
-        && (!managers().texteIsEnabled()
+                                                MotCleCible::IdCible,id))
+        && (!managers().ensembleEnable(TexteEnable)
             || testAutorisationList<TexteCible>(autoris,
                                                TexteCible::Cible,cible(idEntity),
-                                               TexteCible::IdCible,id
-                                               ))
-        && (!managers().restrictionModificationIsEnabled()
+                                               TexteCible::IdCible,id))
+        && (!managers().ensembleEnable(RestrictionEnable)
             || testAutorisationList<Restriction>(autoris,
                                                 Restriction::Cible,cible(idEntity),
-                                                Restriction::IdCible,id
-                                                ))
-        && (!managers().historiqueIsEnabled()
+                                                Restriction::IdCible,id))
+        && (!managers().ensembleEnable(HistoriqueEnable)
             || (testAutorisationList<Historique>(autoris,
                                                 Historique::Cible,cible(idEntity),
-                                                Historique::IdCible,id
-                                                )
+                                                Historique::IdCible,id)
                 && testAutorisationList<Historique>(autoris,
                                                    Historique::Etat,cible(idEntity),
-                                                   Historique::IdEtat,id
-                                                   )))
-        && (!managers().utilisationIsEnabled()
+                                                   Historique::IdEtat,id)))
+        && (!managers().ensembleEnable(UtilisationEnable)
             ||  (testAutorisationList<Utilisation>(autoris,
                                                   Utilisation::Cible,cible(idEntity),
-                                                  Utilisation::IdCible,id
-                                                  )
+                                                  Utilisation::IdCible,id)
                 && testAutorisationList<Utilisation>(autoris,
                                                     Utilisation::Etat,cible(idEntity),
-                                                    Utilisation::IdEtat,id
-                                                    )));
+                                                    Utilisation::IdEtat,id)));
         // Spécifique
         if(controle) {
             switch (idEntity) {
@@ -188,6 +204,10 @@ bool BddPredef::testAutorisationP(idt id, szt idEntity, flag autoris) {
                                 && testAutorisationList<DonneeCard>(autoris,
                                                                    DonneeCard::IdDonnee,id);}
                       ,false);
+                break;
+            case Evenement::ID:
+                controle = controle && testAutorisationList<EvenementCible>(autoris,
+                                                                            EvenementCible::IdEvenement,id);
                 break;
             case MotCle::ID:
                 controle = controle && foreachBeginChild<MotCle>(id,
@@ -217,6 +237,14 @@ bool BddPredef::testAutorisationP(idt id, szt idEntity, flag autoris) {
                 controle = foreachBeginChild<Type>(id,
                                 [this,autoris](idt id)->bool{return testAutorisationP(id,Type::ID,autoris);}
                      ,false);
+                break;
+            case Usage::ID:
+                controle = controle && foreachBeginChild<Usage>(id,
+                        [this,autoris](idt id)->bool {
+                        return testAutorisationP(id,Usage::ID,autoris)
+                                && testAutorisationList<Utilisation>(autoris,
+                                                                    Utilisation::IdUsage,id);}
+                      ,false);
                 break;
             }
         }
@@ -277,31 +305,32 @@ std::pair<int, int> BddPredef::intervalEntityInDonnee(idt idCible, int cible, in
 void BddPredef::listeMiseAJourBdd(int version) {
     if(version == bddVersion::Initiale) {
         //Type
-        if(managers().typeIsEnabled()) {
+        if(managers().ensembleEnable(TypeEnable)) {
             creerTable<Type>();
             creerTable<TypePermission>();
         }
         //Commentaire
-        if(managers().commentaireIsEnabled()) {
+        if(managers().ensembleEnable(CommentaireEnable)) {
             creerTable<Commentaire>();
             creerTable<CommentaireCible>();
         }
         //Donnee
-        if(managers().donneeIsEnabled()) {
+        if(managers().ensembleEnable(DonneeEnable)) {
             creerTable<Donnee>();
             creerTable<DonneeCible>();
             creerTable<DonneeCard>();
-//            Donnee dn;
-//            dn.setIdProg(donnee::defaultValueId);
-//            dn.setNom("Valeur par défaut");
-//            dn.setType()
-//            save(Donnee)
+        }
+        //Evenement
+        if(managers().ensembleEnable(EvenementEnable)) {
+            creerTable<EvenementStyle>();
+            creerTable<Evenement>();
+            creerTable<EvenementCible>();
         }
         //Historique
-        if(managers().historiqueIsEnabled())
+        if(managers().ensembleEnable(HistoriqueEnable))
             creerTable<Historique>();
         //Mot Cle
-        if(managers().motCleIsEnabled()) {
+        if(managers().ensembleEnable(MotCleEnable)) {
             creerTable<MotCle>();
             creerTable<MotCleCible>();
             creerTable<MotClePermission>();
@@ -309,17 +338,17 @@ void BddPredef::listeMiseAJourBdd(int version) {
             creerTable<MotProgPermission>();
         }
         //Restriction Modification
-        if(managers().restrictionModificationIsEnabled())
+        if(managers().ensembleEnable(RestrictionEnable))
             creerTable<Restriction>();
         //Texte
-        if(managers().texteIsEnabled()) {
+        if(managers().ensembleEnable(TexteEnable)) {
             creerTable<Texte>();
             creerTable<TexteCible>();
             creerTable<Source>();
             creerTable<SourceTexte>();
         }
         //Utilisation
-        if(managers().utilisationIsEnabled()) {
+        if(managers().ensembleEnable(UtilisationEnable)) {
             creerTable<Utilisation>();
             creerTable<Usage>();
         }

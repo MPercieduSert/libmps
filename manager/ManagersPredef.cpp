@@ -28,7 +28,7 @@ void ManagersPredef::enableCommentaire(const QString & commentaire, const QStrin
     setManager<CommentaireCible>(std::make_unique<ManagerSql<CommentaireCible>>(infoCibleCom,std::make_unique<Unique>()));
     setCible<CommentaireCible>(bmps::cibleId::CommentaireCible);
 
-    m_commentaireEnabled = true;
+    setEnsembleEnable(bmps::CommentaireEnable);
 }
 
 void ManagersPredef::enableDonnee(const QString & donnee, const QString & arbreDonnee, const QString & cibleDonnee,
@@ -91,7 +91,64 @@ void ManagersPredef::enableDonnee(const QString & donnee, const QString & arbreD
         setManager<DonneeCard>(std::make_unique<ManagerSql<DonneeCard>>(infoCard, std::make_unique<UniqueCard>()));
     setCible<DonneeCard>(bmps::cibleId::DonneeCard);
 
-    m_donneeEnabled = true;
+    setEnsembleEnable(bmps::DonneeEnable);
+}
+
+void ManagersPredef::enableEvenement(const QString & evenement, const QString & evenementCible, const QString & evenementStyle) {
+    // EvenementStyle
+    using UniqueStyle = NomUniqueSql<EvenementStyle>;
+    InfoBdd infoStyle(EvenementStyle::Name(),evenementStyle,EvenementStyle::NbrAtt,{UniqueStyle::NbrUnique});
+    infoStyle.setAttribut(EvenementStyle::Bordure,"bd");
+    infoStyle.setAttribut(EvenementStyle::Brush,"br");
+    infoStyle.setAttribut(EvenementStyle::CouleurFond,"cf",bmps::typeAttributBdd::Text);
+    infoStyle.setAttribut(EvenementStyle::CouleurTexte,"cte",bmps::typeAttributBdd::Text);
+    infoStyle.setAttribut(EvenementStyle::CouleurTitre,"cti",bmps::typeAttributBdd::Text);
+    infoStyle.setAttribut(EvenementStyle::Forme,"fm");
+    infoStyle.setAttribut(EvenementStyle::Nom,"nm",bmps::typeAttributBdd::Text);
+    infoStyle.setAttribut(EvenementStyle::PoliceTexte,"pte",bmps::typeAttributBdd::Text);
+    infoStyle.setAttribut(EvenementStyle::PolicceTitre,"pti",bmps::typeAttributBdd::Text);
+    infoStyle.setUnique(EvenementStyle::Nom,UniqueStyle::NomUnique);
+    setManager<EvenementStyle>(std::make_unique<ManagerSql<EvenementStyle>>(infoStyle, std::make_unique<UniqueStyle>()));
+    setCible<EvenementStyle>(bmps::cibleId::EvenementStyle);
+
+    // Evenement
+    using UniqueEvenement = NomUniqueSql<Evenement>;
+    InfoBdd infoEvenement(Evenement::Name(),evenement,Evenement::NbrAtt,{UniqueEvenement::NbrUnique});
+    infoEvenement.setAttribut(Evenement::IdStyle,"idSt");
+    infoEvenement.setAttribut(Evenement::Code,"cd");
+    infoEvenement.setAttribut(Evenement::Creation,"cr",bmps::typeAttributBdd::DateTime);
+    infoEvenement.setAttribut(Evenement::Debut,"deb",bmps::typeAttributBdd::DateTime);
+    infoEvenement.setAttribut(Evenement::Fin,"fn",bmps::typeAttributBdd::DateTime);
+    infoEvenement.setAttribut(Evenement::Modification,"modif",bmps::typeAttributBdd::DateTime);
+    infoEvenement.setAttribut(Evenement::Nc,"nc",bmps::typeAttributBdd::Text);
+    infoEvenement.setAttribut(Evenement::Nom,"nm",bmps::typeAttributBdd::Text);
+    infoEvenement.setAttribut(Evenement::Titre,"tii",bmps::typeAttributBdd::Text);
+    infoEvenement.setAttribut(Evenement::Type,"tp");
+    infoEvenement.setUnique(Evenement::Nom,UniqueEvenement::NomUnique);
+    infoEvenement.setForeignKey(Evenement::IdStyle,infoStyle);
+    setTypeForeignKey<Evenement>(infoEvenement);
+    setManager<Evenement>(std::make_unique<ManagerSql<Evenement>>(infoEvenement, std::make_unique<UniqueEvenement>()));
+    setCible<Evenement>(bmps::cibleId::Evenement);
+
+    // EvenementCible
+    using UniqueCible = CibleNumUniqueSql<EvenementCible>;
+    InfoBdd infoCible("EvenementCible",evenementCible,EvenementCible::NbrAtt,{UniqueCible::NbrUnique});
+    infoCible.setAttribut(EvenementCible::IdEvenement,"idEv");
+    infoCible.setAttribut(EvenementCible::IdCible,"idCb");
+    infoCible.setAttribut(EvenementCible::Cible,"cb");
+    infoCible.setAttribut(EvenementCible::DateTime,"dt",bmps::typeAttributBdd::DateTime);
+    infoCible.setAttribut(EvenementCible::Num,"num");
+    infoCible.setAttribut(EvenementCible::TpVal,"tpV");
+    infoCible.setAttribut(EvenementCible::Valeur,"val",bmps::typeAttributBdd::Blob);
+    infoCible.setUnique(EvenementCible::IdEvenement,UniqueCible::Id1Unique);
+    infoCible.setUnique(EvenementCible::IdCible,UniqueCible::IdCibleUnique);
+    infoCible.setUnique(EvenementCible::Cible,UniqueCible::CibleUnique);
+    infoCible.setUnique(EvenementCible::Num,UniqueCible::NumUnique);
+    infoCible.setForeignKey(EvenementCible::IdEvenement,infoEvenement);
+    setManager<EvenementCible>(std::make_unique<ManagerSql<EvenementCible>>(infoCible, std::make_unique<UniqueCible>()));
+    setCible<EvenementCible>(bmps::cibleId::EvenementCible);
+
+    setEnsembleEnable(bmps::EvenementEnable);
 }
 
 void ManagersPredef::enableHistorique(const QString & historique) {
@@ -109,7 +166,7 @@ void ManagersPredef::enableHistorique(const QString & historique) {
     setManager<Historique>(std::make_unique<ManagerSql<Historique>>(info, std::make_unique<Unique>()));
     setCible<Historique>(bmps::cibleId::Historique);
 
-    m_historiqueEnabled = true;
+    setEnsembleEnable(bmps::HistoriqueEnable);
 }
 
 void ManagersPredef::enableMotCle(const QString & motCle, const QString & motCleArbre, const QString & cibleMotCle,
@@ -195,7 +252,7 @@ void ManagersPredef::enableMotCle(const QString & motCle, const QString & motCle
                                                                                                  std::make_unique<UniqueProgPermission>()));
     setCible<MotProgPermission>(bmps::cibleId::MotProgPermission);
 
-    m_motCleEnabled = true;
+    setEnsembleEnable(bmps::MotCleEnable);
 }
 
 void ManagersPredef::enableRestriction(const QString & restriction) {
@@ -209,7 +266,7 @@ void ManagersPredef::enableRestriction(const QString & restriction) {
     setManager<Restriction>(std::make_unique<ManagerPermissionCode<Restriction>>(info,std::make_unique<Unique>()));
     setCible<Restriction>(bmps::cibleId::Restriction);
 
-    m_restrictionModificationEnabled = true;
+    setEnsembleEnable(bmps::RestrictionEnable);
 }
 
 void ManagersPredef::enableTexte(const QString & texte, const QString & cibleTexte, const QString & source
@@ -264,7 +321,7 @@ void ManagersPredef::enableTexte(const QString & texte, const QString & cibleTex
     setManager<SourceTexte>(std::make_unique<ManagerSql<SourceTexte>>(infoTS, std::make_unique<UniqueTS>()));
     setCible<SourceTexte>(bmps::cibleId::SourceTexte);
 
-    m_texteEnabled = true;
+    setEnsembleEnable(bmps::TexteEnable);
 }
 
 void  ManagersPredef::enableType(const QString & typeEnt, const QString & permissionType,
@@ -306,7 +363,7 @@ void  ManagersPredef::enableType(const QString & typeEnt, const QString & permis
                                                                                            std::make_unique<UniquePermission>()));
     setCible<TypePermission>(bmps::cibleId::TypePermission);
 
-    m_typeEnabled = true;
+    setEnsembleEnable(bmps::TypeEnable);
 }
 
 void ManagersPredef::enableUtilisation(const QString &utilisation, const QString &usage, const QString & usageArbre,
@@ -347,5 +404,5 @@ void ManagersPredef::enableUtilisation(const QString &utilisation, const QString
     setManager<Utilisation>(std::make_unique<ManagerSql<Utilisation>>(infoU, std::make_unique<UniqueU>()));
     setCible<Utilisation>(bmps::cibleId::Utilisation);
 
-    m_utilisationEnabled = true;
+    setEnsembleEnable(bmps::UtilisationEnable);
 }
