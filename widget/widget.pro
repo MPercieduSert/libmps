@@ -52,7 +52,8 @@ SOURCES += \
     TreeNodeModel.cpp \
     FindModel.cpp \
     IdComboBox.cpp \
-    NewModifPredef.cpp
+    NewModifPredef.cpp \
+    TreeColonnesModel.cpp
 
 HEADERS += \
     #BarPlotter.h \
@@ -85,7 +86,8 @@ HEADERS += \
     TreeNodeModel.h \
     FindModel.h \
     IdComboBox.h \
-    NewModifPredef.h
+    NewModifPredef.h \
+    TreeColonnesModel.h
 
 unix {
     target.path = /usr/lib
