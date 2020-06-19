@@ -19,6 +19,11 @@ DESTR_VIDE_DEF(Type)
 DESTR_VIDE_DEF(TypePermission)
 DESTR_VIDE_DEF(Utilisation)
 
+QString EvenementStyle::formeString(int forme) {
+    if(forme == EvenementStyle::Rectangle)
+        return QObject::tr("Rectangle");
+    return QObject::tr("Forme inconnue");
+}
 
 
 

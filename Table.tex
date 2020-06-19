@@ -640,10 +640,13 @@
 		couleurNom\\
 		policeTexte\\
 		couleurTexte\\
-		couleur\\
-		brush\\
+		policeTitre\\
+		couleurTitre\\
+		couleurFond\\
+		texture\\
 		forme\\
-		bordure
+		bordure\\
+		couleurBordure
 	}\\
 	\&
 	\relation{ciblageEvenement}
@@ -697,14 +700,15 @@
 	\\
 	\tableEntity{EvenementStyle}{
 		bordure&int&int&bd\\
-		brush&int&brush&br\\
+		couleurBorbure&text&couleur&cb\\
 		couleurFond&text&couleur&cf\\
 		couleurTexte&text&couleur&cte\\
 		couleurTitre&text&couleur&cti\\
 		forme&int&int&fm\\
 		nom&text&stringNotEmpty&nm\\
 		policeTexte&text&font&pte\\
-		policeTitre&text&font&pti
+		policeTitre&text&font&pti\\
+		texture&int&brush&tx
 	}{
 		\unique{nom}
 	}

@@ -323,7 +323,31 @@ void BddPredef::listeMiseAJourBdd(int version) {
         //Evenement
         if(managers().ensembleEnable(EvenementEnable)) {
             creerTable<EvenementStyle>();
+            EvenementStyle style;
+            style.setBordure(Qt::SolidLine);
+            style.setCouleurBordure(QColor(Qt::black).name());
+            style.setCouleurFond(QColor(Qt::gray).name());
+            style.setCouleurTexte(QColor(Qt::black).name());
+            style.setCouleurTitre(QColor(Qt::black).name());
+            style.setForme(EvenementStyle::Rectangle);
+            style.setNom("Style par défaut");
+            style.setPoliceTexte(QFont("Times", 10).toString());
+            style.setPoliceTitre(QFont("Times", 14,QFont::Bold).toString());
+            style.setTexture(Qt::SolidPattern);
+            save(style);
             creerTable<Evenement>();
+            if(managers().ensembleEnable(TypeEnable)){
+                Type tpEve;
+                tpEve.setIdProg(idProg::EvenementType);
+                tpEve.setNc("Événement");
+                tpEve.setNom("Événement");
+                save(tpEve);
+                TypePermission permEve;
+                permEve.setIdType(tpEve.id());
+                permEve.setCible(cible<Evenement>());
+                permEve.setCode(code::Visible);
+                save(permEve);
+            }
             creerTable<EvenementCible>();
         }
         //Historique

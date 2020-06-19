@@ -186,7 +186,7 @@ public:
 
     //! Test la restriction de modification de l'entité d'identifiant id.
     virtual bool testRestriction(idt /*id*/, flag /*restrict*/)
-        {return true;}
+        {return false;}
 
     //! Retourne le type du manager.
     virtual flag typeManager() const

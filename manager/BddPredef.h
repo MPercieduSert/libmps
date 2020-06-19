@@ -4,6 +4,7 @@
 #ifndef BDDPREDEF_H
 #define BDDPREDEF_H
 
+#include <QFont>
 #include "Bdd.h"
 #include "ManagersPredef.h"
 #include "EntityPredef.h"
@@ -18,6 +19,13 @@ namespace bddMPS {
         enum permission : flag::flag_type {Interdit = 0,
                               Visible = 0x1,
                               Attribuable = 0x2};
+    }
+    namespace idProg {
+        //! Identifiant de programmation de la table type.
+        enum idProgTypePredef {
+            Null = 0,
+            EvenementType = 1,
+            NbrIdProgTypePredef};
     }
 
 /*! \ingroup groupeFile

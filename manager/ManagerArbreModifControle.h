@@ -38,7 +38,7 @@ public:
 
     //! Supprime de la table en base de donnée l'entité d'identifiant id.
     bool del(idt id) override
-        {return testRestriction(id,bddMPS::Suppr) && ManagerArb::del(id);}
+        {return !testRestriction(id,bddMPS::Suppr) && ManagerArb::del(id);}
 
     //! Enregistre l'entité entity en base de donnée.
     void save(Ent & entity) override

@@ -203,6 +203,12 @@ class Evenement : public EntityIDs<infoEntity::EvenementId, amps::Id1Attribut,
 protected:
     template<class T> using PositionEnum = PositionEnum<T,Evenement>;
 public:
+    //! Code.
+    enum codeFlag : flag::flag_type {
+        Aucun = 0x0,
+        UnJour = 0x1,
+        JourEntier = 0x2
+    };
     using EAID = EntityIDs<infoEntity::EvenementId, amps::Id1Attribut,
                                                     amps::NcNomTypeAttribut,
                                                     amps::CodeAttribut,
@@ -221,7 +227,7 @@ public:
                        Nom = PositionEnum<NomAttribut>::Position,
                        Titre = PositionEnum<TitreAttribut>::Position,
                        Type = PositionEnum<TypeAttribut>::Position,
-                       NbrAtt,
+                       NbrAtt = EAID::NbrAtt,
                        IdStyle = Id1};
     using EAID::EntityID;
     BASE_ENTITY(Evenement)
@@ -247,35 +253,46 @@ public:
         setTitre(titre);
         setType(type);
     }
+
+    //! Teste si l'entité est valide.
+    bool isValid() const override
+        {return EAID::isValid() && debut() <= fin();}
+
 };
 /*! \ingroup groupeEntity
  * \brief Représentation de l'entité EvenementStyle.
  */
 class EvenementStyle : public EntityIDs<infoEntity::EvenementStyleId, amps::BordureAttribut,
-                                                                      amps::BrushAttribut,
+                                                                      amps::CouleurBordureAttribut,
                                                                       amps::CouleurFondAttribut,
                                                                       amps::CouleurTexteAttribut,
                                                                       amps::CouleurTitreAttribut,
                                                                       amps::FormeAttribut,
                                                                       amps::NomAttribut,
                                                                       amps::PoliceTexteAttribut,
-                                                                      amps::PoliceTitreAttribut>{
+                                                                      amps::PoliceTitreAttribut,
+                                                                      amps::TextureAttribut>{
 protected:
     template<class T> using PositionEnum = PositionEnum<T,EvenementStyle>;
 public:
-    enum {IdStyleDefault};
-    using EAID = EntityIDs<infoEntity::EvenementStyleId, amps::BordureAttribut,
-                                                        amps::BrushAttribut,
+    enum {IdStyleDefault = 1};
+    //! Forme.
+    enum formeStyle {Rectangle,
+                    NbrFormeStyle};
+    using EAID = EntityIDs<infoEntity::EvenementStyleId,amps::BordureAttribut,
+                                                        amps::CouleurBordureAttribut,
                                                         amps::CouleurFondAttribut,
                                                         amps::CouleurTexteAttribut,
                                                         amps::CouleurTitreAttribut,
                                                         amps::FormeAttribut,
                                                         amps::NomAttribut,
                                                         amps::PoliceTexteAttribut,
-                                                        amps::PoliceTitreAttribut>;
+                                                        amps::PoliceTitreAttribut,
+                                                        amps::TextureAttribut>;
     //! Positions des attributs.
     enum Position:szt {Id = PositionEnum<IdAttribut>::Position,
-                       Brush = PositionEnum<BrushAttribut>::Position,
+                       Bordure = PositionEnum<BordureAttribut>::Position,
+                       CouleurBordure = PositionEnum<CouleurBordureAttribut>::Position,
                        CouleurFond = PositionEnum<CouleurFondAttribut>::Position,
                        CouleurTexte = PositionEnum<CouleurTexteAttribut>::Position,
                        CouleurTitre = PositionEnum<CouleurTitreAttribut>::Position,
@@ -283,7 +300,8 @@ public:
                        Nom = PositionEnum<NomAttribut>::Position,
                        PoliceTexte = PositionEnum<PoliceTexteAttribut>::Position,
                        PolicceTitre = PositionEnum<PoliceTitreAttribut>::Position,
-                       NbrAtt};
+                       Texture = PositionEnum<TextureAttribut>::Position,
+                       NbrAtt = EAID::NbrAtt};
     using EAID::EntityID;
     BASE_ENTITY(EvenementStyle)
 
@@ -293,18 +311,22 @@ public:
         {setNom(nom);}
 
     //! Constructeur à partir des valeurs attributs.
-    EvenementStyle(szt brush, int bordure, const QString & CouleurFond, const QString & couleurTexte, const QString & couleurTitre,
-                   int forme, const QString & nom, const QString & policeTexte, const QString & policeTitre, idt id = 0)
+    EvenementStyle(int bordure, const QString & CouleurBordure, const QString & CouleurFond,
+                   const QString & couleurTexte, const QString & couleurTitre,
+                   int forme, const QString & nom, const QString & policeTexte, const QString & policeTitre, szt texture, idt id = 0)
         : EvenementStyle(nom,id) {
-        setBrush(brush);
         setBordure(bordure);
+        setCouleurBordure(CouleurBordure);
         setCouleurFond(CouleurFond);
         setCouleurTexte(couleurTexte);
         setCouleurTitre(couleurTitre);
         setForme(forme);
         setPoliceTexte(policeTexte);
         setPoliceTitre(policeTitre);
+        setTexture(texture);
     }
+
+    static QString formeString(int forme);
 };
 }
 using namespace ensembleEvenement;

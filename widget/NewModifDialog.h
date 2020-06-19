@@ -197,9 +197,9 @@ protected:
     using Permission = entityMPS::ensembleType::TypePermission;
     using AbstractNcNomNewModifForm::m_mainLayout;
     int m_cible;                        //!< Numero de cible de l'entité
-    bool m_valide;              //!< Controle de la validité du type
+    bool m_valide;                      //!< Controle de la validité du type
     QLabel * m_typeLabel;               //!< Label du nom
-    QTreeWidget * m_typeTree;             //!< Ligne d'édition du nom.
+    QTreeWidget * m_typeTree;           //!< Ligne d'édition du nom.
 public:
     enum {nomType,ncType,nbrColumn};
     //! Constructeur.

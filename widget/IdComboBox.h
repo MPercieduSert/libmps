@@ -41,6 +41,10 @@ public:
         for(auto i = vec.cbegin(); i != vec.cend(); ++i)
                 addItem(text(*i),i->id());
     }
+public slots:
+    //! Mutateur de l'élément courant par choix de l'identifiant.
+    void setCurrentIndexId(szt id);
+
 signals:
     //! La valeur de l'identifiant change.
     void idChanged(szt id);

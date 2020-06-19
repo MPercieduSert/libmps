@@ -126,7 +126,7 @@ NewModifDialog::NewModifDialog(AbstractNewModifForm * form, QWidget * parent)
     m_annulButton = new QPushButton(tr("Annuler"));
     connect(m_annulButton,&QPushButton::clicked,this,&NewModifDialog::reject);
     m_okButton = new QPushButton(tr("Enregistrer"));
-    //m_okButton->setEnabled(m_form->valide());
+    m_okButton->setEnabled(m_form->valide());
     connect(m_okButton,&QPushButton::clicked,this,&NewModifDialog::accept);
     connect(m_form,SIGNAL(savePermis(bool)),m_okButton,SLOT(setEnabled(bool)));
     if(!m_form->delDisable()) {

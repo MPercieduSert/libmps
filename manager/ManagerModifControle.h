@@ -65,11 +65,11 @@ public:
 
     //! Teste la restriction de modification pour une entité d'identifiant id.
     virtual bool testRestriction(idt id, flag restrict)
-        {return m_bypass ? true : m_gestionRestriction->testRestriction(id, restrict);}
+        {return m_bypass ? false : m_gestionRestriction->testRestriction(id, restrict);}
 
     //! Teste la restriction de modification pour une entité d'identifiant id avec les valeurs de entity.
     virtual bool testRestriction(idt id, flag restrict, const Ent & entity)
-        {return m_bypass ? true : m_gestionRestriction->testRestriction(id, restrict, entity);}
+        {return m_bypass ? false : m_gestionRestriction->testRestriction(id, restrict, entity);}
 
 protected:
     //! Met en place un court circuit du gestionnaire d'autorisations.
@@ -123,7 +123,7 @@ public:
 
     //! Supprime de la table en base de donnée l'entité d'identifiant id.
     bool del(idt id) override
-        {return testRestriction(id,bddMPS::Suppr) &&  ManagerSqlEnt::del(id);}
+        {return !testRestriction(id,bddMPS::Suppr) &&  ManagerSqlEnt::del(id);}
 
     //! Demande les restriction de modification pour l'entité d'identifiant id.
     flag getRestriction(idt id) override
@@ -158,7 +158,7 @@ protected:
 
     //! Met à jour l'entité entity en base de donnée.
     void modify(const Ent & entity) override {
-        if(testRestriction(entity.id(), bmps::Modif,entity))
+        if(!testRestriction(entity.id(), bmps::Modif,entity))
             ManagerSqlEnt::modify(entity);
         else
             throw std::invalid_argument(QString("Erreur d'autorisation de modification' : "
@@ -168,7 +168,7 @@ protected:
 
     //! Met à jour l'entité entity en base de donnée d'identifiant id avec les valeurs d'entity.
     void modify(const Ent & entity, idt id) override {
-        if(testRestriction(id, bmps::Modif, entity))
+        if(!testRestriction(id, bmps::Modif, entity))
             ManagerSqlEnt::modify(entity,id);
         else
             throw std::invalid_argument(QString("Erreur d'autorisation de modification' : "

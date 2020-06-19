@@ -99,7 +99,7 @@ void ManagersPredef::enableEvenement(const QString & evenement, const QString & 
     using UniqueStyle = NomUniqueSql<EvenementStyle>;
     InfoBdd infoStyle(EvenementStyle::Name(),evenementStyle,EvenementStyle::NbrAtt,{UniqueStyle::NbrUnique});
     infoStyle.setAttribut(EvenementStyle::Bordure,"bd");
-    infoStyle.setAttribut(EvenementStyle::Brush,"br");
+    infoStyle.setAttribut(EvenementStyle::CouleurBordure,"cb",bmps::typeAttributBdd::Text);
     infoStyle.setAttribut(EvenementStyle::CouleurFond,"cf",bmps::typeAttributBdd::Text);
     infoStyle.setAttribut(EvenementStyle::CouleurTexte,"cte",bmps::typeAttributBdd::Text);
     infoStyle.setAttribut(EvenementStyle::CouleurTitre,"cti",bmps::typeAttributBdd::Text);
@@ -107,6 +107,7 @@ void ManagersPredef::enableEvenement(const QString & evenement, const QString & 
     infoStyle.setAttribut(EvenementStyle::Nom,"nm",bmps::typeAttributBdd::Text);
     infoStyle.setAttribut(EvenementStyle::PoliceTexte,"pte",bmps::typeAttributBdd::Text);
     infoStyle.setAttribut(EvenementStyle::PolicceTitre,"pti",bmps::typeAttributBdd::Text);
+    infoStyle.setAttribut(EvenementStyle::Texture,"tx");
     infoStyle.setUnique(EvenementStyle::Nom,UniqueStyle::NomUnique);
     setManager<EvenementStyle>(std::make_unique<ManagerSql<EvenementStyle>>(infoStyle, std::make_unique<UniqueStyle>()));
     setCible<EvenementStyle>(bmps::cibleId::EvenementStyle);
