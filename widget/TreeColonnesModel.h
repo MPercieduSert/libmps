@@ -47,6 +47,10 @@ protected:
     //! Nombre de ligne afficher en szt.
     szt nbrRow() const override
         {return static_cast<szt>(m_tree.tree().size());}
+
+    //! Met le vecteur des correspondance de ligne à l'identitée.
+    void resetRowToLigne() override
+        {m_tree.setTree(m_fullTree);}
 };
 }
 #endif // TREECOLONNESMODEL_H
