@@ -173,8 +173,8 @@
 			exact
 		}\\
 		\entity{Donnee}{
-			idProg\\
 			nom\\
+			ref\\
 			type\\
 			tpVal
 		}
@@ -216,13 +216,13 @@
 	}[\bdd]\\
 	\tableEntity{Donnee}{
 		nom&text&stringNotEmpty&nm&\\
+		ref&text&ref&ref&NULL\\
 		type&uint&idSup1&tp&\\
-		tpVal&int&int&tpV\\
-		idProg&uint&idSup1NULL&idPg&NULL\\
+		tpVal&int&int&tpV
 	}{
 		\fkey{id}{ArbreDonnee}\\
 		\fkey{type}{Type}*\\
-		\unique{idProg}\\
+		\unique{ref}\\
 		ArbreModifControle*
 	}[\bdd]
 	\&
@@ -272,6 +272,7 @@
 		\entity{Usage}{
 			nc\\
 			nom\\
+			ref\\
 			type
 		}
 		\&
@@ -293,11 +294,13 @@
 		\tableEntity{Usage}{
 			nc&text&stringNotEmpty&nc&\\
 			nom&text&stringNotEmpty&nm&\\
+			ref&text&ref&ref&NULL\\
 			type&uint&idSup1&tp&
 		}{
 			\fkey{id}{ArbreUsage}\\
 			\fkey{type}{Type}*\\
 			\unique{nom, type}\\
+			\unique{ref}
 			ArbreModifControle*
 		}[\bdd]
 		\\
@@ -337,7 +340,7 @@
 	\matrix[ampersand replacement=\&,column sep =.5cm, row sep =1cm]{
 		\entity{MotProgPermission}{
 			cible\\
-			idProg\\
+			ref\\
 			code
 		}
 		\&
@@ -354,7 +357,7 @@
 		\entity{MotProgCible}{
 			idCible\\
 			cible\\
-			idProg
+			ref
 		}
 		\&
 		\relation{ciblageProg}
@@ -388,13 +391,13 @@
 	\begin{tikzpicture}[thick]
 	\matrix[ampersand replacement=\&,column sep =.25cm, row sep =0.25cm]{
 		\tableEntity{MotProgPermission}{
-			idProg&int&int&idPg\\
 			idMotCle& uint &idSup1& idMC &\\
 			cible&int&int&cb&\\
 			code& uint &code& cd \\
+			ref&text&ref&ref&NULL\\
 		}{
 			\fkey{idMotCle}{MotCle}\\
-			\unique{idProg, idMotCle, cible}
+			\unique{idMotCle, cible, ref}
 		}[\bdd]
 		\&
 		\arbreTable{MotCle}	
@@ -409,13 +412,13 @@
 			ModifControlePermissionCode*
 		}[\bdd]\\
 		\tableEntity{MotProgCible}{
-			idProg&int&int&idPg&\\
 			idMotCle&uint&idSup1&idMC&\\
 			idCible&uint&idSup1&idCb&\\
-			cible&int&int&cb&
+			cible&int&int&cb&\\
+			ref&text&ref&ref&NULL\\
 		}{
 			\fkey{idMotCle}{MotCle}\\
-			\unique{idProg, idCible, cible}
+			\unique{idCible, cible, ref}
 		}[\bdd]
 		\&
 		\tableEntity{MotCle}{
@@ -563,9 +566,9 @@
 	\begin{tikzpicture}[thick]
 	\matrix[ampersand replacement=\&,column sep =3cm, row sep =0.5cm]{
 		\entity{Type}{
-			idProg\\
 			nc\\
-			nom
+			nom\\
+			ref
 		}	
 		\node[relation,above=1.65cm of Type](parentType){parentType};
 		\&
@@ -588,14 +591,14 @@
 \begin{tikzpicture}[thick]
 \matrix[ampersand replacement=\&,column sep =1.5cm, row sep =0.5cm]{
 	\tableEntity{Type}{
-		idProg&uint&idSup1Null&idPg&NULL\\
 		parent&uint&idSup1Null&pt&NULL\\
 		nc&text&stringNotEmpty&nc&\\
-		nom&text&stringNotEmpty&nm&	
+		nom&text&stringNotEmpty&nm&\\	
+		ref&text&stringNotEmpty&ref&
 	}{
 		\fkey{parent}{Type}\\
-		\unique{idProg}\\
-		\unique{nom}\\
+		\unique{nom, parent}\\
+		\unique{ref}\\
 		ArbreSimpleModifControle*
 		
 	}[\bdd]
@@ -1094,8 +1097,8 @@
 	\relation{duNiveau}[below=0.75cm of Niveau]
 	
 	\entity{Classe}{
-		nc
-		nom
+		nc\\
+		nom\\
 		num
 	}[right=2cm of classeDans]
 
