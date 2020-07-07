@@ -2,6 +2,7 @@
 
 using namespace attributMPS;
 constexpr std::array<int, AttributDecimale::NbrValues> AttributDecimale::Decimale{{1,2,3,4,5,6,8,10,20,25,50,100,200,250,500,1000}};
+const QRegularExpression AttributRef::reg {"^[a-z][a-z0-9_]*$"};
 
 QString AttributEntity::affiche() const
         {return nameAtt().append(" : ").append(nameClasseAttribut())
@@ -19,6 +20,7 @@ DESTR_VIDE_DEF(AttributDateTimeCurrent)
 DESTR_VIDE_DEF(AttributDateTimeNull)
 DESTR_VIDE_DEF(AttributDateTimeValide)
 DESTR_VIDE_DEF(AttributDecimale)
+DESTR_VIDE_DEF(AttributRef)
 DESTR_VIDE_DEF(AttributStringNotEmpty)
 
 DESTR_VIDE_DEF(AlphaAttribut)
@@ -65,6 +67,7 @@ DESTR_VIDE_DEF(ParentAttribut)
 DESTR_VIDE_DEF(PoliceAttribut)
 DESTR_VIDE_DEF(PoliceTexteAttribut)
 DESTR_VIDE_DEF(PoliceTitreAttribut)
+DESTR_VIDE_DEF(RefAttribut)
 DESTR_VIDE_DEF(SaisieAttribut)
 DESTR_VIDE_DEF(TexteAttribut)
 DESTR_VIDE_DEF(TextureAttribut)

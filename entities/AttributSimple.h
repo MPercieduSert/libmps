@@ -8,6 +8,7 @@
 #include <QColor>
 #include <QDate>
 #include <QDateTime>
+#include <QRegularExpression>
 #include <QString>
 #include <QVariant>
 #include <utility>
@@ -585,6 +586,24 @@ public:
         {return !m_valeur.isEmpty();}
 };
 
+/*! \ingroup groupeAttributEntity
+ * \brief Classe mère des attributs de type référence.
+ */
+class AttributRef : public AttributString {
+public:
+    CONSTR_DEFAUT(AttributRef)
+    CONSTR_AFFECT_DEFAUT(AttributRef)
+
+    static const QRegularExpression reg;
+
+    //!Destructeur.
+    ~AttributRef();
+
+    //! Teste la validité de la valeur.
+    bool isValidAttribut() const final
+        {return m_valeur.isNull() || reg.match(m_valeur).hasMatch();}
+};
+
 SINGLE_ATTRIBUT(AlphaAttribut,AttributInt,Alpha,alpha)
 SINGLE_ATTRIBUT(BordureAttribut,AttributInt,Bordure,bordure)
 SINGLE_ATTRIBUT(CardAttribut,AttributInt,Card,card)
@@ -629,6 +648,7 @@ SINGLE_ATTRIBUT(ParentAttribut,AttributIdNull,Parent,parent)
 SINGLE_ATTRIBUT(PoliceAttribut,AttributStringNotEmpty,Font,font)
 SINGLE_ATTRIBUT(PoliceTexteAttribut,AttributStringNotEmpty,PoliceTexte,policeTexte)
 SINGLE_ATTRIBUT(PoliceTitreAttribut,AttributStringNotEmpty,PoliceTitre,policeTitre)
+SINGLE_ATTRIBUT(RefAttribut,AttributRef,Ref,ref)
 SINGLE_ATTRIBUT(SaisieAttribut,AttributCode,Saisie,saisie)
 SINGLE_ATTRIBUT(TexteAttribut,AttributString,Texte,texte)
 SINGLE_ATTRIBUT(TextureAttribut,AttributBrush,Texture,texture)
