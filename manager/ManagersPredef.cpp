@@ -38,13 +38,13 @@ void ManagersPredef::enableDonnee(const QString & donnee, const QString & arbreD
                                   std::unique_ptr<AbstractGestionRestriction<DonneeCard>> && gestionCardDonnee) {
     //Donnee
     auto infoArbre = infoBddArbre(arbreDonnee);
-    using UniqueDonnee = IdProgUniqueSql<Donnee>;
+    using UniqueDonnee = RefUniqueSql<Donnee>;
     InfoBdd infoDonnee(Donnee::Name(),donnee,Donnee::NbrAtt,{UniqueDonnee::NbrUnique});
     infoDonnee.setAttribut(Donnee::Nom,"nom",bmps::typeAttributBdd::Text);
     infoDonnee.setAttribut(Donnee::Type,"tp");
     infoDonnee.setAttribut(Donnee::TpVal,"tpV");
-    infoDonnee.setAttribut(Donnee::IdProg,"idPg",bmps::typeAttributBdd::Integer,false);
-    infoDonnee.setUnique(Donnee::IdProg,UniqueDonnee::IdProgUnique);
+    infoDonnee.setAttribut(Donnee::Ref,"ref",bmps::typeAttributBdd::Text,false);
+    infoDonnee.setUnique(Donnee::Ref,UniqueDonnee::RefUnique);
     infoDonnee.setForeignKey(Donnee::Id,infoArbre);
     setTypeForeignKey<Donnee>(infoDonnee);
     if(gestion)
@@ -219,13 +219,13 @@ void ManagersPredef::enableMotCle(const QString & motCle, const QString & motCle
     setCible<MotClePermission>(bmps::cibleId::MotClePermission);
 
     // Cible Mot Prog
-    using UniqueProgCible = CibleUniqueSql<MotProgCible>;
+    using UniqueProgCible = CibleSimpleRefUniqueSql<MotProgCible>;
     InfoBdd infoProgCible(MotProgCible::Name(),cibleProg,MotProgCible::NbrAtt,{UniqueProgCible::NbrUnique});
-    infoProgCible.setAttribut(MotProgCible::IdProg,"idPg");
+    infoProgCible.setAttribut(MotProgCible::Ref,"ref",bddMPS::typeAttributBdd::Text,false);
     infoProgCible.setAttribut(MotProgCible::IdMotCle,"idMC");
     infoProgCible.setAttribut(MotProgCible::IdCible,"idCb");
     infoProgCible.setAttribut(MotProgCible::Cible,"cb");
-    infoProgCible.setUnique(MotProgCible::IdProg,UniqueProgCible::Id1Unique);
+    infoProgCible.setUnique(MotProgCible::Ref,UniqueProgCible::RefUnique);
     infoProgCible.setUnique(MotProgCible::IdCible,UniqueProgCible::IdCibleUnique);
     infoProgCible.setUnique(MotProgCible::Cible,UniqueProgCible::CibleUnique);
     infoProgCible.setForeignKey(MotProgCible::IdMotCle,infoMC);
@@ -233,14 +233,14 @@ void ManagersPredef::enableMotCle(const QString & motCle, const QString & motCle
     setCible<MotProgCible>(bmps::cibleId::MotProgCible);
 
     // Permission Mot Prog
-    using UniqueProgPermission = RelationCibleUniqueSql<MotProgPermission>;
+    using UniqueProgPermission = IdCibleRefUniqueSql<MotProgPermission>;
     InfoBdd infoProgPermission(MotProgPermission::Name(),permissionProg,MotProgPermission::NbrAtt,{UniqueProgPermission::NbrUnique});
-    infoProgPermission.setAttribut(MotProgPermission::IdProg,"idPg");
+    infoProgPermission.setAttribut(MotProgPermission::Ref,"ref",bddMPS::typeAttributBdd::Text,false);
     infoProgPermission.setAttribut(MotProgPermission::IdMotCle,"idMC");
     infoProgPermission.setAttribut(MotProgPermission::Cible,"cb");
     infoProgPermission.setAttribut(MotProgPermission::Code,"cd");
-    infoProgPermission.setUnique(MotProgPermission::IdProg,UniqueProgPermission::Id1Unique);
-    infoProgPermission.setUnique(MotProgPermission::IdMotCle,UniqueProgPermission::Id2Unique);
+    infoProgPermission.setUnique(MotProgPermission::Ref,UniqueProgPermission::RefUnique);
+    infoProgPermission.setUnique(MotProgPermission::IdMotCle,UniqueProgPermission::Id1Unique);
     infoProgPermission.setUnique(MotProgPermission::Cible,UniqueProgPermission::CibleUnique);
     infoProgPermission.setForeignKey(MotProgPermission::IdMotCle,infoMC);
     if(gestionProgPermission)
@@ -330,14 +330,15 @@ void  ManagersPredef::enableType(const QString & typeEnt, const QString & permis
                 std::unique_ptr<AbstractGestionRestriction<TypePermission>> &&  gestionPermission)
 {
     //Type
-    using UniqueType = IdProgNomUniqueSql<Type>;
+    using UniqueType = RefNomParentUniqueSql<Type>;
     InfoBdd infoType(Type::Name(),typeEnt,Type::NbrAtt,{UniqueType::NbrUnique_1,UniqueType::NbrUnique_2});
-    infoType.setAttribut(Type::IdProg,"idPg",bmps::typeAttributBdd::Integer,false);
+    infoType.setAttribut(Type::Ref,"ref",bmps::typeAttributBdd::Text,false);
     infoType.setAttribut(Type::Parent,"pt",bmps::typeAttributBdd::Integer,false);
     infoType.setAttribut(Type::Nc,"nc",bmps::typeAttributBdd::Text);
     infoType.setAttribut(Type::Nom,"nm",bmps::typeAttributBdd::Text);
-    infoType.setUnique(Type::IdProg,UniqueType::IdProgUnique,UniqueType::IdProgUniqueSet);
+    infoType.setUnique(Type::Ref,UniqueType::RefUnique,UniqueType::RefUniqueSet);
     infoType.setUnique(Type::Nom,UniqueType::NomUnique,UniqueType::NomUniqueSet);
+    infoType.setUnique(Type::Parent,UniqueType::ParentUnique,UniqueType::ParentUniqueSet);
     infoType.setForeignKey(Type::Parent,infoType);
     if(gestionType)
         setManager<Type>(std::make_unique<ManagerArbreSimpleModifControle<Type>>(infoType,std::move(gestionType),
@@ -372,13 +373,15 @@ void ManagersPredef::enableUtilisation(const QString &utilisation, const QString
 {
     //Usage
     auto infoArbre = infoBddArbre(usageArbre);
-    using UniqueN = NomTypeUniqueSql<Usage>;
-    InfoBdd infoN("Usage",usage,Usage::NbrAtt,{UniqueN::NbrUnique});
+    using UniqueN = RefNomTypeUniqueSql<Usage>;
+    InfoBdd infoN("Usage",usage,Usage::NbrAtt,{UniqueN::NbrUnique_1,UniqueN::NbrUnique_2});
     infoN.setAttribut(Usage::Nc,"nc",bmps::typeAttributBdd::Text);
     infoN.setAttribut(Usage::Nom,"nm",bmps::typeAttributBdd::Text);
+    infoN.setAttribut(Usage::Ref,"ref",bmps::typeAttributBdd::Text,false);
     infoN.setAttribut(Usage::Type,"tp");
-    infoN.setUnique(Usage::Nom,UniqueN::NomUnique);
-    infoN.setUnique(Usage::Type,UniqueN::TypeUnique);
+    infoN.setUnique(Usage::Ref,UniqueN::RefUnique,UniqueN::TypeUniqueSet);
+    infoN.setUnique(Usage::Nom,UniqueN::NomUnique,UniqueN::NomUniqueSet);
+    infoN.setUnique(Usage::Type,UniqueN::TypeUnique,UniqueN::TypeUniqueSet);
     infoN.setForeignKey(Usage::Id,infoArbre);
     setTypeForeignKey<Usage>(infoN);
     if(gestionUsage)

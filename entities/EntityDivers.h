@@ -243,6 +243,51 @@ public:
 template<szt IDM > ArbreSimpleNcNomEntity<IDM>::~ArbreSimpleNcNomEntity() {}
 
 /*! \ingroup groupeBaseEntity
+ * \brief Classe de base des entités ayant des attributs parent, nc, nom et ref.
+ */
+template<szt IDM > class ArbreSimpleNcNomRefEntity : public EntityIDs<IDM,ParentAttribut,NcNomRefAttribut> {
+public:
+    using EAID = EntityIDs<IDM,ParentAttribut,NcNomRefAttribut>;
+    //! Positions des attributs.
+    enum Position:szt {Id = PositionEnum<IdAttribut,EAID>::Position,
+                   Nc = PositionEnum<NcAttribut,EAID>::Position,
+                   Nom = PositionEnum<NomAttribut,EAID>::Position,
+                   Parent = PositionEnum<ParentAttribut,EAID>::Position,
+                   Ref = PositionEnum<RefAttribut,EAID>::Position,
+                   NbrAtt = EAID::NbrAtt,
+                   Ordre = Nom};
+
+    using EntityIDs<IDM,ParentAttribut,NcNomRefAttribut>::EntityIDs;
+    using EAID::setNc;
+    using EAID::setNom;
+    using EAID::setParent;
+    using EAID::setRef;
+    BASE_ENTITY(ArbreSimpleNcNomRefEntity)
+
+    //! Constructeur à partir d'un jeux de valeurs attributs unique.
+    ArbreSimpleNcNomRefEntity(const QString & ref, idt id = 0)
+        : EAID(id)
+    {setRef(ref);}
+
+    //! Constructeur à partir d'un jeux de valeurs attributs unique.
+    ArbreSimpleNcNomRefEntity(const QString & nom, idt parent, idt id = 0)
+        : EAID(id) {
+        setNom(nom);
+        setParent(parent);
+    }
+
+    //! Constructeur à partir des valeurs attributs.
+    ArbreSimpleNcNomRefEntity(const QString & nc, const QString & nom, idt parent = 0, const QString & ref = QString(), idt id = 0)
+        : ArbreSimpleNcNomRefEntity(nom, parent, id) {
+        setNc(nc);
+        setParent(parent);
+        setRef(ref);
+    }
+};
+
+template<szt IDM > ArbreSimpleNcNomRefEntity<IDM>::~ArbreSimpleNcNomRefEntity() {}
+
+/*! \ingroup groupeBaseEntity
  * \brief Classe de base des entités ayant un attribut nom et nc.
  */
 template<szt IDM > class NcNomEntity : public EntityID<IDM,NcNomAttribut> {
@@ -310,6 +355,48 @@ public:
 };
 
 template<szt IDM > NcNomTypeEntity<IDM>::~NcNomTypeEntity() {}
+
+/*! \ingroup groupeBaseEntity
+ * \brief Classe de base des entités ayant des attributs nc, nom, ref et type.
+ */
+template<szt IDM > class NcNomRefTypeEntity : public EntityID<IDM,NcNomRefTypeAttribut> {
+public:
+    using EAID = EntityID<IDM,NcNomRefTypeAttribut>;
+    //! Positions des attributs.
+    enum Position:szt {Id = PositionEnum<IdAttribut,EAID>::Position,
+                   Nc = PositionEnum<NcAttribut,EAID>::Position,
+                   Nom = PositionEnum<NomAttribut,EAID>::Position,
+                   Ref = PositionEnum<RefAttribut,EAID>::Position,
+                   Type = PositionEnum<TypeAttribut,EAID>::Position,
+                   NbrAtt = EAID::NbrAtt};
+
+    using EntityID<IDM,NcNomRefTypeAttribut>::EntityID;
+    using EAID::setNc;
+    using EAID::setNom;
+    using EAID::setRef;
+    using EAID::setType;
+    BASE_ENTITY(NcNomRefTypeEntity)
+
+    //! Constructeur à partir d'un jeux de valeurs attributs unique.
+    NcNomRefTypeEntity(const QString & ref)
+        {setRef(ref);}
+
+    //! Constructeur à partir d'un jeux de valeurs attributs unique.
+    NcNomRefTypeEntity(const QString & nom, idt type, idt id = 0)
+        : EAID (id) {
+        setNom(nom);
+        setType(type);
+    }
+
+    //! Constructeur à partir des valeurs attributs.
+    NcNomRefTypeEntity(const QString & nc, const QString & nom, const QString & ref, idt type, idt id = 0)
+        : NcNomRefTypeEntity(nom,type,id) {
+        setNc(nc);
+        setRef(ref);
+    }
+};
+
+template<szt IDM > NcNomRefTypeEntity<IDM>::~NcNomRefTypeEntity() {}
 
 /*! \ingroup groupeBaseEntity
  * \brief Classe de base des entités ayant un attribut nom.

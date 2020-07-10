@@ -18,7 +18,7 @@ namespace infoEntity {
     //! Liste des identifiants des types d'entités de base, n'ayant pas de manageurs dans accessible par identifiant.
     enum entityBaseId:typeMPS::szt{ArbreId,
                       VersionBddId,
-                     NbrEntBaseId};
+                      NbrEntBaseId};
 
 //        entityId = -26,
 //                    ArbreSimpleId,

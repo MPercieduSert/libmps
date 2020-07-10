@@ -52,7 +52,7 @@ void AbstractNcNomNewModifForm::connexion() {
 }
 
 //AbstractTypeNcNomForm
-AbstractTypeNcNomNewModifForm::AbstractTypeNcNomNewModifForm(bddMPS::BddPredef & bdd, idt idProgRoot, idt idEntity,
+AbstractTypeNcNomNewModifForm::AbstractTypeNcNomNewModifForm(bddMPS::BddPredef & bdd, const QString & refRoot, idt idEntity,
                                                              const QString & labelType, const QString &labelNc, const QString &labelNom,
                                                              bool newEnt, QWidget * parent)
     : AbstractNcNomNewModifForm(bdd,labelNc,labelNom,newEnt,parent), m_cible(bdd.cible(idEntity)), m_valide(!m_new)
@@ -66,7 +66,7 @@ AbstractTypeNcNomNewModifForm::AbstractTypeNcNomNewModifForm(bddMPS::BddPredef &
     m_typeTree->setColumnCount(nbrColumn);
     m_typeTree->setHeaderLabels(QStringList({"nom","nom court"}));
     m_typeTree->setSelectionModel(new QItemSelectionModel(m_typeTree->model()));
-    auto tree = m_bdd.getArbre<Type>(m_bdd.idProgToId<Type>(idProgRoot));
+    auto tree = m_bdd.getArbre<Type>(m_bdd.refToId<Type>(refRoot));
     auto iter = tree.beginBrother();
     auto * item = new QTreeWidgetItem(QStringList({iter->nom(),iter->nc()}));
     item->setData(nomType,Qt::UserRole,iter->id());

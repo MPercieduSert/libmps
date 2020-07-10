@@ -3,7 +3,7 @@
 using namespace dialogMPS;
 //////////////////////////////////////////////// EvenementNewModifForm ////////////////////////////////////////
 EvenementNewModifForm::EvenementNewModifForm(bddMPS::Bdd &bdd, bool newEnt, QWidget * parent)
-    : AbstractTypeNcNomNewModifForm(static_cast<bddMPS::BddPredef &>(bdd),bddMPS::idProg::EvenementType,Evenement::ID,
+    : AbstractTypeNcNomNewModifForm(static_cast<bddMPS::BddPredef &>(bdd),"evenement_root_tp",Evenement::ID,
                                     "Type de l'événement :","Nom court de l'événement :","Nom de l'événement :",
                                     newEnt,parent){
     // Nom

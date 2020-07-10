@@ -319,6 +319,46 @@ void BddPredef::listeMiseAJourBdd(int version) {
             creerTable<Donnee>();
             creerTable<DonneeCible>();
             creerTable<DonneeCard>();
+            if(managers().ensembleEnable(TypeEnable)) {
+                Type configType;
+                configType.setNom("Configuration");
+                configType.setNc("config");
+                configType.setRef("config_root_tp");
+                save(configType,Suppr);
+                TypePermission configPerm;
+                configPerm.setIdType(configType.id());
+                configPerm.setCible(cible<Donnee>());
+                configPerm.setCode(code::Visible);
+                save(configPerm);
+                Type defValType;
+                defValType.setNom("Valeur par defaut");
+                defValType.setNc("defaut");
+                defValType.setRef("valeur_defaut_tp");
+                defValType.setParent(configType.id());
+                save(defValType,Suppr);
+                TypePermission defValPerm;
+                defValPerm.setIdType(defValType.id());
+                defValPerm.setCible(cible<Donnee>());
+                defValPerm.setCode(code::Visible | code::Attribuable);
+                save(defValPerm);
+                conteneurMPS::tree<Donnee> tree;
+                auto iter = tree.begin();
+                iter->setNom("Configuration");
+                iter->setType(configType.id());
+                iter->setTpVal(donnee::NoDonnee);
+                iter->setRef("config_dn");
+                iter = tree.push_back(iter);
+                iter->setNom("Valeurs par defaut");
+                iter->setType(configType.id());
+                iter->setTpVal(donnee::NoDonnee);
+                iter->setRef("valeur_defaut_dn");
+                iter = tree.push_back(iter);
+                iter->setNom("Date par defaut");
+                iter->setType(defValType.id());
+                iter->setTpVal(donnee::Date);
+                iter->setRef("date_defaut_dn");
+                save(tree,WithoutDelete);
+            }
         }
         //Evenement
         if(managers().ensembleEnable(EvenementEnable)) {
@@ -338,7 +378,7 @@ void BddPredef::listeMiseAJourBdd(int version) {
             creerTable<Evenement>();
             if(managers().ensembleEnable(TypeEnable)){
                 Type tpEve;
-                tpEve.setIdProg(idProg::EvenementType);
+                tpEve.setRef("evenement_root_tp");
                 tpEve.setNc("Événement");
                 tpEve.setNom("Événement");
                 save(tpEve);

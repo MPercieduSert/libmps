@@ -533,6 +533,63 @@ template<szt IDM > using CibleNegEntity = CibleEntityTemp<IDM,Id1NegAttribut>;
 #define ENUM_CibleNeg(ID1) ENUM_CibleTemp(ID1)
 
 //! \ingroup groupeMacroEntity
+//! Macro définissant les positions des attributs pour une clé, une clé de cible, une cible et une ref.
+#define ENUM_CibleRefTemp(ID1) /*! \brief Positions des attributs */ \
+    enum Position:szt {Id = mere::Id, Id1 = mere::Id1, IdCible = mere::IdCible, Cible = mere::Cible, Ref = mere::Ref, \
+    NbrAtt = mere::NbrAtt, Id ## ID1 = Id1};
+
+/*! \ingroup groupeBaseEntity
+ * \brief Classe de base des entités ayant un attribut clé étrangère, idCible, cible et ref.
+ */
+template<szt IDM , class Id1Att> class CibleRefEntityTemp : public EntityIDs<IDM,Id1Att,CibleAttributs,RefAttribut> {
+public:
+    using Id1Trans = typename Id1Att::AttTrans;
+    using EAID = EntityIDs<IDM,Id1Att,CibleAttributs,RefAttribut>;
+    //! Positions des attributs.
+    enum Position:szt {Id = PositionEnum<IdAttribut,EAID>::Position,
+                   Id1 = PositionEnum<Id1Att,EAID>::Position,
+                   IdCible = PositionEnum<IdCibleAttribut,EAID>::Position,
+                   Cible = PositionEnum<CibleAttribut,EAID>::Position,
+                   Ref = PositionEnum<RefAttribut,EAID>::Position,
+                   NbrAtt = EAID::NbrAtt};
+
+    using EntityIDs<IDM,Id1Att,CibleAttributs,RefAttribut>::EntityIDs;
+    using EAID::setId1;
+    using EAID::setIdCible;
+    using EAID::setCible;
+    using EAID::setRef;
+    BASE_ENTITY(CibleRefEntityTemp)
+
+    //! Constructeur à partir des valeurs d'un ensemble d'attributs unique.
+    CibleRefEntityTemp(const QString & ref, idt id = 0)
+        : EAID(id)
+        {setRef(ref);}
+
+    //! Constructeur à partir des valeurs d'un ensemble d'attributs unique.
+    CibleRefEntityTemp(idt idCible, int cible, const QString & ref, idt id = 0)
+        : CibleRefEntityTemp(ref,id) {
+        setIdCible(idCible);
+        setCible(cible);
+    }
+
+    //! Constructeur à partir des valeurs attributs.
+    CibleRefEntityTemp(Id1Trans id1, idt idCible, int cible, const QString & ref, idt id = 0)
+        : CibleRefEntityTemp(idCible,cible,ref,id)
+        {setId1(id1);}
+};
+
+template<szt IDM , class Id1Att> CibleRefEntityTemp<IDM,Id1Att>::~CibleRefEntityTemp() {}
+
+template<szt IDM > using CibleRefEntity = CibleRefEntityTemp<IDM,Id1Attribut>;
+#define ENUM_CibleRef(ID1) ENUM_CibleRefTemp(ID1)
+
+template<szt IDM > using CibleNullRefEntity = CibleRefEntityTemp<IDM,Id1NullAttribut>;
+#define ENUM_CibleNullRef(ID1) ENUM_CibleRefTemp(ID1)
+
+template<szt IDM > using CibleNegRefEntity = CibleRefEntityTemp<IDM,Id1NegAttribut>;
+#define ENUM_CibleNegRef(ID1) ENUM_CibleRefTemp(ID1)
+
+//! \ingroup groupeMacroEntity
 //! Macro définissant les positions des attributs pour une clé, une clé de cible, une cible, un numéro et un type.
 #define ENUM_CibleNumTypeTemp(ID1) /*! \brief Positions des attributs */ \
     enum Position:szt {Id = mere::Id, Id1 = mere::Id1, IdCible = mere::IdCible, Cible = mere::Cible, Num = mere::Num,\
@@ -565,7 +622,7 @@ public:
     using EAID::setType;
     BASE_ENTITY(CibleNumTypeEntityTemp)
 
-    //! Constructeur à partir des valeurs attributs.
+    //! Constructeur à partir des valeurs d'un ensemble d'attributs unique.
     CibleNumTypeEntityTemp(idt idCible, int cible, int num, idt type) {
         setIdCible(idCible);
         setCible(cible);
@@ -1417,6 +1474,63 @@ template<szt IDM > using IdNegCibleCodeEntity = IdCibleCodeEntityTemp<IDM,Id1Neg
 #define ENUM_IdNegCibleCode(ID1) ENUM_IdCibleCodeTemp(ID1)
 
 //! \ingroup groupeMacroEntity
+//! Macro définissant les positions des attributs pour une clé, une cible, un code et une ref.
+#define ENUM_IdCibleCodeRefTemp(ID1) /*! \brief Positions des attributs */ \
+enum Position:szt {Id = mere::Id, Id1 = mere::Id1, Cible = mere::Cible, Code = mere::Code, Ref = mere::Ref, \
+    NbrAtt = mere::NbrAtt, Id ## ID1 = Id1};
+
+/*! \ingroup groupeBaseEntity
+ * \brief Classe de base des entités ayant un attribut clé étrangère, idCible et Cible.
+ */
+template<szt IDM , class Id1Att> class IdCibleCodeRefEntityTemp : public EntityIDs<IDM,Id1Att,CibleAttribut,CodeAttribut,RefAttribut> {
+public:
+    using Id1Trans = typename Id1Att::AttTrans;
+    using EAID = EntityIDs<IDM,Id1Att,CibleAttribut,CodeAttribut,RefAttribut>;
+    //! Positions des attributs.
+    enum Position:szt {Id = PositionEnum<IdAttribut,EAID>::Position,
+                    Id1 = PositionEnum<Id1Att,EAID>::Position,
+                    Cible = PositionEnum<CibleAttribut,EAID>::Position,
+                    Code = PositionEnum<CodeAttribut,EAID>::Position,
+                    Ref = PositionEnum<RefAttribut,EAID>::Position,
+                    NbrAtt = EAID::NbrAtt};
+
+    using EntityIDs<IDM,Id1Att,CibleAttribut,CodeAttribut,RefAttribut>::EntityIDs;
+    using EAID::setId1;
+    using EAID::setCible;
+    using EAID::setCode;
+    using EAID::setRef;
+    BASE_ENTITY(IdCibleCodeRefEntityTemp)
+
+    //! Constructeur à partir d'un jeux de valeurs attributs unique.
+    IdCibleCodeRefEntityTemp(const QString & ref, idt id = 0)
+        : EAID(id)
+    {setRef(ref);}
+
+    //! Constructeur à partir d'un jeux de valeurs attributs unique.
+    IdCibleCodeRefEntityTemp(Id1Trans id1, int cible, const QString & ref, idt id = 0)
+        : IdCibleCodeRefEntityTemp(ref,id) {
+        setId1(id1);
+        setCible(cible);
+    }
+
+    //! Constructeur à partir des valeurs attributs.
+    IdCibleCodeRefEntityTemp(Id1Trans id1, int cible, flag code, const QString & ref = QString(), idt id = 0)
+        : IdCibleCodeRefEntityTemp(id1,cible,ref,id)
+    {setCode(code);}
+};
+
+template<szt IDM , class Id1Att> IdCibleCodeRefEntityTemp<IDM,Id1Att>::~IdCibleCodeRefEntityTemp() {}
+
+template<szt IDM > using IdCibleCodeRefEntity = IdCibleCodeRefEntityTemp<IDM,Id1Attribut>;
+#define ENUM_IdCibleCodeRef(ID1) ENUM_IdCibleCodeRefTemp(ID1)
+
+template<szt IDM > using IdNullCibleCodeRefEntity = IdCibleCodeRefEntityTemp<IDM,Id1NullAttribut>;
+#define ENUM_IdNullCibleCodeRef(ID1) ENUM_IdCibleCodeRefTemp(ID1)
+
+template<szt IDM > using IdNegCibleCodeRefEntity = IdCibleCodeRefEntityTemp<IDM,Id1NegAttribut>;
+#define ENUM_IdNegCibleCodeRef(ID1) ENUM_IdCibleCodeRefTemp(ID1)
+
+//! \ingroup groupeMacroEntity
 //! Macro définissant les positions des attributs pour une clé, une cible et un num.
 #define ENUM_IdCibleNumTemp(ID1) /*! \brief Positions des attributs */ \
     enum Position:szt {Id = mere::Id, Id1 = mere::Id1, Cible = mere::Cible, Num = mere::Num, NbrAtt = mere::NbrAtt, Id ## ID1 = Id1};
@@ -1461,77 +1575,77 @@ template<szt IDM > using IdNullCibleNumEntity = IdCibleNumEntityTemp<IDM,Id1Null
 template<szt IDM > using IdNegCibleNumEntity = IdCibleNumEntityTemp<IDM,Id1NegAttribut>;
 #define ENUM_IdNegCibleNum(ID1) ENUM_IdCibleNumTemp(ID1)
 
-/*! \ingroup groupeBaseEntity
- * \brief Classe de base des entités ayant un attribut idCible, cible et code.
- */
-template<szt IDM > class CibleSimpleCodeEntity : public EntityIDs<IDM,IdCibleAttribut,CibleAttribut,CodeAttribut> {
-public:
-    using EAID = EntityIDs<IDM,IdCibleAttribut,CibleAttribut,CodeAttribut>;
-    //! Positions des attributs.
-    enum Position:szt {Id = PositionEnum<IdAttribut,EAID>::Position,
-                    IdCible = PositionEnum<IdCibleAttribut,EAID>::Position,
-                    Cible = PositionEnum<CibleAttribut,EAID>::Position,
-                    Code = PositionEnum<CodeAttribut,EAID>::Position,
-                    NbrAtt = EAID::NbrAtt};
+///*! \ingroup groupeBaseEntity
+// * \brief Classe de base des entités ayant un attribut idCible, cible et code.
+// */
+//template<szt IDM > class CibleSimpleCodeEntity : public EntityIDs<IDM,IdCibleAttribut,CibleAttribut,CodeAttribut> {
+//public:
+//    using EAID = EntityIDs<IDM,IdCibleAttribut,CibleAttribut,CodeAttribut>;
+//    //! Positions des attributs.
+//    enum Position:szt {Id = PositionEnum<IdAttribut,EAID>::Position,
+//                    IdCible = PositionEnum<IdCibleAttribut,EAID>::Position,
+//                    Cible = PositionEnum<CibleAttribut,EAID>::Position,
+//                    Code = PositionEnum<CodeAttribut,EAID>::Position,
+//                    NbrAtt = EAID::NbrAtt};
 
-    using EntityIDs<IDM,IdCibleAttribut,CibleAttribut,CodeAttribut>::EntityIDs;
-    using EAID::setIdCible;
-    using EAID::setCible;
-    using EAID::setCode;
-    BASE_ENTITY(CibleSimpleCodeEntity)
+//    using EntityIDs<IDM,IdCibleAttribut,CibleAttribut,CodeAttribut>::EntityIDs;
+//    using EAID::setIdCible;
+//    using EAID::setCible;
+//    using EAID::setCode;
+//    BASE_ENTITY(CibleSimpleCodeEntity)
 
-    //! Constructeur à partir d'un jeux de valeurs attributs unique.
-    CibleSimpleCodeEntity(idt idCible, int cible) {
-        setIdCible(idCible);
-        setCible(cible);
-    }
+//    //! Constructeur à partir d'un jeux de valeurs attributs unique.
+//    CibleSimpleCodeEntity(idt idCible, int cible) {
+//        setIdCible(idCible);
+//        setCible(cible);
+//    }
 
-    //! Constructeur à partir des valeurs attributs.
-    CibleSimpleCodeEntity(idt idCible, int cible, flag code, idt id = 0)
-        : EAID(id) {
-        setIdCible(idCible);
-        setCible(cible);
-        setCode(code);
-    }
-};
+//    //! Constructeur à partir des valeurs attributs.
+//    CibleSimpleCodeEntity(idt idCible, int cible, flag code, idt id = 0)
+//        : EAID(id) {
+//        setIdCible(idCible);
+//        setCible(cible);
+//        setCode(code);
+//    }
+//};
 
-template<szt IDM > CibleSimpleCodeEntity<IDM>::~CibleSimpleCodeEntity() {}
+//template<szt IDM > CibleSimpleCodeEntity<IDM>::~CibleSimpleCodeEntity() {}
 
-/*! \ingroup groupeBaseEntity
- * \brief Classe de base des entités ayant un attribut idCible, cible et num.
- */
-template<szt IDM > class CibleSimpleNumEntity : public EntityIDs<IDM,IdCibleAttribut,CibleAttribut,NumAttribut> {
-public:
-    using EAID = EntityIDs<IDM,IdCibleAttribut,CibleAttribut,NumAttribut>;
-    //! Positions des attributs.
-    enum Position:szt {Id = PositionEnum<IdAttribut,EAID>::Position,
-                   IdCible = PositionEnum<IdCibleAttribut,EAID>::Position,
-                   Cible = PositionEnum<CibleAttribut,EAID>::Position,
-                   Num = PositionEnum<NumAttribut,EAID>::Position,
-                   NbrAtt = EAID::NbrAtt};
+///*! \ingroup groupeBaseEntity
+// * \brief Classe de base des entités ayant un attribut idCible, cible et num.
+// */
+//template<szt IDM > class CibleSimpleNumEntity : public EntityIDs<IDM,IdCibleAttribut,CibleAttribut,NumAttribut> {
+//public:
+//    using EAID = EntityIDs<IDM,IdCibleAttribut,CibleAttribut,NumAttribut>;
+//    //! Positions des attributs.
+//    enum Position:szt {Id = PositionEnum<IdAttribut,EAID>::Position,
+//                   IdCible = PositionEnum<IdCibleAttribut,EAID>::Position,
+//                   Cible = PositionEnum<CibleAttribut,EAID>::Position,
+//                   Num = PositionEnum<NumAttribut,EAID>::Position,
+//                   NbrAtt = EAID::NbrAtt};
 
-    using EntityIDs<IDM,IdCibleAttribut,CibleAttribut,NumAttribut>::EntityIDs;
-    using EAID::setIdCible;
-    using EAID::setCible;
-    using EAID::setNum;
-    BASE_ENTITY(CibleSimpleNumEntity)
+//    using EntityIDs<IDM,IdCibleAttribut,CibleAttribut,NumAttribut>::EntityIDs;
+//    using EAID::setIdCible;
+//    using EAID::setCible;
+//    using EAID::setNum;
+//    BASE_ENTITY(CibleSimpleNumEntity)
 
-    //! Constructeur à partir d'un jeux de valeurs attributs unique.
-    CibleSimpleNumEntity(idt idCible, int cible) {
-        setIdCible(idCible);
-        setCible(cible);
-    }
+//    //! Constructeur à partir d'un jeux de valeurs attributs unique.
+//    CibleSimpleNumEntity(idt idCible, int cible) {
+//        setIdCible(idCible);
+//        setCible(cible);
+//    }
 
-    //! Constructeur à partir des valeurs attributs.
-    CibleSimpleNumEntity(idt idCible, int cible, int num, idt id = 0)
-        : EAID(id) {
-        setIdCible(idCible);
-        setCible(cible);
-        setNum(num);
-    }
-};
+//    //! Constructeur à partir des valeurs attributs.
+//    CibleSimpleNumEntity(idt idCible, int cible, int num, idt id = 0)
+//        : EAID(id) {
+//        setIdCible(idCible);
+//        setCible(cible);
+//        setNum(num);
+//    }
+//};
 
-template<szt IDM > CibleSimpleNumEntity<IDM>::~CibleSimpleNumEntity() {}
+//template<szt IDM > CibleSimpleNumEntity<IDM>::~CibleSimpleNumEntity() {}
 
 /*! \ingroup groupeBaseEntity
  * \brief Classe de base des entités ayant un attribut idCible, idEtat, cible, etat, num et dateTime.

@@ -433,6 +433,13 @@ public:
          return existsUnique(entity) ? entity.id() : 0;
     }
 
+    //! Renvoie l'identifiant de l'entité de type Ent de référence fourni ou 0 si elle n'existe pas.
+    template<class Ent> idt refToId(const QString & ref) {
+         Ent entity;
+         entity.setRef(ref);
+         return existsUnique(entity) ? entity.id() : 0;
+    }
+
     //! Importation de donnée à partir d'un xmlDoc
     QString importXml(const fichierMPS::XmlDoc & doc);
 

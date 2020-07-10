@@ -20,13 +20,6 @@ namespace bddMPS {
                               Visible = 0x1,
                               Attribuable = 0x2};
     }
-    namespace idProg {
-        //! Identifiant de programmation de la table type.
-        enum idProgTypePredef {
-            Null = 0,
-            EvenementType = 1,
-            NbrIdProgTypePredef};
-    }
 
 /*! \ingroup groupeFile
  * \brief Gestionnaire de la base de donnée pour les entités prédéfinie.

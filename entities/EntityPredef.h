@@ -34,9 +34,6 @@ namespace donnee {
                   Date = 5,
                   DateTime = 6};
 
-    //! Identifiant de programmation
-    enum prog {NoId};
-
     //! Exact
     enum cardinalCode {Exact,
                        Auplus,
@@ -94,20 +91,20 @@ namespace ensembleDonnee {
  * \brief Représentation de l'entité Donnee.
  */
 class Donnee : public EntityIDs<infoEntity::DonneeId,amps::NomTypeAttribut,
-                                                             amps::IdProgAttribut,
+                                                             amps::RefAttribut,
                                                              amps::TpValAttribut> {
 protected:
     template<class T> using PositionEnum = PositionEnum<T,Donnee>;
 public:
     using EAID = EntityIDs<infoEntity::DonneeId,amps::NomTypeAttribut,
-                                                        amps::IdProgAttribut,
+                                                        amps::RefAttribut,
                                                         amps::TpValAttribut>;
 
     //! Positions des attributs.
     enum Position:szt {Id = PositionEnum<IdAttribut>::Position,
                    Nom = PositionEnum<NomAttribut>::Position,
                    Type = PositionEnum<TypeAttribut>::Position,
-                   IdProg = PositionEnum<IdProgAttribut>::Position,
+                   Ref = PositionEnum<RefAttribut>::Position,
                    TpVal = PositionEnum<TpValAttribut>::Position,
                    NbrAtt = EAID::NbrAtt};
 
@@ -123,17 +120,20 @@ public:
     BASE_ENTITY(Donnee)
 
     //! Constructeur à partir des valeurs d'un ensemble d'attributs unique.
-    Donnee(idt idProg, idt id)
-        : EAID(id)
-        {setIdProg(idProg);}
+    Donnee(const QString & ref)
+        {setRef(ref);}
 
     //! Constructeur à partir des valeurs attributs.
-    Donnee(const QString & nom, idt type, int tpVal, idt idProg = donnee::NoId, idt id = 0)
-        : Donnee(idProg,id) {
+    Donnee(const QString & nom, idt type, int tpVal, idt id = 0)
+        : EAID(id) {
         setNom(nom);
         setType(type);
         setTpVal(tpVal);
     }
+
+    Donnee(const QString & nom, const QString & ref, idt type, int tpVal, idt id = 0)
+        : Donnee(nom,type,tpVal,id)
+    {setRef(ref);}
 };
 
 /*! \ingroup groupeEntity
@@ -346,8 +346,8 @@ namespace ensembleMotCle {
 using MotCle = ebmps::NcNomEntity<infoEntity::MotCleId>;
 ID1_ENTITY(MotCleCible,Cible,infoEntity::MotCleCibleId,MotCle)
 ID1_ENTITY(MotClePermission,IdCibleCode,infoEntity::MotClePermissionId,MotCle)
-RELATION_ENTITY_NEG(MotProgCible,RelationCibleNeg,infoEntity::MotProgCibleId,MotCle,Prog)
-RELATION_ENTITY_NEG(MotProgPermission,RelationCibleAttCodeNeg,infoEntity::MotProgPermissionId,MotCle,Prog)
+ID1_ENTITY(MotProgCible,CibleRef,infoEntity::MotProgCibleId,MotCle)
+ID1_ENTITY(MotProgPermission,IdCibleCodeRef,infoEntity::MotProgPermissionId,MotCle)
 }
 using namespace ensembleMotCle;
 
@@ -355,7 +355,7 @@ using namespace ensembleMotCle;
  * \brief Ensemble des classes de la fonctionalité restriction.
  */
 namespace ensembleRestriction {
-using Restriction = ebmps::CibleSimpleCodeEntity<infoEntity::RestrictionId>;
+ID1_ENTITY(Restriction,IdCibleCode,infoEntity::RestrictionId,Cible)
 }
 using namespace ensembleRestriction;
 
@@ -374,7 +374,7 @@ using namespace ensembleTexte;
  * \brief Ensemble des classes de la fonctionalité type.
  */
 namespace ensembleType {
-ID1_ENTITY(Type,IdNullArbreSimpleNcNom,infoEntity::TypeId,Prog);
+using Type = ebmps::ArbreSimpleNcNomRefEntity<infoEntity::TypeId>;
 ID1_ENTITY(TypePermission,IdCibleCode,infoEntity::TypePermissionId,Type)
 }
 using namespace ensembleType;
@@ -383,7 +383,7 @@ using namespace ensembleType;
  * \brief Ensemble des classes de la fonctionalité utilisation.
  */
 namespace ensembleUtilisation {
-using Usage = ebmps::NcNomTypeEntity<infoEntity::UsageId>;
+using Usage = ebmps::NcNomRefTypeEntity<infoEntity::UsageId>;
 ID1_ENTITY(Utilisation,Utilisation,infoEntity::UtilisationId,Usage)
 }
 using namespace ensembleUtilisation;

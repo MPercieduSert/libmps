@@ -123,6 +123,28 @@ protected:
 };
 
 /*! \ingroup groupeUniqueSql
+ * \brief Classe condition d'unicité pour les entités possédant une seule condition d'unicité sur le triple (IdCible,Cible,ref).
+ */
+template<class Ent> class CibleSimpleRefUniqueSql : public CibleSimpleUniqueSql<Ent> {
+protected:
+    using CibleSimpleUniqueSql<Ent>::bindValue;
+
+public:
+    enum {RefUnique = CibleSimpleUniqueSql<Ent>::NbrUnique, NbrUnique};
+    CONSTR_DEFAUT(CibleSimpleRefUniqueSql)
+
+    //!Destructeur.
+    ~CibleSimpleRefUniqueSql() override = default;
+
+protected:
+    //! Transmet les valeurs des attributs uniques à la requète SQL préparée.
+    void bindValuesUnique(const Ent & entity) override {
+        CibleSimpleUniqueSql<Ent>::bindValuesUnique(entity);
+        bindValue(RefUnique,entity.ref());
+    }
+};
+
+/*! \ingroup groupeUniqueSql
  * \brief Classe condition d'unicité pour les entités possédant une seule condition d'unicité sur id1.
  */
 template<class Ent> class IdUniqueSql : public SimpleUniqueSql<Ent> {
@@ -184,6 +206,28 @@ protected:
     void bindValuesUnique(const Ent & entity) override {
         IdCibleUniqueSql<Ent>::bindValuesUnique(entity);
         bindValue(NumUnique,entity.num());
+    }
+};
+
+/*! \ingroup groupeUniqueSql
+ * \brief Classe condition d'unicité pour les entités possédant une seule condition d'unicité sur le triple (Id1,Cible,ref).
+ */
+template<class Ent> class IdCibleRefUniqueSql : public IdCibleUniqueSql<Ent> {
+protected:
+    using IdCibleUniqueSql<Ent>::bindValue;
+
+public:
+    enum {RefUnique = IdCibleUniqueSql<Ent>::NbrUnique, NbrUnique};
+    CONSTR_DEFAUT(IdCibleRefUniqueSql)
+
+    //!Destructeur.
+    ~IdCibleRefUniqueSql() override = default;
+
+protected:
+    //! Transmet les valeurs des attributs uniques à la requète SQL préparée.
+    void bindValuesUnique(const Ent & entity) override {
+        IdCibleUniqueSql<Ent>::bindValuesUnique(entity);
+        bindValue(RefUnique,entity.ref());
     }
 };
 
@@ -653,6 +697,88 @@ protected:
     //! Transmet les valeurs des attributs uniques à la requète SQL préparée.
     void bindValuesUniqueAtts(const Ent &entity) override
         {bindValue(Id3Unique,entity.id3());}
+};
+
+/*! \ingroup groupeUniqueSql
+ * \brief Classe condition d'unicité pour les entités possédant une seule condition d'unicité sur l'attribut ref.
+ */
+template<class Ent> class RefUniqueSql : public SimpleUniqueSql<Ent> {
+protected:
+    using SimpleUniqueSql<Ent>::bindValue;
+
+public:
+    enum {RefUnique ,NbrUnique};
+    CONSTR_DEFAUT(RefUniqueSql)
+
+    //! Destructeur.
+    ~RefUniqueSql() override = default;
+
+protected:
+    //! Transmet les valeurs des attributs uniques à la requète SQL préparée.
+    void bindValuesUnique(const Ent &entity) override
+        {bindValue(RefUnique,entity.ref());}
+};
+
+/*! \ingroup groupeUniqueSql
+ * \brief Classe condition d'unicité pour les entités possédant deux conditions d'unicité sur l'attribut ref et le couple (nom, type).
+ */
+template<class Ent> class RefNomTypeUniqueSql : public DoubleUniqueSql<Ent> {
+protected:
+    using DoubleUniqueSql<Ent>::bindValue;
+    using DoubleUniqueSql<Ent>::bindValuesUnique;
+    using DoubleUniqueSql<Ent>::bindValuesUnique_2;
+
+public:
+    enum {RefUnique, NbrUnique_1, NomUnique = RefUnique, TypeUnique, NbrUnique_2,
+          RefUniqueSet = DoubleUniqueSql<Ent>::UniqueSet1,
+          NomUniqueSet = DoubleUniqueSql<Ent>::UniqueSet2,
+          TypeUniqueSet = DoubleUniqueSql<Ent>::UniqueSet2};
+    CONSTR_DEFAUT(RefNomTypeUniqueSql)
+
+    //! Destructeur.
+    ~RefNomTypeUniqueSql() override = default;
+
+protected:
+    //! Transmet les valeurs des attributs uniques à la requète SQL préparée.
+    void bindValuesUnique(const Ent &entity) override
+        {bindValue(RefUnique,entity.ref());}
+
+    //! Transmet les valeurs des attributs uniques à la requète SQL préparée.
+    void bindValuesUnique_2(const Ent &entity) override {
+        bindValue(NomUnique,entity.nom());
+        bindValue(TypeUnique,entity.type());
+    }
+};
+
+/*! \ingroup groupeUniqueSql
+ * \brief Classe condition d'unicité pour les entités possédant deux conditions d'unicité sur l'attribut ref et le couple (nom, parent).
+ */
+template<class Ent> class RefNomParentUniqueSql : public DoubleUniqueSql<Ent> {
+protected:
+    using DoubleUniqueSql<Ent>::bindValue;
+    using DoubleUniqueSql<Ent>::bindValuesUnique;
+    using DoubleUniqueSql<Ent>::bindValuesUnique_2;
+
+public:
+    enum {RefUnique, NbrUnique_1, NomUnique = RefUnique, ParentUnique, NbrUnique_2,
+          RefUniqueSet = DoubleUniqueSql<Ent>::UniqueSet1,
+          NomUniqueSet = DoubleUniqueSql<Ent>::UniqueSet2,
+          ParentUniqueSet = DoubleUniqueSql<Ent>::UniqueSet2};
+    CONSTR_DEFAUT(RefNomParentUniqueSql)
+
+    //! Destructeur.
+    ~RefNomParentUniqueSql() override = default;
+
+protected:
+    //! Transmet les valeurs des attributs uniques à la requète SQL préparée.
+    void bindValuesUnique(const Ent &entity) override
+        {bindValue(RefUnique,entity.ref());}
+
+    //! Transmet les valeurs des attributs uniques à la requète SQL préparée.
+    void bindValuesUnique_2(const Ent &entity) override {
+        bindValue(NomUnique,entity.nom());
+        bindValue(ParentUnique,entity.parent());
+    }
 };
 }
 #endif // UNIQUESQLBASE_H

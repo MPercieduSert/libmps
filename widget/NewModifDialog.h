@@ -203,8 +203,8 @@ protected:
 public:
     enum {nomType,ncType,nbrColumn};
     //! Constructeur.
-    AbstractTypeNcNomNewModifForm(bddMPS::BddPredef &bdd, idt idProgRoot, idt idEntity, const QString & labelType, const QString &labelNc,
-                                  const QString &labelNom, bool newEnt, QWidget * parent = nullptr);
+    AbstractTypeNcNomNewModifForm(bddMPS::BddPredef &bdd, const QString &refRoot, idt idEntity, const QString & labelType,
+                                  const QString &labelNc, const QString &labelNom, bool newEnt, QWidget * parent = nullptr);
 
     //! Destructeur.
     ~AbstractTypeNcNomNewModifForm() override = default;
