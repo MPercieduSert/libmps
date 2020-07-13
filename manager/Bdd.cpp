@@ -3,7 +3,7 @@
 using namespace bddMPS;
 
 bool Bdd::copy(const QString & name) {
-    Bdd bdd(m_bdd.driverName(), name,0);
+    Bdd bdd(m_bdd.driverName(), name,{});
     if(bdd.exists() && bdd.isValid()) {
         QFile file(name);
         return file.copy(m_fileName);
@@ -132,16 +132,24 @@ const managerMPS::InfoBdd & Bdd::info(const Entity & entity) const
     {return m_manager->get(entity.idEntity()).info();}
 
 void Bdd::miseAJourBdd() {
-    if(m_version != m_manager->numVersion()) {
-        if(m_version > m_manager->numVersion()) {
-            while(m_version != m_manager->numVersion())
-                listeMiseAJourBdd(m_manager->numVersion());
-        }
-        else {
-            QString str("La base de données est d'une version plus récente que le programme: \n");
-            str.append("Version de la base de données requis par le programmen :").append(QString::number(m_version)).append(".\n");
-            str.append("Version de la base de données :").append(QString::number(m_manager->numVersion())).append(".\n");
-            throw std::runtime_error(str.toStdString());
+    for (idt type = 0; type != m_version.size(); ++type) {
+        if(!m_manager->existsVersion(type))
+            listeMiseAJourBdd(bddVersion::Initiale,type);
+        auto versionBdd = m_manager->numVersion(type);
+        if(m_version[type] != versionBdd) {
+            if(m_version[type] > versionBdd) {
+                while(m_version[type] != versionBdd) {
+                    listeMiseAJourBdd(versionBdd,type);
+                    versionBdd = m_manager->numVersion(type);
+                }
+            }
+            else {
+                QString str("La base de données est d'une version plus récente que le programme pour le type: ");
+                str.append(QString::number(type)).append(" \n");
+                str.append("Version de la base de données requis par le programmen :").append(QString::number(m_version[type])).append(".\n");
+                str.append("Version de la base de données :").append(QString::number(m_manager->numVersion(type))).append(".\n");
+                throw std::runtime_error(str.toStdString());
+            }
         }
     }
 }

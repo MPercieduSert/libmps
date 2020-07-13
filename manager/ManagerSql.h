@@ -189,7 +189,7 @@ public:
         return true;
     }
 
-    //! Fonction d'agrega de valeur de type T sur l'attribut att appliquée à toutes les entités de la table.
+    //! Fonction d'agrega sur l'attribut att appliquée à toutes les entités de la table.
     QVariant fonctionAgrega(bmps::agrega fonc, typename Ent::Position att) override {
         exec(m_sqlFonctionAgrega.arg(m_fonctionAgregaString[fonc],
                                      attribut(att)));
@@ -197,7 +197,7 @@ public:
         return value<QVariant>();
     }
 
-    //! Fonction d'agrega de valeur de type T sur l'attribut att appliquée à toutes les entités vérifiant la condition,
+    //! Fonction d'agrega  sur l'attribut att appliquée à toutes les entités vérifiant la condition,
     //! valeur de la colonne d'identifiant cle = value.
     QVariant fonctionAgrega(bmps::agrega fonc, typename Ent::Position att,
                                        typename Ent::Position cle, const QVariant & value,
@@ -212,7 +212,7 @@ public:
         return AbstractManagerSql::value<QVariant>();
     }
 
-    //! Fonction d'agrega de valeur de type T sur l'attribut att appliquée à toutes les entités vérifiant les deux conditions,
+    //! Fonction d'agrega sur l'attribut att appliquée à toutes les entités vérifiant les deux conditions,
     //! valeur de la colonne d'identifiant cle1 = value1 et valeur de la colonne d'identifiant cle2 = value2.
     QVariant fonctionAgrega(bmps::agrega fonc, typename Ent::Position att,
                                        typename Ent::Position cle1, const QVariant & value1,

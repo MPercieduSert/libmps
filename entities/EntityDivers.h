@@ -575,7 +575,39 @@ template<szt IDM > TypeVersionEntity<IDM>::~TypeVersionEntity() {}
 }
 
 namespace entityMPS {
-//Version
-using VersionBdd = entityBaseMPS::DateTimeCurrentNumEntity<infoEntity::entityBaseId::VersionBddId>;
+/*! \ingroup groupeEntity
+ * \brief Représentation un changment de version de la base de donnée.
+ */
+class VersionBdd : public EntityIDs<infoEntity::VersionBddId,amps::DateTimeCurrentAttribut,
+                                                             amps::NumAttribut,
+                                                             amps::TypeIdtAttribut> {
+protected:
+    template<class T> using PositionEnum = PositionEnum<T,VersionBdd>;
+public:
+    using EAID = EntityIDs<infoEntity::VersionBddId,amps::DateTimeCurrentAttribut,
+                                                    amps::NumAttribut,
+                                                    amps::TypeIdtAttribut>;
+    //! Positions des attributs.
+    enum Position:szt {Id = PositionEnum<IdAttribut>::Position,
+                       DateTime = PositionEnum<DateTimeCurrentAttribut>::Position,
+                       Num = PositionEnum<NumAttribut>::Position,
+                       Type = PositionEnum<TypeIdtAttribut>::Position,
+                       NbrAtt = EAID::NbrAtt};
+
+    using EAID::EntityID;
+    BASE_ENTITY(VersionBdd)
+
+    //! Constructeur à partir des valeurs d'un ensemble d'attributs unique.
+    VersionBdd(int num, idt type, idt id = 0)
+        : EAID(id) {
+        setNum(num);
+        setType(type);
+    }
+
+    //! Constructeur à partir des valeurs attributs.
+    VersionBdd(const QDateTime & dt, int num, idt type, idt id = 0)
+        : VersionBdd(num, type, id)
+        {setDateTime(dt);}
+};
 }
 #endif // ENTITYDIVERS

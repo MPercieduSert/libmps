@@ -13,10 +13,13 @@
 namespace bddMPS {
     //! Version de création de la base de données.
     namespace bddVersion  {
-        enum creationBdd{Initiale,NbrCreationBdd};
+        enum creationBdd{Initiale,
+                         Creation,
+                         NbrVersion
+                        };
+        enum typeBdd {LibraryType,
+                      NbrType};
     }
-
-
     //! Demande autorisation de modification
     enum DemandeAutorisationModificationBdd{
         Oui = 1,
@@ -66,6 +69,9 @@ public:
     //! Creé la table de l'entité VersionBdd
     void creerVersion();
 
+    //! Retourne la version courante de la base de donnée pour un type donnée.
+    VersionBdd getVersion(idt type);
+
     //! Renvoie l'indice du manager associé à l'entité de nom name ou nbrEntity s'il n'existe pas.
     szt find(const QString & name) const{
         szt i = 0;
@@ -91,8 +97,8 @@ public:
     template<class Ent> AbstractManagerTemp<Ent> & get()
         {return static_cast<AbstractManagerTemp<Ent> &>(*m_managers[Ent::ID]);}
 
-    //! Retourne la version courante de la base de donnée.
-    VersionBdd getVersion();
+    //! Teste s'il existe une version d'un type donnée.
+    bool existsVersion(idt type);
 
     //! Renvoie les informations sur la table associée à l'entité d'identifiant id.
     const InfoBdd & info(szt id) const;
@@ -105,10 +111,10 @@ public:
         {return m_nbrEntity;}
 
     //! Retourne le numero de version de la base de donnée.
-    int numVersion();
+    int numVersion(idt type);
 
     //! Enregistre le numéro de version de la base de donnée.
-    void saveVersion(int num);
+    void saveVersion(int num, idt type);
 
     //! Modifie le pointeur vers l'objet requête.
     void setRequete(const QSqlQuery & req);

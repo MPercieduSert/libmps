@@ -57,11 +57,11 @@ class Bdd : public fichierMPS::FileInterface
 protected:
     QSqlDatabase m_bdd;                 //!< Connexion à la base de donnée.
     std::unique_ptr<managerMPS::Managers> m_manager;         //!< Manager des entités.
-    const int m_version;                //!< Version de la base de donnée requis par le programme
+    const std::vector<int> m_version;                //!< Version de la base de donnée requis par le programme
 
 public:
     //! Constructeur. Donner en argument le type ainsi que le chemin de la base de donnée.
-    Bdd(const QString & dbtype, int version, std::unique_ptr<managerMPS::Managers> && manager = nullptr)
+    Bdd(const QString & dbtype, const std::vector<int> & version, std::unique_ptr<managerMPS::Managers> && manager = nullptr)
         : FileInterface(QString(),"Data Base files (*.db)"),
            m_bdd(QSqlDatabase::addDatabase(dbtype)),
            m_manager(std::move(manager)),
@@ -69,7 +69,7 @@ public:
 
 
     //! Constructeur. Donner en argument le type ainsi que le chemin de la base de donnée, la version et le managers.
-    Bdd(const QString & dbtype, const QString & fileName, int version, std::unique_ptr<managerMPS::Managers> && manager = nullptr)
+    Bdd(const QString & dbtype, const QString & fileName, const std::vector<int> & version, std::unique_ptr<managerMPS::Managers> && manager = nullptr)
         : FileInterface(fileName,"Data Base files (*.db)"),
            m_bdd(QSqlDatabase::addDatabase(dbtype)),
            m_manager(std::move(manager)),
@@ -77,10 +77,8 @@ public:
         {m_bdd.setDatabaseName(fileName);}
 
     //! Destructeur. Referme la base de donnée.
-    ~Bdd() override {
-        //delete m_manager;
-        m_bdd.close();
-    }
+    ~Bdd() override
+        {m_bdd.close();}
 
     //! Ajoute des restrictions de modification pour une entité donnée.
     void addRestriction(const Entity & entity, flag restrict);
@@ -619,7 +617,7 @@ protected:
     QString hydrateEntityXml(entityMPS::Entity & entity, fichierMPS::XmlDoc::const_brother_iterator iter);
 
     //! Mise à jour de la base de donnée.
-    virtual void listeMiseAJourBdd(int /*version*/) {}
+    virtual void listeMiseAJourBdd(int /*version*/, idt /*type*/) {}
 
     //! Ouverture de la base de donnée.
     bool openBdd();

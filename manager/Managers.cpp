@@ -8,11 +8,13 @@ Managers::Managers(const szt nbrEntity, const QString & versionTable,
       : m_nbrEntity(nbrEntity),
         m_requete(req),
         m_managers(nbrEntity) {
-      using UniqueVersion = NumUniqueSql<VersionBdd>;
+      using UniqueVersion = NumTypeUniqueSql<VersionBdd>;
       InfoBdd infoVersion("Version",versionTable,VersionBdd::NbrAtt,{UniqueVersion::NbrUnique});
-      infoVersion.setAttribut(VersionBdd::Num,"num");
       infoVersion.setAttribut(VersionBdd::DateTime,"dt",bmps::typeAttributBdd::DateTime);
+      infoVersion.setAttribut(VersionBdd::Num,"num");
+      infoVersion.setAttribut(VersionBdd::Type,"tp");
       infoVersion.setUnique(VersionBdd::Num,UniqueVersion::NumUnique);
+      infoVersion.setUnique(VersionBdd::Type,UniqueVersion::TypeUnique);
       m_managerVersion = std::make_unique<ManagerSql<VersionBdd>>(infoVersion, std::make_unique<UniqueVersion>());
 
       for(auto i = managers.begin(); i != managers.end(); ++i)
@@ -21,12 +23,14 @@ Managers::Managers(const szt nbrEntity, const QString & versionTable,
 
 void Managers::creerVersion() {
     m_managerVersion->creer();
-    saveVersion(bmps::bddVersion::Initiale);
+    saveVersion(bmps::bddVersion::Creation,bmps::bddVersion::LibraryType);
 }
 
-entityBaseMPS::VersionBdd Managers::getVersion() {
-    int max = m_managerVersion->fonctionAgrega(bmps::Max,VersionBdd::Num).toInt();
-    VersionBdd ver(QDateTime(),max);
+bool Managers::existsVersion(idt type)
+    {return m_managerVersion->exists(VersionBdd::Type,type);}
+
+entityBaseMPS::VersionBdd Managers::getVersion(idt type) {
+    VersionBdd ver(numVersion(type),type);
     m_managerVersion->getUnique(ver);
     return ver;
 }
@@ -60,11 +64,11 @@ std::unique_ptr<Entity> Managers::makeEntity(const QString & entity) const {
         return m_managers[i]->makeEntity();
 }
 
-int Managers::numVersion()
-    {return m_managerVersion->fonctionAgrega(bmps::Max,VersionBdd::Num).toInt();}
+int Managers::numVersion(idt type)
+    {return m_managerVersion->fonctionAgrega(bmps::Max,VersionBdd::Num,VersionBdd::Type,type).toInt();}
 
-void Managers::saveVersion(int num)
-    {m_managerVersion->save(VersionBdd(QDateTime::currentDateTime(), num));}
+void Managers::saveVersion(int num, idt type)
+    {m_managerVersion->save(VersionBdd(num,type));}
 
 void Managers::setRequete(const QSqlQuery & req) {
     m_requete = req;

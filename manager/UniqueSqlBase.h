@@ -544,6 +544,28 @@ protected:
 };
 
 /*! \ingroup groupeUniqueSql
+ * \brief Classe condition d'unicité pour les entités possédant une seule condition d'unicité sur le couple (num, type).
+ */
+template<class Ent> class NumTypeUniqueSql : public NumUniqueSql<Ent> {
+protected:
+    using NumUniqueSql<Ent>::bindValue;
+
+public:
+    enum {TypeUnique = NumUniqueSql<Ent>::NbrUnique,NbrUnique};
+    CONSTR_DEFAUT(NumTypeUniqueSql)
+
+    //! Destructeur.
+    ~NumTypeUniqueSql() override = default;
+
+protected:
+    //! Transmet les valeurs des attributs uniques à la requète SQL préparée.
+    void bindValuesUnique(const Ent &entity) override {
+        NumUniqueSql<Ent>::bindValuesUnique(entity);
+        bindValue(TypeUnique,entity.type());
+    }
+};
+
+/*! \ingroup groupeUniqueSql
  * \brief Classe condition d'unicité pour les entités possédant une seule condition d'unicité sur le couple (id1,num).
  */
 template<class Ent> class IdNumUniqueSql : public IdUniqueSql<Ent> {

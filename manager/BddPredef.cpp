@@ -302,121 +302,124 @@ std::pair<int, int> BddPredef::intervalEntityInDonnee(idt idCible, int cible, in
     return interval;
 }
 
-void BddPredef::listeMiseAJourBdd(int version) {
-    if(version == bddVersion::Initiale) {
-        //Type
-        if(managers().ensembleEnable(TypeEnable)) {
-            creerTable<Type>();
-            creerTable<TypePermission>();
-        }
-        //Commentaire
-        if(managers().ensembleEnable(CommentaireEnable)) {
-            creerTable<Commentaire>();
-            creerTable<CommentaireCible>();
-        }
-        //Donnee
-        if(managers().ensembleEnable(DonneeEnable)) {
-            creerTable<Donnee>();
-            creerTable<DonneeCible>();
-            creerTable<DonneeCard>();
+void BddPredef::listeMiseAJourBdd(int version, idt type) {
+    if(type == bddVersion::LibraryType) {
+        switch (version) {
+        case bddVersion::Creation:
+            //Restriction Modification
+            if(managers().ensembleEnable(RestrictionEnable))
+                creerTable<Restriction>();
+            //Type
             if(managers().ensembleEnable(TypeEnable)) {
-                Type configType;
-                configType.setNom("Configuration");
-                configType.setNc("config");
-                configType.setRef("config_root_tp");
-                save(configType,Suppr);
-                TypePermission configPerm;
-                configPerm.setIdType(configType.id());
-                configPerm.setCible(cible<Donnee>());
-                configPerm.setCode(code::Visible);
-                save(configPerm);
-                Type defValType;
-                defValType.setNom("Valeur par defaut");
-                defValType.setNc("defaut");
-                defValType.setRef("valeur_defaut_tp");
-                defValType.setParent(configType.id());
-                save(defValType,Suppr);
-                TypePermission defValPerm;
-                defValPerm.setIdType(defValType.id());
-                defValPerm.setCible(cible<Donnee>());
-                defValPerm.setCode(code::Visible | code::Attribuable);
-                save(defValPerm);
-                conteneurMPS::tree<Donnee> tree;
-                auto iter = tree.begin();
-                iter->setNom("Configuration");
-                iter->setType(configType.id());
-                iter->setTpVal(donnee::NoDonnee);
-                iter->setRef("config_dn");
-                iter = tree.push_back(iter);
-                iter->setNom("Valeurs par defaut");
-                iter->setType(configType.id());
-                iter->setTpVal(donnee::NoDonnee);
-                iter->setRef("valeur_defaut_dn");
-                iter = tree.push_back(iter);
-                iter->setNom("Date par defaut");
-                iter->setType(defValType.id());
-                iter->setTpVal(donnee::Date);
-                iter->setRef("date_defaut_dn");
-                save(tree,WithoutDelete);
+                creerTable<Type>();
+                creerTable<TypePermission>();
             }
-        }
-        //Evenement
-        if(managers().ensembleEnable(EvenementEnable)) {
-            creerTable<EvenementStyle>();
-            EvenementStyle style;
-            style.setBordure(Qt::SolidLine);
-            style.setCouleurBordure(QColor(Qt::black).name());
-            style.setCouleurFond(QColor(Qt::gray).name());
-            style.setCouleurTexte(QColor(Qt::black).name());
-            style.setCouleurTitre(QColor(Qt::black).name());
-            style.setForme(EvenementStyle::Rectangle);
-            style.setNom("Style par défaut");
-            style.setPoliceTexte(QFont("Times", 10).toString());
-            style.setPoliceTitre(QFont("Times", 14,QFont::Bold).toString());
-            style.setTexture(Qt::SolidPattern);
-            save(style);
-            creerTable<Evenement>();
-            if(managers().ensembleEnable(TypeEnable)){
-                Type tpEve;
-                tpEve.setRef("evenement_root_tp");
-                tpEve.setNc("Événement");
-                tpEve.setNom("Événement");
-                save(tpEve);
-                TypePermission permEve;
-                permEve.setIdType(tpEve.id());
-                permEve.setCible(cible<Evenement>());
-                permEve.setCode(code::Visible);
-                save(permEve);
+            //Commentaire
+            if(managers().ensembleEnable(CommentaireEnable)) {
+                creerTable<Commentaire>();
+                creerTable<CommentaireCible>();
             }
-            creerTable<EvenementCible>();
+            //Donnee
+            if(managers().ensembleEnable(DonneeEnable)) {
+                creerTable<Donnee>();
+                creerTable<DonneeCible>();
+                creerTable<DonneeCard>();
+                if(managers().ensembleEnable(TypeEnable)) {
+                    Type configType;
+                    configType.setNom("Configuration");
+                    configType.setNc("config");
+                    configType.setRef("config_root_tp");
+                    save(configType,Suppr);
+                    TypePermission configPerm;
+                    configPerm.setIdType(configType.id());
+                    configPerm.setCible(cible<Donnee>());
+                    configPerm.setCode(code::Visible);
+                    save(configPerm);
+                    Type defValType;
+                    defValType.setNom("Valeur par defaut");
+                    defValType.setNc("defaut");
+                    defValType.setRef("valeur_defaut_tp");
+                    defValType.setParent(configType.id());
+                    save(defValType,Suppr);
+                    TypePermission defValPerm;
+                    defValPerm.setIdType(defValType.id());
+                    defValPerm.setCible(cible<Donnee>());
+                    defValPerm.setCode(code::Visible | code::Attribuable);
+                    save(defValPerm);
+                    conteneurMPS::tree<Donnee> tree;
+                    auto iter = tree.begin();
+                    iter->setNom("Configuration");
+                    iter->setType(configType.id());
+                    iter->setTpVal(donnee::NoDonnee);
+                    iter->setRef("config_dn");
+                    iter = tree.push_back(iter);
+                    iter->setNom("Valeurs par defaut");
+                    iter->setType(configType.id());
+                    iter->setTpVal(donnee::NoDonnee);
+                    iter->setRef("valeur_defaut_dn");
+                    iter = tree.push_back(iter);
+                    iter->setNom("Date par defaut");
+                    iter->setType(defValType.id());
+                    iter->setTpVal(donnee::Date);
+                    iter->setRef("date_defaut_dn");
+                    save(tree,WithoutDelete);
+                }
+            }
+            //Evenement
+            if(managers().ensembleEnable(EvenementEnable)) {
+                creerTable<EvenementStyle>();
+                EvenementStyle style;
+                style.setBordure(Qt::SolidLine);
+                style.setCouleurBordure(QColor(Qt::black).name());
+                style.setCouleurFond(QColor(Qt::gray).name());
+                style.setCouleurTexte(QColor(Qt::black).name());
+                style.setCouleurTitre(QColor(Qt::black).name());
+                style.setForme(EvenementStyle::Rectangle);
+                style.setNom("Style par défaut");
+                style.setPoliceTexte(QFont("Times", 10).toString());
+                style.setPoliceTitre(QFont("Times", 14,QFont::Bold).toString());
+                style.setTexture(Qt::SolidPattern);
+                save(style);
+                creerTable<Evenement>();
+                if(managers().ensembleEnable(TypeEnable)){
+                    Type tpEve;
+                    tpEve.setRef("evenement_root_tp");
+                    tpEve.setNc("Événement");
+                    tpEve.setNom("Événement");
+                    save(tpEve);
+                    TypePermission permEve;
+                    permEve.setIdType(tpEve.id());
+                    permEve.setCible(cible<Evenement>());
+                    permEve.setCode(code::Visible);
+                    save(permEve);
+                }
+                creerTable<EvenementCible>();
+            }
+            //Historique
+            if(managers().ensembleEnable(HistoriqueEnable))
+                creerTable<Historique>();
+            //Mot Cle
+            if(managers().ensembleEnable(MotCleEnable)) {
+                creerTable<MotCle>();
+                creerTable<MotCleCible>();
+                creerTable<MotClePermission>();
+                creerTable<MotProgCible>();
+                creerTable<MotProgPermission>();
+            }
+            //Texte
+            if(managers().ensembleEnable(TexteEnable)) {
+                creerTable<Texte>();
+                creerTable<TexteCible>();
+                creerTable<Source>();
+                creerTable<SourceTexte>();
+            }
+            //Utilisation
+            if(managers().ensembleEnable(UtilisationEnable)) {
+                creerTable<Utilisation>();
+                creerTable<Usage>();
+            }
+            //Mise à jour de la version de la base de donnée.
+            managers().saveVersion(bddVersion::CreationPredef,bddVersion::LibraryType);
         }
-        //Historique
-        if(managers().ensembleEnable(HistoriqueEnable))
-            creerTable<Historique>();
-        //Mot Cle
-        if(managers().ensembleEnable(MotCleEnable)) {
-            creerTable<MotCle>();
-            creerTable<MotCleCible>();
-            creerTable<MotClePermission>();
-            creerTable<MotProgCible>();
-            creerTable<MotProgPermission>();
-        }
-        //Restriction Modification
-        if(managers().ensembleEnable(RestrictionEnable))
-            creerTable<Restriction>();
-        //Texte
-        if(managers().ensembleEnable(TexteEnable)) {
-            creerTable<Texte>();
-            creerTable<TexteCible>();
-            creerTable<Source>();
-            creerTable<SourceTexte>();
-        }
-        //Utilisation
-        if(managers().ensembleEnable(UtilisationEnable)) {
-            creerTable<Utilisation>();
-            creerTable<Usage>();
-        }
-        //Mise à jour de la version de la base de donnée.
-        managers().saveVersion(bddVersion::InitialePredef);
     }
 }

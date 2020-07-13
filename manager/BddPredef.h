@@ -11,8 +11,8 @@
 
 namespace bddMPS {
     namespace bddVersion {
-        enum creationBddPredef {InitialePredef = NbrCreationBdd,
-                        NbrCreationBddPredef};}
+        enum creationBddPredef {CreationPredef = NbrVersion,
+                        NbrVersionPredef};}
 
     namespace code {
         enum invalide : flag::flag_type {Invalide = 0x1000000};
@@ -49,11 +49,12 @@ namespace bddMPS {
 class BddPredef : public Bdd {
 public:
     //! Constructeur. Donner en argument le type ainsi que le chemin de la base de donnée.
-    BddPredef(const QString & dbtype, int version, std::unique_ptr<managerMPS::ManagersPredef> && manager)
+    BddPredef(const QString & dbtype, const std::vector<int> & version, std::unique_ptr<managerMPS::ManagersPredef> && manager)
         : Bdd(dbtype,version,std::move(manager)) {}
 
     //! Constructeur. Donner en argument le type ainsi que le chemin de la base de donnée.
-    BddPredef(const QString & dbtype, const QString & fileName, int version, std::unique_ptr<managerMPS::ManagersPredef> && manager)
+    BddPredef(const QString & dbtype, const QString & fileName, const std::vector<int> & version,
+              std::unique_ptr<managerMPS::ManagersPredef> && manager)
         : Bdd(dbtype,fileName,version,std::move(manager)) {}
 
     //! Destructeur. Referme la base de donnée.
@@ -98,7 +99,7 @@ protected:
     std::pair<int, int> intervalEntityInDonnee(idt idCible, int cible, int num);
 
     //! Mise à jour de la base de donnée.
-    void listeMiseAJourBdd(int version) override;
+    void listeMiseAJourBdd(int version, idt type) override;
 
     //! Acceseur du manageur.
     const managerMPS::ManagersPredef & managers() const
