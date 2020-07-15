@@ -331,7 +331,7 @@ void  ManagersPredef::enableType(const QString & typeEnt, const QString & permis
 {
     //Type
     using UniqueType = RefNomParentUniqueSql<Type>;
-    InfoBdd infoType(Type::Name(),typeEnt,Type::NbrAtt,{UniqueType::NbrUnique_1,UniqueType::NbrUnique_2});
+    InfoBdd infoType("Type",typeEnt,Type::NbrAtt,{UniqueType::NbrUnique_1,UniqueType::NbrUnique_2});
     infoType.setAttribut(Type::Ref,"ref",bmps::typeAttributBdd::Text,false);
     infoType.setAttribut(Type::Parent,"pt",bmps::typeAttributBdd::Integer,false);
     infoType.setAttribut(Type::Nc,"nc",bmps::typeAttributBdd::Text);
