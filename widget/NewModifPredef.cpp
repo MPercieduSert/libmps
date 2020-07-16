@@ -73,7 +73,7 @@ void EvenementNewModifForm::connexion() {
             m_finDate->setEnabled(true);
     });
     connect(m_jourEntierOption,&QCheckBox::stateChanged,this,[this](){
-        if(m_jourEntierOption->checkState() == Qt::Checked) {
+        if(m_jourEntierOption->isChecked()) {
             m_debutHeure->setTime(QTime(0,0));
             m_debutHeure->setDisabled(true);
             m_finHeure->setTime(QTime(0,0));
@@ -85,7 +85,7 @@ void EvenementNewModifForm::connexion() {
         }
     });
     connect(m_debutDate,&QCalendarWidget::selectionChanged,this,[this](){
-        if(m_unJourOption->checkState() == Qt::Checked)
+        if(m_unJourOption->isChecked())
             m_finDate->setSelectedDate(m_debutDate->selectedDate());
     });
     connect(m_titreEdit,&QLineEdit::textChanged,this,[this](){emit savePermis(valide());});
@@ -104,9 +104,9 @@ void EvenementNewModifForm::save() {
     else
         eve.setCreation(QDateTime::currentDateTime());
     eve.setIdStyle(m_styleICB->id());
-    if(m_unJourOption->checkState() == Qt::Checked)
+    if(m_unJourOption->isChecked())
         eve.add(Evenement::UnJour);
-    if(m_jourEntierOption->checkState() == Qt::Checked)
+    if(m_jourEntierOption->isChecked())
         eve.add(Evenement::JourEntier);
     QDateTime dt;
     dt.setDate(m_debutDate->selectedDate());
@@ -126,8 +126,8 @@ void EvenementNewModifForm::updateData() {
         Evenement eve;
         updateTemp<Evenement>(eve);
         m_styleICB->setCurrentIndexId(eve.idStyle());
-        m_unJourOption->setCheckState(eve.code().test(Evenement::UnJour) ? Qt::Checked : Qt::Unchecked);
-        m_jourEntierOption->setCheckState(eve.code().test(Evenement::JourEntier) ? Qt::Checked : Qt::Unchecked);
+        m_unJourOption->setChecked(eve.code().test(Evenement::UnJour));
+        m_jourEntierOption->setChecked(eve.code().test(Evenement::JourEntier));
         m_debutDate->setSelectedDate(eve.debut().date());
         m_debutHeure->setTime(eve.debut().time());
         m_finDate->setSelectedDate(eve.fin().date());

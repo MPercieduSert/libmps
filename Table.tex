@@ -1358,29 +1358,21 @@
 		\unique{idAn,idEtab, idNiveau, num}\\
 		ModifControle
 	}[left=.8cm of ClasseEleve,\gui]
-
-	\tableEntity{ClasseGroupe}{
-		idAn&uint&idSup1Null&idAn&NULL\\
-		idClasse&uint&idSup1Null&idCl&NULL\\
-		idGroupe&uint&idSup1&idGr
-	}{
-		\fkey{idAn}{Annee}\\
-		\fkey{idClasse}{Classe}\\
-		\fkey{idGroupe}{Groupe}\\
-		\unique{idAn, idGroupe}\\
-		\unique{idClasse, idGroupe}
-	}[below=0.25cm of Annee,\bdd]
 	
 	\tableEntity{Groupe}{
+		idAn&uint&idSup1Null&idAn&NULL\\
+		idClasse&uint&idSup1Null&idCl&NULL\\
 		alpha&int&int&al\\
 		code&uint&code&cd\\
 		nc&text&stringNotEmpty&nc&\\
 		nom&text&stringNotEmpty&nm&\\
 		type&uint&idSup1&tp\\
 	}{
+		\fkey{idAn}{Annee}\\
+		\fkey{idClasse}{Classe}\\
 		\fkey{type}{Type}\\
 		\unique{nom}
-	}[below=0.25cm of ClasseGroupe,\bdd]
+	}[below=0.25cm of Annee,\bdd]
 		
 	\tableEntity{EleveGroupe}{
 		idEleve&uint&idSup1&idEl\\
@@ -1539,9 +1531,8 @@
 \lkey{Niveau.south west}{Classe.north east} 
 \lkey{Classe}{ClasseEleve} 
 \lkey{Annee}{Classe}
-\lkey{Annee}{ClasseGroupe}
-\lkey{Classe}{ClasseGroupe} 
-\lkey{Groupe}{ClasseGroupe}
+\lkey{Annee}{Groupe}
+\lkey{Classe}{Groupe} 
 \lkey{Eleve}{ClasseEleve}
 \lkey{Eleve}{EleveGroupe}
 \lkey{Groupe}{EleveGroupe}
