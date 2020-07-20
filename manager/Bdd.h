@@ -135,6 +135,10 @@ public:
     //! Teste s'il existe une entité vérifiant une condition.
     template<class Ent> bool exists(typename Ent::Position cle, const QVariant & value, condition cond = condition::Egal);
 
+    //! Teste s'il existe une entité vérifiant des conditions.
+    template<class Ent> bool exists(const std::map<typename Ent::Position, QVariant> & value,
+                    std::vector<condition> cond = std::vector<condition>({condition::Egal}));
+
     //! Teste s'il existe une entité ayant les mêmes valeurs qu'un des ensemble d'attributs uniques d'entity en base de donnée.
     //! De plus, si l'identifiant de entity est nul et qu'il existe en base de donnée exactement une entité possédant des ensembles
     //! d'attributs uniques avec les mêmes valeurs qu'entity, alors l'identifiant d'entity est remplacé par l'identifiant de cette entité.
@@ -278,9 +282,9 @@ public:
     //! (true -> croissant, false -> décroissant).
     template<class Ent, class Join> VectorPtr<Ent> getList(typename Ent::Position colonneTable,
                                                    typename Join::Position colonneJoin,
-                                                   const std::map<int,QVariant> & whereMapTable,
-                                                   const std::map<int,QVariant> & whereMapJoin,
-                                                   const std::vector<std::pair<int,bool>> & orderMapTable);
+                                                   const std::map<typename Ent::Position,QVariant> & whereMapTable,
+                                                   const std::map<typename Join::Position,QVariant> & whereMapJoin,
+                                                   const std::vector<std::pair<typename Ent::Position,bool>> & orderMapTable);
 
     //! Renvoie la liste des entités de la table vérifiant une condition sur une jointure (Ent.ID = join.cleJoin),
     //! valeur de la colonne de la jointure d'identifiant cleWhere = valueWhere,
@@ -397,8 +401,8 @@ public:
     //! valeur des colonnes de la table Join d'identifiant key = value de std::map whereMapJoin.
     template<class Ent, class Join> mapIdt<Ent> getMap(typename Ent::Position colonneTable,
                                                        typename Join::Position colonneJoin,
-                                                       const std::map<int,QVariant> & whereMapTable,
-                                                       const std::map<int,QVariant> & whereMapJoin,
+                                                       const std::map<typename Ent::Position,QVariant> & whereMapTable,
+                                                       const std::map<typename Join::Position,QVariant> & whereMapJoin,
                                                        typename Ent::Position cleMap = Ent::Id);
 
     //! Renvoie la liste des entités de la table vérifiant une condition sur une jointure (Ent.ID = Join.cleJoin),
@@ -647,6 +651,9 @@ template<class Ent> bool Bdd::exists(const Ent & entity)
 template<class Ent> bool Bdd::exists(typename Ent::Position cle, const QVariant & value, condition cond)
     {return m_manager->get<Ent>().exists(cle,value,cond);}
 
+template<class Ent> bool Bdd::exists(const std::map<typename Ent::Position, QVariant> & value, std::vector<condition> cond)
+    {return m_manager->get<Ent>().exists(value,cond);}
+
 template<class Ent> bool Bdd::existsUnique(Ent & entity)
     {return m_manager->get<Ent>().existsUnique(entity) != Aucun;}
 
@@ -778,12 +785,14 @@ template<class Ent> VectorPtr<Ent> Bdd::getList(const std::vector<typename Ent::
     {return m_manager->get<Ent>().getList(cle,value,ordre,condition,crois);}
 
 template<class Ent, class Join> VectorPtr<Ent> Bdd::getList(typename Ent::Position colonneTable, typename Join::Position colonneJoin,
-                                               const std::map<int,QVariant> & whereMapTable, const std::map<int,QVariant> & whereMapJoin,
-                                               const std::vector<std::pair<int,bool>> & orderMapTable) {
+                                               const std::map<typename Ent::Position, QVariant> &whereMapTable,
+                                               const std::map<typename Join::Position, QVariant> &whereMapJoin,
+                                               const std::vector<std::pair<typename Ent::Position, bool> > &orderMapTable) {
     std::map<QString,QVariant> whereMapJoinString;
     for(auto i = whereMapJoin.cbegin(); i != whereMapJoin.cend(); i++)
-        whereMapJoinString[m_manager->get<Join>().attribut(i->first)] = i->second;
-    return m_manager->get<Ent>().getListJoin(m_manager->get<Join>().info().table(),colonneTable,
+        whereMapJoinString[m_manager->get<Join>().info().attribut(i->first)] = i->second;
+    return m_manager->get<Ent>().getListJoin(m_manager->get<Join>().info().table(),
+                                             colonneTable,
                                              m_manager->get<Join>().info().attribut(colonneJoin),
                                              whereMapTable, whereMapJoinString, orderMapTable);
 }
@@ -873,9 +882,11 @@ template<class Ent> mapIdt<Ent> Bdd::getMap(const std::vector<typename Ent::Posi
                      const std::vector<bool> & crois)
     {return m_manager->get<Ent>().getMap(cle,value,cleMap,ordre,cond,crois);}
 
-template<class Ent, class Join> mapIdt<Ent> Bdd::getMap(typename Ent::Position colonneTable, typename Join::Position colonneJoin,
-                                               const std::map<int,QVariant> & whereMapTable, const std::map<int,QVariant> & whereMapJoin,
-                                               typename Ent::Position cleMap) {
+template<class Ent, class Join> mapIdt<Ent> Bdd::getMap(typename Ent::Position colonneTable,
+                                                        typename Join::Position colonneJoin,
+                                                        const std::map<typename Ent::Position,QVariant> & whereMapTable,
+                                                        const std::map<typename Join::Position,QVariant> & whereMapJoin,
+                                                        typename Ent::Position cleMap) {
     std::map<QString,QVariant> whereMapJoinString;
     for(auto i = whereMapJoin.cbegin(); i != whereMapJoin.cend(); i++)
         whereMapJoinString[m_manager->get<Join>().attribut(i->first)] = i->second;

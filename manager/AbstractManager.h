@@ -223,6 +223,10 @@ public:
     //! Teste s'il existe une entité vérifiant une condition en base de donnée.
     virtual bool exists(typename Ent::Position cle, const QVariant & value, bmps::condition cond = bmps::condition::Egal) = 0;
 
+    //! Teste s'il existe une entité vérifiant des conditions.
+    virtual bool exists(const std::map<typename Ent::Position, QVariant> & value,
+                std::vector<bmps::condition> cond = std::vector<bmps::condition>({bmps::condition::Egal})) = 0;
+
     //! Teste s'il existe une entité ayant les mêmes valeurs d'attributs uniques qu'entity en base de donnée.
     //! De plus, si l'identifiant de entity est nul et qu'il existe en base de donnée exactement une entité
     //! possédant des ensembles d'attributs uniques avec les mêmes valeurs qu'entity, alors l'identifiant d'entity
@@ -436,9 +440,9 @@ public:
     //! (true -> croissant, false -> décroissant).
     virtual ListPtr<Ent> getListJoin(const QString & tableJoin, szt colonneTable,
                                      const QString & colonneJoin,
-                                     const std::map<szt,QVariant> & whereMapTable,
+                                     const std::map<typename Ent::Position,QVariant> & whereMapTable,
                                      const std::map<QString,QVariant> & whereMapJoin,
-                                     const std::vector<std::pair<szt,bool>> & orderMapTable) = 0;
+                                     const std::vector<std::pair<typename Ent::Position,bool>> & orderMapTable) = 0;
 
     //! Renvoie la liste des entités de la table vérifiant une condition sur une jointure (table.ID = join.colonneJoin),
     //! valeur de la colonne de la jointure d'identifiant cleWhere = valueWhere,
@@ -491,7 +495,7 @@ public:
     //! valeur des colonnes de la table Join key = value de std::map whereMapJoin.
     virtual mapIdt<Ent> getMapJoin(const QString & tableJoin, szt colonneTable,
                                    const QString & colonneJoin,
-                                   const std::map<szt,QVariant> & whereMapTable,
+                                   const std::map<typename Ent::Position,QVariant> & whereMapTable,
                                    const std::map<QString,QVariant> & whereMapJoin,
                                    typename Ent::Position cleMap = Ent::Id) = 0;
 

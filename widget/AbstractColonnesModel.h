@@ -134,6 +134,9 @@ public:
         //! Ajoute count lignes au tableau.
         virtual void add(szt /*count*/) {}
 
+        //! Efface les données du tableau.
+        virtual void clear() = 0;
+
         //! Comparaison d'égalité de deux ligne.
         virtual bool egal(szt /*ligne1*/, szt /*ligne2*/) const {return false;}
 
@@ -196,6 +199,15 @@ public:
     //! Accesseur du vecteur des aspect des états.
     const std::vector<QBrush> & brushEtat() const noexcept
         {return m_brush;}
+
+    //! Efface les données du model.
+    void clear() {
+        beginResetModel();
+            m_data->clear();
+            m_etats.clear();
+            resetRowToLigne();
+        endResetModel();
+    }
 
     //! Accesseur de la colonne en position pos.
     const AbstractColonne & colonne(szt pos) const
@@ -496,6 +508,10 @@ public:
     //! Constructeur d'un tableau d'une colonne de size valeur fabriquée.(Factory: T(*factory)(szt)).
     template<class Factory> AbstractVecTableau(szt size, Factory factory);
 
+    //! Efface les données du tableau.
+    void clear() override
+        {m_vec->clear();}
+
     //! Comparaison d'égalité de deux ligne.
     bool egal(szt ligne1, szt ligne2) const override {return m_vec[ligne1] == m_vec[ligne2];}
 
@@ -647,6 +663,9 @@ public:
 
     //! Ajoute count lignes au tableau.
     void add(szt count) override;
+
+    //! Efface les données du tableau.
+    void clear() override;
 
     //! Comparaison d'égalité de deux ligne.
     bool egal(szt ligne1, szt ligne2) const override;

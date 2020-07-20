@@ -165,6 +165,26 @@ public:
         return bb;
     }
 
+    //! Teste s'il existe une entité vérifiant des conditions.
+    bool exists(const std::map<typename Ent::Position, QVariant> & value,
+                std::vector<bmps::condition> cond = std::vector<bmps::condition>({bmps::condition::Egal})) override {
+        if(value.size() > cond.size())
+            cond.resize(value.size(),bmps::condition::Egal);
+        QString str;
+        auto iterCond = cond.cbegin();
+        for (auto iterValue = value.cbegin(); iterValue != value.cend(); ++iterValue, ++iterCond)
+            str.append(attribut(iterValue->first)).append(m_conditionString[*iterCond]).append("? AND ");
+        str.chop(5);
+        prepare(m_sqlExistsWhere.arg(str));
+        auto i = 0;
+        for(auto iterValue = value.cbegin(); iterValue != value.cend(); ++iterValue, ++i)
+            bindValue(i,iterValue->second);
+        exec();
+        bool bb = next();
+        finish();
+        return bb;
+    }
+
     //! Teste s'il existe une entité ayant les mêmes valeurs d'attributs uniques que l'entité entity en base de donnée.
     //! Si le test est positif, l'identitfiant de l'entité entity est remplacé par celui de l'entité en base de donnée
     //! ayant les mêmes valeurs d'attributs uniques.
@@ -492,9 +512,9 @@ public:
     //! et d'ordre value de std::map orderMapTable (true -> croissant, false -> décroissant).
     ListPtr<Ent> getListJoin(const QString & tableJoin, szt colonneTable,
                                                    const QString & colonneJoin,
-                                                   const std::map<szt,QVariant> & whereMapTable,
+                                                   const std::map<typename Ent::Position,QVariant> & whereMapTable,
                                                    const std::map<QString,QVariant> & whereMapJoin,
-                                                   const std::vector<std::pair<szt,bool>> & orderMapTable) override {
+                                                   const std::vector<std::pair<typename Ent::Position,bool>> & orderMapTable) override {
         QString sqlWhere;
         for(auto i = whereMapTable.cbegin(); i != whereMapTable.cend(); ++i)
             sqlWhere.append("T.").append(attribut(i->first)).append("=? AND ");
@@ -503,7 +523,7 @@ public:
         sqlWhere.chop(5);
         QString sqlOrder;
         for(auto i = orderMapTable.cbegin(); i != orderMapTable.cend(); ++i)
-            sqlOrder.append(" T.").append(attribut((*i).first)).append(" ").append(croissant((*i).second)).append(",");
+            sqlOrder.append(" T.").append(attribut(i->first)).append(" ").append(croissant(i->second)).append(",");
         sqlOrder.chop(1);
         prepare(m_sqlGetListJoin.arg(tableJoin,
                                      attribut(colonneTable),
@@ -633,7 +653,7 @@ public:
     //! valeur des colonnes de la table Join key = value de std::map whereMapJoin.
     mapIdt<Ent> getMapJoin(const QString & tableJoin, szt colonneTable,
                            const QString & colonneJoin,
-                           const std::map<szt,QVariant> & whereMapTable,
+                           const std::map<typename Ent::Position,QVariant> & whereMapTable,
                            const std::map<QString,QVariant> & whereMapJoin,
                            typename Ent::Position cleMap = Ent::Id) override {
         QString sqlWhere;

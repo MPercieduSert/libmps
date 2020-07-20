@@ -232,6 +232,11 @@ void CompositionTableau::add(szt count) {
         (*iter)->add(count);
 }
 
+void CompositionTableau::clear() {
+    for(auto iter = m_tableaux.begin(); iter != m_tableaux.end(); ++iter)
+        (*iter)->clear();
+}
+
 bool CompositionTableau::egal(szt ligne1, szt ligne2) const
     TEST_COMPOSITION_TABLEAU(EgalModule,egal(ligne1,ligne2))
 
