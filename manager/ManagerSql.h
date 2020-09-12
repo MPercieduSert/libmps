@@ -555,6 +555,26 @@ public:
         return listFromRequete();
     }
 
+    //! Renvoie la liste des entités de la table vérifiant une condition sur une jointure
+    //! (table.ID = join1.colonne1, join2.ID = join1.colonne2),
+    //! valeur de la colonne de la jointure d'identifiant cleWhere = valueWhere sur la seconde jointure,
+    //! ordonnée suivant la colonne de l'entité d'identifiant ordre.
+    ListPtr<Ent> getListJoin(const QString & tableJoin1,
+                             const QString & tableJoin2,
+                             const QString & colonne1,
+                             const QString & colonne2,
+                             const QString & whereJoin2,
+                             const QVariant & valueWhere,
+                             typename Ent::Position ordre = Ent::Id,
+                             bmps::condition cond = bmps::condition::Egal, bool crois = true) override {
+        prepare(m_sqlGetListJoin.arg(tableJoin1,"ID",
+                                     QString(colonne1).append(" JOIN ").append(tableJoin2).append(" K ON K.ID=J.").append(colonne2),
+                                     QString("K.").append(whereJoin2).append(m_conditionString[cond]).append("?"),
+                                     QString("T.").append(attribut(ordre)).append(" ").append(croissant(crois))));
+        bindValue(0,valueWhere);
+        return listFromRequete();
+    }
+
     //! Renvoie la map des entités de la table vérifiant la condition.
     mapIdt<Ent> getMap(const QString & condition, typename Ent::Position cleMap = Ent::Id) {
         prepare(m_sqlGetListWhere.arg(condition));
@@ -1056,7 +1076,7 @@ template<class Ent> void ManagerSql<Ent>::writeStringSql() {
 
     // Get list join
     m_sqlGetListJoin.append(selectJoin);
-    m_sqlGetListJoin.append("T.%2=J.%3 WHERE %4 ORDER BY%5");
+    m_sqlGetListJoin.append("T.%2=J.%3 WHERE %4 ORDER BY %5");
     m_sqlGetListJoin.squeeze();
 
     // Get list join 1 where 1

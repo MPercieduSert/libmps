@@ -454,6 +454,19 @@ public:
                                      typename Ent::Position ordre = Ent::Id,
                                      bmps::condition cond = bmps::condition::Egal, bool crois = true) = 0;
 
+    //! Renvoie la liste des entités de la table vérifiant une condition sur une jointure
+    //! (table.ID = join1.colonne1, join2.ID = join1.colonne2),
+    //! valeur de la colonne de la jointure d'identifiant cleWhere = valueWhere sur la seconde jointure,
+    //! ordonnée suivant la colonne de l'entité d'identifiant ordre.
+    virtual ListPtr<Ent> getListJoin(const QString & tableJoin1,
+                             const QString & tableJoin2,
+                             const QString & colonne1,
+                             const QString & colonne2,
+                             const QString & whereJoin2,
+                             const QVariant & valueWhere,
+                             typename Ent::Position ordre = Ent::Id,
+                             bmps::condition cond = bmps::condition::Egal, bool crois = true) = 0;
+
     // Map
     //! Renvoie la map des entités de la table des entités Ent.
     virtual mapIdt<Ent> getMap(typename Ent::Position cleMap = Ent::Id) = 0;

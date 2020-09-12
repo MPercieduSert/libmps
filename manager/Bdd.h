@@ -69,7 +69,8 @@ public:
 
 
     //! Constructeur. Donner en argument le type ainsi que le chemin de la base de donnée, la version et le managers.
-    Bdd(const QString & dbtype, const QString & fileName, const std::vector<int> & version, std::unique_ptr<managerMPS::Managers> && manager = nullptr)
+    Bdd(const QString & dbtype, const QString & fileName, const std::vector<int> & version,
+        std::unique_ptr<managerMPS::Managers> && manager = nullptr)
         : FileInterface(fileName,"Data Base files (*.db)"),
            m_bdd(QSqlDatabase::addDatabase(dbtype)),
            m_manager(std::move(manager)),
@@ -175,15 +176,15 @@ public:
     //! et renvoie l'identifiant du premier trouver.
     template<class Ent> std::pair<existeUni,idt> existsUniqueId(const Ent & entity);
 
-    //! Fonction d'agrega de valeur de type T sur l'attribut att appliquée à toutes les entités de la table.
+    //! Fonction d'agrega sur l'attribut att appliquée à toutes les entités de la table.
     template<class Ent> QVariant fonctionAgrega(agrega fonc, typename Ent::Position att);
 
-    //! Fonction d'agrega de valeur de type T sur l'attribut att appliquée à toutes les entités vérifiant la condition,
+    //! Fonction d'agrega  sur l'attribut att appliquée à toutes les entités vérifiant la condition,
     //! valeur de la colonne d'identifiant cle = value.
     template<class Ent> QVariant fonctionAgrega(agrega fonc, typename Ent::Position att, typename Ent::Position cle,
                                                   const QVariant & value, condition cond = condition::Egal);
 
-    //! Fonction d'agrega de valeur de type T sur l'attribut att appliquée à toutes les entités vérifiant les deux conditions,
+    //! Fonction d'agrega sur l'attribut att appliquée à toutes les entités vérifiant les deux conditions,
     //! valeur de la colonne d'identifiant cle1 = value1 et valeur de la colonne d'identifiant cle2 = value2.
     template<class Ent> QVariant fonctionAgrega(agrega fonc, typename Ent::Position att, typename Ent::Position cle1,
                                                   const QVariant & value1, typename Ent::Position cle2,  const QVariant & value2,
@@ -292,6 +293,25 @@ public:
     template<class Ent, class Join> VectorPtr<Ent> getList(typename Join::Position cleJoin, typename Join::Position cleWhere,
                                                          const QVariant & valueWhere, typename Ent::Position ordre = Ent::Id,
                                                          condition cond = condition::Egal, bool crois = true);
+
+    //! Renvoie la liste des entités de la table vérifiant deux conditions sur une jointure (Ent.ID = join.cleJoin),
+    //! valeur de la colonne de la jointure d'identifiant cleWhere1 = valueWhere1 et cleWhere2 = valueWhere2,
+    //! ordonnée suivant la colonne de l'entité d'identifiant ordre.
+    template<class Ent, class Join> VectorPtr<Ent> getList(typename Join::Position cleJoin,
+                                                           typename Join::Position cleWhere1, const QVariant & valueWhere1,
+                                                           typename Join::Position cleWhere2, const QVariant & valueWhere2,
+                                                           typename Ent::Position ordre = Ent::Id, bool crois = true);
+
+    //! Renvoie la liste des entités de la table vérifiant une condition sur une jointure
+    //! (table.ID = join1.colonne1, join2.ID = join1.colonne2),
+    //! valeur de la colonne de la jointure d'identifiant cleWhere = valueWhere sur la seconde jointure,
+    //! ordonnée suivant la colonne de l'entité d'identifiant ordre.
+    template<class Ent , class Join1, class Join2> VectorPtr<Ent> getList(typename Join1::Position cle1,
+                                                                              typename Join1::Position cle2,
+                                                                              typename Join2::Position cleWhere,
+                                                                              const QVariant & valueWhere,
+                                                                              typename Ent::Position ordre = Ent::Id,
+                                                                              condition cond = condition::Egal, bool crois = true);
 
     //! Renvoie le liste des descendant direct d'entity.
     template<class Ent> VectorPtr<Ent> getListChilds(const Ent & entity);
@@ -787,7 +807,7 @@ template<class Ent> VectorPtr<Ent> Bdd::getList(const std::vector<typename Ent::
 template<class Ent, class Join> VectorPtr<Ent> Bdd::getList(typename Ent::Position colonneTable, typename Join::Position colonneJoin,
                                                const std::map<typename Ent::Position, QVariant> &whereMapTable,
                                                const std::map<typename Join::Position, QVariant> &whereMapJoin,
-                                               const std::vector<std::pair<typename Ent::Position, bool> > &orderMapTable) {
+                                               const std::vector<std::pair<typename Ent::Position, bool>> &orderMapTable) {
     std::map<QString,QVariant> whereMapJoinString;
     for(auto i = whereMapJoin.cbegin(); i != whereMapJoin.cend(); i++)
         whereMapJoinString[m_manager->get<Join>().info().attribut(i->first)] = i->second;
@@ -803,6 +823,31 @@ template<class Ent, class Join> VectorPtr<Ent> Bdd::getList(typename Join::Posit
     return m_manager->get<Ent>().getListJoin(m_manager->get<Join>().info().table(),
                                              m_manager->get<Join>().info().attribut(cleJoin),
                                              m_manager->get<Join>().info().attribut(cleWhere),
+                                             valueWhere, ordre, cond, crois);
+}
+
+template<class Ent, class Join> VectorPtr<Ent> Bdd::getList(typename Join::Position cleJoin,
+                                                       typename Join::Position cleWhere1, const QVariant & valueWhere1,
+                                                       typename Join::Position cleWhere2, const QVariant & valueWhere2,
+                                                       typename Ent::Position ordre, bool crois){
+    std::map<typename Join::Position, QVariant> mapWhere;
+    mapWhere[cleWhere1] = valueWhere1;
+    mapWhere[cleWhere2] = valueWhere2;
+    return getList<Ent,Join>(Ent::Id,cleJoin,std::map<typename Ent::Position, QVariant>(),mapWhere,
+                             std::vector<std::pair<typename Ent::Position, bool>>({std::pair<typename Ent::Position, bool>(ordre,crois)}));
+}
+
+template<class Ent , class Join1, class Join2> VectorPtr<Ent> Bdd::getList(typename Join1::Position cle1,
+                                                          typename Join1::Position cle2,
+                                                          typename Join2::Position cleWhere,
+                                                          const QVariant & valueWhere,
+                                                          typename Ent::Position ordre,
+                                                          condition cond, bool crois) {
+    return m_manager->get<Ent>().getListJoin(m_manager->get<Join1>().info().table(),
+                                             m_manager->get<Join2>().info().table(),
+                                             m_manager->get<Join1>().info().attribut(cle1),
+                                             m_manager->get<Join1>().info().attribut(cle2),
+                                             m_manager->get<Join2>().info().attribut(cleWhere),
                                              valueWhere, ordre, cond, crois);
 }
 
