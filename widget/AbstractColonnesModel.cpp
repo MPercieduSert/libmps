@@ -69,6 +69,20 @@ bool AbstractColonnesModel::insertColonne(int pos, const NewColonneInfo & info, 
     return true;
 }
 
+bool AbstractColonnesModel::push_backColonne(const NewColonneInfo & info, bool allParent){
+    if(allParent) {
+        beginResetModel();
+            m_colonnes.push_back(m_data->makeColonne(info));
+        endResetModel();
+    }
+    else {
+        beginInsertColumns(QModelIndex(),columnCount(),columnCount());
+            m_colonnes.push_back(m_data->makeColonne(info));
+        endInsertColumns();
+    }
+    return true;
+}
+
 void AbstractColonnesModel::save() {
     if(!m_valideLigne && !m_uniqueLigne)
         for (szt ligne = 0; ligne != nbrLignes(); ++ligne)
@@ -277,4 +291,3 @@ void CompositionTableau::save(szt ligne)
 
 bool CompositionTableau::valide(szt ligne) const
     TEST_COMPOSITION_TABLEAU(ValideModule,valide(ligne))
-
