@@ -3,13 +3,57 @@
 using namespace attributMPS;
 constexpr std::array<int, AttributDecimale::NbrValues> AttributDecimale::Decimale{{1,2,3,4,5,6,8,10,20,25,50,100,200,250,500,1000}};
 const QRegularExpression AttributRef::reg {"^[a-z][a-z0-9_]*$"};
-
+const std::map<int,QString> AttributAlpha::m_romain{ {1000,"M"}, {900,"CM"}, {500,"D"}, {400,"CD"}, {100,"C"}, {90,"XC"}, {50,"L"}, {40,"XL"}, {10,"X"}, {9,"IX"}, {5,"V"}, {4,"IV"}, {1,"I"}};
 QString AttributEntity::affiche() const
         {return nameAtt().append(" : ").append(nameClasseAttribut())
                                             .append(" (").append(validToString())
                                             .append("): ").append(toStringAttribut());}
 
+QString AttributAlpha::alphaTexte(int num) const {
+    if(num >= 0) {
+        switch (m_valeur) {
+        case ArabeAlphaTexte:
+            return QString::number(num + 1);
+        case RomainAlphaTexte: {
+            num += 1;
+            QString str;
+            for (auto iter = m_romain.cbegin(); num; ++iter) {
+                while (num >= iter->first) {
+                    str.append(iter->second);
+                    num -= iter->first;
+                }
+            }
+            return str;
+        }
+        case MinusculeAlphaTexte: {
+            auto i = 0x61;
+            i += num;
+            return QChar(i);
+        }
+        case MajusculeAlphaTexte: {
+            auto i = 0x41;
+            i += num;
+            return QChar(i);
+        }
+        case GrecMinusculeAlphaTexte: {
+            auto i = 0x3B1;
+            i += num;
+            return QChar(i);
+        }
+        case GrecMajusculeAlphaTexte: {
+            auto i = 0x391;
+            i += num;
+            return QChar(i);
+        }
+        default:
+            return QString();
+        }
+    }
+    return QString();
+}
+
 DESTR_VIDE_DEF(AttributEntity)
+DESTR_VIDE_DEF(AttributAlpha)
 DESTR_VIDE_DEF(AttributBrush)
 DESTR_VIDE_DEF(AttributCode)
 DESTR_VIDE_DEF(AttributCouleur)

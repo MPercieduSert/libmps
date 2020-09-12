@@ -91,6 +91,17 @@
  */
 namespace attributMPS {
 
+//! Type d'affichage des attributs alpha.
+enum alpha_texte {
+    ArabeAlphaTexte,
+    RomainAlphaTexte,
+    MinusculeAlphaTexte,
+    MajusculeAlphaTexte,
+    GrecMinusculeAlphaTexte,
+    GrecMajusculeAlphaTexte,
+    NbrAlphaTexte
+};
+
 using namespace typeMPS;
 
 /*! \ingroup groupeAttributEntity
@@ -546,7 +557,7 @@ public:
     CONSTR_AFFECT_DEFAUT(AttributCouleur)
 
     //!Destructeur.
-    ~AttributCouleur();
+    ~AttributCouleur() override;
 
     //! Teste la validité de la valeur.
     bool isValidAttribut() const final
@@ -563,11 +574,27 @@ public:
     CONSTR_AFFECT_DEFAUT(AttributBrush)
 
     //!Destructeur.
-    ~AttributBrush();
+    ~AttributBrush() override;
 
     //! Teste la validité de la valeur.
     bool isValidAttribut() const final
         {return m_valeur < Max;}
+};
+
+/*! \ingroup groupeAttributEntity
+ * \brief Classe mère des attributs de type alpha.
+ */
+class AttributAlpha : public AttributEncadre<0,NbrAlphaTexte> {
+public:
+    const static std::map<int,QString> m_romain;
+    CONSTR_DEFAUT(AttributAlpha)
+    CONSTR_AFFECT_DEFAUT(AttributAlpha)
+
+    //!Destructeur.
+    ~AttributAlpha() override;
+
+    //! Retourne le texte de la valeur.
+    QString alphaTexte(int num) const;
 };
 
 /*! \ingroup groupeAttributEntity
@@ -604,7 +631,7 @@ public:
         {return m_valeur.isNull() || reg.match(m_valeur).hasMatch();}
 };
 
-SINGLE_ATTRIBUT(AlphaAttribut,AttributInt,Alpha,alpha)
+SINGLE_ATTRIBUT(AlphaAttribut,AttributAlpha,Alpha,alpha)
 SINGLE_ATTRIBUT(BordureAttribut,AttributInt,Bordure,bordure)
 SINGLE_ATTRIBUT(CardAttribut,AttributInt,Card,card)
 SINGLE_ATTRIBUT(CibleAttribut,AttributInt,Cible,cible)
