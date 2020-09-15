@@ -1,5 +1,5 @@
 #include "FindModel.h"
-#include "AbstractColonnesModel.h"
+#include "ColonnesForModel.h"
 
 using namespace  delegateMPS;
 using namespace modelMPS;

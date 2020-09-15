@@ -22,12 +22,22 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    AbstractColonnesModel.cpp \
+    AbstractEntityTableau.cpp \
+    AbstractModel.cpp \
     #BarPlotter.cpp \
+    Checklist.cpp \
+    ColonnesForModel.cpp \
     #EditTreeWidget.cpp \
+    FindModel.cpp \
+    FindWidget.cpp \
     #Histogramme.cpp \
+    IdComboBox.cpp \
     #MotCleDelegate.cpp \
     #MotCleModel.cpp \
     #MotCleWidget.cpp \
+    NewModifDialog.cpp \
+    NewModifPredef.cpp \
     #NewMotCleDialog.cpp \
     #Plotter.cpp \
     #ReadTreeWidget.cpp \
@@ -36,32 +46,34 @@ SOURCES += \
     SpinBoxAnnee.cpp \
     SpinBoxDecimale.cpp \
     SpinBoxNumExclu.cpp \
+    TableauForModel.cpp \
+    TableEntityView.cpp \
+    TableModel.cpp \
+    TreeColonnesModel.cpp \
+    TreeNodeModel.cpp \
     #TreeModelEditEntity.cpp \
     #TreeModelMotCle.cpp \
     #TreeModelReadEntity.cpp \
     #TreeModelReadTemp.cpp \
     #TreeModelTemp.cpp \
-    NewModifDialog.cpp \
-    Checklist.cpp \
-    TableEntityView.cpp \
-    FindWidget.cpp \
-    AbstractColonnesModel.cpp \
-    TableModel.cpp \
-    AbstractEntityTableau.cpp \
-    AbstractModel.cpp \
-    TreeNodeModel.cpp \
-    FindModel.cpp \
-    IdComboBox.cpp \
-    NewModifPredef.cpp \
-    TreeColonnesModel.cpp
 
 HEADERS += \
+    AbstractColonnesModel.h \
+    AbstractEntityTableau.h \
+    AbstractModel.h \
     #BarPlotter.h \
+    Checklist.h \
+    ColonnesForModel.h \
     #EditTreeWidget.h \
+    FindModel.h \
+    FindWidget.h \
     #Histogramme.h \
+    IdComboBox.h \
     #MotCleDelegate.h \
     #MotCleModel.h \
     #MotCleWidget.h \
+    NewModifDialog.h \
+    NewModifPredef.h \
     #NewMotCleDialog.h \
     #Plotter.h \
     #ReadTreeWidget.h \
@@ -70,24 +82,16 @@ HEADERS += \
     SpinBoxAnnee.h \
     SpinBoxDecimale.h \
     SpinBoxNumExclu.h \
+    TableauForModel.h \
+    TableEntityView.h \
+    TableModel.h \
+    TreeColonnesModel.h \
+    TreeNodeModel.h \
     #TreeModelEditEntity.h \
     #TreeModelMotCle.h \
     #TreeModelReadEntity.h \
     #TreeModelReadTemp.h \
     #TreeModelTemp.h \
-    NewModifDialog.h \
-    Checklist.h \
-    TableEntityView.h \
-    FindWidget.h \
-    AbstractColonnesModel.h \
-    TableModel.h \
-    AbstractEntityTableau.h \
-    AbstractModel.h \
-    TreeNodeModel.h \
-    FindModel.h \
-    IdComboBox.h \
-    NewModifPredef.h \
-    TreeColonnesModel.h
 
 unix {
     target.path = /usr/lib
