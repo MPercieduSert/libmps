@@ -13,6 +13,7 @@
 #include <QVariant>
 #include <utility>
 #include <cmath>
+#include "NumToTexte.h"
 #include "infoEntity.h"
 #include "macrolibmps.h"
 
@@ -90,17 +91,6 @@
  * \brief Espace de nom des attributs des entités.
  */
 namespace attributMPS {
-
-//! Type d'affichage des attributs alpha.
-enum alpha_texte {
-    ArabeAlphaTexte,
-    RomainAlphaTexte,
-    MinusculeAlphaTexte,
-    MajusculeAlphaTexte,
-    GrecMinusculeAlphaTexte,
-    GrecMajusculeAlphaTexte,
-    NbrAlphaTexte
-};
 
 using namespace typeMPS;
 
@@ -377,7 +367,7 @@ using AttributUnsignedNull = AttributZeroNull<unsigned>;
 /*! \ingroup groupeAttributEntity
  * \brief Template des attributs de type entier supérieur ou égal à N.
  */
-template<class T, int N> class AttributSup : public AttributEntityVal<T> {
+template<class T, T N> class AttributSup : public AttributEntityVal<T> {
 protected:
     using AttributEntityVal<T>::m_valeur;
 public:
@@ -394,29 +384,40 @@ public:
         {return m_valeur >= N;}
 };
 
-template<class T, int N> AttributSup<T,N>::~AttributSup() = default;
+template<class T, T N> AttributSup<T,N>::~AttributSup() = default;
 
-template<int N> using AttributIdSup = AttributSup<idt, N>;
+template<idt N> using AttributIdSup = AttributSup<idt, N>;
 template<int N> using AttributIntSup = AttributSup<int, N>;
-template<int N> using AttributUnsignedSup = AttributSup<unsigned, N>;
+template<unsigned N> using AttributUnsignedSup = AttributSup<unsigned, N>;
 
 /*! \ingroup groupeAttributEntity
- * \brief Template des attributs de type entier inférieur ou égal à N.
+ * \brief Template des attributs de type entier inférieur strict à N.
  */
-template<int N> class AttributIntInf : public AttributInt {
+template<class T, T N> class AttributInf : public AttributEntityVal<T> {
+protected:
+    using AttributEntityVal<T>::m_valeur;
 public:
-    CONSTR_DEFAUT(AttributIntInf)
-    CONSTR_AFFECT_DEFAUT(AttributIntInf)
+    CONSTR_DEFAUT(AttributInf)
+    //! Constructeur.
+    using AttributEntityVal<T>::AttributEntityVal;
+    CONSTR_AFFECT_DEFAUT(AttributInf)
 
     //! Destruteur.
-    ~AttributIntInf() override;
+    ~AttributInf() override;
 
     //! Teste la validité de la valeur.
     bool isValidAttribut() const final override
-        {return m_valeur <= N;}
+        {return m_valeur < N;}
 };
 
-template<int N> AttributIntInf<N>::~AttributIntInf() = default;
+template<class T, T N> AttributInf<T,N>::~AttributInf() = default;
+
+template<idt N> using AttributIdInf = AttributInf<idt, N>;
+template<int N> using AttributIntInf = AttributInf<int, N>;
+template<unsigned N> using AttributUnsignedInf = AttributInf<unsigned, N>;
+
+//! Classe mère des attributs de style de numérotation.
+using AttributStyleNum = AttributUnsignedInf<diversMPS::NumToTexte::NbrStyle>;
 
 /*! \ingroup groupeAttributEntity
  * \brief Template des attributs de type entier compris entre M (inclus) et N (exclut).
@@ -439,37 +440,48 @@ template<int M, int N> AttributEncadre<M,N>::~AttributEncadre() = default;
 /*! \ingroup groupeAttributEntity
  * \brief Classe mère des attributs de type decimale.
  */
-class AttributDecimale : public AttributEncadre<0,infoEntity::decimale::NbrDecimales> {
+class AttributDecimale : public AttributUnsigned {
 public:
-    enum {NotFind = -1,
+    enum {NotFind = 0,
+          DefaultValue = 1,
          NbrValues = infoEntity::decimale::NbrDecimales};
 
-    static const std::array<int, NbrValues> Decimale;   //! Liste des inverses des décimales permises.
-    CONSTR_DEFAUT(AttributDecimale)
+    static const std::array<szt, NbrValues> Decimale;   //!< Liste des inverses des décimales permises.
+    //! Constructeur.
+    AttributDecimale() : AttributUnsigned(DefaultValue) {}
     CONSTR_AFFECT_DEFAUT(AttributDecimale)
 
     //! Destructeur.
     ~AttributDecimale() override;
 
     //! Renvoie l'inverse de la valeur de Decimale d'indice indice.
-    static double atome(int indice)
-        {return 1.0 / Decimale.at(static_cast<uint>(indice));}
+    static double atome(szt indice)
+        {return 1.0 / Decimale.at(indice);}
 
     //! Renvoie l'inverse de m_valeur.
     double atome() const
         {return 1.0 / m_valeur;}
 
     //! Renvoie l'indice de valeur dans la list Decimale.
-    static int indice(int valeur) {
-        auto i = 0;
-        while(i != NbrValues && Decimale[static_cast<uint>(i)] != valeur)
+    static szt indice(szt valeur) {
+        szt i = 0;
+        while(i != NbrValues && Decimale[i] != valeur)
             ++i;
         return i;
     }
 
-    //! Renvoie l'indice de m_valeur dans la list Decimale.
-    int indice() const
+    //! Renvoie l'indice de m_valeur dans la liste Decimale.
+    szt indice() const
     {return indice(m_valeur);}
+
+    //! Teste la validité de la valeur.
+    bool isValidAttribut() const final override{
+        if(m_valeur == 0)
+            return false;
+        auto iter = Decimale.cbegin();
+        while(iter != Decimale.cend() && m_valeur != *iter)
+            ++iter;
+        return iter != Decimale.cend();}
 };
 
 /*! \ingroup groupeAttributEntity
@@ -582,22 +594,6 @@ public:
 };
 
 /*! \ingroup groupeAttributEntity
- * \brief Classe mère des attributs de type alpha.
- */
-class AttributAlpha : public AttributEncadre<0,NbrAlphaTexte> {
-public:
-    const static std::map<int,QString> m_romain;
-    CONSTR_DEFAUT(AttributAlpha)
-    CONSTR_AFFECT_DEFAUT(AttributAlpha)
-
-    //!Destructeur.
-    ~AttributAlpha() override;
-
-    //! Retourne le texte de la valeur.
-    QString alphaTexte(int num) const;
-};
-
-/*! \ingroup groupeAttributEntity
  * \brief Classe mère des attributs de type QString non vide.
  */
 class AttributStringNotEmpty : public AttributString {
@@ -631,7 +627,6 @@ public:
         {return m_valeur.isNull() || reg.match(m_valeur).hasMatch();}
 };
 
-SINGLE_ATTRIBUT(AlphaAttribut,AttributAlpha,Alpha,alpha)
 SINGLE_ATTRIBUT(BordureAttribut,AttributInt,Bordure,bordure)
 SINGLE_ATTRIBUT(CardAttribut,AttributInt,Card,card)
 SINGLE_ATTRIBUT(CibleAttribut,AttributInt,Cible,cible)
@@ -677,6 +672,7 @@ SINGLE_ATTRIBUT(PoliceTexteAttribut,AttributStringNotEmpty,PoliceTexte,policeTex
 SINGLE_ATTRIBUT(PoliceTitreAttribut,AttributStringNotEmpty,PoliceTitre,policeTitre)
 SINGLE_ATTRIBUT(RefAttribut,AttributRef,Ref,ref)
 SINGLE_ATTRIBUT(SaisieAttribut,AttributCode,Saisie,saisie)
+SINGLE_ATTRIBUT(StyleNumAttribut,AttributStyleNum,StyleNum,styleNum)
 SINGLE_ATTRIBUT(TexteAttribut,AttributString,Texte,texte)
 SINGLE_ATTRIBUT(TextureAttribut,AttributBrush,Texture,texture)
 SINGLE_ATTRIBUT(TitreAttribut,AttributStringNotEmpty,Titre,titre)

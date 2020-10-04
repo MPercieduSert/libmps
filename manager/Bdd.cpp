@@ -97,7 +97,6 @@ QString Bdd::importXml(const fichierMPS::XmlDoc & doc){
             if(typeManager & bddMPS::ArbreTypeManager) {
                 //auto iterHA = iter.cbeginChild();
                 //entityBaseMPS::Arbre arb;
-
             }
             else {
                 controle = hydrateEntityXml(*entity, iter);
@@ -120,7 +119,6 @@ QString Bdd::importXml(const fichierMPS::XmlDoc & doc){
                 }
                 if(!controle.isEmpty())
                     controle.prepend("->").prepend(iter->name());
-
             }
         }
         ++iter;
@@ -146,7 +144,8 @@ void Bdd::miseAJourBdd() {
             else {
                 QString str("La base de données est d'une version plus récente que le programme pour le type: ");
                 str.append(QString::number(type)).append(" \n");
-                str.append("Version de la base de données requis par le programmen :").append(QString::number(m_version[type])).append(".\n");
+                str.append("Version de la base de données requis par le programmen :").
+                        append(QString::number(m_version[type])).append(".\n");
                 str.append("Version de la base de données :").append(QString::number(m_manager->numVersion(type))).append(".\n");
                 throw std::runtime_error(str.toStdString());
             }

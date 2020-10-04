@@ -37,7 +37,8 @@ SOURCES += \
     EntityPredef.cpp \
     XmlMps.cpp \
     Tree.cpp \
-    ConteneurPtr.cpp
+    ConteneurPtr.cpp \
+    NumToTexte.cpp
 
 HEADERS += \
     AttributMultiple.h \
@@ -57,7 +58,8 @@ HEADERS += \
     XmlMps.h \
     Tree.h \
     ConteneurPtr.h \
-    typemps.h
+    typemps.h \
+    NumToTexte.h
 unix {
     target.path = /usr/lib
     INSTALLS += target

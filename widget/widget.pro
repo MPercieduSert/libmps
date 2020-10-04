@@ -56,6 +56,8 @@ SOURCES += \
     #TreeModelReadEntity.cpp \
     #TreeModelReadTemp.cpp \
     #TreeModelTemp.cpp \
+    TreeWidget.cpp \
+    SpinBoxLettre.cpp
 
 HEADERS += \
     AbstractColonnesModel.h \
@@ -92,6 +94,8 @@ HEADERS += \
     #TreeModelReadEntity.h \
     #TreeModelReadTemp.h \
     #TreeModelTemp.h \
+    TreeWidget.h \
+    SpinBoxLettre.h
 
 unix {
     target.path = /usr/lib

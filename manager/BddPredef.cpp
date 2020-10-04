@@ -3,14 +3,19 @@
 using namespace bddMPS;
 using namespace entityMPS;
 
-flag BddPredef::code(const QString & str) const {
-    if(str == "Interdit")
-        return code::Interdit;
-    if(str == "Visible")
-        return code::Visible;
-    if(str== "Attribuable")
-        return code::Attribuable;
-    return code::Invalide;
+flag BddPredef::code(idt idEntity, const QString & str) const {
+    switch (idEntity) {
+    case TypePermission::ID:
+        if(str == "Interdit")
+            return code::Interdit;
+        if(str == "Visible")
+            return code::Visible;
+        if(str== "Attribuable")
+            return code::Attribuable;
+    [[clang::fallthrough]];
+    default:
+        return code::Invalide;
+    }
 }
 
 bool BddPredef::delP(idt id, szt idEntity) {
@@ -267,7 +272,7 @@ QString BddPredef::hydrateAttributXml(entityMPS::Entity & entity, szt pos, fichi
         flag fl;
         QString controle;
         for(auto iter_list = list.cbegin(); controle.isEmpty() && iter_list != list.cend(); ++iter_list) {
-            auto cd = code(*iter_list);
+            auto cd = code(entity.idEntity(),*iter_list);
             if (cd != code::Invalide)
                 fl |= cd;
             else

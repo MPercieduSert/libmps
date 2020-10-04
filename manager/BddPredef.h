@@ -82,8 +82,8 @@ public:
     virtual std::map<int,QString> nomsEntityCible(int /*cible*/) const
         {return std::map<int,QString>();}//à finir
 
-    //! renvoie le numéro permission associée à la chaine de caractères, ou NbrPermission la chaine ne correspond à aucun numéro.
-    virtual flag code(const QString & str) const;
+    //! renvoie le numéro de permission associée à la chaine de caractères, ou NbrPermission la chaine ne correspond à aucun numéro.
+    virtual flag code(idt idEntity, const QString & str) const;
 
     //! Mutateur d'une entité enregistrée comme donnée.
     template<class Ent> void setEntityInDonnee(const Ent & entity, idt idCible, int cible, int num = 0);

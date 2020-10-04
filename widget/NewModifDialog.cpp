@@ -64,7 +64,7 @@ AbstractTypeNcNomNewModifForm::AbstractTypeNcNomNewModifForm(bddMPS::BddPredef &
     m_mainLayout->addWidget(m_typeTree);
 
     m_typeTree->setColumnCount(nbrColumn);
-    m_typeTree->setHeaderLabels(QStringList({"nom","nom court"}));
+    m_typeTree->setHeaderLabels(QStringList({"nom","nom abrégé"}));
     m_typeTree->setSelectionModel(new QItemSelectionModel(m_typeTree->model()));
     auto tree = m_bdd.getArbre<Type>(m_bdd.refToId<Type>(refRoot));
     auto iter = tree.beginBrother();
@@ -113,6 +113,23 @@ void AbstractTypeNcNomNewModifForm::setType(idt idType){
         ++iter;
     if(*iter)
         m_typeTree->setCurrentItem(*iter);
+}
+
+//AbstractParentNcNomForm
+AbstractParentNcNomNewModifForm::AbstractParentNcNomNewModifForm(bddMPS::Bdd & bdd, const QStringList & header,
+                                                             const QString & labelParent, const QString &labelNc, const QString &labelNom,
+                                                             bool newEnt, QWidget * parent)
+    : AbstractNcNomNewModifForm(bdd,labelNc,labelNom,newEnt,parent)
+{
+    m_parentLabel = new QLabel(labelParent);
+    m_mainLayout->addWidget(m_parentLabel);
+
+    m_parentTree = new widgetMPS::TreeWidget;
+    m_mainLayout->addWidget(m_parentTree);
+
+    m_parentTree->setColumnCount(nbrColumn);
+    m_parentTree->setHeaderLabels(header);
+    m_parentTree->setSelectionModel(new QItemSelectionModel(m_parentTree->model()));
 }
 
 //NewModifDialog

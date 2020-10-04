@@ -17,6 +17,7 @@
 #include "BddPredef.h"
 #include "EntityPredef.h"
 #include "IdComboBox.h"
+#include "TreeWidget.h"
 
 /*! \defgroup groupeDialogue Fenêtre de Dialogue
  * \brief Ensemble de classes représentant des fenêtres de dialogue.
@@ -199,7 +200,7 @@ protected:
     int m_cible;                        //!< Numero de cible de l'entité
     bool m_valide;                      //!< Controle de la validité du type
     QLabel * m_typeLabel;               //!< Label du nom
-    QTreeWidget * m_typeTree;           //!< Ligne d'édition du nom.
+    QTreeWidget * m_typeTree;           //!< Séléction du type
 public:
     enum {nomType,ncType,nbrColumn};
     //! Constructeur.
@@ -230,6 +231,37 @@ protected:
     //! Modifie les drapeaux de selection des items.
     void setFlags(QTreeWidgetItem * item);
 
+    //! Récupère l'entité en base de donné et met à jours les données du formulaire
+    template<class Ent> void updateTemp(Ent & entity);
+};
+
+/*! \ingroup groupeDialogue
+ * \brief Classe des formulaires pour les dialogues commençant par le choix du nom, le nom court et du parent.
+ */
+class AbstractParentNcNomNewModifForm : public AbstractNcNomNewModifForm {
+    Q_OBJECT
+protected:
+    using AbstractNcNomNewModifForm::m_mainLayout;
+    QLabel * m_parentLabel;             //!< Label du parent
+    widgetMPS::TreeWidget * m_parentTree;         //!< Ligne d'édition du nom.
+public:
+    enum {nomParent,ncParent,nbrColumn};
+    //! Constructeur.
+    AbstractParentNcNomNewModifForm(bddMPS::Bdd &bdd, const QStringList & header, const QString & parentType,
+                                  const QString &labelNc, const QString &labelNom, bool newEnt, QWidget * parent = nullptr);
+
+    //! Destructeur.
+    ~AbstractParentNcNomNewModifForm() override = default;
+
+    //! Renvoie l'identifiant du type sélectionné.
+    idt idParent() const
+        {return m_parentTree->id();}
+
+    //! Mutateur du type.
+    void setParent(idt idParent)
+        {m_parentTree->setId(idParent);}
+
+protected:
     //! Récupère l'entité en base de donné et met à jours les données du formulaire
     template<class Ent> void updateTemp(Ent & entity);
 };
@@ -292,6 +324,11 @@ template<class Ent> void AbstractNcNomNewModifForm::updateTemp(Ent & entity) {
 template<class Ent> void AbstractTypeNcNomNewModifForm::updateTemp(Ent & entity) {
     AbstractNcNomNewModifForm::updateTemp<Ent>(entity);
     setType(entity.type());
+}
+
+template<class Ent> void AbstractParentNcNomNewModifForm::updateTemp(Ent & entity) {
+    AbstractNcNomNewModifForm::updateTemp<Ent>(entity);
+    setParent(entity.parent());
 }
 }
 #endif // NEWMODIFDIALOG_H
