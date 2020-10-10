@@ -72,7 +72,7 @@ namespace infoEntity {
                     UsageId,
                     NbrEntityPredefinie};
 
-    enum decimale{NbrDecimales = 16};
+    enum decimale{NbrDecimales = 17};
 };
 
 #endif // INFOENTITY_H

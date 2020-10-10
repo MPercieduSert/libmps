@@ -446,7 +446,8 @@ public:
           DefaultValue = 1,
          NbrValues = infoEntity::decimale::NbrDecimales};
 
-    static const std::array<szt, NbrValues> Decimale;   //!< Liste des inverses des décimales permises.
+    static const std::array<uint, NbrValues> Decimale;   //!< Liste des inverses des décimales permises.
+    static const std::array<int, NbrValues> Precision;  //!< Précision d'affichage de chaque valeur.
     //! Constructeur.
     AttributDecimale() : AttributUnsigned(DefaultValue) {}
     CONSTR_AFFECT_DEFAUT(AttributDecimale)
