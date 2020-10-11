@@ -253,7 +253,7 @@ public:
     //! Destructeur.
     ~AbstractParentNcNomNewModifForm() override = default;
 
-    //! Renvoie l'identifiant du type sélectionné.
+    //! Renvoie l'identifiant du parent sélectionné.
     idt idParent() const
         {return m_parentTree->id();}
 
