@@ -440,16 +440,16 @@ template<int M, int N> AttributEncadre<M,N>::~AttributEncadre() = default;
 /*! \ingroup groupeAttributEntity
  * \brief Classe mère des attributs de type decimale.
  */
-class AttributDecimale : public AttributUnsigned {
+class AttributDecimale : public AttributInt{
 public:
     enum {NotFind = 0,
           DefaultValue = 1,
          NbrValues = infoEntity::decimale::NbrDecimales};
 
-    static const std::array<uint, NbrValues> Decimale;   //!< Liste des inverses des décimales permises.
+    static const std::array<int, NbrValues> Decimale;   //!< Liste des inverses des décimales permises.
     static const std::array<int, NbrValues> Precision;  //!< Précision d'affichage de chaque valeur.
     //! Constructeur.
-    AttributDecimale() : AttributUnsigned(DefaultValue) {}
+    AttributDecimale() : AttributInt(DefaultValue) {}
     CONSTR_AFFECT_DEFAUT(AttributDecimale)
 
     //! Destructeur.
@@ -464,7 +464,7 @@ public:
         {return 1.0 / m_valeur;}
 
     //! Renvoie l'indice de valeur dans la list Decimale.
-    static szt indice(szt valeur) {
+    static szt indice(int valeur) {
         szt i = 0;
         while(i != NbrValues && Decimale[i] != valeur)
             ++i;

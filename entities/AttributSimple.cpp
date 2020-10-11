@@ -1,7 +1,7 @@
 #include "AttributSimple.h"
 
 using namespace attributMPS;
-constexpr std::array<uint, AttributDecimale::NbrValues> AttributDecimale::Decimale{{1,2,3,4,5,6,7,8,10,20,40,50,100,200,400,500,1000}};
+constexpr std::array<int, AttributDecimale::NbrValues> AttributDecimale::Decimale{{1,2,3,4,5,6,7,8,10,20,40,50,100,200,400,500,1000}};
 constexpr std::array<int, AttributDecimale::NbrValues> AttributDecimale::Precision{{0,1,2,2,1,2,3,3,1,2,3,2,2,3,4,3,3}};
 const QRegularExpression AttributRef::reg {"^[a-z][a-z0-9_]*$"};
 QString AttributEntity::affiche() const
