@@ -1,8 +1,8 @@
 #include "AttributSimple.h"
 
 using namespace attributMPS;
-constexpr std::array<int, AttributDecimale::NbrValues> AttributDecimale::Decimale{{1,2,3,4,5,6,7,8,10,20,40,50,100,200,400,500,1000}};
-constexpr std::array<int, AttributDecimale::NbrValues> AttributDecimale::Precision{{0,1,2,2,1,2,3,3,1,2,3,2,2,3,4,3,3}};
+constexpr std::array<int, AttributDecimale::NbrValues> AttributDecimale::Decimale{{1,2,3,4,5,6,7,8,9,10,20,40,50,100,200,400,500,1000}};
+constexpr std::array<int, AttributDecimale::NbrValues> AttributDecimale::Precision{{0,1,2,2,1,2,3,3,3,1,2,3,2,2,3,4,3,3}};
 const QRegularExpression AttributRef::reg {"^[a-z][a-z0-9_]*$"};
 QString AttributEntity::affiche() const
         {return nameAtt().append(" : ").append(nameClasseAttribut())
@@ -80,3 +80,52 @@ DESTR_VIDE_DEF(ValeurDoubleAttribut)
 DESTR_VIDE_DEF(ValeurIntAttribut)
 DESTR_VIDE_DEF(ValeurVariantAttribut)
 DESTR_VIDE_DEF(VersionAttribut)
+
+szt AttributDecimale::indice(int valeur) {
+    szt k = 16;
+    szt i = 0;
+    if(valeur >= Decimale[k]){
+        i = k;
+        while(i != NbrValues && Decimale[i] != valeur)
+            ++i;
+        return i;
+    }
+    else {
+        while(k != 1){
+            k /= 2;
+            if(valeur >= Decimale[i + k])
+                i += k;
+        }
+        if(valeur == Decimale[i])
+            return i;
+        else
+            return  NbrValues;
+    }
+}
+
+bool AttributDecimale::isValidAttribut() const {
+    szt k = 16;
+    szt i = 0;
+    if(m_valeur >= Decimale[k]){
+        i = k;
+        while(i != NbrValues && m_valeur != Decimale[i])
+            ++i;
+        return i != NbrValues;
+    }
+    else {
+        while(k != 1){
+            k /= 2;
+            if(m_valeur >= Decimale[i + k])
+                i += k;
+        }
+        return m_valeur == Decimale[i];
+    }
+}
+
+int AttributDecimale::precisionDecimale(int valeur) {
+    auto i = indice(valeur);
+    if(i != NbrValues)
+        return Precision.at(i);
+    else
+        return 0;
+}

@@ -43,9 +43,6 @@ SOURCES += \
     #ReadTreeWidget.cpp \
     #SelectDonneeDialog.cpp \
     SelectInListBox.cpp \
-    SpinBoxAnnee.cpp \
-    SpinBoxDecimale.cpp \
-    SpinBoxNumExclu.cpp \
     TableauForModel.cpp \
     TableEntityView.cpp \
     TableModel.cpp \
@@ -57,7 +54,7 @@ SOURCES += \
     #TreeModelReadTemp.cpp \
     #TreeModelTemp.cpp \
     TreeWidget.cpp \
-    SpinBoxLettre.cpp
+    SpinBox.cpp
 
 HEADERS += \
     AbstractColonnesModel.h \
@@ -81,9 +78,6 @@ HEADERS += \
     #ReadTreeWidget.h \
     #SelectDonneeDialog.h \
     SelectInListBox.h \
-    SpinBoxAnnee.h \
-    SpinBoxDecimale.h \
-    SpinBoxNumExclu.h \
     TableauForModel.h \
     TableEntityView.h \
     TableModel.h \
@@ -95,7 +89,7 @@ HEADERS += \
     #TreeModelReadTemp.h \
     #TreeModelTemp.h \
     TreeWidget.h \
-    SpinBoxLettre.h
+    SpinBox.h
 
 unix {
     target.path = /usr/lib

@@ -106,27 +106,23 @@ public:
         {return m_toNum(str);}
 
     //! Convertion en un uint
-    operator uint() const
-        {return m_style;}
-
-    //! Convertion en un uint
-    operator QVariant() const
+    operator uint() const noexcept
         {return m_style;}
 
     //! Opérateur de copie.
-    NumToTexte & operator =(const NumToTexte & other) {
+    NumToTexte & operator =(const NumToTexte & other) noexcept {
         setStyle(other.m_style);
         return *this;
     }
 
     //! Opérateur d'affectation à partir d'un uint.
-    NumToTexte & operator =(unsigned style) {
+    NumToTexte & operator =(unsigned style) noexcept {
         setStyle(style);
         return *this;
     }
 
     //! Test d'égalité.
-    bool operator == (const NumToTexte & other) const
+    bool operator == (const NumToTexte & other) const noexcept
         {return m_style == other.m_style;}
 
     //! Recomposition de l'entier.
@@ -145,7 +141,7 @@ public:
     void setStyle(unsigned style);
 
     //! Accesseur du style.
-    unsigned style() const
+    unsigned style() const noexcept
         {return m_style;}
 
     //! Converstion d'un entier (début à 0) en QString avec le style définie.

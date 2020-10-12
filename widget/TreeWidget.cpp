@@ -2,11 +2,7 @@
 
 using namespace widgetMPS;
 
-TreeWidget::TreeWidget(QWidget *parent)
-    : QTreeWidget (parent)
-{
-
-}
+TreeWidget::~TreeWidget() = default;
 
 void TreeWidget::setId(idt id){
     collapseAll();

@@ -464,25 +464,17 @@ public:
         {return 1.0 / m_valeur;}
 
     //! Renvoie l'indice de valeur dans la list Decimale.
-    static szt indice(int valeur) {
-        szt i = 0;
-        while(i != NbrValues && Decimale[i] != valeur)
-            ++i;
-        return i;
-    }
+    static szt indice(int valeur);
 
     //! Renvoie l'indice de m_valeur dans la liste Decimale.
     szt indice() const
     {return indice(m_valeur);}
 
     //! Teste la validité de la valeur.
-    bool isValidAttribut() const final override{
-        if(m_valeur == 0)
-            return false;
-        auto iter = Decimale.cbegin();
-        while(iter != Decimale.cend() && m_valeur != *iter)
-            ++iter;
-        return iter != Decimale.cend();}
+    bool isValidAttribut() const final override;
+
+    //! Précision en nombre de chiffre à virgule.
+    static int precisionDecimale(int valeur);
 };
 
 /*! \ingroup groupeAttributEntity

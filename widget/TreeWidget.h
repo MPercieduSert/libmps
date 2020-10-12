@@ -18,11 +18,14 @@ public:
                  IdRole = Qt::UserRole + 1};
 
     //! Constructeur.
-    TreeWidget(QWidget * parent = nullptr);
+    TreeWidget(QWidget * parent = nullptr) : QTreeWidget (parent) {}
+
+    //! Destructeur.
+    ~TreeWidget() override;
 
     //! Renvoie l'identifiant du type sélectionné.
     idt id() const
-        {return selectionModel()->hasSelection() ? currentItem()->data(IdColonne,Qt::UserRole).toUInt() : 0;}
+        {return selectionModel()->hasSelection() ? currentItem()->data(IdColonne,IdRole).toUInt() : 0;}
 
     //! Mutateur du type.
     void setId(idt id);
