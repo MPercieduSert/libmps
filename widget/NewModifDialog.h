@@ -200,7 +200,7 @@ protected:
     int m_cible;                        //!< Numero de cible de l'entité
     bool m_valide;                      //!< Controle de la validité du type
     QLabel * m_typeLabel;               //!< Label du nom
-    QTreeWidget * m_typeTree;           //!< Séléction du type
+    widgetMPS::TreeWidget * m_typeTree; //!< Séléction du type
 public:
     enum {nomType,ncType,nbrColumn};
     //! Constructeur.
@@ -215,22 +215,17 @@ public:
 
     //! Renvoie l'identifiant du type sélectionné.
     idt idType() const
-        {return m_typeTree->selectionModel()->hasSelection() ? m_typeTree->currentItem()->data(nomType,Qt::UserRole).toUInt() : 0;}
+        {return m_typeTree->id();}
 
     //! Mutateur du type.
-    void setType(idt idType);
+    void setType(idt idType)
+        {m_typeTree->setId(idType);}
 
     //! Teste si le formulaire est valide.
     bool valide() const override
         {return AbstractNcNomNewModifForm::valide() && m_valide;}
 
 protected:
-    //! Ajouter les fils de iter à item.
-    void addChilds(conteneurMPS::tree<Type>::brother_iterator iter, QTreeWidgetItem * item);
-
-    //! Modifie les drapeaux de selection des items.
-    void setFlags(QTreeWidgetItem * item);
-
     //! Récupère l'entité en base de donné et met à jours les données du formulaire
     template<class Ent> void updateTemp(Ent & entity);
 };

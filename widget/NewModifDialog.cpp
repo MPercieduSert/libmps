@@ -60,31 +60,26 @@ AbstractTypeNcNomNewModifForm::AbstractTypeNcNomNewModifForm(bddMPS::BddPredef &
     m_typeLabel = new QLabel(labelType);
     m_mainLayout->addWidget(m_typeLabel);
 
-    m_typeTree = new QTreeWidget;
+    m_typeTree = new widgetMPS::TreeWidget;
     m_mainLayout->addWidget(m_typeTree);
 
     m_typeTree->setColumnCount(nbrColumn);
     m_typeTree->setHeaderLabels(QStringList({"nom","nom abrégé"}));
     m_typeTree->setSelectionModel(new QItemSelectionModel(m_typeTree->model()));
-    auto tree = m_bdd.getArbre<Type>(m_bdd.refToId<Type>(refRoot));
-    auto iter = tree.beginBrother();
-    auto * item = new QTreeWidgetItem(QStringList({iter->nom(),iter->nc()}));
-    item->setData(nomType,Qt::UserRole,iter->id());
-    setFlags(item);
-    m_typeTree->addTopLevelItem(item);
-    addChilds(iter,item);
-}
-
-void AbstractTypeNcNomNewModifForm::addChilds(conteneurMPS::tree<Type>::brother_iterator iter, QTreeWidgetItem * item) {
-    if(!iter.leaf()){
-        for (auto iterChild = iter.beginChild(); iterChild; ++iterChild) {
-            auto * itemChild = new QTreeWidgetItem(QStringList({iterChild->nom(),iterChild->nc()}));
-            itemChild->setData(nomType,Qt::UserRole,iterChild->id());
-            item->addChild(itemChild);
-            setFlags(item);
-            addChilds(iterChild,itemChild);
-        }
-    }
+    m_typeTree->setTreeRef(m_bdd.getArbre<Type>(m_bdd.refToId<Type>(refRoot)),
+                        [this](const Type & tp)->QTreeWidgetItem *{
+        auto item = new QTreeWidgetItem({tp.nom(),tp.nc()});
+        item->setData(widgetMPS::TreeWidget::IdColonne,widgetMPS::TreeWidget::IdRole,tp.id());
+        Permission perm(item->data(nomType,widgetMPS::TreeWidget::IdRole).toUInt(),m_cible);
+        m_bdd.getUnique(perm);
+        if(perm.test(bddMPS::code::Attribuable))
+            item->setFlags(Qt::ItemIsEnabled|Qt::ItemIsSelectable);
+        else
+            item->setFlags(Qt::ItemIsEnabled);
+        return item;
+    });
+    m_typeTree->setSelectionMode(QAbstractItemView::SingleSelection);
+    m_typeTree->setSelectionBehavior(QAbstractItemView::SelectRows);
 }
 
 void AbstractTypeNcNomNewModifForm::connexion() {
@@ -95,24 +90,6 @@ void AbstractTypeNcNomNewModifForm::connexion() {
         m_valide = perm.test(bddMPS::code::Attribuable);
         emit savePermis(valide());
     });
-}
-
-void AbstractTypeNcNomNewModifForm::setFlags(QTreeWidgetItem * item) {
-    Permission perm(item->data(nomType,Qt::UserRole).toUInt(),m_cible);
-    m_bdd.getUnique(perm);
-    if(perm.test(bddMPS::code::Attribuable))
-        item->setFlags(Qt::ItemIsSelectable);
-    else
-        item->setFlags(Qt::ItemIsEnabled);
-}
-
-void AbstractTypeNcNomNewModifForm::setType(idt idType){
-    m_typeTree->collapseAll();
-    QTreeWidgetItemIterator iter(m_typeTree);
-    while (*iter && (*iter)->data(nomType,Qt::UserRole).toUInt() != idType)
-        ++iter;
-    if(*iter)
-        m_typeTree->setCurrentItem(*iter);
 }
 
 //AbstractParentNcNomForm
