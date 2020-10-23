@@ -630,7 +630,7 @@ protected:
 };
 
 /*! \ingroup groupeUniqueSql
- * \brief Classe condition d'unicité pour les entités possédant deux conditions d'unicité sur l'attribut idProg et le couple (Parent, nom).
+ * \brief Classe condition d'unicité pour les entités possédant deux conditions d'unicité sur l'attribut idProg et le nom.
  */
 template<class Ent> class IdProgNomUniqueSql : public DoubleUniqueSql<Ent> {
 protected:
@@ -657,7 +657,44 @@ protected:
 };
 
 /*! \ingroup groupeUniqueSql
- * \brief Classe condition d'unicité pour les entités possédant deux conditions d'unicité sur l'attribut idProg et le nom.
+ * \brief Classe condition d'unicité pour les entités possédant deux conditions d'unicité sur l'attribut nom
+ * et le 4-upplet (id1,idCible,cible,num).
+ */
+template<class Ent> class NomCibleUniqueSql : public DoubleUniqueSql<Ent> {
+protected:
+    using DoubleUniqueSql<Ent>::bindValue;
+    using DoubleUniqueSql<Ent>::bindValuesUnique;
+    using DoubleUniqueSql<Ent>::bindValuesUnique_2;
+
+public:
+    enum {NomUnique, NbrUnique_1,
+          Id1Unique = NomUnique, IdCibleUnique, CibleUnique, NumUnique, NbrUnique_2,
+          NomUniqueSet = DoubleUniqueSql<Ent>::UniqueSet1,
+          Id1UniqueSet = DoubleUniqueSql<Ent>::UniqueSet2,
+          IdCibleUniqueSet = Id1UniqueSet,
+          CibleUniqueSet = Id1UniqueSet,
+          NumUniqueSet = Id1UniqueSet};
+    CONSTR_DEFAUT(NomCibleUniqueSql)
+
+    //! Destructeur.
+    ~NomCibleUniqueSql() override = default;
+
+protected:
+    //! Transmet les valeurs des attributs uniques à la requète SQL préparée.
+    void bindValuesUnique(const Ent &entity) override
+        {bindValue(NomUnique, entity.nom());}
+
+    //! Transmet les valeurs des attributs uniques à la requète SQL préparée.
+    void bindValuesUnique_2(const Ent &entity) override {
+        bindValue(Id1Unique, entity.id1());
+        bindValue(IdCibleUnique, entity.idCible());
+        bindValue(CibleUnique, entity.cible());
+        bindValue(NumUnique, entity.num());
+    }
+};
+
+/*! \ingroup groupeUniqueSql
+ * \brief Classe condition d'unicité pour les entités possédant deux conditions d'unicité sur l'attribut idProg et le couple (Parent, nom).
  */
 template<class Ent> class IdProgNomParentUniqueSql : public IdProgNomUniqueSql<Ent> {
 protected:
