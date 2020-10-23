@@ -12,10 +12,11 @@ flag BddPredef::code(idt idEntity, const QString & str) const {
             return code::Visible;
         if(str== "Attribuable")
             return code::Attribuable;
-    [[clang::fallthrough]];
+        break;
     default:
         return code::Invalide;
     }
+    return code::Invalide;
 }
 
 bool BddPredef::delP(idt id, szt idEntity) {
