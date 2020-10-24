@@ -43,11 +43,11 @@ public:
     }
 public slots:
     //! Mutateur de l'élément courant par choix de l'identifiant.
-    void setCurrentIndexId(szt id);
+    void setCurrentIndexId(idt id);
 
 signals:
     //! La valeur de l'identifiant change.
-    void idChanged(szt id);
+    void idChanged(idt id);
 };
 }
 #endif // IDCOMBOBOX_H
