@@ -6,6 +6,7 @@
 
 #include <QHBoxLayout>
 #include <QVBoxLayout>
+#include "Bdd.h"
 #include "IdComboBox.h"
 
 namespace widgetMPS {
@@ -17,15 +18,16 @@ class AbstractEntitySelectWidget : public QWidget {
     Q_OBJECT
 protected:
     QLayout * m_mainLayout;
+    bddMPS::Bdd & m_bdd;
 public:
     //! Constructeur.
-    AbstractEntitySelectWidget(Qt::Orientations orientation, QWidget * parent = nullptr);
+    AbstractEntitySelectWidget(bddMPS::Bdd & bdd, Qt::Orientations orientation = Qt::Horizontal, QWidget * parent = nullptr);
 
     //! Acceseur de l'identifiant de l'entité séléctionnée.
     virtual idt id() const = 0;
 
     //! Mutateur de l'identifiant de l'entité séléctionnée.
-    virtual void setId() = 0;
+    virtual void setId(idt id) = 0;
 
 signals :
     //! La valeur de l'identifiant change.

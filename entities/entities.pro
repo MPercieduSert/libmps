@@ -31,9 +31,6 @@ SOURCES += \
     EntityRelation.cpp \
     FileInterface.cpp \
     infoEntity.cpp \
-#    ListPtr.cpp \
-#    MapPtr.cpp \
-#    VectorPtr.cpp \
     EntityPredef.cpp \
     XmlMps.cpp \
     Tree.cpp \
@@ -51,10 +48,7 @@ HEADERS += \
     EntityRelation.h \
     FileInterface.h \
     infoEntity.h \
-#    ListPtr.h \
     macrolibmps.h \
-#    MapPtr.h \
-#    VectorPtr.h \
     XmlMps.h \
     Tree.h \
     ConteneurPtr.h \
