@@ -94,8 +94,8 @@ protected:
     QLabel * m_nameLabel;               //!< Label du nom.
     QLineEdit * m_nameLine;             //!< Ligne d'édition du nom.
     widgetMPS::IdComboBox * m_nameCB;   //!< Liste à choix du nom.
+    QHBoxLayout * m_nameLayout;         //!< Calque du nom.
     QVBoxLayout * m_mainLayout;         //!< Calque principal du formulaire.
-
 public:
     //! Constructeur.
     AbstractNomNewModifForm(bddMPS::Bdd & bdd, const QString &label, bool newEnt, QWidget * parent = nullptr);
@@ -162,6 +162,7 @@ protected:
     using AbstractNomNewModifForm::m_mainLayout;
     QLabel * m_ncLabel;               //!< Label du nom court.
     QLineEdit * m_ncLine;             //!< Ligne d'édition du nom court.
+    QHBoxLayout * m_ncLayout;         //!< Calque du nom court.
 public:
     //! Constructeur.
     AbstractNcNomNewModifForm(bddMPS::Bdd & bdd, const QString &lableNc, const QString &labelNom, bool newEnt, QWidget * parent = nullptr);

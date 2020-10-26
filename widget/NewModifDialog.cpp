@@ -11,17 +11,21 @@ AbstractNomNewModifForm::AbstractNomNewModifForm(bddMPS::Bdd & bdd, const QStrin
 {
     m_mainLayout = new QVBoxLayout(this);
     m_nameLabel = new QLabel(label);
-    m_mainLayout->addWidget(m_nameLabel);
+    m_nameLayout = new QHBoxLayout;
+    m_nameLayout->addWidget(m_nameLabel);
+    m_mainLayout->addLayout(m_nameLayout);
     if(m_new) {
         m_nameLine = new QLineEdit;
+        m_nameLine->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Fixed);
         m_nameLabel->setBuddy(m_nameLine);
-        m_mainLayout->addWidget(m_nameLine);
+        m_nameLayout->addWidget(m_nameLine);
     }
     else {
         m_nameCB = new widgetMPS::IdComboBox();
         m_nameCB->setInsertPolicy(QComboBox::NoInsert);
+        m_nameCB->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Fixed);
         m_nameLabel->setBuddy(m_nameCB);
-        m_mainLayout->addWidget(m_nameCB);
+        m_nameLayout->addWidget(m_nameCB);
     }
 }
 
@@ -41,9 +45,12 @@ AbstractNcNomNewModifForm::AbstractNcNomNewModifForm(bddMPS::Bdd &bdd, const QSt
     : AbstractNomNewModifForm(bdd,labelNom,newEnt,parent) {
     m_ncLabel = new QLabel(labelNc);
     m_ncLine = new QLineEdit;
-    m_ncLabel->setBuddy(m_ncLine);   
-    m_mainLayout->addWidget(m_ncLabel);
-    m_mainLayout->addWidget(m_ncLine);
+    m_ncLine->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Fixed);
+    m_ncLabel->setBuddy(m_ncLine);
+    m_ncLayout = new QHBoxLayout;
+    m_ncLayout->addWidget(m_ncLabel);
+    m_ncLayout->addWidget(m_ncLine);
+    m_mainLayout->addLayout(m_ncLayout);
 }
 
 void AbstractNcNomNewModifForm::connexion() {
