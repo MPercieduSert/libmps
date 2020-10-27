@@ -56,6 +56,5 @@ public:
     void setId(idt id) override
         {m_box->setCurrentIndexId(id);}
 };
-
 }
 #endif // ABSTRACTENTITYSELECTWIDGET_H

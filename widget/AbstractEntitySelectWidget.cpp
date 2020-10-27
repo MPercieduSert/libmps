@@ -16,6 +16,7 @@ ComboBoxEntitySelectWidget::ComboBoxEntitySelectWidget(bddMPS::Bdd & bdd, const 
     : AbstractEntitySelectWidget(bdd,orientation,parent) {
     m_label = new QLabel(label);
     m_box = new widgetMPS::IdComboBox;
+    m_box->setSizeAdjustPolicy(QComboBox::AdjustToContents);
     m_box->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Fixed);
     connect(m_box,qOverload<int>(&QComboBox::currentIndexChanged),this,[this](){emit idChanged(id());});
     m_mainLayout->addWidget(m_label);
