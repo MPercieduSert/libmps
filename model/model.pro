@@ -27,11 +27,12 @@ SOURCES += \
     AbstractModel.cpp \
     AbstractNodeModel.cpp \
     ColonnesForModel.cpp \
-    FindModel.cpp \
+    FindNoeudModel.cpp \
     TableauForModel.cpp \
     TableModel.cpp \
     TreeColonnesModel.cpp \
-    TreeNoeudModel.cpp
+    TreeNoeudModel.cpp \
+    FindModel.cpp
 
 HEADERS += \
     AbstractColonnesModel.h \
@@ -39,11 +40,12 @@ HEADERS += \
     AbstractModel.h \
     AbstractNodeModel.h \
     ColonnesForModel.h \
-    FindModel.h \
+    FindNoeudModel.h \
     TableauForModel.h \
     TableModel.h \
     TreeColonnesModel.h \
-    TreeNoeudModel.h
+    TreeNoeudModel.h \
+    FindModel.h
 
 unix {
     target.path = /usr/lib
