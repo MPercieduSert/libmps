@@ -10,20 +10,20 @@
 namespace modelMPS {
 using namespace typeMPS;
 
-class TreeNodeModel : public AbstractModel {
+class TreeNoeudModel : public AbstractModel {
     Q_OBJECT
 public:
     enum {NoType = -1};
 
     //! Noeud abstré de l'arbre de recherche.
-    class AbstractNode {
+    class AbstractNoeud {
     protected:
         int m_type;     //! type du noeud.
     public:
         //! Constructeur.
-        AbstractNode(int type = NoType) : m_type(type){}
+        AbstractNoeud(int type = NoType) : m_type(type){}
 
-        virtual ~AbstractNode();
+        virtual ~AbstractNoeud();
 
         //! Nombre de colonne des descendants.
         virtual int childColumnCount() const {return 0;}
@@ -41,11 +41,11 @@ public:
         int type() const {return m_type;}
     };
     //! Classe des noeud de l'arbre de données
-    using Node = std::unique_ptr<AbstractNode>;
+    using Noeud = std::unique_ptr<AbstractNoeud>;
     //! Classe structurant les données.
-    using Tree = conteneurMPS::tree<Node>;
+    using Tree = conteneurMPS::tree<Noeud>;
     //! Classe du protomodel.
-    using Data = TreeForModel<Node>;
+    using Data = TreeForModel<Noeud>;
 protected:
     Data m_data;                            //!< Arbre de données du model.
     std::vector<QString> m_header;          //!< Entête des colonnes.      
@@ -53,7 +53,7 @@ public:
     TREE_FOR_MODEL_INDEX_PARENT_ROWCOUNT(m_data)    // Implémentation des méthodes virtuelles index, parent, rowCount.
 
     //!Constructeur.
-    TreeNodeModel(bool racine, QObject * parent);
+    TreeNoeudModel(bool racine, QObject * parent);
 
     //! Accesseur du nombre de colonne des descendant.
     int columnCount(const QModelIndex & parent) const override;
@@ -65,11 +65,11 @@ public:
     Qt::ItemFlags flags(const QModelIndex &index) const override;
 
     //! Renvoie une référence sur la donné coorespondant à l'index (en supposant la validité).
-    const AbstractNode & getData(const QModelIndex &index) const
+    const AbstractNoeud & getData(const QModelIndex &index) const
         {return **m_data.getIter(index);}
 
     //! Renvoie une référence sur la donné coorespondant à l'index (en supposant la validité).
-    AbstractNode & getData(const QModelIndex &index)
+    AbstractNoeud & getData(const QModelIndex &index)
         {return **m_data.getIter(index);}
 
     //! Accesseur des entêtes des colonnes.
@@ -81,7 +81,7 @@ public:
     }
 
     //! Insert count noeuds de nature type avant la ligne row de parent.
-    bool insertNodes(int type, int row, int count, const QModelIndex &parent = QModelIndex());
+    bool insertNoeuds(int type, int row, int count, const QModelIndex &parent = QModelIndex());
 
     //! Supprimer count ligne en commençant par la ligne row.
     bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex()) override;
@@ -91,7 +91,7 @@ public:
 
 protected:
     //! Fabrique des noeuds.
-    virtual Node nodeFactory(int /*type*/, int /*row*/, const QModelIndex & /*parent*/) {return std::make_unique<AbstractNode>();}
+    virtual Noeud nodeFactory(int /*type*/, int /*row*/, const QModelIndex & /*parent*/) {return std::make_unique<AbstractNoeud>();}
 };
 }
 #endif // TREENODEMODEL_H

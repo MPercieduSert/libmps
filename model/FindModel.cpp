@@ -1,7 +1,6 @@
 #include "FindModel.h"
 #include "ColonnesForModel.h"
 
-using namespace  delegateMPS;
 using namespace modelMPS;
 using namespace findNodeModel;
 
@@ -342,65 +341,4 @@ bool TexteNode::testValue(const QVariant & value) const {
         return m_regular.match(value.toString(),0).hasMatch();
     else
         return value.toString().contains(m_texte, m_case ? Qt::CaseSensitive : Qt::CaseInsensitive);
-}
-///////////////////////////// FindDelegate ////////////////////////////
-QWidget * FindDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const {
-    if(index.isValid()) {
-        if(index.column() == OpColumn) {
-            auto * comboBox = new QComboBox(parent);
-            for (szt i = 0; i != NbrOperation; ++i)
-                comboBox->addItem(OperationNode::Strings[i],i);
-            return comboBox;
-        }
-        if(index.column() == ColonneColumn) {
-            auto * comboBox = new QComboBox(parent);
-            auto vec = static_cast<const modelMPS::FindModel *>(index.model())->nomColonnes();
-            for (szt i = 0; i != vec.size(); ++i)
-                comboBox->addItem(vec[i],i);
-            return comboBox;
-        }
-        if(index.column() == ComparaisonColumn && index.model()->data(index,Qt::UserRole).toUInt() & ComparaisonSet) {
-            auto * comboBox = new QComboBox(parent);
-            for (szt i = 0; i != NbrComparaison; ++i)
-                comboBox->addItem(AbstractComparaisonNode::Strings[i],i);
-            return comboBox;
-        }
-    }
-    return QStyledItemDelegate::createEditor(parent,option,index);
-}
-
-bool FindDelegate::editorEvent(QEvent *event, QAbstractItemModel *model,
-                                        const QStyleOptionViewItem &option, const QModelIndex &index) {
-    if(index.isValid() && index.column() == NegColumn
-            && event->type() == QEvent::MouseButtonPress
-            && model->flags(index).testFlag(Qt::ItemIsEnabled)) {
-        auto eventMouse = static_cast<QMouseEvent *>(event);
-        if(eventMouse->button() == Qt::LeftButton) {
-            model->setData(index,!model->data(index,Qt::EditRole).toBool());
-            return true;
-        }
-    }
-    return QStyledItemDelegate::editorEvent(event,model,option,index);
-}
-
-void FindDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const {
-    if(index.isValid() && (index.column() == OpColumn
-                           || index.column() == ColonneColumn
-                           || index.model()->data(index,Qt::UserRole).toUInt() & ComparaisonSet)) {
-        auto * comboBox = static_cast<QComboBox *>(editor);
-        comboBox->setCurrentIndex(index.model()->data(index,Qt::EditRole).toInt());
-    }
-    else
-        QStyledItemDelegate::setEditorData(editor,index);
-}
-
-void FindDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const {
-    if(index.isValid() && (index.column() == OpColumn
-                           || index.column() == ColonneColumn
-                           || index.model()->data(index,Qt::UserRole).toUInt() & ComparaisonSet)) {
-        auto * comboBox = static_cast<QComboBox *>(editor);
-        model->setData(index,comboBox->currentIndex());
-    }
-    else
-        QStyledItemDelegate::setModelData(editor,model,index);
 }

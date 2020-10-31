@@ -10,7 +10,7 @@ namespace modelMPS {
 namespace cmps = conteneurMPS;
 using Entity = entityMPS::Entity;
 /*! \ingroup groupeModel
- * \brief Classe mère des model de type tableau.
+ * \brief Classe mère des models de type tableau d'entités.
  */
 class AbstractEntityTableau : public AbstractColonnesModel::AbstractTableau {
 public:

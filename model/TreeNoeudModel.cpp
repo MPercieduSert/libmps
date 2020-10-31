@@ -1,31 +1,31 @@
-#include "TreeNodeModel.h"
+#include "TreeNoeudModel.h"
 
 using namespace modelMPS;
 
-TreeNodeModel::AbstractNode::~AbstractNode() = default;
+TreeNoeudModel::AbstractNoeud::~AbstractNoeud() = default;
 
-TreeNodeModel::TreeNodeModel(bool racine, QObject *parent) : AbstractModel (parent), m_data(this,racine){}
+TreeNoeudModel::TreeNoeudModel(bool racine, QObject *parent) : AbstractModel (parent), m_data(this,racine){}
 
-int TreeNodeModel::columnCount(const QModelIndex & parent) const {
+int TreeNoeudModel::columnCount(const QModelIndex & parent) const {
     if(parent.isValid())
         return m_data.getValidData(parent)->childColumnCount();
     else
         return m_data.getRootData()->childColumnCount();
 }
 
-QVariant TreeNodeModel::data(const QModelIndex &index, int role) const {
+QVariant TreeNoeudModel::data(const QModelIndex &index, int role) const {
     if(checkIndex(index))
         return m_data.getValidData(index)->data(index.column(),role);
     return QVariant();
 }
 
-Qt::ItemFlags TreeNodeModel::flags(const QModelIndex & index) const {
+Qt::ItemFlags TreeNoeudModel::flags(const QModelIndex & index) const {
     if(checkIndex(index))
         return m_data.getValidData(index)->flags(index.column());
     return Qt::NoItemFlags;
 }
 
-bool TreeNodeModel::insertNodes(int type, int row, int count, const QModelIndex &parent) {
+bool TreeNoeudModel::insertNoeuds(int type, int row, int count, const QModelIndex &parent) {
     if (count <= 0 || row < 0 || row > rowCount(parent))
         return false;
     if(m_data.racine() && !parent.isValid())
@@ -36,7 +36,7 @@ bool TreeNodeModel::insertNodes(int type, int row, int count, const QModelIndex 
     return true;
 }
 
-bool TreeNodeModel::removeRows(int row, int count, const QModelIndex &parent) {
+bool TreeNoeudModel::removeRows(int row, int count, const QModelIndex &parent) {
     if(row < 0 || count <= 0 || row >= rowCount(parent))
         return false;
     beginRemoveRows(parent, row, row + count -1);
@@ -48,7 +48,7 @@ bool TreeNodeModel::removeRows(int row, int count, const QModelIndex &parent) {
     return true;
 }
 
-bool TreeNodeModel::setData(const QModelIndex &index, const QVariant &value, int role) {
+bool TreeNoeudModel::setData(const QModelIndex &index, const QVariant &value, int role) {
     if(checkIndex(index) && m_data.getValidData(index)->setData(index.column(),value,role)) {
         dataChanged(index,index);
         return true;

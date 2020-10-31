@@ -5,12 +5,9 @@
 #define FINDMODEL_H
 
 #include <memory>
-#include <QComboBox>
 #include <QDate>
-#include <QMouseEvent>
 #include <QRegularExpression>
-#include <QStyledItemDelegate>
-#include "TreeNodeModel.h"
+#include "TreeNoeudModel.h"
 
 namespace modelMPS {
 //! Déclaration anticipée.
@@ -441,34 +438,4 @@ public:
 };
 }// end namespace findNodeModel
 }// end namespace modelMPS
-//////////////////////////////////////// FindDelegate /////////////////////////
-/*! \defgroup groupeDelegate Delegate
- * \brief Ensemble des classes des delegates.
- */
-
-/*! \ingroup groupeDelegate
- * \brief Espace de noms des delegates.
- */
-namespace delegateMPS {
-class FindDelegate : public QStyledItemDelegate {
-    Q_OBJECT
-public:
-    //! Constructeur.
-    FindDelegate(QObject * parent = nullptr)
-        : QStyledItemDelegate(parent) {}
-
-    //! Fabrique d'éditeur.
-    QWidget * createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
-
-    //! Gestionnaire d'évenement.
-    bool editorEvent(QEvent *event, QAbstractItemModel *model,
-                     const QStyleOptionViewItem &option, const QModelIndex &index) override;
-
-    //! Hydrate l'éditeur.
-    void setEditorData(QWidget *editor, const QModelIndex &index) const override;
-
-    //! Transmet les données au model.
-    void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const override;
-};
-}
 #endif // FINDMODEL_H
