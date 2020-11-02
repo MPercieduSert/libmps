@@ -35,6 +35,17 @@ void FindModel::insertNode(int row, const NodeIndex & parent) {
     }
 }
 
+std::vector<QString> FindModel::nomColonnes() const {
+    if(m_model) {
+        std::vector<QString> vec(static_cast<szt>(m_model->columnCount()));
+        for (szt i = 0; i != vec.size(); ++i)
+            vec[i]=m_model->colonne(i).header();
+        return vec;
+    }
+    else
+        return std::vector<QString>();
+}
+
 TreeNodeModel::Node FindModel::nodeFactory(int type, int row, const NodeIndex & parent) {
     switch (type) {
     case ChoiceNodeType:
@@ -84,7 +95,7 @@ bool FindModel::setData(const NodeIndex &index, int type, const QVariant &value,
                     return true;
                 }
             }
-            else if (type == ColonneColumn) {
+            else if (type == ColonneType) {
                 if(getData(index).type() != OperationNodeType
                         && value.toInt() >= 0 && value.toInt() < m_model->columnCount()) {
                     if(getData(index).type() != m_model->colonne(value.toUInt()).type())
@@ -172,16 +183,12 @@ bool AbstractComparaisonNode::setData(int type, const QVariant & value, int role
 }
 ///////////////////////////// AbstractConditionNode /////////////////////
 QVariant AbstractConditionNode::data(int type, int role, szt /*num*/) const{
-    if(type == ColonneColumn){
-        if(role == Qt::DisplayRole)
-            return m_label;
-        if(role == Qt::EditRole)
+    if(type == ColonneType && role == Qt::DisplayRole)
             return m_pos;
-    }
     return AbstractNegationNode::data(type,role);
 }
 bool AbstractConditionNode::setData(int type, const QVariant & value, int role, szt /*num*/) {
-    if(type == ColonneColumn && role == Qt::EditRole) {
+    if(type == ColonneType && role == Qt::EditRole) {
         m_pos = value.toUInt();
         return true;
     }
@@ -218,7 +225,7 @@ bool BoolNode::setData(int type, const QVariant & value, int role, szt /*num*/) 
 }
 ///////////////////////////// ChoiceNode //////////////////////////////
 QVariant ChoiceNode::data(int type, int role, szt /*num*/) const {
-    if(type == OpColumn || type == ColonneColumn) {
+    if(type == OpColumn || type == ColonneType) {
         if(role == Qt::DisplayRole)
             return QString("?");
         if(role == Qt::EditRole)

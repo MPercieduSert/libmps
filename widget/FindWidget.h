@@ -7,6 +7,7 @@
 #include <QComboBox>
 #include <QCheckBox>
 #include <QHBoxLayout>
+#include <QLabel>
 #include <QPushButton>
 #include <QVBoxLayout>
 #include "FindModel.h"
@@ -45,7 +46,7 @@ protected:
     QPushButton * m_delButton;      //!< Bouton de suppresion d'une condition.
     QPushButton * m_findButton;     //!< Bouton de recherche.
     QPushButton * m_resetButton;    //!< Bouton de réinitialisation de la recherche.
-    NodeView * m_view;             //!< Vue de l'arbre de recherche.
+    NodeView * m_view;              //!< Vue de l'arbre de recherche.
 
     // Calque
     QVBoxLayout * m_mainLayout;     //!< Calque principal.
@@ -76,7 +77,7 @@ namespace findNodeWidget {
 class FindNodeWidget : public NodeWidget {
     Q_OBJECT
 public:
-    //! Constructeur
+    //! Constructeur.
     using NodeWidget::NodeWidget;
 };
 
@@ -86,10 +87,10 @@ public:
 class NegationNodeWidget : public FindNodeWidget {
     Q_OBJECT
 protected:
-    QCheckBox * m_nonCheckBox;      //! CheckBox de négation du prédicat de recherche.
-    QHBoxLayout * m_mainLayout;     //! Calque principale du noeud.
+    QCheckBox * m_nonCheckBox;      //!< CheckBox de négation du prédicat de recherche.
+    QHBoxLayout * m_mainLayout;     //!< Calque principale du noeud.
 public:
-    //! Constructeur
+    //! Constructeur.
     NegationNodeWidget(const NodeIndex & index, QWidget * parent);
 
     //! Met à jour les données du widget à partir des données du model.
@@ -103,15 +104,34 @@ public:
 class ConditionNodeWidget : public NegationNodeWidget {
     Q_OBJECT
 protected:
-    QCheckBox * m_nonCheckBox;      //! CheckBox de négation du prédicat de recherche.
-    QHBoxLayout * m_mainLayout;     //! Calque principale du noeud.
+    QLabel * m_colonneLabel;            //!< Label du choix de la colonne.
+    QComboBox * m_colonneCB;            //!< Choix de la colonne.
+    QVBoxLayout * m_colonneLayout;      //!< Calque du choix de colonne.
 public:
-    //! Constructeur
-    NegationNodeWidget(const NodeIndex & index, QWidget * parent);
+    //! Constructeur.
+    ConditionNodeWidget(const NodeIndex & index, QWidget * parent);
 
     //! Met à jour les données du widget à partir des données du model.
     void updateData() override
-        {m_nonCheckBox->setChecked(m_index.data(modelMPS::findNodeModel::NegType,Qt::DisplayRole).toBool());}
+        {m_colonneCB->setCurrentIndex(m_colonneCB->findData(m_index.data(modelMPS::findNodeModel::ColonneType,Qt::DisplayRole)));}
+};
+
+/*! \ingroup groupeModel
+ * \brief Classe mère des widget de noeuds de recherche définissant une condition de comparaison.
+ */
+class ComparaisonNodeWidget : public ConditionNodeWidget {
+    Q_OBJECT
+protected:
+    QLabel * m_compLabel;            //!< Label du choix de la comparaison.
+    QComboBox * m_compCB;            //!< Choix de la comparaison.
+    QVBoxLayout * m_compLayout;      //!< Calque du choix de la comparaison.
+public:
+    //! Constructeur.
+    ComparaisonNodeWidget(const NodeIndex & index, QWidget * parent);
+
+    //! Met à jour les données du widget à partir des données du model.
+    void updateData() override
+        {m_compCB->setCurrentIndex(m_compCB->findData(m_index.data(modelMPS::findNodeModel::ComparaisonType,Qt::DisplayRole)));}
 };
 }
 }

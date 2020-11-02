@@ -36,6 +36,7 @@ enum setNode : unsigned {NoSet = 0,
 enum dataType {NegType,
              OpColumn,
              ColonneType,
+             ComparaisonType,
              Condition1,
              Condition2,
              Condition3,
@@ -43,7 +44,6 @@ enum dataType {NegType,
              TexteColumn = Condition1,
              CaseColumn = Condition2,
              RegexColumn = Condition3,
-             ComparaisonColumn = Condition1,
              DateColumn = Condition2,
              TrueColumn = Condition1,
              FalseColumn = Condition2
@@ -90,6 +90,9 @@ public:
     //! Si le noeuds parent n'est pas un operationNode, un nouveau operationNode prend sa place
     //! et le noeud parent devient l'ainé de ce nouveau et un noeud ChoiceNode est ajouté en cadet.
     void insertNode(int row, const NodeIndex & parent);
+
+    //! Donne la liste des noms des colonnes du model associé.
+    std::vector<QString> nomColonnes() const;
 
     //! Supprime le noeud de la ligne row de parent.
     void removeNode(int row, const NodeIndex & parent);
@@ -176,30 +179,23 @@ public:
 class AbstractConditionNode : public AbstractNegationNode {
 protected:
     szt m_pos = 0;            //!< Position de la colonne dans le model filtré.
-    QString m_label;    //!< Label de la condition.
 public:
     //! Constructeur.
     AbstractConditionNode() = default;
 
     //!Constructeur.
-    AbstractConditionNode(szt pos, const QString & label, int type = NoType)
-        : AbstractNegationNode(type), m_pos(pos), m_label(label) {}
+    AbstractConditionNode(szt pos, int type = NoType)
+        : AbstractNegationNode(type), m_pos(pos) {}
 
     //! Accesseur de la donnée associé à column.
     QVariant data(int type, int role = Qt::DisplayRole, szt num = 0) const override;
 
     //! Accesseur des drapeaux associés à column.
     Qt::ItemFlags flags(int type, szt num = 0) const override {
-        if(type == OpColumn)
-            return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
-        if(type == ColonneColumn)
+        if(type == ColonneType)
             return AbstractNegationNode::flags(type,num) | Qt::ItemIsEnabled | Qt::ItemIsEditable;
         return AbstractNegationNode::flags(type,num);
     }
-
-    //! Accesseur du label.
-    const QString & label() const
-        {return m_label;}
 
     //! Accesseur de position.
     szt pos() const
@@ -207,10 +203,6 @@ public:
 
     //! Mutateur de la donnée associé à column.
     bool setData(int type, const QVariant & value, int role = Qt::EditRole, szt num = 0) override;
-
-    //! Mutateur du label.
-    void setLabel(const QString & label)
-        {m_label = label;}
 
     //! Mutateur de position.
     void setPos(szt pos)
@@ -232,15 +224,15 @@ protected:
 public:
     static const std::array<QString, NbrComparaison> Strings;        //!< Labels des comparaisons.
     //! Constructeur.
-    AbstractComparaisonNode(szt pos, const QString & label, szt comp = Egal,int type = NoType)
-        : AbstractConditionNode(pos,label,type), m_comp(comp) {}
+    AbstractComparaisonNode(szt pos, szt comp = Egal,int type = NoType)
+        : AbstractConditionNode(pos,type), m_comp(comp) {}
 
     //! Accesseur de la donnée associé à column.
     QVariant data(int type, int role = Qt::DisplayRole, szt num = 0) const override;
 
     //! Accesseur des drapeaux associés à column.
     Qt::ItemFlags flags(int type, szt num = 0) const override {
-        if(type == ComparaisonColumn)
+        if(type == ComparaisonType)
             return AbstractConditionNode::flags(type,num) | Qt::ItemIsEnabled | Qt::ItemIsEditable;
         return AbstractConditionNode::flags(type,num);
     }
@@ -309,7 +301,7 @@ public:
 
     //! Accesseur des drapeaux associés à column.
     Qt::ItemFlags flags(int type, szt /*num*/ = 0) const override {
-        if(type == OpColumn || type == ColonneColumn)
+        if(type == OpColumn || type == ColonneType)
             return Qt::ItemIsEnabled | Qt::ItemIsEditable;
         return Qt::NoItemFlags;
     }

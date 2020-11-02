@@ -30,13 +30,6 @@ NodeWidget * FindDelegate::createWidget(const NodeIndex &index) const {
 //                comboBox->addItem(OperationNode::Strings[i],i);
 //            return comboBox;
 //        }
-//        if(index.column() == ColonneColumn) {
-//            auto * comboBox = new QComboBox(parent);
-//            auto vec = static_cast<const modelMPS::FindModel *>(index.model())->nomColonnes();
-//            for (szt i = 0; i != vec.size(); ++i)
-//                comboBox->addItem(vec[i],i);
-//            return comboBox;
-//        }
 //        if(index.column() == ComparaisonColumn && index.model()->data(index,Qt::UserRole).toUInt() & ComparaisonSet) {
 //            auto * comboBox = new QComboBox(parent);
 //            for (szt i = 0; i != NbrComparaison; ++i)
@@ -129,9 +122,9 @@ void FindWidget::setFindModel(FindModel * model) {
     m_model->setParent(this);
 }
 
-/////////////////////////////////////////// NégationNodeWidget///////////////////////////////////////////////
+/////////////////////////////////////////////////// Noeud de Recherche /////////////////////////////////
 NegationNodeWidget::NegationNodeWidget(const NodeIndex & index, QWidget * parent)
-    : FindNodeWidget (index, parent){
+    : FindNodeWidget (index, parent) {
     m_nonCheckBox = new QCheckBox(tr("Négation"));
     m_nonCheckBox->setEnabled(index.flags(NegType).testFlag(Qt::ItemIsEnabled));
     connect(m_nonCheckBox,&QCheckBox::stateChanged,this,[this](){
@@ -139,4 +132,37 @@ NegationNodeWidget::NegationNodeWidget(const NodeIndex & index, QWidget * parent
     });
     m_mainLayout = new QHBoxLayout(this);
     m_mainLayout->addWidget(m_nonCheckBox);
+}
+
+ConditionNodeWidget::ConditionNodeWidget(const NodeIndex & index, QWidget * parent)
+    : NegationNodeWidget (index,parent) {
+    m_colonneLabel = new QLabel(tr("Colonne :"));
+    m_colonneCB = new QComboBox;
+    m_colonneCB->setEditable(index.flags(ColonneType).testFlag(Qt::ItemIsEnabled));
+    m_colonneCB->setInsertPolicy(QComboBox::NoInsert);
+    auto vec = static_cast<const modelMPS::FindModel *>(index.model())->nomColonnes();
+    for (szt i = 0; i != vec.size(); ++i)
+        m_colonneCB->addItem(vec[i],i);
+    connect(m_colonneCB,qOverload<int>(&QComboBox::currentIndexChanged),this,[this]()
+    {m_index.model()->setData(m_index,ColonneType,m_colonneCB->currentData());});
+    m_colonneLayout = new QVBoxLayout;
+    m_colonneLayout->addWidget(m_colonneLabel);
+    m_colonneLayout->addWidget(m_colonneCB);
+    m_mainLayout->addLayout(m_colonneLayout);
+}
+
+ComparaisonNodeWidget::ComparaisonNodeWidget(const NodeIndex & index, QWidget * parent)
+    : ConditionNodeWidget (index,parent) {
+    m_compLabel = new QLabel(tr("Comparaison :"));
+    m_compCB = new QComboBox;
+    m_compCB->setEditable(index.flags(ColonneType).testFlag(Qt::ItemIsEnabled));
+    m_compCB->setInsertPolicy(QComboBox::NoInsert);
+    for (szt i = 0; i != NbrComparaison; ++i)
+        m_compCB->addItem(AbstractComparaisonNode::Strings[i],i);
+    connect(m_compCB,qOverload<int>(&QComboBox::currentIndexChanged),this,[this]()
+    {m_index.model()->setData(m_index,ColonneType,m_compCB->currentData());});
+    m_compLayout = new QVBoxLayout;
+    m_compLayout->addWidget(m_compLabel);
+    m_compLayout->addWidget(m_compCB);
+    m_mainLayout->addLayout(m_compLayout);
 }
