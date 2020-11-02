@@ -9,7 +9,7 @@ const std::array<QString, NbrComparaison> AbstractComparaisonNoeud::Strings = {"
 
 AbstractFindNoeud::~AbstractFindNoeud() = default;
 
-FindModel::FindModel(QObject *parent)
+FindNoeudModel::FindNoeudModel(QObject *parent)
     :   TreeNoeudModel (true,parent) {
     // Entête
     m_header.resize(NbrColumn);
@@ -22,18 +22,18 @@ FindModel::FindModel(QObject *parent)
     m_data.setTree(Tree(std::move(racine)));
 }
 
-void FindModel::find(){
+void FindNoeudModel::find(){
     if(m_model)
         m_model->find(this);
 }
 
-void FindModel::insertNoeud(int row, const QModelIndex & parent) {
+void FindNoeudModel::insertNoeud(int row, const QModelIndex & parent) {
     if(getData(parent).type() == OperationNoeudType)
         insertNoeuds(ChoiceNoeudType,row,1,parent);
     else {
         auto node = std::move(m_data.getData(parent));
         m_data.getData(parent) = std::make_unique<OperationNoeud>();
-        dataChanged(parent,parent);
+        emit dataChanged(parent,parent);
         beginInsertRows(parent,0,1);
             m_data.tree().push_back(m_data.getIter(parent),std::move(node));
             m_data.tree().push_back(m_data.getIter(parent),static_cast<Noeud &&>(std::make_unique<ChoiceNoeud>()));
@@ -41,7 +41,7 @@ void FindModel::insertNoeud(int row, const QModelIndex & parent) {
     }
 }
 
-std::vector<QString> FindModel::nomColonnes() const {
+std::vector<QString> FindNoeudModel::nomColonnes() const {
     if(m_model) {
         std::vector<QString> vec(static_cast<szt>(m_model->columnCount()));
         for (szt i = 0; i != vec.size(); ++i)
@@ -52,7 +52,7 @@ std::vector<QString> FindModel::nomColonnes() const {
         return std::vector<QString>();
 }
 
-TreeNoeudModel::Noeud FindModel::nodeFactory(int type, int row, const QModelIndex & parent) {
+TreeNoeudModel::Noeud FindNoeudModel::nodeFactory(int type, int row, const QModelIndex & parent) {
     switch (type) {
     case ChoiceNoeudType:
         return std::make_unique<ChoiceNoeud>();
@@ -62,7 +62,7 @@ TreeNoeudModel::Noeud FindModel::nodeFactory(int type, int row, const QModelInde
     return TreeNoeudModel::nodeFactory(type,row,parent);
 }
 
-TreeNoeudModel::Noeud FindModel::nodeConditionFactory(szt pos){
+TreeNoeudModel::Noeud FindNoeudModel::nodeConditionFactory(szt pos){
     const auto & colonne = m_model->colonne(pos);
     switch (m_model->colonne(pos).type()) {
     case BoolNoeudType:
@@ -77,7 +77,7 @@ TreeNoeudModel::Noeud FindModel::nodeConditionFactory(szt pos){
     }
 }
 
-void FindModel::removeNoeud(int row, const QModelIndex & parent){
+void FindNoeudModel::removeNoeud(int row, const QModelIndex & parent){
     if(parent.isValid() && row >= 0 && row < rowCount(parent)){
         if(rowCount(parent) == 2) {
             m_data.getValidData(parent) = std::move(m_data.getValidData(index(1 - row,0,parent)));
@@ -89,7 +89,7 @@ void FindModel::removeNoeud(int row, const QModelIndex & parent){
     }
 }
 
-bool FindModel::setData(const QModelIndex &index, const QVariant &value, int role) {
+bool FindNoeudModel::setData(const QModelIndex &index, const QVariant &value, int role) {
     if(index.isValid()) {
         if(role == Qt::EditRole) {
             if(index.column() == OpColumn){
@@ -121,16 +121,16 @@ bool FindModel::setData(const QModelIndex &index, const QVariant &value, int rol
     return false;
 }
 
-void FindModel::setModel(AbstractColonnesModel * model)
+void FindNoeudModel::setModel(AbstractColonnesModel * model)
     {m_model = model;}
 
-bool FindModel::testRoot(szt id) const{
+bool FindNoeudModel::testRoot(szt id) const{
     auto & root = static_cast<const AbstractConditionNoeud &>(**m_data.tree().cbegin().toFirstChild());
     return root.negation() ? !root.test(id,m_model)
                            : root.test(id,m_model);
 }
 
-bool FindModel::testTree(szt id) const{
+bool FindNoeudModel::testTree(szt id) const{
     auto iter = m_data.tree().crbegin();
     iter.toFirstLeaf();
     auto test = true;

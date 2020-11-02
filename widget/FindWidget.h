@@ -5,45 +5,27 @@
 #define FINDWIDGET_H
 
 #include <QComboBox>
+#include <QCheckBox>
 #include <QHBoxLayout>
-#include <QMouseEvent>
 #include <QPushButton>
-#include <QStyledItemDelegate>
-#include <QTreeView>
 #include <QVBoxLayout>
 #include "FindModel.h"
+#include "NodeView.h"
 
 //////////////////////////////////////// FindDelegate /////////////////////////
-/*! \defgroup groupeDelegate Delegate
- * \brief Ensemble des classes des delegates.
- */
-
-/*! \ingroup groupeDelegate
- * \brief Espace de noms des delegates.
- */
 namespace delegateMPS {
 /*! \ingroup groupeDelegate
  * \brief Delegate de la recherche dans un model de type colonnes.
  */
-class FindDelegate : public QStyledItemDelegate {
+class FindDelegate : public AbstractNodeDelegate {
     Q_OBJECT
 public:
     //! Constructeur.
     FindDelegate(QObject * parent = nullptr)
-        : QStyledItemDelegate(parent) {}
+        : AbstractNodeDelegate (parent) {}
 
     //! Fabrique d'éditeur.
-    QWidget * createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
-
-    //! Gestionnaire d'évenement.
-    bool editorEvent(QEvent *event, QAbstractItemModel *model,
-                     const QStyleOptionViewItem &option, const QModelIndex &index) override;
-
-    //! Hydrate l'éditeur.
-    void setEditorData(QWidget *editor, const QModelIndex &index) const override;
-
-    //! Transmet les données au model.
-    void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const override;
+    NodeWidget * createWidget(const NodeIndex &index) const override;
 };
 }
 
@@ -63,7 +45,7 @@ protected:
     QPushButton * m_delButton;      //!< Bouton de suppresion d'une condition.
     QPushButton * m_findButton;     //!< Bouton de recherche.
     QPushButton * m_resetButton;    //!< Bouton de réinitialisation de la recherche.
-    QTreeView * m_view;             //!< Vue de l'arbre de recherche.
+    NodeView * m_view;             //!< Vue de l'arbre de recherche.
 
     // Calque
     QVBoxLayout * m_mainLayout;     //!< Calque principal.
@@ -85,5 +67,52 @@ public:
             m_model->setModel(model);
     }
 };
+/////////////////////////////////////////////////// Noeud de Recherche /////////////////////////////////
+//! Espace de noms des noeud de recheches.
+namespace findNodeWidget {
+/*! \ingroup groupeModel
+ * \brief Classe mère des widgets associés aux neuds de recherche.
+ */
+class FindNodeWidget : public NodeWidget {
+    Q_OBJECT
+public:
+    //! Constructeur
+    using NodeWidget::NodeWidget;
+};
+
+/*! \ingroup groupeModel
+ * \brief Classe mère des widget de noeuds de recherche avec négation.
+ */
+class NegationNodeWidget : public FindNodeWidget {
+    Q_OBJECT
+protected:
+    QCheckBox * m_nonCheckBox;      //! CheckBox de négation du prédicat de recherche.
+    QHBoxLayout * m_mainLayout;     //! Calque principale du noeud.
+public:
+    //! Constructeur
+    NegationNodeWidget(const NodeIndex & index, QWidget * parent);
+
+    //! Met à jour les données du widget à partir des données du model.
+    void updateData() override
+        {m_nonCheckBox->setChecked(m_index.data(modelMPS::findNodeModel::NegType,Qt::DisplayRole).toBool());}
+};
+
+/*! \ingroup groupeModel
+ * \brief Classe mère des widget de noeuds de recherche définissant une condition.
+ */
+class ConditionNodeWidget : public NegationNodeWidget {
+    Q_OBJECT
+protected:
+    QCheckBox * m_nonCheckBox;      //! CheckBox de négation du prédicat de recherche.
+    QHBoxLayout * m_mainLayout;     //! Calque principale du noeud.
+public:
+    //! Constructeur
+    NegationNodeWidget(const NodeIndex & index, QWidget * parent);
+
+    //! Met à jour les données du widget à partir des données du model.
+    void updateData() override
+        {m_nonCheckBox->setChecked(m_index.data(modelMPS::findNodeModel::NegType,Qt::DisplayRole).toBool());}
+};
+}
 }
 #endif // FINDWIDGET_H

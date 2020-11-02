@@ -35,6 +35,12 @@ QVariant TreeNodeModel::data(const NodeIndex &index, int type, int role, szt num
     return QVariant();
 }
 
+szt TreeNodeModel::dataCount(const NodeIndex & index, int type) const {
+    if(checkIndex(index))
+        return m_data.getValidData(index)->dataCount(type);
+    return NoData;
+}
+
 Qt::ItemFlags TreeNodeModel::flags(const NodeIndex & index, int type, szt num) const {
     if(checkIndex(index))
         return m_data.getValidData(index)->flags(type, num);

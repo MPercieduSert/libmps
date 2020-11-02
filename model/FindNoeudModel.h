@@ -68,7 +68,7 @@ enum comparaison {Egal,
 /*! \ingroup groupeModel
  * \brief Classe mère des model de recherche.
  */
-class FindModel : public TreeNoeudModel {
+class FindNoeudModel : public TreeNoeudModel {
     Q_OBJECT
 public:
    //! Structure d'informations sur une colonne du model.
@@ -83,7 +83,7 @@ protected:
     using QAbstractItemModel::createIndex;
 public:
     //! Constructeur.
-    FindModel(QObject * parent = nullptr);
+    FindNoeudModel(QObject * parent = nullptr);
 
     //! Renvoie le nombre de column pour un parent donné.
     int columnCount(const QModelIndex &/*parent*/ = QModelIndex()) const override

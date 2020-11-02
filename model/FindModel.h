@@ -4,7 +4,6 @@
 #ifndef FINDMODEL_H
 #define FINDMODEL_H
 
-
 #include <memory>
 #include <QDate>
 #include <QRegularExpression>
@@ -34,9 +33,9 @@ enum setNode : unsigned {NoSet = 0,
                         ComparaisonSet = 1};
 
 //! Indice des colonnes.
-enum column {NegColumn,
+enum dataType {NegType,
              OpColumn,
-             ColonneColumn,
+             ColonneType,
              Condition1,
              Condition2,
              Condition3,
@@ -127,7 +126,7 @@ protected:
 
 namespace findNodeModel {
 /*! \ingroup groupeModel
- * \brief Classe mère des feuilles de recherche (héritage multiple).
+ * \brief Classe mère des neuds de recherche.
  */
 class AbstractFindNode : public TreeNodeModel::AbstractNode {
 public:
@@ -158,10 +157,8 @@ public:
 
     //! Accesseur des drapeaux associés à column.
     Qt::ItemFlags flags(int type, szt num = 0) const override {
-        if(type == NegColumn)
+        if(type == NegType)
             return Qt::ItemIsEnabled;
-        if(type == OpColumn)
-            return Qt::ItemIsSelectable;
         return AbstractNode::flags(type,num);
     }
 
@@ -253,7 +250,7 @@ public:
 };
 
 /*! \ingroup groupeModel
- * \brief Classe des noeuds de filtrage sur les textes.
+ * \brief Classe des noeuds de filtrage sur des booléen.
  */
 class BoolNode : public AbstractConditionNode {
 protected:

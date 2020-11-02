@@ -26,7 +26,7 @@ SOURCES += \
     #BarPlotter.cpp \
     Checklist.cpp \
     #EditTreeWidget.cpp \
-    FindWidget.cpp \
+    FindNoeudWidget.cpp \
     #Histogramme.cpp \
     IdComboBox.cpp \
     #MotCleDelegate.cpp \
@@ -47,14 +47,15 @@ SOURCES += \
     #TreeModelReadTemp.cpp \
     #TreeModelTemp.cpp \
     TreeWidget.cpp \
-    NodeView.cpp
+    NodeView.cpp \
+    FindWidget.cpp
 
 HEADERS += \
     AbstractEntitySelectWidget.h \
     #BarPlotter.h \
     Checklist.h \
     #EditTreeWidget.h \
-    FindWidget.h \
+    FindNoeudWidget.h \
     #Histogramme.h \
     IdComboBox.h \
     #MotCleDelegate.h \
@@ -75,7 +76,8 @@ HEADERS += \
     #TreeModelReadTemp.h \
     #TreeModelTemp.h \
     TreeWidget.h \
-    NodeView.h
+    NodeView.h \
+    FindWidget.h
 
 unix {
     target.path = /usr/lib

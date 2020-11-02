@@ -1,21 +1,15 @@
 #include "NodeView.h"
 
+using namespace delegateMPS;
 using namespace widgetMPS;
 
-NodeView::NodeView(QWidget * parent) : QScrollArea (parent) {
+////////////////////////////////////// AbstractNodeDelegate /////////////////////////////////
+AbstractNodeDelegate::AbstractNodeDelegate(QObject * parent)
+    : QObject(parent) {}
 
-}
-
-void NodeView::setModel(modelMPS::AbstractNodeModel *model) {
-    if(m_model->parent() == this)
-        delete m_model;
-    m_model = model;
-    if(!m_model->parent())
-        m_model->setParent(this);
-}
-
-////////////////////////////////////// NodeWidget //////////////////////////////////////////
-NodeView::NodeWidget::NodeWidget(QWidget * parent) : QWidget (parent) {
+////////////////////////////////////// ArcWidget //////////////////////////////////////////
+NodeView::ArcWidget::ArcWidget(QWidget * parent)
+    : QWidget (parent) {
     m_expandButton = new QPushButton;
     m_expandLayout = new QVBoxLayout;
     m_expandLayout->addWidget(m_expandButton);
@@ -26,7 +20,7 @@ NodeView::NodeWidget::NodeWidget(QWidget * parent) : QWidget (parent) {
     m_mainLayout->addLayout(m_expandLayout);
 }
 
-void NodeView::NodeWidget::setExpandEtat(bool bb) {
+void NodeView::ArcWidget::setExpandEtat(bool bb) {
     m_expandEtat = bb;
     if(bb) {
         m_expandButton->setText("-");
@@ -35,3 +29,38 @@ void NodeView::NodeWidget::setExpandEtat(bool bb) {
         m_expandButton->setText("+");
     }
 }
+
+void NodeView::ArcWidget::setNodeWidget(NodeWidget * widget) {
+    if(m_nodeWidget) {
+        m_secondLayout->removeWidget(m_nodeWidget);
+        delete m_nodeWidget;
+    }
+    m_nodeWidget = widget;
+    m_secondLayout->insertWidget(NodeWidgetIndice,widget);
+}
+
+/////////////////////////////////////// NodeView //////////////////////////////////////////
+NodeView::NodeView(QWidget * parent)
+    : QScrollArea (parent) {
+    setWidget(m_delegate->createWidget(m_model->index(0)));
+}
+
+void NodeView::setDelegate(AbstractNodeDelegate * delegate) {
+    if(m_delegate)
+        delete m_delegate;
+    m_delegate = delegate;
+    m_delegate->setParent(this);
+}
+
+void NodeView::setModel(modelMPS::AbstractNodeModel *model) {
+    if(m_model->parent() == this)
+        delete m_model;
+    m_model = model;
+    if(!m_model->parent())
+        m_model->setParent(this);
+}
+
+////////////////////////////////////////// NodeWidget /////////////////////////////////////
+NodeWidget::NodeWidget(const NodeIndex & index, QWidget * parent)
+    : QWidget (parent), m_index(index) {}
+

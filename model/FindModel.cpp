@@ -27,7 +27,7 @@ void FindModel::insertNode(int row, const NodeIndex & parent) {
     else {
         auto node = std::move(m_data.getData(parent));
         m_data.getData(parent) = std::make_unique<OperationNode>();
-        dataChanged(parent,parent);
+        emit dataChanged(parent);
         beginInsertRows(parent,0,1);
             m_data.tree().push_back(m_data.getIter(parent),std::move(node));
             m_data.tree().push_back(m_data.getIter(parent),static_cast<Node &&>(std::make_unique<ChoiceNode>()));
@@ -63,28 +63,28 @@ TreeNodeModel::Node FindModel::nodeConditionFactory(szt pos){
 void FindModel::removeNode(int row, const NodeIndex & parent){
     if(parent.isValid() && row >= 0 && row < rowCount(parent)){
         if(rowCount(parent) == 2) {
-            m_data.getValidData(parent) = std::move(m_data.getValidData(index(1 - row,0,parent)));
+            m_data.getValidData(parent) = std::move(m_data.getValidData(index(1 - row,parent)));
             removeRows(0,2,parent);
-            dataChanged(parent,parent.siblingAtColumn(NbrColumn));
+            emit dataChanged(parent);
         }
         else
             removeRows(row,1,parent);
     }
 }
 
-bool FindModel::setData(const NodeIndex &index, const QVariant &value, int role) {
+bool FindModel::setData(const NodeIndex &index, int type, const QVariant &value, int role, szt num) {
     if(index.isValid()) {
         if(role == Qt::EditRole) {
-            if(index.column() == OpColumn){
+            if(type == OpColumn){
                 if(getData(index).type() == ChoiceNodeType
                         && value.toInt() >= 0 && value.toInt() < NbrOperation) {
                     m_data.getValidData(index) = std::make_unique<OperationNode>(value.toUInt());
-                    dataChanged(index.siblingAtColumn(0),index.siblingAtColumn(NbrColumn));
+                    emit dataChanged(index);
                     insertNodes(ChoiceNodeType,0,2,index);
                     return true;
                 }
             }
-            else if (index.column() == ColonneColumn) {
+            else if (type == ColonneColumn) {
                 if(getData(index).type() != OperationNodeType
                         && value.toInt() >= 0 && value.toInt() < m_model->columnCount()) {
                     if(getData(index).type() != m_model->colonne(value.toUInt()).type())
@@ -93,13 +93,13 @@ bool FindModel::setData(const NodeIndex &index, const QVariant &value, int role)
                         static_cast<AbstractConditionNode &>(getData(index)).setPos(value.toUInt());
                         static_cast<AbstractConditionNode &>(getData(index)).setLabel(m_model->colonne(value.toUInt()).header());
                     }
-                    dataChanged(index.siblingAtColumn(0),index.siblingAtColumn(NbrColumn));
+                    emit dataChanged(index);
                     return true;
                 }
 
             }
         }
-        return TreeNodeModel::setData(index,value,role);
+        return TreeNodeModel::setData(index,type,value,role,num);
     }
     return false;
 }
@@ -136,16 +136,16 @@ bool FindModel::testTree(szt id) const{
 
 ///////////////////////////// AbstractNegationNode//////////////////////
 QVariant AbstractNegationNode::data(int type, int role, szt /*num*/) const {
-    if(type == NegColumn) {
+    if(type == NegType) {
         if(role == Qt::DisplayRole)
-            return m_negation ? QString("Non") : QString("");
+            return m_negation;
         if(role == Qt::EditRole)
             return m_negation;
     }
     return QVariant();
 }
 bool AbstractNegationNode::setData(int type, const QVariant & value, int role, szt /*num*/) {
-    if(type == NegColumn && role == Qt::EditRole) {
+    if(type == NegType && role == Qt::EditRole) {
         m_negation = value.toBool();
         return true;
     }

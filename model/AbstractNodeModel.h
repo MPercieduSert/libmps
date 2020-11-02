@@ -21,6 +21,17 @@
 namespace modelMPS {
 using namespace typeMPS;
 class AbstractNodeModel;
+//! Donnée types prédéfinies.
+enum typeDataNode {
+    NodeType = -1
+};
+
+//! Role des données
+enum roleDataNode {
+    progRole = -1
+};
+
+
 /*! \ingroup groupeModel
  * \brief Classe d'index d'un noeuds.
  */
@@ -64,6 +75,7 @@ class AbstractNodeModel : public QObject{
     Q_OBJECT
     template<class T> friend class TreeForNodeModel;
 public:
+    using QObject::parent;
     //! Constructeur.
     AbstractNodeModel(QObject * parent = nullptr) : QObject(parent) {}
 
@@ -101,6 +113,9 @@ public:
 signals:
     //! Signal le changement d'une donnée.
     void dataChanged(const NodeIndex & index, int type, szt num);
+
+    //! Signal le changement d'une donnée.
+    void dataChanged(const NodeIndex & index);
 
     //! Signal la réinitialisation du model.
     void modelReset();
@@ -155,7 +170,10 @@ public:
 class TreeNodeModel : public AbstractNodeModel {
     Q_OBJECT
 public:
-    enum {NoType = -1};
+    enum {NoType = -1,
+          NodeType = -1,
+          NoData = 0
+         };
 
     //! Node abstré de l'arbre de recherche.
     class AbstractNode {
@@ -168,13 +186,20 @@ public:
         virtual ~AbstractNode();
 
         //! Accesseur de la donnée associé à column.
-        virtual QVariant data(int /*type*/, int /*role*/ = Qt::DisplayRole, szt /*num*/ = 0) const {return QVariant();}
+        virtual QVariant data(int tp, int role = Qt::DisplayRole, szt /*num*/ = 0) const {
+            if(tp == NodeType && role == progRole)
+                return type();
+            return QVariant();}
+
+        //! Nombre de donnée associé au noeud pour un type donnée.
+        virtual szt dataCount(int tp) const
+            {return tp == NodeType ? 1 : NoData;}
 
         //! Accesseur des drapeaux associés à column.
-        virtual Qt::ItemFlags flags(int /*type*/, szt /*num*/ = 0) const {return  Qt::NoItemFlags;}
+        virtual Qt::ItemFlags flags(int /*tp*/, szt /*num*/ = 0) const {return  Qt::NoItemFlags;}
 
         //! Mutateur de la donnée associé à column.
-        virtual bool setData(int /*type*/, const QVariant & /*value*/, int /*role*/ = Qt::EditRole, szt /*num*/ = 0) {return true;}
+        virtual bool setData(int /*tp*/, const QVariant & /*value*/, int /*role*/ = Qt::EditRole, szt /*num*/ = 0) {return true;}
 
         //! Accesseur du type du noeud.
         int type() const {return m_type;}
@@ -195,6 +220,9 @@ public:
 
     //! Accesseur la donnée associé à un couple (index,role).
     QVariant data(const NodeIndex &index, int type, int role = Qt::DisplayRole, szt num = 0) const override;
+
+    //! Nombre de données associées associé à un noeud pour un type donnée.
+    szt dataCount(const NodeIndex & index, int type) const override;
 
     //! Renvoie les drapeaux associé à un index.
     Qt::ItemFlags flags(const NodeIndex &index, int type, szt num = 0) const override;
