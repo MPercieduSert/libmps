@@ -28,7 +28,8 @@ enum typeDataNode {
 
 //! Role des données
 enum roleDataNode {
-    progRole = -1
+    DataRole,
+    LabelRole
 };
 
 
@@ -46,7 +47,7 @@ public:
     NodeIndex() = default;
 
     //! Accesseur des données associées à l'index.
-    QVariant data(int type, int role = Qt::DisplayRole, szt num = 0) const;
+    QVariant data(int type, int role = DataRole, szt num = 0) const;
 
     //! Drapeaux assossiés à une donnée.
     Qt::ItemFlags flags(int type, szt num = 0) const;
@@ -62,6 +63,14 @@ public:
     //! Accesseur du model.
     AbstractNodeModel * model() const noexcept
         {return m_model;}
+
+    //! Teste l'équivalence de deux index.
+    bool operator==(const NodeIndex & index) const
+        {return m_model == index.m_model && m_ptr == index.m_ptr;}
+
+    //! Relation d'ordre sur les index.
+    bool operator<(const NodeIndex & index) const
+        {return m_ptr < index.m_ptr;}
 
     //! Retourne un index sur le parent.
     NodeIndex parent() const;
@@ -84,7 +93,7 @@ public:
         {return index.m_model == this && index.m_ptr && index.m_row >= 0 && index.m_row < rowCount(index);}
 
     //! Accesseur des données du model.
-    virtual QVariant data(const NodeIndex & index, int type, int role = Qt::DisplayRole, szt num = 0) const = 0;
+    virtual QVariant data(const NodeIndex & index, int type, int role = DataRole, szt num = 0) const = 0;
 
     //! Nombre de donnée d'un noeud et d'un type.
     virtual szt dataCount(const NodeIndex & index, int type) const = 0;
@@ -108,7 +117,7 @@ public:
     virtual int rowCount(const NodeIndex & index) const = 0;
 
     //! Mutateur des données du model.
-    virtual bool setData(const NodeIndex & index, int type, const QVariant & value, int role = Qt::EditRole, szt num = 0) = 0;
+    virtual bool setData(const NodeIndex & index, int type, const QVariant & value, int role = DataRole, szt num = 0) = 0;
 
 signals:
     //! Signal le changement d'une donnée.
@@ -171,7 +180,6 @@ class TreeNodeModel : public AbstractNodeModel {
     Q_OBJECT
 public:
     enum {NoType = -1,
-          NodeType = -1,
           NoData = 0
          };
 
@@ -186,8 +194,8 @@ public:
         virtual ~AbstractNode();
 
         //! Accesseur de la donnée associé à column.
-        virtual QVariant data(int tp, int role = Qt::DisplayRole, szt /*num*/ = 0) const {
-            if(tp == NodeType && role == progRole)
+        virtual QVariant data(int tp, int role = DataRole, szt /*num*/ = 0) const {
+            if(tp == NodeType && role == DataRole)
                 return type();
             return QVariant();}
 
@@ -199,7 +207,7 @@ public:
         virtual Qt::ItemFlags flags(int /*tp*/, szt /*num*/ = 0) const {return  Qt::NoItemFlags;}
 
         //! Mutateur de la donnée associé à column.
-        virtual bool setData(int /*tp*/, const QVariant & /*value*/, int /*role*/ = Qt::EditRole, szt /*num*/ = 0) {return true;}
+        virtual bool setData(int /*tp*/, const QVariant & /*value*/, int /*role*/ = DataRole, szt /*num*/ = 0) {return true;}
 
         //! Accesseur du type du noeud.
         int type() const {return m_type;}
@@ -219,7 +227,7 @@ public:
     TreeNodeModel(bool racine, QObject * parent);
 
     //! Accesseur la donnée associé à un couple (index,role).
-    QVariant data(const NodeIndex &index, int type, int role = Qt::DisplayRole, szt num = 0) const override;
+    QVariant data(const NodeIndex &index, int type, int role = DataRole, szt num = 0) const override;
 
     //! Nombre de données associées associé à un noeud pour un type donnée.
     szt dataCount(const NodeIndex & index, int type) const override;
@@ -242,7 +250,7 @@ public:
     bool removeRows(int row, int count, const NodeIndex &parent = NodeIndex()) override;
 
     //! Mutateur la donnée associé à un couple (index,role).
-    bool setData(const NodeIndex &index, int type, const QVariant &value, int role = Qt::EditRole, szt num = 0) override;
+    bool setData(const NodeIndex &index, int type, const QVariant &value, int role = DataRole, szt num = 0) override;
 
 protected:
     //! Fabrique des noeuds.

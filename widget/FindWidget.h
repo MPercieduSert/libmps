@@ -10,6 +10,8 @@
 #include <QLabel>
 #include <QPushButton>
 #include <QVBoxLayout>
+#include "AbstractColonnesModel.h"
+#include "ColonnesForModel.h"
 #include "FindModel.h"
 #include "NodeView.h"
 
@@ -26,7 +28,7 @@ public:
         : AbstractNodeDelegate (parent) {}
 
     //! Fabrique d'éditeur.
-    NodeWidget * createWidget(const NodeIndex &index) const override;
+    NodeWidget * createWidget(const NodeIndex &index, QWidget * parent) const override;
 };
 }
 
@@ -71,6 +73,8 @@ public:
 /////////////////////////////////////////////////// Noeud de Recherche /////////////////////////////////
 //! Espace de noms des noeud de recheches.
 namespace findNodeWidget {
+using namespace modelMPS;
+using namespace findNodeModel;
 /*! \ingroup groupeModel
  * \brief Classe mère des widgets associés aux neuds de recherche.
  */
@@ -91,11 +95,11 @@ protected:
     QHBoxLayout * m_mainLayout;     //!< Calque principale du noeud.
 public:
     //! Constructeur.
-    NegationNodeWidget(const NodeIndex & index, QWidget * parent);
+    NegationNodeWidget(const NodeIndex & index, QWidget * parent, int tp = NoType);
 
     //! Met à jour les données du widget à partir des données du model.
     void updateData() override
-        {m_nonCheckBox->setChecked(m_index.data(modelMPS::findNodeModel::NegType,Qt::DisplayRole).toBool());}
+        {m_nonCheckBox->setChecked(m_index.data(NegType,DataRole).toBool());}
 };
 
 /*! \ingroup groupeModel
@@ -109,11 +113,11 @@ protected:
     QVBoxLayout * m_colonneLayout;      //!< Calque du choix de colonne.
 public:
     //! Constructeur.
-    ConditionNodeWidget(const NodeIndex & index, QWidget * parent);
+    ConditionNodeWidget(const NodeIndex & index, QWidget * parent, int tp = NoType);
 
     //! Met à jour les données du widget à partir des données du model.
     void updateData() override
-        {m_colonneCB->setCurrentIndex(m_colonneCB->findData(m_index.data(modelMPS::findNodeModel::ColonneType,Qt::DisplayRole)));}
+        {m_colonneCB->setCurrentIndex(m_colonneCB->findData(m_index.data(ColonneType,Qt::DisplayRole)));}
 };
 
 /*! \ingroup groupeModel
@@ -127,11 +131,31 @@ protected:
     QVBoxLayout * m_compLayout;      //!< Calque du choix de la comparaison.
 public:
     //! Constructeur.
-    ComparaisonNodeWidget(const NodeIndex & index, QWidget * parent);
+    ComparaisonNodeWidget(const NodeIndex & index, QWidget * parent, int tp = NoType);
 
     //! Met à jour les données du widget à partir des données du model.
     void updateData() override
-        {m_compCB->setCurrentIndex(m_compCB->findData(m_index.data(modelMPS::findNodeModel::ComparaisonType,Qt::DisplayRole)));}
+        {m_compCB->setCurrentIndex(m_compCB->findData(m_index.data(ComparaisonType,Qt::DisplayRole)));}
+};
+
+/*! \ingroup groupeModel
+ * \brief Classe des widget de noeuds filtrage sur des booléen.
+ */
+class BoolNodeWidget : public ConditionNodeWidget {
+    Q_OBJECT
+protected:
+    QCheckBox * m_falseCheck;           //!< CheckBox de faux.
+    QCheckBox * m_trueCheck;            //!< CheckBox de vraie
+    QHBoxLayout * m_boolLayout;         //!< Calque filtrage sur des booléen.
+public:
+    //! Constructeur.
+    BoolNodeWidget(const NodeIndex & index, QWidget * parent, int tp = modelMPS::findNodeModel::BoolNodeType);
+
+    //! Met à jour les données du widget à partir des données du model.
+    void updateData() override {
+        m_falseCheck->setChecked(m_index.data(FalseType).toBool());
+        m_trueCheck->setChecked(m_index.data(TrueType).toBool());
+    }
 };
 }
 }

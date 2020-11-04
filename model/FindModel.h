@@ -37,6 +37,8 @@ enum dataType {NegType,
              OpColumn,
              ColonneType,
              ComparaisonType,
+             TrueType,
+             FalseType,
              Condition1,
              Condition2,
              Condition3,
@@ -44,9 +46,7 @@ enum dataType {NegType,
              TexteColumn = Condition1,
              CaseColumn = Condition2,
              RegexColumn = Condition3,
-             DateColumn = Condition2,
-             TrueColumn = Condition1,
-             FalseColumn = Condition2
+             DateColumn = Condition2
             };
 
 //! Opérations binaire.
@@ -91,6 +91,10 @@ public:
     //! et le noeud parent devient l'ainé de ce nouveau et un noeud ChoiceNode est ajouté en cadet.
     void insertNode(int row, const NodeIndex & parent);
 
+    //! Accesseur du model filtré.
+    AbstractColonnesModel * model() const
+        {return m_model;}
+
     //! Donne la liste des noms des colonnes du model associé.
     std::vector<QString> nomColonnes() const;
 
@@ -102,7 +106,7 @@ public:
         {return m_data.tree().cbegin().toFirstChild().leaf();}
 
     //! Mutateur des données du model.
-    bool setData(const NodeIndex &index, int type, const QVariant &value, int role = Qt::EditRole, szt num = 0) override;
+    bool setData(const NodeIndex &index, int type, const QVariant &value, int role = DataRole, szt num = 0) override;
 
     //! Mutateur du model filtré.
     void setModel(AbstractColonnesModel * model);
@@ -156,7 +160,7 @@ public:
     using AbstractFindNode::AbstractFindNode;
 
     //! Accesseur de la donnée associé à column.
-    QVariant data(int type, int role = Qt::DisplayRole, szt num = 0) const override;
+    QVariant data(int type, int role = DataRole, szt num = 0) const override;
 
     //! Accesseur des drapeaux associés à column.
     Qt::ItemFlags flags(int type, szt num = 0) const override {
@@ -170,7 +174,7 @@ public:
         {return m_negation;}
 
     //! Mutateur de la donnée associé à column.
-    bool setData(int type, const QVariant & value, int role = Qt::EditRole, szt num = 0) override;
+    bool setData(int type, const QVariant & value, int role = DataRole, szt num = 0) override;
 };
 
 /*! \ingroup groupeModel
@@ -188,7 +192,7 @@ public:
         : AbstractNegationNode(type), m_pos(pos) {}
 
     //! Accesseur de la donnée associé à column.
-    QVariant data(int type, int role = Qt::DisplayRole, szt num = 0) const override;
+    QVariant data(int type, int role = DataRole, szt num = 0) const override;
 
     //! Accesseur des drapeaux associés à column.
     Qt::ItemFlags flags(int type, szt num = 0) const override {
@@ -202,7 +206,7 @@ public:
         {return m_pos;}
 
     //! Mutateur de la donnée associé à column.
-    bool setData(int type, const QVariant & value, int role = Qt::EditRole, szt num = 0) override;
+    bool setData(int type, const QVariant & value, int role = DataRole, szt num = 0) override;
 
     //! Mutateur de position.
     void setPos(szt pos)
@@ -228,7 +232,7 @@ public:
         : AbstractConditionNode(pos,type), m_comp(comp) {}
 
     //! Accesseur de la donnée associé à column.
-    QVariant data(int type, int role = Qt::DisplayRole, szt num = 0) const override;
+    QVariant data(int type, int role = DataRole, szt num = 0) const override;
 
     //! Accesseur des drapeaux associés à column.
     Qt::ItemFlags flags(int type, szt num = 0) const override {
@@ -238,7 +242,7 @@ public:
     }
 
     //! Mutateur de la donnée associé à column.
-    bool setData(int type, const QVariant & value, int role = Qt::EditRole, szt num = 0) override;
+    bool setData(int type, const QVariant & value, int role = DataRole, szt num = 0) override;
 };
 
 /*! \ingroup groupeModel
@@ -246,24 +250,23 @@ public:
  */
 class BoolNode : public AbstractConditionNode {
 protected:
-    QString m_trueLabel;    //!< Label du booléen vraie.
-    QString m_falseLabel;   //!< Label du booléen faux.
+    bool m_false;           //!< Filtre contenant les faux.
     bool m_true;            //!< Filtre contenant les vraies.
-    bool m_false;            //!< Filtre contenant les faux.
+    QString m_falseLabel;   //!< Label du filtre faux.
+    QString m_trueLabel;    //!< Label du filtre faux.
 public:
     //! Constructeur.
-    BoolNode(szt pos, const QString & label,
-             const QString & trueLabel = QString(), const QString & falseLabel = QString(),
+    BoolNode(szt pos, const QString & falseLabel = QString(), const QString trueLabel = QString(),
              bool trueChecked = true, bool falseChecked = true)
-        : AbstractConditionNode(pos,label,BoolNodeType),
-          m_trueLabel(trueLabel), m_falseLabel(falseLabel),
-          m_true(trueChecked), m_false(falseChecked){}
+        : AbstractConditionNode(pos,BoolNodeType),
+          m_false(falseChecked), m_true(trueChecked),
+          m_falseLabel(falseLabel), m_trueLabel(trueLabel)  {}
 
     //! Destructeur.
     ~BoolNode() override = default;
 
     //! Accesseur de la donnée associé à column.
-    QVariant data(int type, int role = Qt::DisplayRole, szt num = 0) const override;
+    QVariant data(int type, int role = DataRole, szt num = 0) const override;
 
     //! Test si le noeud intervient dans la recherche.
     bool empty() const override
@@ -271,13 +274,13 @@ public:
 
     //! Accesseur des drapeaux associés à column.
     Qt::ItemFlags flags(int type, szt num = 0) const override {
-        if(type == TrueColumn || type == FalseColumn)
-            return AbstractConditionNode::flags(type,num) | Qt::ItemIsEnabled | Qt::ItemIsUserCheckable;
+        if(type == TrueType || type == FalseType)
+            return AbstractConditionNode::flags(type,num) | Qt::ItemIsEnabled;
         return AbstractConditionNode::flags(type,num);
     }
 
     //! Mutateur de la donnée associé à column.
-    bool setData(int type, const QVariant & value, int role = Qt::EditRole, szt num = 0) override;
+    bool setData(int type, const QVariant & value, int role = DataRole, szt num = 0) override;
 
     //! Teste si la ligne d'indice id vérifie la condition du noeud.
     bool testValue(const QVariant & value) const override
@@ -293,7 +296,7 @@ public:
     ChoiceNode() : AbstractFindNode(ChoiceNodeType) {}
 
     //! Accesseur de la donnée associé à column.
-    QVariant data(int type, int role = Qt::DisplayRole, szt num = 0) const override;
+    QVariant data(int type, int role = DataRole, szt num = 0) const override;
 
     //! Test si le noeud intervient dans la recherche.
     bool empty() const override
@@ -315,14 +318,14 @@ protected:
     QDate m_date;       //!< Date de filtrage.
 public:
     //! Constructeur.
-    DateNode(szt pos, const QString & label,const QDate & date = QDate(), szt comp = Egal)
-        : AbstractComparaisonNode(pos,label,comp,DateNodeType), m_date(date) {}
+    DateNode(szt pos,const QDate & date = QDate(), szt comp = Egal)
+        : AbstractComparaisonNode(pos,comp,DateNodeType), m_date(date) {}
 
     //! Destructeur.
     ~DateNode() override = default;
 
     //! Accesseur de la donnée associé à column.
-    QVariant data(int type, int role = Qt::DisplayRole, szt num = 0) const override;
+    QVariant data(int type, int role = DataRole, szt num = 0) const override;
 
     //! Test si le noeud intervient dans la recherche.
     bool empty() const override
@@ -336,7 +339,7 @@ public:
     }
 
     //! Mutateur de la donnée associé à column.
-    bool setData(int type, const QVariant & value, int role = Qt::EditRole, szt num = 0) override;
+    bool setData(int type, const QVariant & value, int role = DataRole, szt num = 0) override;
 
     //! Teste si la ligne d'indice id vérifie la condition du noeud.
     bool testValue(const QVariant & value) const override;
@@ -357,7 +360,7 @@ public:
     ~OperationNode() override = default;
 
     //! Accesseur de la donnée associé à column.
-    QVariant data(int type, int role = Qt::DisplayRole, szt num = 0) const override;
+    QVariant data(int type, int role = DataRole, szt num = 0) const override;
 
     //! Accesseur des drapeaux associés à column.
     Qt::ItemFlags flags(int type, szt num = 0) const override {
@@ -371,7 +374,7 @@ public:
         {return m_operation;}
 
     //! Mutateur de la donnée associé à column.
-    bool setData(int type, const QVariant & value, int role = Qt::EditRole, szt num = 0) override;
+    bool setData(int type, const QVariant & value, int role = DataRole, szt num = 0) override;
 };
 
 /*! \ingroup groupeModel
@@ -385,8 +388,8 @@ protected:
     bool m_regex;           //!< La recherche est une expression régulière.
 public:
     //! Constructeur.
-    TexteNode(szt pos, const QString & label,const QString & texte = QString(), bool c = false,bool regex = false)
-        : AbstractConditionNode(pos,label,TexteNodeType), m_texte(texte), m_case(c), m_regex(regex) {
+    TexteNode(szt pos,const QString & texte = QString(), bool c = false,bool regex = false)
+        : AbstractConditionNode(pos,TexteNodeType), m_texte(texte), m_case(c), m_regex(regex) {
         if(m_regex){
             m_regular.setPattern(m_texte);
             if(!m_case)
@@ -398,7 +401,7 @@ public:
     ~TexteNode() override = default;
 
     //! Accesseur de la donnée associé à column.
-    QVariant data(int type, int role = Qt::DisplayRole, szt num = 0) const override;
+    QVariant data(int type, int role = DataRole, szt num = 0) const override;
 
     //! Test si le noeud intervient dans la recherche.
     bool empty() const override
@@ -414,7 +417,7 @@ public:
     }
 
     //! Mutateur de la donnée associé à column.
-    bool setData(int type, const QVariant & value, int role = Qt::EditRole, szt num = 0) override;
+    bool setData(int type, const QVariant & value, int role = DataRole, szt num = 0) override;
 
     //! Teste si la ligne d'indice id vérifie la condition du noeud.
     bool testValue(const QVariant & value) const override;

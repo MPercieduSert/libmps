@@ -8,10 +8,11 @@ using namespace findNodeWidget;
 
 
 ///////////////////////////// FindDelegate ////////////////////////////
-NodeWidget * FindDelegate::createWidget(const NodeIndex &index) const {
+NodeWidget * FindDelegate::createWidget(const NodeIndex &index, QWidget *parent) const {
     if(index.isValid()) {
-        switch (index.data(modelMPS::NodeType,modelMPS::progRole).toInt()) {
+        switch (index.data(modelMPS::NodeType,modelMPS::DataRole).toInt()) {
         case BoolNodeType:
+            return new BoolNodeWidget(index,parent);
         case ChoiceNodeType:
         case DateNodeType:
         case OperationNodeType:
@@ -123,8 +124,8 @@ void FindWidget::setFindModel(FindModel * model) {
 }
 
 /////////////////////////////////////////////////// Noeud de Recherche /////////////////////////////////
-NegationNodeWidget::NegationNodeWidget(const NodeIndex & index, QWidget * parent)
-    : FindNodeWidget (index, parent) {
+NegationNodeWidget::NegationNodeWidget(const NodeIndex & index, QWidget * parent, int tp)
+    : FindNodeWidget (index,parent,tp) {
     m_nonCheckBox = new QCheckBox(tr("Négation"));
     m_nonCheckBox->setEnabled(index.flags(NegType).testFlag(Qt::ItemIsEnabled));
     connect(m_nonCheckBox,&QCheckBox::stateChanged,this,[this](){
@@ -134,8 +135,8 @@ NegationNodeWidget::NegationNodeWidget(const NodeIndex & index, QWidget * parent
     m_mainLayout->addWidget(m_nonCheckBox);
 }
 
-ConditionNodeWidget::ConditionNodeWidget(const NodeIndex & index, QWidget * parent)
-    : NegationNodeWidget (index,parent) {
+ConditionNodeWidget::ConditionNodeWidget(const NodeIndex & index, QWidget * parent, int tp)
+    : NegationNodeWidget (index,parent,tp) {
     m_colonneLabel = new QLabel(tr("Colonne :"));
     m_colonneCB = new QComboBox;
     m_colonneCB->setEditable(index.flags(ColonneType).testFlag(Qt::ItemIsEnabled));
@@ -151,8 +152,8 @@ ConditionNodeWidget::ConditionNodeWidget(const NodeIndex & index, QWidget * pare
     m_mainLayout->addLayout(m_colonneLayout);
 }
 
-ComparaisonNodeWidget::ComparaisonNodeWidget(const NodeIndex & index, QWidget * parent)
-    : ConditionNodeWidget (index,parent) {
+ComparaisonNodeWidget::ComparaisonNodeWidget(const NodeIndex & index, QWidget * parent, int tp)
+    : ConditionNodeWidget (index,parent,tp) {
     m_compLabel = new QLabel(tr("Comparaison :"));
     m_compCB = new QComboBox;
     m_compCB->setEditable(index.flags(ColonneType).testFlag(Qt::ItemIsEnabled));
@@ -165,4 +166,13 @@ ComparaisonNodeWidget::ComparaisonNodeWidget(const NodeIndex & index, QWidget * 
     m_compLayout->addWidget(m_compLabel);
     m_compLayout->addWidget(m_compCB);
     m_mainLayout->addLayout(m_compLayout);
+}
+
+BoolNodeWidget::BoolNodeWidget(const NodeIndex & index, QWidget * parent,int tp)
+    : ConditionNodeWidget (index,parent,tp) {
+    m_falseCheck = new QCheckBox(m_index.data(FalseType,LabelRole).toString());
+    m_trueCheck = new QCheckBox(m_index.data(TrueType,LabelRole).toString());
+    m_boolLayout = new QHBoxLayout;
+    m_boolLayout->addWidget(m_trueCheck);
+    m_boolLayout->addWidget(m_falseCheck);
 }

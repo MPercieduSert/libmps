@@ -56,14 +56,14 @@ template<class T> using VectorValColonne = BaseColonne<T, T, std::vector<T>>;
  */
 class AbstractBoolColonne : public AbstractColonnesModel::AbstractColonne {
 protected:
-    QString m_trueLabel;                //!< Label du booléen vraie.
     QString m_falseLabel;               //!< Label du booléen faux.
+    QString m_trueLabel;                //!< Label du booléen vraie.
 public:
     //! Constructeur.
     AbstractBoolColonne(const QString & name, Qt::ItemFlags flags, int type,
                 const QString & trueLabel = QString(), const QString & falseLabel = QString())
         : AbstractColonne(name,flags,type),
-          m_trueLabel(trueLabel), m_falseLabel(falseLabel) {}
+          m_falseLabel(falseLabel), m_trueLabel(trueLabel) {}
 
     //! Destructeur.
     ~AbstractBoolColonne() override;

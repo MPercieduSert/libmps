@@ -61,11 +61,11 @@ TreeNodeModel::Node FindModel::nodeConditionFactory(szt pos){
     switch (m_model->colonne(pos).type()) {
     case BoolNodeType:
         {const auto & boolColonne = static_cast<const AbstractBoolColonne &>(colonne);
-        return std::make_unique<BoolNode>(pos,colonne.header(),boolColonne.trueLabel(),boolColonne.falseLabel());}
+        return std::make_unique<BoolNode>(pos,boolColonne.falseLabel(),boolColonne.trueLabel());}
     case DateNodeType:
-        return std::make_unique<DateNode>(pos,colonne.header());
+        return std::make_unique<DateNode>(pos);
     case TexteNodeType:
-        return std::make_unique<TexteNode>(pos,colonne.header());
+        return std::make_unique<TexteNode>(pos);
     default:
         return std::make_unique<ChoiceNode>();
     }
@@ -85,7 +85,7 @@ void FindModel::removeNode(int row, const NodeIndex & parent){
 
 bool FindModel::setData(const NodeIndex &index, int type, const QVariant &value, int role, szt num) {
     if(index.isValid()) {
-        if(role == Qt::EditRole) {
+        if(role == DataRole) {
             if(type == OpColumn){
                 if(getData(index).type() == ChoiceNodeType
                         && value.toInt() >= 0 && value.toInt() < NbrOperation) {
@@ -100,10 +100,8 @@ bool FindModel::setData(const NodeIndex &index, int type, const QVariant &value,
                         && value.toInt() >= 0 && value.toInt() < m_model->columnCount()) {
                     if(getData(index).type() != m_model->colonne(value.toUInt()).type())
                         m_data.getValidData(index) = nodeConditionFactory(value.toUInt());
-                    else{
+                    else
                         static_cast<AbstractConditionNode &>(getData(index)).setPos(value.toUInt());
-                        static_cast<AbstractConditionNode &>(getData(index)).setLabel(m_model->colonne(value.toUInt()).header());
-                    }
                     emit dataChanged(index);
                     return true;
                 }
@@ -147,16 +145,12 @@ bool FindModel::testTree(szt id) const{
 
 ///////////////////////////// AbstractNegationNode//////////////////////
 QVariant AbstractNegationNode::data(int type, int role, szt /*num*/) const {
-    if(type == NegType) {
-        if(role == Qt::DisplayRole)
+    if(type == NegType && role == DataRole)
             return m_negation;
-        if(role == Qt::EditRole)
-            return m_negation;
-    }
     return QVariant();
 }
 bool AbstractNegationNode::setData(int type, const QVariant & value, int role, szt /*num*/) {
-    if(type == NegType && role == Qt::EditRole) {
+    if(type == NegType && role == DataRole) {
         m_negation = value.toBool();
         return true;
     }
@@ -164,10 +158,8 @@ bool AbstractNegationNode::setData(int type, const QVariant & value, int role, s
 }
 ///////////////////////////// AbstractComparaisonNode ///////////////////
 QVariant AbstractComparaisonNode::data(int type, int role, szt /*num*/) const{
-    if(type == ComparaisonColumn){
-        if(role == Qt::DisplayRole)
-            return Strings[m_comp];
-        if(role == Qt::EditRole)
+    if(type == ComparaisonType){
+        if(role == DataRole)
             return m_comp;
         if(role == Qt::UserRole)
             return ComparaisonSet;
@@ -175,7 +167,7 @@ QVariant AbstractComparaisonNode::data(int type, int role, szt /*num*/) const{
     return AbstractConditionNode::data(type,role);
 }
 bool AbstractComparaisonNode::setData(int type, const QVariant & value, int role, szt /*num*/) {
-    if(type == ComparaisonColumn && role == Qt::EditRole) {
+    if(type == ComparaisonType && role == DataRole) {
         m_comp = value.toUInt();
         return true;
     }
@@ -183,12 +175,12 @@ bool AbstractComparaisonNode::setData(int type, const QVariant & value, int role
 }
 ///////////////////////////// AbstractConditionNode /////////////////////
 QVariant AbstractConditionNode::data(int type, int role, szt /*num*/) const{
-    if(type == ColonneType && role == Qt::DisplayRole)
-            return m_pos;
+    if(type == ColonneType && role == DataRole)
+        return m_pos;
     return AbstractNegationNode::data(type,role);
 }
 bool AbstractConditionNode::setData(int type, const QVariant & value, int role, szt /*num*/) {
-    if(type == ColonneType && role == Qt::EditRole) {
+    if(type == ColonneType && role == DataRole) {
         m_pos = value.toUInt();
         return true;
     }
@@ -198,49 +190,45 @@ bool AbstractConditionNode::test(szt id, AbstractColonnesModel * model) const
     {return testValue(model->colonne(m_pos).dataTest(id));}
 ////////////////////////////// BoolNode /////////////////////////////
 QVariant BoolNode::data(int type, int role, szt /*num*/) const {
-    if(type == TrueColumn){
-        if(role == Qt::CheckStateRole)
-            return m_true ? Qt::Checked : Qt::Unchecked;
-        if(role == Qt::DisplayRole)
+    if(type == TrueType) {
+        if(role == DataRole)
+            return m_true;
+        if(role == LabelRole)
             return m_trueLabel;
     }
-    else if(type == FalseColumn){
-        if(role == Qt::CheckStateRole)
-            return m_false ? Qt::Checked : Qt::Unchecked;
-        if(role == Qt::DisplayRole)
+    if(type == FalseType) {
+        if(role == DataRole)
+            return m_false;
+        if(role == LabelRole)
             return m_falseLabel;
     }
     return AbstractConditionNode::data(type,role);
 }
 bool BoolNode::setData(int type, const QVariant & value, int role, szt /*num*/) {
-    if(type == TrueColumn){
-        if(role == Qt::CheckStateRole)
+    if(type == TrueType && role == DataRole)
             return m_true = value.toBool();
-    }
-    else if(type == FalseColumn){
-        if(role == Qt::CheckStateRole)
+    if(type == FalseType && role == DataRole)
             return m_false = value.toBool();
-    }
     return AbstractConditionNode::setData(type,value,role);
 }
 ///////////////////////////// ChoiceNode //////////////////////////////
 QVariant ChoiceNode::data(int type, int role, szt /*num*/) const {
     if(type == OpColumn || type == ColonneType) {
-        if(role == Qt::DisplayRole)
+        if(role == DataRole)
             return QString("?");
-        if(role == Qt::EditRole)
+        if(role == DataRole)
             return -1;
     }
     return QVariant();
 }
 ///////////////////////////// DateNode ///////////////////////////
 QVariant DateNode::data(int type, int role, szt /*num*/) const {
-    if(type == DateColumn && (role == Qt::DisplayRole || role == Qt::EditRole))
+    if(type == DateColumn && role == DataRole )
         return m_date;
     return AbstractComparaisonNode::data(type,role);
 }
 bool DateNode::setData(int type, const QVariant & value, int role, szt /*num*/) {
-    if(type == DateColumn && role == Qt::EditRole) {
+    if(type == DateColumn && role == DataRole) {
         m_date = value.toDate();
         return true;
     }
@@ -266,16 +254,12 @@ bool DateNode::testValue(const QVariant & value) const {
 }
 ///////////////////////////// OperationNode ///////////////////////////
 QVariant OperationNode::data(int type, int role, szt /*num*/) const {
-    if(type == OpColumn) {
-        if(role == Qt::DisplayRole)
-                return  Strings[m_operation];
-        if(role == Qt::EditRole)
+    if(type == OpColumn && role == DataRole)
             return m_operation;
-    }
     return AbstractNegationNode::data(type,role);
 }
 bool OperationNode::setData(int type, const QVariant & value, int role, szt /*num*/) {
-    if(type == OpColumn && role == Qt::EditRole) {
+    if(type == OpColumn && role == DataRole) {
         m_operation = value.toUInt();
         return true;
     }
@@ -285,20 +269,16 @@ bool OperationNode::setData(int type, const QVariant & value, int role, szt /*nu
 QVariant TexteNode::data(int type, int role, szt /*num*/) const {
     switch (type) {
     case TexteColumn:
-        if(role == Qt::DisplayRole || role == Qt::EditRole)
+        if(role == DataRole)
                 return m_texte;
         break;
     case CaseColumn:
-        if(role == Qt::CheckStateRole)
-            return m_case ? Qt::Checked : Qt::Unchecked;
-        if(role == Qt::DisplayRole)
-            return "Sensible à la case";
+        if(role == DataRole)
+            return m_case;
         break;
     case RegexColumn:
-        if(role == Qt::CheckStateRole)
-            return m_regex ? Qt::Checked : Qt::Unchecked;
-        if(role == Qt::DisplayRole)
-            return "Expression Régulière";
+        if(role == DataRole)
+            return m_regex ;
         break;
     }
     return AbstractConditionNode::data(type,role);
@@ -306,19 +286,19 @@ QVariant TexteNode::data(int type, int role, szt /*num*/) const {
 bool TexteNode::setData(int type, const QVariant & value, int role, szt /*num*/) {
     switch (type) {
     case TexteColumn:
-        if(role == Qt::EditRole) {
+        if(role == DataRole) {
                 m_texte = value.toString();
                 if(m_regex)
                     m_regular.setPattern(m_texte);
         }
         break;
     case CaseColumn:
-        if(role == Qt::CheckStateRole)
+        if(role == DataRole)
             m_regular.setPatternOptions((m_case = value.toBool())? QRegularExpression::NoPatternOption
                                                                  : QRegularExpression::CaseInsensitiveOption);
         break;
     case RegexColumn:
-        if(role == Qt::CheckStateRole
+        if(role == DataRole
                 && (m_regex = value.toBool()))
             m_regular.setPattern(m_texte);
 
