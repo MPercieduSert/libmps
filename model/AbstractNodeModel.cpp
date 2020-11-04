@@ -11,12 +11,12 @@ NodeIndex AbstractNodeModel::createIndex(int row, void * ptr) const {
 }
 
 //////////////////////////////////// NodeIndex ////////////////////////////////
-QVariant NodeIndex::data(int type, int role, szt num) const
-    {return isValid() ? m_model->data(*this, type, role, num)
+QVariant NodeIndex::data(int cible, int role, szt num) const
+    {return isValid() ? m_model->data(*this, cible, role, num)
                       : QVariant();}
 
-Qt::ItemFlags NodeIndex::flags(int type, szt num) const
-    {return isValid() ? m_model->flags(*this, type, num)
+Qt::ItemFlags NodeIndex::flags(int cible, szt num) const
+    {return isValid() ? m_model->flags(*this, cible, num)
                       : Qt::NoItemFlags;}
 
 NodeIndex NodeIndex::parent() const
@@ -29,21 +29,21 @@ TreeNodeModel::AbstractNode::~AbstractNode() = default;
 
 TreeNodeModel::TreeNodeModel(bool racine, QObject *parent) : AbstractNodeModel (parent), m_data(this,racine){}
 
-QVariant TreeNodeModel::data(const NodeIndex &index, int type, int role, szt num) const {
+QVariant TreeNodeModel::data(const NodeIndex &index, int cible, int role, szt num) const {
     if(checkIndex(index))
-        return m_data.getValidData(index)->data(type,role,num);
+        return m_data.getValidData(index)->data(cible,role,num);
     return QVariant();
 }
 
-szt TreeNodeModel::dataCount(const NodeIndex & index, int type) const {
+szt TreeNodeModel::dataCount(const NodeIndex & index, int cible) const {
     if(checkIndex(index))
-        return m_data.getValidData(index)->dataCount(type);
+        return m_data.getValidData(index)->dataCount(cible);
     return NoData;
 }
 
-Qt::ItemFlags TreeNodeModel::flags(const NodeIndex & index, int type, szt num) const {
+Qt::ItemFlags TreeNodeModel::flags(const NodeIndex & index, int cible, szt num) const {
     if(checkIndex(index))
-        return m_data.getValidData(index)->flags(type, num);
+        return m_data.getValidData(index)->flags(cible, num);
     return Qt::NoItemFlags;
 }
 
@@ -70,9 +70,9 @@ bool TreeNodeModel::removeRows(int row, int count, const NodeIndex &parent) {
     return true;
 }
 
-bool TreeNodeModel::setData(const NodeIndex &index, int type, const QVariant &value, int role, szt num) {
-    if(checkIndex(index) && m_data.getValidData(index)->setData(type,value,role,num)) {
-        dataChanged(index,type,num);
+bool TreeNodeModel::setData(const NodeIndex &index, int cible, const QVariant &value, int role, szt num) {
+    if(checkIndex(index) && m_data.getValidData(index)->setData(cible,value,role,num)) {
+        dataChanged(index,cible,num);
         return true;
     }
     return false;

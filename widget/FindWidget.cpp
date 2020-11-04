@@ -10,14 +10,16 @@ using namespace findNodeWidget;
 ///////////////////////////// FindDelegate ////////////////////////////
 NodeWidget * FindDelegate::createWidget(const NodeIndex &index, QWidget *parent) const {
     if(index.isValid()) {
-        switch (index.data(modelMPS::NodeType,modelMPS::DataRole).toInt()) {
+        switch (index.data(modelMPS::NodeTypeCible,modelMPS::DataRole).toInt()) {
         case BoolNodeType:
             return new BoolNodeWidget(index,parent);
         case ChoiceNodeType:
+            //return new
         case DateNodeType:
+            return new DateNodeWidget(index,parent);
         case OperationNodeType:
         case TexteNodeType:
-            break;
+            return new TexteNodeWidget(index,parent);
         }
 
     }
@@ -127,9 +129,9 @@ void FindWidget::setFindModel(FindModel * model) {
 NegationNodeWidget::NegationNodeWidget(const NodeIndex & index, QWidget * parent, int tp)
     : FindNodeWidget (index,parent,tp) {
     m_nonCheckBox = new QCheckBox(tr("Négation"));
-    m_nonCheckBox->setEnabled(index.flags(NegType).testFlag(Qt::ItemIsEnabled));
+    m_nonCheckBox->setEnabled(index.flags(NegCible).testFlag(Qt::ItemIsEnabled));
     connect(m_nonCheckBox,&QCheckBox::stateChanged,this,[this](){
-       m_index.model()->setData(m_index,NegType,m_nonCheckBox->isChecked());
+       m_index.model()->setData(m_index,NegCible,m_nonCheckBox->isChecked());
     });
     m_mainLayout = new QHBoxLayout(this);
     m_mainLayout->addWidget(m_nonCheckBox);
@@ -139,13 +141,13 @@ ConditionNodeWidget::ConditionNodeWidget(const NodeIndex & index, QWidget * pare
     : NegationNodeWidget (index,parent,tp) {
     m_colonneLabel = new QLabel(tr("Colonne :"));
     m_colonneCB = new QComboBox;
-    m_colonneCB->setEditable(index.flags(ColonneType).testFlag(Qt::ItemIsEnabled));
+    m_colonneCB->setEditable(index.flags(ColonneCible).testFlag(Qt::ItemIsEnabled));
     m_colonneCB->setInsertPolicy(QComboBox::NoInsert);
     auto vec = static_cast<const modelMPS::FindModel *>(index.model())->nomColonnes();
     for (szt i = 0; i != vec.size(); ++i)
         m_colonneCB->addItem(vec[i],i);
     connect(m_colonneCB,qOverload<int>(&QComboBox::currentIndexChanged),this,[this]()
-    {m_index.model()->setData(m_index,ColonneType,m_colonneCB->currentData());});
+    {m_index.model()->setData(m_index,ColonneCible,m_colonneCB->currentData());});
     m_colonneLayout = new QVBoxLayout;
     m_colonneLayout->addWidget(m_colonneLabel);
     m_colonneLayout->addWidget(m_colonneCB);
@@ -156,12 +158,12 @@ ComparaisonNodeWidget::ComparaisonNodeWidget(const NodeIndex & index, QWidget * 
     : ConditionNodeWidget (index,parent,tp) {
     m_compLabel = new QLabel(tr("Comparaison :"));
     m_compCB = new QComboBox;
-    m_compCB->setEditable(index.flags(ColonneType).testFlag(Qt::ItemIsEnabled));
+    m_compCB->setEditable(index.flags(ColonneCible).testFlag(Qt::ItemIsEnabled));
     m_compCB->setInsertPolicy(QComboBox::NoInsert);
     for (szt i = 0; i != NbrComparaison; ++i)
         m_compCB->addItem(AbstractComparaisonNode::Strings[i],i);
     connect(m_compCB,qOverload<int>(&QComboBox::currentIndexChanged),this,[this]()
-    {m_index.model()->setData(m_index,ColonneType,m_compCB->currentData());});
+        {m_index.model()->setData(m_index,ColonneCible,m_compCB->currentData());});
     m_compLayout = new QVBoxLayout;
     m_compLayout->addWidget(m_compLabel);
     m_compLayout->addWidget(m_compCB);
@@ -170,9 +172,52 @@ ComparaisonNodeWidget::ComparaisonNodeWidget(const NodeIndex & index, QWidget * 
 
 BoolNodeWidget::BoolNodeWidget(const NodeIndex & index, QWidget * parent,int tp)
     : ConditionNodeWidget (index,parent,tp) {
-    m_falseCheck = new QCheckBox(m_index.data(FalseType,LabelRole).toString());
-    m_trueCheck = new QCheckBox(m_index.data(TrueType,LabelRole).toString());
+    m_falseCheck = new QCheckBox(m_index.data(FalseCible,LabelRole).toString());
+    connect(m_falseCheck,&QCheckBox::stateChanged,this,[this]()
+        {m_index.model()->setData(m_index,FalseCible,m_falseCheck->isChecked());});
+    m_trueCheck = new QCheckBox(m_index.data(TrueCible,LabelRole).toString());
+    connect(m_trueCheck,&QCheckBox::stateChanged,this,[this]()
+        {m_index.model()->setData(m_index,TrueCible,m_trueCheck->isChecked());});
     m_boolLayout = new QHBoxLayout;
     m_boolLayout->addWidget(m_trueCheck);
     m_boolLayout->addWidget(m_falseCheck);
+    m_mainLayout->addLayout(m_boolLayout);
+}
+
+DateNodeWidget::DateNodeWidget(const NodeIndex & index, QWidget * parent,int tp)
+    : ComparaisonNodeWidget (index,parent,tp) {
+    m_dateLabel = new QLabel(tr("Date :"));
+    m_dateEdit = new QDateEdit;
+    connect(m_dateEdit,&QDateEdit::dateChanged,this,[this]()
+        {m_index.model()->setData(m_index,DateCible,m_dateEdit->date());});
+    m_dateLayout = new QVBoxLayout;
+    m_dateLayout->addWidget(m_dateLabel);
+    m_dateLayout->addWidget(m_dateEdit);
+    m_mainLayout->addLayout(m_dateLayout);
+}
+
+TexteNodeWidget::TexteNodeWidget(const NodeIndex & index, QWidget * parent,int tp)
+    : ConditionNodeWidget (index,parent,tp) {
+    m_texteLabel = new QLabel(tr("Chercher :"));
+    m_lineEdit = new QLineEdit;
+    connect(m_lineEdit,&QLineEdit::textChanged,this,[this]()
+        {m_index.model()->setData(m_index,TexteCible,m_lineEdit->text());});
+    m_caseCheck = new QCheckBox(tr("Sensible à la case"));
+    connect(m_caseCheck,&QCheckBox::stateChanged,this,[this]()
+        {m_index.model()->setData(m_index,TrueCible,m_caseCheck->isChecked());});
+    m_regexCheck = new QCheckBox(tr("Expression régulière"));
+    connect(m_regexCheck,&QCheckBox::stateChanged,this,[this]()
+        {m_index.model()->setData(m_index,TrueCible,m_regexCheck->isChecked());});
+    m_texteLayout = new QHBoxLayout;
+    m_texteLayout->addWidget(m_texteLabel);
+    m_texteLayout->addWidget(m_lineEdit);
+    m_texteLayout->addWidget(m_caseCheck);
+    m_texteLayout->addWidget(m_regexCheck);
+    m_mainLayout->addLayout(m_texteLayout);
+}
+
+void TexteNodeWidget::updateData(){
+    m_texteLabel->setText(m_index.data(TexteCible).toString());
+    m_caseCheck->setChecked(m_index.data(CaseCible).toBool());
+    m_regexCheck->setChecked(m_index.data(RegexCible).toBool());
 }

@@ -83,10 +83,10 @@ void FindModel::removeNode(int row, const NodeIndex & parent){
     }
 }
 
-bool FindModel::setData(const NodeIndex &index, int type, const QVariant &value, int role, szt num) {
+bool FindModel::setData(const NodeIndex &index, int cible, const QVariant &value, int role, szt num) {
     if(index.isValid()) {
         if(role == DataRole) {
-            if(type == OpColumn){
+            if(cible == OpColumn){
                 if(getData(index).type() == ChoiceNodeType
                         && value.toInt() >= 0 && value.toInt() < NbrOperation) {
                     m_data.getValidData(index) = std::make_unique<OperationNode>(value.toUInt());
@@ -95,7 +95,7 @@ bool FindModel::setData(const NodeIndex &index, int type, const QVariant &value,
                     return true;
                 }
             }
-            else if (type == ColonneType) {
+            else if (cible == ColonneCible) {
                 if(getData(index).type() != OperationNodeType
                         && value.toInt() >= 0 && value.toInt() < m_model->columnCount()) {
                     if(getData(index).type() != m_model->colonne(value.toUInt()).type())
@@ -108,7 +108,7 @@ bool FindModel::setData(const NodeIndex &index, int type, const QVariant &value,
 
             }
         }
-        return TreeNodeModel::setData(index,type,value,role,num);
+        return TreeNodeModel::setData(index,cible,value,role,num);
     }
     return false;
 }
@@ -144,76 +144,76 @@ bool FindModel::testTree(szt id) const{
 }
 
 ///////////////////////////// AbstractNegationNode//////////////////////
-QVariant AbstractNegationNode::data(int type, int role, szt /*num*/) const {
-    if(type == NegType && role == DataRole)
+QVariant AbstractNegationNode::data(int cible, int role, szt /*num*/) const {
+    if(cible == NegCible && role == DataRole)
             return m_negation;
     return QVariant();
 }
-bool AbstractNegationNode::setData(int type, const QVariant & value, int role, szt /*num*/) {
-    if(type == NegType && role == DataRole) {
+bool AbstractNegationNode::setData(int cible, const QVariant & value, int role, szt /*num*/) {
+    if(cible == NegCible && role == DataRole) {
         m_negation = value.toBool();
         return true;
     }
     return false;
 }
 ///////////////////////////// AbstractComparaisonNode ///////////////////
-QVariant AbstractComparaisonNode::data(int type, int role, szt /*num*/) const{
-    if(type == ComparaisonType){
+QVariant AbstractComparaisonNode::data(int cible, int role, szt /*num*/) const{
+    if(cible == ComparaisonCible){
         if(role == DataRole)
             return m_comp;
         if(role == Qt::UserRole)
             return ComparaisonSet;
     }
-    return AbstractConditionNode::data(type,role);
+    return AbstractConditionNode::data(cible,role);
 }
-bool AbstractComparaisonNode::setData(int type, const QVariant & value, int role, szt /*num*/) {
-    if(type == ComparaisonType && role == DataRole) {
+bool AbstractComparaisonNode::setData(int cible, const QVariant & value, int role, szt /*num*/) {
+    if(cible == ComparaisonCible && role == DataRole) {
         m_comp = value.toUInt();
         return true;
     }
-    return AbstractConditionNode::setData(type,value,role);
+    return AbstractConditionNode::setData(cible,value,role);
 }
 ///////////////////////////// AbstractConditionNode /////////////////////
-QVariant AbstractConditionNode::data(int type, int role, szt /*num*/) const{
-    if(type == ColonneType && role == DataRole)
+QVariant AbstractConditionNode::data(int cible, int role, szt /*num*/) const{
+    if(cible == ColonneCible && role == DataRole)
         return m_pos;
-    return AbstractNegationNode::data(type,role);
+    return AbstractNegationNode::data(cible,role);
 }
-bool AbstractConditionNode::setData(int type, const QVariant & value, int role, szt /*num*/) {
-    if(type == ColonneType && role == DataRole) {
+bool AbstractConditionNode::setData(int cible, const QVariant & value, int role, szt /*num*/) {
+    if(cible == ColonneCible && role == DataRole) {
         m_pos = value.toUInt();
         return true;
     }
-    return AbstractNegationNode::setData(type,value,role);
+    return AbstractNegationNode::setData(cible,value,role);
 }
 bool AbstractConditionNode::test(szt id, AbstractColonnesModel * model) const
     {return testValue(model->colonne(m_pos).dataTest(id));}
 ////////////////////////////// BoolNode /////////////////////////////
-QVariant BoolNode::data(int type, int role, szt /*num*/) const {
-    if(type == TrueType) {
+QVariant BoolNode::data(int cible, int role, szt /*num*/) const {
+    if(cible == TrueCible) {
         if(role == DataRole)
             return m_true;
         if(role == LabelRole)
             return m_trueLabel;
     }
-    if(type == FalseType) {
+    if(cible == FalseCible) {
         if(role == DataRole)
             return m_false;
         if(role == LabelRole)
             return m_falseLabel;
     }
-    return AbstractConditionNode::data(type,role);
+    return AbstractConditionNode::data(cible,role);
 }
-bool BoolNode::setData(int type, const QVariant & value, int role, szt /*num*/) {
-    if(type == TrueType && role == DataRole)
+bool BoolNode::setData(int cible, const QVariant & value, int role, szt /*num*/) {
+    if(cible == TrueCible && role == DataRole)
             return m_true = value.toBool();
-    if(type == FalseType && role == DataRole)
+    if(cible == FalseCible && role == DataRole)
             return m_false = value.toBool();
-    return AbstractConditionNode::setData(type,value,role);
+    return AbstractConditionNode::setData(cible,value,role);
 }
 ///////////////////////////// ChoiceNode //////////////////////////////
-QVariant ChoiceNode::data(int type, int role, szt /*num*/) const {
-    if(type == OpColumn || type == ColonneType) {
+QVariant ChoiceNode::data(int cible, int role, szt /*num*/) const {
+    if(cible == OpColumn || cible == ColonneCible) {
         if(role == DataRole)
             return QString("?");
         if(role == DataRole)
@@ -222,17 +222,17 @@ QVariant ChoiceNode::data(int type, int role, szt /*num*/) const {
     return QVariant();
 }
 ///////////////////////////// DateNode ///////////////////////////
-QVariant DateNode::data(int type, int role, szt /*num*/) const {
-    if(type == DateColumn && role == DataRole )
+QVariant DateNode::data(int cible, int role, szt /*num*/) const {
+    if(cible == DateCible && role == DataRole )
         return m_date;
-    return AbstractComparaisonNode::data(type,role);
+    return AbstractComparaisonNode::data(cible,role);
 }
-bool DateNode::setData(int type, const QVariant & value, int role, szt /*num*/) {
-    if(type == DateColumn && role == DataRole) {
+bool DateNode::setData(int cible, const QVariant & value, int role, szt /*num*/) {
+    if(cible == DateCible && role == DataRole) {
         m_date = value.toDate();
         return true;
     }
-    return AbstractComparaisonNode::setData(type,value,role);
+    return AbstractComparaisonNode::setData(cible,value,role);
 }
 bool DateNode::testValue(const QVariant & value) const {
     switch (m_comp) {
@@ -253,58 +253,58 @@ bool DateNode::testValue(const QVariant & value) const {
     }
 }
 ///////////////////////////// OperationNode ///////////////////////////
-QVariant OperationNode::data(int type, int role, szt /*num*/) const {
-    if(type == OpColumn && role == DataRole)
+QVariant OperationNode::data(int cible, int role, szt /*num*/) const {
+    if(cible == OpColumn && role == DataRole)
             return m_operation;
-    return AbstractNegationNode::data(type,role);
+    return AbstractNegationNode::data(cible,role);
 }
-bool OperationNode::setData(int type, const QVariant & value, int role, szt /*num*/) {
-    if(type == OpColumn && role == DataRole) {
+bool OperationNode::setData(int cible, const QVariant & value, int role, szt /*num*/) {
+    if(cible == OpColumn && role == DataRole) {
         m_operation = value.toUInt();
         return true;
     }
-    return AbstractNegationNode::setData(type,value,role);
+    return AbstractNegationNode::setData(cible,value,role);
 }
 ///////////////////////////// TexteNode ///////////////////////////
-QVariant TexteNode::data(int type, int role, szt /*num*/) const {
-    switch (type) {
-    case TexteColumn:
+QVariant TexteNode::data(int cible, int role, szt /*num*/) const {
+    switch (cible) {
+    case TexteCible:
         if(role == DataRole)
                 return m_texte;
         break;
-    case CaseColumn:
+    case CaseCible:
         if(role == DataRole)
             return m_case;
         break;
-    case RegexColumn:
+    case RegexCible:
         if(role == DataRole)
-            return m_regex ;
+            return m_regex;
         break;
     }
-    return AbstractConditionNode::data(type,role);
+    return AbstractConditionNode::data(cible,role);
 }
-bool TexteNode::setData(int type, const QVariant & value, int role, szt /*num*/) {
-    switch (type) {
-    case TexteColumn:
+bool TexteNode::setData(int cible, const QVariant & value, int role, szt /*num*/) {
+    switch (cible) {
+    case TexteCible:
         if(role == DataRole) {
                 m_texte = value.toString();
                 if(m_regex)
                     m_regular.setPattern(m_texte);
         }
         break;
-    case CaseColumn:
+    case CaseCible:
         if(role == DataRole)
             m_regular.setPatternOptions((m_case = value.toBool())? QRegularExpression::NoPatternOption
                                                                  : QRegularExpression::CaseInsensitiveOption);
         break;
-    case RegexColumn:
+    case RegexCible:
         if(role == DataRole
                 && (m_regex = value.toBool()))
             m_regular.setPattern(m_texte);
 
         break;
     }
-    return AbstractConditionNode::setData(type,value,role);
+    return AbstractConditionNode::setData(cible,value,role);
 }
 bool TexteNode::testValue(const QVariant & value) const {
     if(m_regex)

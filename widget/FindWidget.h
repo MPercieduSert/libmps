@@ -4,10 +4,12 @@
 #ifndef FINDWIDGET_H
 #define FINDWIDGET_H
 
+#include <QDateEdit>
 #include <QComboBox>
 #include <QCheckBox>
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QLineEdit>
 #include <QPushButton>
 #include <QVBoxLayout>
 #include "AbstractColonnesModel.h"
@@ -99,7 +101,7 @@ public:
 
     //! Met à jour les données du widget à partir des données du model.
     void updateData() override
-        {m_nonCheckBox->setChecked(m_index.data(NegType,DataRole).toBool());}
+        {m_nonCheckBox->setChecked(m_index.data(NegCible,DataRole).toBool());}
 };
 
 /*! \ingroup groupeModel
@@ -117,7 +119,7 @@ public:
 
     //! Met à jour les données du widget à partir des données du model.
     void updateData() override
-        {m_colonneCB->setCurrentIndex(m_colonneCB->findData(m_index.data(ColonneType,Qt::DisplayRole)));}
+        {m_colonneCB->setCurrentIndex(m_colonneCB->findData(m_index.data(ColonneCible,DataRole)));}
 };
 
 /*! \ingroup groupeModel
@@ -135,7 +137,7 @@ public:
 
     //! Met à jour les données du widget à partir des données du model.
     void updateData() override
-        {m_compCB->setCurrentIndex(m_compCB->findData(m_index.data(ComparaisonType,Qt::DisplayRole)));}
+        {m_compCB->setCurrentIndex(m_compCB->findData(m_index.data(ComparaisonCible,DataRole)));}
 };
 
 /*! \ingroup groupeModel
@@ -153,9 +155,46 @@ public:
 
     //! Met à jour les données du widget à partir des données du model.
     void updateData() override {
-        m_falseCheck->setChecked(m_index.data(FalseType).toBool());
-        m_trueCheck->setChecked(m_index.data(TrueType).toBool());
+        m_falseCheck->setChecked(m_index.data(FalseCible).toBool());
+        m_trueCheck->setChecked(m_index.data(TrueCible).toBool());
     }
+};
+
+/*! \ingroup groupeModel
+ * \brief Classe des widget de noeuds filtrage sur des dates.
+ */
+class DateNodeWidget : public ComparaisonNodeWidget {
+    Q_OBJECT
+protected:
+    QLabel * m_dateLabel;       //!< Label de date.
+    QDateEdit * m_dateEdit;     //!< Choix de la date.
+    QVBoxLayout * m_dateLayout; //!< Calque du choix de la date.
+public:
+    //! Constructeur.
+    DateNodeWidget(const NodeIndex & index, QWidget * parent, int tp = modelMPS::findNodeModel::DateNodeType);
+
+    //! Met à jour les données du widget à partir des données du model.
+    void updateData() override
+        {m_dateEdit->setDate(m_index.data(DateCible).toDate());}
+};
+
+/*! \ingroup groupeModel
+ * \brief Classe des widget de noeuds filtrage sur des textes.
+ */
+class TexteNodeWidget : public ConditionNodeWidget {
+    Q_OBJECT
+protected:
+    QLabel * m_texteLabel;          //!< Label.
+    QLineEdit * m_lineEdit;         //!< Texte chercher.
+    QCheckBox * m_caseCheck;        //!< CheckBox de la case.
+    QCheckBox * m_regexCheck;       //!< CheckBox de l'expression régulière.
+    QHBoxLayout * m_texteLayout;    //!< Calque du texte chercher.
+public:
+    //! Constructeur.
+    TexteNodeWidget(const NodeIndex & index, QWidget * parent, int tp = modelMPS::findNodeModel::TexteNodeType);
+
+    //! Met à jour les données du widget à partir des données du model.
+    void updateData() override;
 };
 }
 }
