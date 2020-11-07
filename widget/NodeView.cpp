@@ -9,7 +9,7 @@ AbstractNodeDelegate::AbstractNodeDelegate(QObject * parent)
     : QObject(parent) {}
 
 ////////////////////////////////////// ArcWidget //////////////////////////////////////////
-NodeView::ArcWidget::ArcWidget(NodeWidget *node, NodeView *view, QWidget * parent)
+ArcWidget::ArcWidget(NodeWidget *node, NodeView *view, QWidget * parent)
     : QWidget (parent), m_view(view) {
     m_expandButton = new QPushButton;
     m_expandLayout = new QVBoxLayout;
@@ -22,7 +22,7 @@ NodeView::ArcWidget::ArcWidget(NodeWidget *node, NodeView *view, QWidget * paren
     m_mainLayout->addLayout(m_secondLayout);
 }
 
-void NodeView::ArcWidget::setExpandEtat(bool bb) {
+void ArcWidget::setExpandEtat(bool bb) {
     m_expandEtat = bb;
     if(bb) {
         m_expandButton->setText("-");
@@ -32,7 +32,7 @@ void NodeView::ArcWidget::setExpandEtat(bool bb) {
     }
 }
 
-void NodeView::ArcWidget::setNodeWidget(NodeWidget * widget) {
+void ArcWidget::setNodeWidget(NodeWidget * widget) {
     if(m_nodeWidget) {
         m_secondLayout->removeWidget(m_nodeWidget);
         m_view->m_arcMap.erase(m_nodeWidget->index());
@@ -45,8 +45,11 @@ void NodeView::ArcWidget::setNodeWidget(NodeWidget * widget) {
 
 /////////////////////////////////////// NodeView //////////////////////////////////////////
 NodeView::NodeView(QWidget * parent)
-    : QScrollArea (parent) {
-    setWidget(new ArcWidget(m_delegate->createWidget(m_model->index(0)),this));
+    : QScrollArea (parent) {}
+
+void NodeView::deleteRoot(){
+    m_arcMap.clear();
+    delete takeWidget();
 }
 
 void NodeView::setDelegate(AbstractNodeDelegate * delegate) {
@@ -54,21 +57,33 @@ void NodeView::setDelegate(AbstractNodeDelegate * delegate) {
         delete m_delegate;
     m_delegate = delegate;
     m_delegate->setParent(this);
+    if(m_delegate && m_model)
+        resetRoot();
 }
 
-void NodeView::setModel(AbstractNodeModel *model) {
-    if(m_model->parent() == this)
+void NodeView::setModel(AbstractNodeModel * model) {
+    if(m_model && static_cast<QObject*>(m_model->parent()) == static_cast<QObject*>(this))
         delete m_model;
     m_model = model;
     if(!m_model->parent())
         m_model->setParent(this);
     connect(m_model,qOverload<const NodeIndex &>(&AbstractNodeModel::dataChanged),this,&NodeView::updateData);
+    connect(m_model,&AbstractNodeModel::modelAboutToBeReset,this,&NodeView::deleteRoot);
+    connect(m_model,&AbstractNodeModel::modelReset,this,&NodeView::resetRoot);
+    if(m_delegate && m_model)
+        resetRoot();
+}
+
+void NodeView::resetRoot(){
+    if(widget())
+        deleteRoot();
+    setWidget(new ArcWidget(m_delegate->createWidget(m_model->index(0)),this));
 }
 
 void NodeView::updateData(const NodeIndex & index) {
     auto iter = m_arcMap.find(index);
     if(iter != m_arcMap.end()){
-        if(index.data(NodeType) == iter->second->nodeWidget()->type())
+        if(index.data(NodeTypeCible) == iter->second->nodeWidget()->type())
             iter->second->nodeWidget()->updateData();
         else
             iter->second->setNodeWidget(index);
@@ -77,5 +92,5 @@ void NodeView::updateData(const NodeIndex & index) {
 
 ////////////////////////////////////////// NodeWidget /////////////////////////////////////
 NodeWidget::NodeWidget(const NodeIndex & index, QWidget * parent, int tp)
-    : QWidget (parent), m_type(tp), m_index(index)
-    {}
+    : QFrame (parent), m_type(tp), m_index(index)
+    {setFrameShape(Box);}

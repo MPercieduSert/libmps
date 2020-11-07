@@ -7,7 +7,7 @@
 #include <memory>
 #include <QAbstractItemModel>
 #include <QBrush>
-#include "FindModel.h"
+#include "AbstractModel.h"
 #include "Bdd.h"
 #include "ConteneurPtr.h"
 #include "Entity.h"
@@ -23,24 +23,42 @@
 namespace modelMPS {
 using namespace typeMPS;
 
+//! Type des colonnes du modèle.
+enum colonneType {NoType = -1,
+                  BoolColonneType,
+                  ConstanteColonneType,
+                  DateColonneType,
+                  DateTimeColonneType,
+                  DoubleColonneType,
+                  IntColonneType,
+                  TexteColonneType,
+                  UIntColonneType};
+
+/*! \ingroup groupeModel
+ * \brief Classe mère d'un modèle d'arbre de recherche.
+ */
+class AbstractFindModel {
+public:
+    //! Destructeur.
+    virtual ~AbstractFindModel() = default;
+
+    //! Teste si l'arbre est réduit à sa racine.
+    virtual bool rootLeaf() const = 0;
+
+    //! Teste si la ligne d'indice id vérifie la condition de la racine.
+    virtual bool testRoot(szt id) const = 0;
+
+    //! Teste si la ligne d'indice id vérifie l'arbre des conditions.
+    virtual bool testTree(szt id) const = 0;
+};
+
+
 /*! \ingroup groupeModel
  * \brief Classe mère des models de colonnes homogènes.
  */
 class AbstractColonnesModel : public AbstractModel {
     Q_OBJECT
 public:
-    //! Type des colonnes du modèle.
-    enum colonneType {NoType = -1,
-                      BoolColonne = findNodeModel::BoolNodeType,
-                      ConstanteColonne = findNodeModel::ConstanteNodeType,
-                      DateColonne = findNodeModel::DateNodeType,
-                      DateTimeColonne = findNodeModel::DateTimeNodeType,
-                      DoubleColonne = findNodeModel::DoubleNodeType,
-                      IntColonne = findNodeModel::IntNodeType,
-                      TexteColonne = findNodeModel::TexteNodeType,
-                      UIntColonne = findNodeModel::UIntNodeType};
-                      //NbrTypeColonne};
-
     //! Role des donnés du model.
     enum itemDataRole {IdRole = 0x0111};
 
@@ -226,7 +244,7 @@ public:
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
 
     //! Recherche les lignes de données vérifiant les conditions d'un modéle de recherche donné.
-    virtual void find(FindModel * findModel) = 0;
+    virtual void find(AbstractFindModel * findModel) = 0;
 
     //! Renvoie les drapeaux associés à un index.
     Qt::ItemFlags flags(const QModelIndex & index) const override;

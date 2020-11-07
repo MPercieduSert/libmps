@@ -1,5 +1,4 @@
 #include "FindNoeudModel.h"
-#include "ColonnesForModel.h"
 
 using namespace modelMPS;
 using namespace findNoeudModel;

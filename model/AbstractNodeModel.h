@@ -65,11 +65,11 @@ public:
         {return m_model;}
 
     //! Teste l'équivalence de deux index.
-    bool operator==(const NodeIndex & index) const
+    bool operator==(const NodeIndex & index) const noexcept
         {return m_model == index.m_model && m_ptr == index.m_ptr;}
 
     //! Relation d'ordre sur les index.
-    bool operator<(const NodeIndex & index) const
+    bool operator<(const NodeIndex & index) const noexcept
         {return m_ptr < index.m_ptr;}
 
     //! Retourne un index sur le parent.
@@ -90,7 +90,7 @@ public:
 
     //! Teste si l'index est valide pour ce model.
     bool checkIndex(const NodeIndex & index) const
-        {return index.m_model == this && index.m_ptr && index.m_row >= 0 && index.m_row < rowCount(index);}
+        {return index.m_model == this && index.m_ptr;}
 
     //! Accesseur des données du model.
     virtual QVariant data(const NodeIndex & index, int cible, int role = DataRole, szt num = 0) const = 0;
@@ -126,7 +126,10 @@ signals:
     //! Signal le changement d'une donnée.
     void dataChanged(const NodeIndex & index);
 
-    //! Signal la réinitialisation du model.
+    //! Signal de fin de réinitialisation du model.
+    void modelAboutToBeReset();
+
+    //! Signal de fin de réinitialisation du model.
     void modelReset();
 
 protected:
@@ -141,7 +144,7 @@ protected:
     void beginRemoveRows(const NodeIndex & /*parent*/, int /*first*/, int /*last*/) {}
 
     //! Début de réinitialisation du model.
-    void beginResetModel() {}
+    void beginResetModel() {emit modelAboutToBeReset();}
 
     //! Crée un index sur le fils numéro row de parent.
     NodeIndex createIndex(int row, void * ptr = nullptr) const;
@@ -156,7 +159,7 @@ protected:
     void endRemoveRows() {}
 
     //! Fin de réinitialisation du model.
-    void endResetModel() {}
+    void endResetModel() {emit modelReset();}
 };
 
 /////////////////////////////////////////// TreeForNodeModel ///////////////////////////////////////
@@ -173,6 +176,9 @@ public:
 
     //! Renvoie l'index correxpondant à la ligne et colonne de parent.
     NodeIndex index(int row, const NodeIndex &parent = NodeIndex()) const;
+
+    //! Renvoie l'index du parent.
+    NodeIndex parent(const NodeIndex & index) const;
 };
 
 //////////////////////////////////////// TreeNodeModel //////////////////////////////////////
@@ -269,6 +275,15 @@ template<class T> NodeIndex TreeForNodeModel<T>::index(int row, const NodeIndex 
         auto iter = m_tree.cbegin().toChild(row);
         if (iter)
             return m_model->createIndex(row, iter.ptr());
+    }
+    return NodeIndex();
+}
+template<class T> NodeIndex TreeForNodeModel<T>::parent(const NodeIndex &index) const {
+    if (index.isValid()) {
+        auto iter = getIter(index);
+        iter.toParent();
+        if(iter && !iter.root())
+            return m_model->createIndex(iter.indexBrother(), iter.ptr());
     }
     return NodeIndex();
 }

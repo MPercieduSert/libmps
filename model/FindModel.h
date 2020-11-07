@@ -8,78 +8,75 @@
 #include <QDate>
 #include <QRegularExpression>
 #include "AbstractNodeModel.h"
+#include "AbstractColonnesModel.h"
+#include "ColonnesForModel.h"
 
 namespace modelMPS {
-//! Déclaration anticipée.
-class AbstractColonnesModel;
-namespace findNodeModel {
-//! Type des noeuds de l'arbre.
-enum typeNode {NoType = -1,
-               BoolNodeType,
-               ConstanteNodeType,
-               DateNodeType,
-               DateTimeNodeType,
-               DoubleNodeType,
-               IntNodeType,
-               TexteNodeType,
-               UIntNodeType,
-               OperationNodeType,
-               ChoiceNodeType,
-               ConditionNodeType,
-               NbrType};
-
-//! Ensemble de noeuds
-enum setNode : unsigned {NoSet = 0,
-                        ComparaisonSet = 1};
-
-//! Cible des données.
-enum dataCible {ComparaisonCible,
-             CaseCible,
-             ColonneCible,
-             DateCible,
-             FalseCible,
-             NegCible,
-             OpColumn,
-             RegexCible,
-             TexteCible,
-             TrueCible
-            };
-
-//! Opérations binaire.
-enum nodeOperation {Et,
-                    Ou,
-                    OuExclusif,
-                    NbrOperation};
-
-//! Comparaison à une valeur.
-enum comparaison {Egal,
-                 Different,
-                 Inferieure,
-                 Superieure,
-                 InfEgal,
-                 SupEgal,
-                 NbrComparaison};
-}
-
 /*! \ingroup groupeModel
  * \brief Classe mère des model de recherche.
  */
-class FindModel : public TreeNodeModel {
+class FindModel : public TreeNodeModel, public AbstractFindModel {
     Q_OBJECT
 public:
+    //! Type des noeuds de l'arbre.
+    enum typeNode {NoType = -1,
+                   BoolNodeType,
+                   ConstanteNodeType,
+                   DateNodeType,
+                   DateTimeNodeType,
+                   DoubleNodeType,
+                   IntNodeType,
+                   TexteNodeType,
+                   UIntNodeType,
+                   OperationNodeType,
+                   ChoiceNodeType,
+                   ConditionNodeType,
+                   NbrType};
+
+    //! Cible des données.
+    enum dataCible {ComparaisonCible,
+                 CaseCible,
+                 ColonneCible,
+                 DateCible,
+                 FalseCible,
+                 NegCible,
+                 OpCible,
+                 RegexCible,
+                 TexteCible,
+                 TrueCible
+                };
+
+    //! Ensemble de noeuds
+    enum setNode : unsigned {NoSet = 0,
+                            ComparaisonSet = 1};
+
+    //! Opérations binaire.
+    enum nodeOperation {Et,
+                        Ou,
+                        OuExclusif,
+                        NbrOperation};
+
+    //! Comparaison à une valeur.
+    enum comparaison {Egal,
+                     Different,
+                     Inferieure,
+                     Superieure,
+                     InfEgal,
+                     SupEgal,
+                     NbrComparaison};
    //! Structure d'informations sur une colonne du model.
     struct Colonne {
-        int type = findNodeModel::NoType;      //!< Type de la colonne.
+        int type = NoType;      //!< Type de la colonne.
         QString nom;      //!< Nom de la colonne.
     };
 
 protected:
-    std::vector<Colonne> m_colonnes;        //!< Informations sur les colonnes.
-    AbstractColonnesModel * m_model = nullptr;        //!< Model filtré.
+    std::vector<Colonne> m_colonnes;                //!< Informations sur les colonnes.
+    AbstractColonnesModel * m_model;      //!< Model filtré.
     using AbstractNodeModel::createIndex;
 public:
     //! Constructeur.
-    FindModel(QObject * parent = nullptr);
+    FindModel(AbstractColonnesModel * model = nullptr, QObject * parent = nullptr);
 
     //! Insert un nouveau noeud.
     //! Si le noeuds parent est un operationNode un noeud choiceNode est ajouté avant row.
@@ -98,7 +95,7 @@ public:
     void removeNode(int row, const NodeIndex & parent);
 
     //! Teste si l'arbre est réduit à sa racine.
-    bool rootLeaf() const
+    bool rootLeaf() const override
         {return m_data.tree().cbegin().toFirstChild().leaf();}
 
     //! Mutateur des données du model.
@@ -108,10 +105,10 @@ public:
     void setModel(AbstractColonnesModel * model);
 
     //! Teste si la ligne d'indice id vérifie la condition de la racine.
-    bool testRoot(szt id) const;
+    bool testRoot(szt id) const override;
 
     //! Teste si la ligne d'indice id vérifie l'arbre des conditions.
-    bool testTree(szt id) const;
+    bool testTree(szt id) const override;
 
 public slots:
     //! Applique la recherche au model à filtré.
@@ -160,7 +157,7 @@ public:
 
     //! Accesseur des drapeaux associés à column.
     Qt::ItemFlags flags(int cible, szt num = 0) const override {
-        if(cible == NegCible)
+        if(cible == FindModel::NegCible)
             return Qt::ItemIsEnabled;
         return AbstractNode::flags(cible,num);
     }
@@ -192,7 +189,7 @@ public:
 
     //! Accesseur des drapeaux associés à column.
     Qt::ItemFlags flags(int cible, szt num = 0) const override {
-        if(cible == ColonneCible)
+        if(cible == FindModel::ColonneCible)
             return AbstractNegationNode::flags(cible,num) | Qt::ItemIsEnabled | Qt::ItemIsEditable;
         return AbstractNegationNode::flags(cible,num);
     }
@@ -222,9 +219,9 @@ class AbstractComparaisonNode : public AbstractConditionNode {
 protected:
     szt m_comp;            //!< Indice de la comparaison.
 public:
-    static const std::array<QString, NbrComparaison> Strings;        //!< Labels des comparaisons.
+    static const std::array<QString, FindModel::NbrComparaison> Strings;        //!< Labels des comparaisons.
     //! Constructeur.
-    AbstractComparaisonNode(szt pos, szt comp = Egal,int type = NoType)
+    AbstractComparaisonNode(szt pos, szt comp = FindModel::Egal,int type = NoType)
         : AbstractConditionNode(pos,type), m_comp(comp) {}
 
     //! Accesseur de la donnée associé à column.
@@ -232,7 +229,7 @@ public:
 
     //! Accesseur des drapeaux associés à column.
     Qt::ItemFlags flags(int cible, szt num = 0) const override {
-        if(cible == ComparaisonCible)
+        if(cible == FindModel::ComparaisonCible)
             return AbstractConditionNode::flags(cible,num) | Qt::ItemIsEnabled | Qt::ItemIsEditable;
         return AbstractConditionNode::flags(cible,num);
     }
@@ -254,7 +251,7 @@ public:
     //! Constructeur.
     BoolNode(szt pos, const QString & falseLabel = QString(), const QString trueLabel = QString(),
              bool trueChecked = true, bool falseChecked = true)
-        : AbstractConditionNode(pos,BoolNodeType),
+        : AbstractConditionNode(pos,FindModel::BoolNodeType),
           m_false(falseChecked), m_true(trueChecked),
           m_falseLabel(falseLabel), m_trueLabel(trueLabel)  {}
 
@@ -270,7 +267,7 @@ public:
 
     //! Accesseur des drapeaux associés à column.
     Qt::ItemFlags flags(int cible, szt num = 0) const override {
-        if(cible == TrueCible || cible == FalseCible)
+        if(cible == FindModel::TrueCible || cible == FindModel::FalseCible)
             return AbstractConditionNode::flags(cible,num) | Qt::ItemIsEnabled;
         return AbstractConditionNode::flags(cible,num);
     }
@@ -289,21 +286,14 @@ public:
 class ChoiceNode : public AbstractFindNode {
 public:
     //! Constructeur.
-    ChoiceNode() : AbstractFindNode(ChoiceNodeType) {}
-
-    //! Accesseur de la donnée associé à column.
-    QVariant data(int type, int role = DataRole, szt num = 0) const override;
+    ChoiceNode() : AbstractFindNode(FindModel::ChoiceNodeType) {}
 
     //! Test si le noeud intervient dans la recherche.
     bool empty() const override
         {return true;}
 
     //! Accesseur des drapeaux associés à column.
-    Qt::ItemFlags flags(int cible, szt /*num*/ = 0) const override {
-        if(cible == OpColumn || cible == ColonneCible)
-            return Qt::ItemIsEnabled | Qt::ItemIsEditable;
-        return Qt::NoItemFlags;
-    }
+    Qt::ItemFlags flags(int cible, szt /*num*/ = 0) const override;
 };
 
 /*! \ingroup groupeModel
@@ -314,8 +304,8 @@ protected:
     QDate m_date;       //!< Date de filtrage.
 public:
     //! Constructeur.
-    DateNode(szt pos,const QDate & date = QDate(), szt comp = Egal)
-        : AbstractComparaisonNode(pos,comp,DateNodeType), m_date(date) {}
+    DateNode(szt pos,const QDate & date = QDate(), szt comp = FindModel::Egal)
+        : AbstractComparaisonNode(pos,comp,FindModel::DateNodeType), m_date(date) {}
 
     //! Destructeur.
     ~DateNode() override = default;
@@ -329,7 +319,7 @@ public:
 
     //! Accesseur des drapeaux associés à column.
     Qt::ItemFlags flags(int cible, szt num = 0) const override {
-        if(cible == DateCible)
+        if(cible == FindModel::DateCible)
             return AbstractComparaisonNode::flags(cible,num) | Qt::ItemIsEnabled | Qt::ItemIsEditable;
         return AbstractComparaisonNode::flags(cible,num);
     }
@@ -348,9 +338,9 @@ class OperationNode : public AbstractNegationNode {
 protected:
     szt m_operation;        //!< Identifiant de l'opération
 public:
-    static const std::array<QString, NbrOperation> Strings;        //!< Labels des opération.
+    static const std::array<QString, FindModel::NbrOperation> Strings;        //!< Labels des opération.
     //! Constructeur.
-    OperationNode(szt op = Et) : AbstractNegationNode(OperationNodeType), m_operation(op) {}
+    OperationNode(szt op = FindModel::Et) : AbstractNegationNode(FindModel::OperationNodeType), m_operation(op) {}
 
     //! Destructeur.
     ~OperationNode() override = default;
@@ -360,7 +350,7 @@ public:
 
     //! Accesseur des drapeaux associés à column.
     Qt::ItemFlags flags(int cible, szt num = 0) const override {
-        if(cible == OpColumn)
+        if(cible == FindModel::OpCible)
             return AbstractNegationNode::flags(cible,num) | Qt::ItemIsEnabled | Qt::ItemIsEditable;
         return AbstractNegationNode::flags(cible,num);
     }
@@ -385,7 +375,7 @@ protected:
 public:
     //! Constructeur.
     TexteNode(szt pos,const QString & texte = QString(), bool c = false,bool regex = false)
-        : AbstractConditionNode(pos,TexteNodeType), m_texte(texte), m_case(c), m_regex(regex) {
+        : AbstractConditionNode(pos,FindModel::TexteNodeType), m_texte(texte), m_case(c), m_regex(regex) {
         if(m_regex){
             m_regular.setPattern(m_texte);
             if(!m_case)
@@ -405,9 +395,9 @@ public:
 
     //! Accesseur des drapeaux associés à column.
     Qt::ItemFlags flags(int cible, szt num = 0) const override {
-        if(cible == TexteCible)
+        if(cible == FindModel::TexteCible)
             return AbstractConditionNode::flags(cible,num) | Qt::ItemIsEnabled | Qt::ItemIsEditable;
-        if(cible == CaseCible || cible == RegexCible)
+        if(cible == FindModel::CaseCible || cible == FindModel::RegexCible)
             return AbstractConditionNode::flags(cible,num) | Qt::ItemIsEnabled | Qt::ItemIsUserCheckable;
         return AbstractConditionNode::flags(cible,num);
     }

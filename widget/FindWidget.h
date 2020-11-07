@@ -7,6 +7,7 @@
 #include <QDateEdit>
 #include <QComboBox>
 #include <QCheckBox>
+#include <QGridLayout>
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QLineEdit>
@@ -59,6 +60,10 @@ public:
     //! Constructeur.
     FindWidget(FindModel * model = new FindModel(),QWidget * parent = nullptr);
 
+    //! Constructeur.
+    FindWidget(modelMPS::AbstractColonnesModel * model,QWidget * parent = nullptr)
+        : FindWidget(new FindModel(model),parent) {}
+
     //! Accesseur du Model.
     FindModel * findModel() const
         {return m_model;}
@@ -101,7 +106,7 @@ public:
 
     //! Met à jour les données du widget à partir des données du model.
     void updateData() override
-        {m_nonCheckBox->setChecked(m_index.data(NegCible,DataRole).toBool());}
+        {m_nonCheckBox->setChecked(m_index.data(FindModel::NegCible,DataRole).toBool());}
 };
 
 /*! \ingroup groupeModel
@@ -119,7 +124,7 @@ public:
 
     //! Met à jour les données du widget à partir des données du model.
     void updateData() override
-        {m_colonneCB->setCurrentIndex(m_colonneCB->findData(m_index.data(ColonneCible,DataRole)));}
+        {m_colonneCB->setCurrentIndex(m_colonneCB->findData(m_index.data(FindModel::ColonneCible,DataRole)));}
 };
 
 /*! \ingroup groupeModel
@@ -137,7 +142,7 @@ public:
 
     //! Met à jour les données du widget à partir des données du model.
     void updateData() override
-        {m_compCB->setCurrentIndex(m_compCB->findData(m_index.data(ComparaisonCible,DataRole)));}
+        {m_compCB->setCurrentIndex(m_compCB->findData(m_index.data(FindModel::ComparaisonCible,DataRole)));}
 };
 
 /*! \ingroup groupeModel
@@ -151,13 +156,33 @@ protected:
     QHBoxLayout * m_boolLayout;         //!< Calque filtrage sur des booléen.
 public:
     //! Constructeur.
-    BoolNodeWidget(const NodeIndex & index, QWidget * parent, int tp = modelMPS::findNodeModel::BoolNodeType);
+    BoolNodeWidget(const NodeIndex & index, QWidget * parent, int tp = FindModel::BoolNodeType);
 
     //! Met à jour les données du widget à partir des données du model.
     void updateData() override {
-        m_falseCheck->setChecked(m_index.data(FalseCible).toBool());
-        m_trueCheck->setChecked(m_index.data(TrueCible).toBool());
+        m_falseCheck->setChecked(m_index.data(FindModel::FalseCible).toBool());
+        m_trueCheck->setChecked(m_index.data(FindModel::TrueCible).toBool());
     }
+};
+
+/*! \ingroup groupeModel
+ * \brief Classe des widgets de noeud choix.
+ */
+class ChoiceNodeWidget : public FindNodeWidget {
+    Q_OBJECT
+protected:
+    QLabel * m_colonneLabel;        //!< Label du choix de colonne.
+    QLabel * m_opLabel;             //!< Label du choix de l'opération.
+    QComboBox * m_colonneCB;        //!< Choix de colonne.
+    QComboBox * m_opCB;             //!< Choix de l'opération.
+    QGridLayout * m_mainLayout;    //!< Calque du choix de l'opération.
+public:
+    enum {LabelRow = 0,
+         ComboBoxRow = 1,
+         OpCol = 0,
+         ColonneCol = 1};
+    //! Constructeur.
+    ChoiceNodeWidget(const NodeIndex & index, QWidget * parent, int tp = FindModel::ChoiceNodeType);
 };
 
 /*! \ingroup groupeModel
@@ -171,11 +196,29 @@ protected:
     QVBoxLayout * m_dateLayout; //!< Calque du choix de la date.
 public:
     //! Constructeur.
-    DateNodeWidget(const NodeIndex & index, QWidget * parent, int tp = modelMPS::findNodeModel::DateNodeType);
+    DateNodeWidget(const NodeIndex & index, QWidget * parent, int tp = FindModel::DateNodeType);
 
     //! Met à jour les données du widget à partir des données du model.
     void updateData() override
-        {m_dateEdit->setDate(m_index.data(DateCible).toDate());}
+        {m_dateEdit->setDate(m_index.data(FindModel::DateCible).toDate());}
+};
+
+/*! \ingroup groupeModel
+ * \brief Classe des widget de noeud d'opération.
+ */
+class OperationNodeWidget : public NegationNodeWidget {
+    Q_OBJECT
+protected:
+    QLabel * m_opLabel;            //!< Label du choix de l'opération.
+    QComboBox * m_opCB;            //!< Choix de l'opération.
+    QVBoxLayout * m_opLayout;      //!< Calque du choix de l'opération.
+public:
+    //! Constructeur.
+    OperationNodeWidget(const NodeIndex & index, QWidget * parent, int tp = FindModel::OperationNodeType);
+
+    //! Met à jour les données du widget à partir des données du model.
+    void updateData() override
+        {m_opCB->setCurrentIndex(m_opCB->findData(m_index.data(FindModel::OpCible,DataRole)));}
 };
 
 /*! \ingroup groupeModel
@@ -191,7 +234,7 @@ protected:
     QHBoxLayout * m_texteLayout;    //!< Calque du texte chercher.
 public:
     //! Constructeur.
-    TexteNodeWidget(const NodeIndex & index, QWidget * parent, int tp = modelMPS::findNodeModel::TexteNodeType);
+    TexteNodeWidget(const NodeIndex & index, QWidget * parent, int tp = FindModel::TexteNodeType);
 
     //! Met à jour les données du widget à partir des données du model.
     void updateData() override;

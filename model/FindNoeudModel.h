@@ -7,6 +7,7 @@
 #include <memory>
 #include <QDate>
 #include <QRegularExpression>
+#include "ColonnesForModel.h"
 #include "TreeNoeudModel.h"
 
 namespace modelMPS {
@@ -68,7 +69,7 @@ enum comparaison {Egal,
 /*! \ingroup groupeModel
  * \brief Classe mère des model de recherche.
  */
-class FindNoeudModel : public TreeNoeudModel {
+class FindNoeudModel : public TreeNoeudModel, public AbstractFindModel {
     Q_OBJECT
 public:
    //! Structure d'informations sur une colonne du model.
@@ -102,7 +103,7 @@ public:
     void removeNoeud(int row, const QModelIndex & parent);
 
     //! Teste si l'arbre est réduit à sa racine.
-    bool rootLeaf() const
+    bool rootLeaf() const override
         {return m_data.tree().cbegin().toFirstChild().leaf();}
 
     //! Mutateur des données du model.
@@ -112,10 +113,10 @@ public:
     void setModel(AbstractColonnesModel * model);
 
     //! Teste si la ligne d'indice id vérifie la condition de la racine.
-    bool testRoot(szt id) const;
+    bool testRoot(szt id) const override;
 
     //! Teste si la ligne d'indice id vérifie l'arbre des conditions.
-    bool testTree(szt id) const;
+    bool testTree(szt id) const override;
 
 public slots:
     //! Applique la recherche au model à filtré.

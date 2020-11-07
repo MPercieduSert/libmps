@@ -496,7 +496,7 @@ template<class T> bool AbstractBddVectorListTableau<T>::valide(szt ligne) const 
 template <class T> std::unique_ptr<AbstractColonnesModel::AbstractColonne>
                         VectorTableau<T>::makeColonne(const AbstractColonnesModel::NewColonneInfo & info) {
     switch (info.type) {
-    case AbstractColonnesModel::BoolColonne:
+    case BoolColonneType:
         if(info.args.size() == 0)
             return std::make_unique<VectorValColonne<T>>(info.name,info.flags,info.type,m_vec,
                                                          [](T element)->bool{return element;},
@@ -506,9 +506,9 @@ template <class T> std::unique_ptr<AbstractColonnesModel::AbstractColonne>
                                                          [](T element)->bool{return element;},
                                                          [](bool value, bool element){element = value;},
                                                          info.args[0].toString(),info.args[1].toString());
-    case AbstractColonnesModel::DoubleColonne:
-    case AbstractColonnesModel::IntColonne:
-    case AbstractColonnesModel::UIntColonne:
+    case DoubleColonneType:
+    case IntColonneType:
+    case UIntColonneType:
         return std::make_unique<VectorValColonne<T>>(info.name,info.flags,info.type,m_vec,
                     [](T element, int role){
                         if(role == Qt::DisplayRole || role == Qt::EditRole)

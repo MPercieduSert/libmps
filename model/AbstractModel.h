@@ -16,7 +16,9 @@
     /*! Renvoie l'index du parent.*/ \
     QModelIndex parent(const QModelIndex &index) const override {return TREE.parent(index);} \
     /*! Renvoie le nombre de d'enfants.*/ \
-    int rowCount(const QModelIndex &parent = QModelIndex()) const override {return TREE.rowCount(parent);}
+    int rowCount(const QModelIndex &parent = QModelIndex()) const override { \
+    if(parent.column() != 0) return 0; \
+    return TREE.rowCount(parent);}
 
 namespace modelMPS {
 namespace cmps = conteneurMPS;
@@ -43,7 +45,7 @@ protected:
     using const_iterator = typename Tree::const_iterator;
     //! Poiteur sur les noeuds de l'arbre.
     using iterator = typename Tree::iterator;
-    Model * m_model;           //!< Model contenant l'arbre.
+    Model * m_model;            //!< Model contenant l'arbre.
     const bool m_racine;        //!< Racine permise.
     Tree m_tree;                //!< Arbre de donnée.
 public:
@@ -104,9 +106,6 @@ public:
     //! Insert des lignes dans le model, ne vérifie pas les arguments.
     template<class Factory> bool insertRows(Factory factory,int row, int count, const Index &parent = Index());
 
-    //! Renvoie l'index du parent.
-    Index parent(const Index &index) const;
-
     //! Acceseur de la racine.
     bool racine() const
         {return m_racine;}
@@ -116,10 +115,12 @@ public:
 
     //! Renvoie le nombre de d'enfants.
     int rowCount(const Index &parent = Index()) const {
-        if(!parent.isValid())
-            return m_tree.cbegin().sizeChild();
-        if(parent.column() != 0)
-            return 0;
+        if(!parent.isValid()){
+            if(m_racine)
+                return 1;
+            else
+                return m_tree.cbegin().sizeChild();
+        }
         return getIter(parent).sizeChild();
     }
 
@@ -168,6 +169,9 @@ public:
 
     //! Renvoie l'index correxpondant à la ligne et colonne de parent.
     QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const;
+
+    //! Renvoie l'index du parent.
+    QModelIndex parent(const QModelIndex &index) const;
 };
 
 ///////////////////////////////////// TempTreeForModel /////////////////////////////
@@ -185,15 +189,7 @@ bool TempTreeForModel<T,Model,Index>::insertRows(Factory factory, int row, int c
     return true;
 }
 
-template<class T,class Model,class Index> Index TempTreeForModel<T,Model,Index>::parent(const Index &index) const {
-    if (index.isValid()) {
-        auto iter = getIter(index);
-        iter.toParent();
-        if(iter && !iter.root())
-            return m_model->createIndex(iter.indexBrother(), 0, iter.ptr());
-    }
-    return QModelIndex();
-}
+
 
 template<class T, class Model, class Index> template<class Deleter>
 bool TempTreeForModel<T,Model,Index>::removeRows(Deleter del, int row, int count, const Index &parent) {
@@ -237,6 +233,16 @@ template<class T> QModelIndex TreeForModel<T>::index(int row, int column, const 
         auto iter = m_tree.cbegin().toChild(row);
         if (iter)
             return m_model->createIndex(row, column, iter.ptr());
+    }
+    return QModelIndex();
+}
+
+template<class T> QModelIndex TreeForModel<T>::parent(const QModelIndex &index) const {
+    if (index.isValid()) {
+        auto iter = getIter(index);
+        iter.toParent();
+        if(iter && !iter.root())
+            return m_model->createIndex(iter.indexBrother(), 0, iter.ptr());
     }
     return QModelIndex();
 }

@@ -4,7 +4,7 @@ using namespace modelMPS;
 
 TreeColonnesModel::TreeColonnesModel(bool racine, QObject *parent) : AbstractColonnesModel (parent), m_tree(this,racine){}
 
-void TreeColonnesModel::find(FindModel * findModel) {
+void TreeColonnesModel::find(AbstractFindModel *findModel) {
     if(findModel) {
         beginResetModel();
             m_tree.setTree(m_fullTree);

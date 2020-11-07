@@ -131,7 +131,7 @@ void TableModel::effacer(const QModelIndexList &selection) {
         setData(*i,QVariant());
 }
 
-void TableModel::find(FindModel * findModel) {
+void TableModel::find(AbstractFindModel *findModel) {
     if(findModel){
         beginResetModel();
             m_rowToLigne.clear();
