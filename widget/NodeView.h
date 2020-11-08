@@ -29,6 +29,12 @@ public:
     //! Constructeur.
     NodeWidget(const NodeIndex & index, QWidget * parent = nullptr, int tp = NoType);
 
+    //! Connecte les éléments du noeuds au model.
+    virtual void connexion() const {}
+
+    //! Déconnecte les éléments du noeuds au model.
+    virtual void deconnexion() const {}
+
     //! Accesseur de l'index.
     const NodeIndex & index() const noexcept
         {return m_index;}
@@ -144,8 +150,13 @@ public:
     void setNodeWidget(NodeWidget * widget);
 
     //! Mutateur du widget de noeud.
-    void setNodeWidget(const modelMPS::NodeIndex & index)
-        {setNodeWidget(m_view->delegate()->createWidget(index,this));}
+    void setNodeWidget(const modelMPS::NodeIndex & index) {
+        setNodeWidget(m_view->delegate()->createWidget(index,this));
+        m_nodeWidget->updateData();
+    }
+
+    //! Taille souhaité du widget.
+    QSize sizeHint() const override;
 
 public slots:
     //! Mutateur de l'état d'expansion des fils.

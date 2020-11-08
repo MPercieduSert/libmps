@@ -11,8 +11,10 @@
 
 //! Macro d'inclusion des membres virtual dans le model.
 #define TREE_FOR_MODEL_INDEX_PARENT_ROWCOUNT(TREE) /*! Renvoie l'index correxpondant à la ligne et colonne de parent.*/ \
-    QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const override \
+    QModelIndex index(int row, int column, const QModelIndex & parent = QModelIndex()) const override \
         {return TREE.index(row,column,parent);} \
+    /*! Teste si le noeud associé à un index valide est une feuille.*/ \
+    bool leaf(const QModelIndex & index) const {return TREE.leaf(index);} \
     /*! Renvoie l'index du parent.*/ \
     QModelIndex parent(const QModelIndex &index) const override {return TREE.parent(index);} \
     /*! Renvoie le nombre de d'enfants.*/ \
@@ -88,20 +90,24 @@ public:
         {return m_tree.begin();}
 
     //! Renvoie une référence sur la donné coorespondant à l'index (en supposant la validité).
-    const T & getValidData(const Index &index) const
+    const T & getValidData(const Index & index) const
         {return *getValidIter(index);}
 
     //! Renvoie une référence sur la donné coorespondant à l'index (en supposant la validité).
-    T & getValidData(const Index &index)
+    T & getValidData(const Index & index)
         {return *getIter(index);}
 
     //! Renvoie un itérateur pointant sur le noeud d'index.
-    const_iterator getValidIter(const Index &index) const
+    const_iterator getValidIter(const Index & index) const
         {return index.internalPointer();}
 
     //! Renvoie un itérateur pointant sur le noeud d'index.
-    iterator getValidIter(const Index &index)
+    iterator getValidIter(const Index & index)
         {return index.internalPointer();}
+
+    //! Teste si le noeud associé à un index valide est une feuille.
+    bool leaf(const Index & index) const
+        {return  getValidIter(index).leaf();}
 
     //! Insert des lignes dans le model, ne vérifie pas les arguments.
     template<class Factory> bool insertRows(Factory factory,int row, int count, const Index &parent = Index());
@@ -115,12 +121,8 @@ public:
 
     //! Renvoie le nombre de d'enfants.
     int rowCount(const Index &parent = Index()) const {
-        if(!parent.isValid()){
-            if(m_racine)
-                return 1;
-            else
+        if(!parent.isValid())
                 return m_tree.cbegin().sizeChild();
-        }
         return getIter(parent).sizeChild();
     }
 

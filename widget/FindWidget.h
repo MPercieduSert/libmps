@@ -104,6 +104,16 @@ public:
     //! Constructeur.
     NegationNodeWidget(const NodeIndex & index, QWidget * parent, int tp = NoType);
 
+    //! Connecte les éléments du noeuds au model.
+    void connexion() const override {
+        connect(m_nonCheckBox,&QCheckBox::stateChanged,this,[this]()
+            {m_index.model()->setData(m_index,FindModel::NegCible,m_nonCheckBox->isChecked());});
+    }
+
+    //! Déconnecte les éléments du noeuds au model.
+    void deconnexion() const override
+        {disconnect(m_nonCheckBox,&QCheckBox::stateChanged,this,nullptr);}
+
     //! Met à jour les données du widget à partir des données du model.
     void updateData() override
         {m_nonCheckBox->setChecked(m_index.data(FindModel::NegCible,DataRole).toBool());}
@@ -122,9 +132,24 @@ public:
     //! Constructeur.
     ConditionNodeWidget(const NodeIndex & index, QWidget * parent, int tp = NoType);
 
+    //! Connecte les éléments du noeuds au model.
+    void connexion() const override {
+        NegationNodeWidget::connexion();
+        connect(m_colonneCB,qOverload<int>(&QComboBox::currentIndexChanged),this,[this]()
+            {m_index.model()->setData(m_index,FindModel::ColonneCible,m_colonneCB->currentData());});
+    }
+
+    //! Déconnecte les éléments du noeuds au model.
+    void deconnexion() const override {
+        NegationNodeWidget::deconnexion();
+        disconnect(m_colonneCB,qOverload<int>(&QComboBox::currentIndexChanged),this,nullptr);
+    }
+
     //! Met à jour les données du widget à partir des données du model.
-    void updateData() override
-        {m_colonneCB->setCurrentIndex(m_colonneCB->findData(m_index.data(FindModel::ColonneCible,DataRole)));}
+    void updateData() override {
+        NegationNodeWidget::updateData();
+        m_colonneCB->setCurrentIndex(m_colonneCB->findData(m_index.data(FindModel::ColonneCible,DataRole)));
+    }
 };
 
 /*! \ingroup groupeModel
@@ -140,9 +165,24 @@ public:
     //! Constructeur.
     ComparaisonNodeWidget(const NodeIndex & index, QWidget * parent, int tp = NoType);
 
+    //! Connecte les éléments du noeuds au model.
+    void connexion() const override {
+        ConditionNodeWidget::connexion();
+        connect(m_compCB,qOverload<int>(&QComboBox::currentIndexChanged),this,[this]()
+            {m_index.model()->setData(m_index,FindModel::ColonneCible,m_compCB->currentData());});
+    }
+
+    //! Déconnecte les éléments du noeuds au model.
+    void deconnexion() const override {
+        ConditionNodeWidget::deconnexion();
+        disconnect(m_compCB,qOverload<int>(&QComboBox::currentIndexChanged),this,nullptr);
+    }
+
     //! Met à jour les données du widget à partir des données du model.
-    void updateData() override
-        {m_compCB->setCurrentIndex(m_compCB->findData(m_index.data(FindModel::ComparaisonCible,DataRole)));}
+    void updateData() override {
+        ConditionNodeWidget::updateData();
+        m_compCB->setCurrentIndex(m_compCB->findData(m_index.data(FindModel::ComparaisonCible,DataRole)));
+    }
 };
 
 /*! \ingroup groupeModel
@@ -158,8 +198,25 @@ public:
     //! Constructeur.
     BoolNodeWidget(const NodeIndex & index, QWidget * parent, int tp = FindModel::BoolNodeType);
 
+    //! Connecte les éléments du noeuds au model.
+    void connexion() const override{
+        ConditionNodeWidget::connexion();
+        connect(m_falseCheck,&QCheckBox::stateChanged,this,[this]()
+            {m_index.model()->setData(m_index,FindModel::FalseCible,m_falseCheck->isChecked());});
+        connect(m_trueCheck,&QCheckBox::stateChanged,this,[this]()
+            {m_index.model()->setData(m_index,FindModel::TrueCible,m_trueCheck->isChecked());});
+    }
+
+    //! Déconnecte les éléments du noeuds au model.
+    void deconnexion() const override {
+        ConditionNodeWidget::deconnexion();
+        disconnect(m_falseCheck,&QCheckBox::stateChanged,this,nullptr);
+        disconnect(m_trueCheck,&QCheckBox::stateChanged,this,nullptr);
+    }
+
     //! Met à jour les données du widget à partir des données du model.
     void updateData() override {
+        ConditionNodeWidget::updateData();
         m_falseCheck->setChecked(m_index.data(FindModel::FalseCible).toBool());
         m_trueCheck->setChecked(m_index.data(FindModel::TrueCible).toBool());
     }
@@ -171,18 +228,35 @@ public:
 class ChoiceNodeWidget : public FindNodeWidget {
     Q_OBJECT
 protected:
+    //! Placement des widgets.
+    enum {LabelRow = 0,
+         ComboBoxRow = 1,
+         OpCol = 0,
+         ColonneCol = 1};
+
     QLabel * m_colonneLabel;        //!< Label du choix de colonne.
     QLabel * m_opLabel;             //!< Label du choix de l'opération.
     QComboBox * m_colonneCB;        //!< Choix de colonne.
     QComboBox * m_opCB;             //!< Choix de l'opération.
     QGridLayout * m_mainLayout;    //!< Calque du choix de l'opération.
 public:
-    enum {LabelRow = 0,
-         ComboBoxRow = 1,
-         OpCol = 0,
-         ColonneCol = 1};
     //! Constructeur.
     ChoiceNodeWidget(const NodeIndex & index, QWidget * parent, int tp = FindModel::ChoiceNodeType);
+
+    //! Connecte les éléments du noeuds au model.
+    void connexion() const override {
+        connect(m_opCB,qOverload<int>(&QComboBox::currentIndexChanged),this,[this]()
+            {m_index.model()->setData(m_index,FindModel::OpCible,m_opCB->currentData());});
+        connect(m_colonneCB,qOverload<int>(&QComboBox::currentIndexChanged),this,[this]()
+            {m_index.model()->setData(m_index,FindModel::ColonneCible,m_colonneCB->currentData());});
+    }
+
+    //! Déconnecte les éléments du noeuds au model.
+    void deconnexion() const override {
+        disconnect(m_opCB,qOverload<int>(&QComboBox::currentIndexChanged),this,nullptr);
+        disconnect(m_colonneCB,qOverload<int>(&QComboBox::currentIndexChanged),this,nullptr);
+    }
+
 };
 
 /*! \ingroup groupeModel
@@ -198,9 +272,24 @@ public:
     //! Constructeur.
     DateNodeWidget(const NodeIndex & index, QWidget * parent, int tp = FindModel::DateNodeType);
 
+    //! Connecte les éléments du noeuds au model.
+    void connexion() const override {
+        ComparaisonNodeWidget::connexion();
+        connect(m_dateEdit,&QDateEdit::dateChanged,this,[this]()
+            {m_index.model()->setData(m_index,FindModel::DateCible,m_dateEdit->date());});
+    }
+
+    //! Déconnecte les éléments du noeuds au model.
+    void deconnexion() const override {
+        ComparaisonNodeWidget::deconnexion();
+        disconnect(m_dateEdit,&QDateEdit::dateChanged,this,nullptr);
+    }
+
     //! Met à jour les données du widget à partir des données du model.
-    void updateData() override
-        {m_dateEdit->setDate(m_index.data(FindModel::DateCible).toDate());}
+    void updateData() override {
+        ComparaisonNodeWidget::updateData();
+        m_dateEdit->setDate(m_index.data(FindModel::DateCible).toDate());
+    }
 };
 
 /*! \ingroup groupeModel
@@ -216,9 +305,24 @@ public:
     //! Constructeur.
     OperationNodeWidget(const NodeIndex & index, QWidget * parent, int tp = FindModel::OperationNodeType);
 
+    //! Connecte les éléments du noeuds au model.
+    void connexion() const override {
+        NegationNodeWidget::connexion();
+        connect(m_opCB,qOverload<int>(&QComboBox::currentIndexChanged),this,[this]()
+            {m_index.model()->setData(m_index,FindModel::OpCible,m_opCB->currentData());});
+    }
+
+    //! Déconnecte les éléments du noeuds au model.
+    void deconnexion() const override {
+        NegationNodeWidget::deconnexion();
+        disconnect(m_opCB,qOverload<int>(&QComboBox::currentIndexChanged),this,nullptr);
+    }
+
     //! Met à jour les données du widget à partir des données du model.
-    void updateData() override
-        {m_opCB->setCurrentIndex(m_opCB->findData(m_index.data(FindModel::OpCible,DataRole)));}
+    void updateData() override{
+        NegationNodeWidget::updateData();
+        m_opCB->setCurrentIndex(m_opCB->findData(m_index.data(FindModel::OpCible,DataRole)));
+    }
 };
 
 /*! \ingroup groupeModel
@@ -235,6 +339,25 @@ protected:
 public:
     //! Constructeur.
     TexteNodeWidget(const NodeIndex & index, QWidget * parent, int tp = FindModel::TexteNodeType);
+
+    //! Connecte les éléments du noeuds au model.
+    void connexion() const override {
+        ConditionNodeWidget::connexion();
+        connect(m_lineEdit,&QLineEdit::textChanged,this,[this]()
+            {m_index.model()->setData(m_index,FindModel::TexteCible,m_lineEdit->text());});
+        connect(m_caseCheck,&QCheckBox::stateChanged,this,[this]()
+            {m_index.model()->setData(m_index,FindModel::TrueCible,m_caseCheck->isChecked());});
+        connect(m_regexCheck,&QCheckBox::stateChanged,this,[this]()
+            {m_index.model()->setData(m_index,FindModel::TrueCible,m_regexCheck->isChecked());});
+    }
+
+    //! Déconnecte les éléments du noeuds au model.
+    void deconnexion() const override {
+        ConditionNodeWidget::deconnexion();
+        disconnect(m_lineEdit,&QLineEdit::textChanged,this,nullptr);
+        disconnect(m_caseCheck,&QCheckBox::stateChanged,this,nullptr);
+        disconnect(m_regexCheck,&QCheckBox::stateChanged,this,nullptr);
+    }
 
     //! Met à jour les données du widget à partir des données du model.
     void updateData() override;

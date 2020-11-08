@@ -11,15 +11,19 @@ AbstractNodeDelegate::AbstractNodeDelegate(QObject * parent)
 ////////////////////////////////////// ArcWidget //////////////////////////////////////////
 ArcWidget::ArcWidget(NodeWidget *node, NodeView *view, QWidget * parent)
     : QWidget (parent), m_view(view) {
-    m_expandButton = new QPushButton;
-    m_expandLayout = new QVBoxLayout;
-    m_expandLayout->addWidget(m_expandButton);
-    m_expandLayout->addStretch();
     m_secondLayout = new QVBoxLayout;
-    setNodeWidget(node);
     m_mainLayout = new QHBoxLayout(this);
-    m_mainLayout->addLayout(m_expandLayout);
-    m_mainLayout->addLayout(m_secondLayout);
+    m_mainLayout->addLayout(m_secondLayout,1);
+    m_mainLayout->addStretch();
+    setNodeWidget(node);
+    if(!m_nodeWidget->index().leaf()) {
+        m_expandButton = new QPushButton;
+        m_expandLayout = new QVBoxLayout;
+        m_expandLayout->addWidget(m_expandButton);
+        m_expandLayout->addStretch();
+        m_mainLayout->insertLayout(0,m_expandLayout);
+        setExpandEtat(false);
+    }
 }
 
 void ArcWidget::setExpandEtat(bool bb) {
@@ -36,11 +40,17 @@ void ArcWidget::setNodeWidget(NodeWidget * widget) {
     if(m_nodeWidget) {
         m_secondLayout->removeWidget(m_nodeWidget);
         m_view->m_arcMap.erase(m_nodeWidget->index());
-        delete m_nodeWidget;
+        m_nodeWidget->deleteLater();
     }
     m_nodeWidget = widget;
+    m_nodeWidget->updateData();
+    m_nodeWidget->connexion();
     m_view->m_arcMap[m_nodeWidget->index()] = this;
-    m_secondLayout->insertWidget(NodeWidgetIndice,widget);
+    m_secondLayout->insertWidget(NodeWidgetIndice,m_nodeWidget);
+}
+
+QSize ArcWidget::sizeHint() const{
+    return m_nodeWidget->sizeHint();
 }
 
 /////////////////////////////////////// NodeView //////////////////////////////////////////
@@ -83,8 +93,11 @@ void NodeView::resetRoot(){
 void NodeView::updateData(const NodeIndex & index) {
     auto iter = m_arcMap.find(index);
     if(iter != m_arcMap.end()){
-        if(index.data(NodeTypeCible) == iter->second->nodeWidget()->type())
+        if(index.data(NodeTypeCible) == iter->second->nodeWidget()->type()) {
+            iter->second->nodeWidget()->deconnexion();
             iter->second->nodeWidget()->updateData();
+            iter->second->nodeWidget()->connexion();
+        }
         else
             iter->second->setNodeWidget(index);
     }
@@ -92,5 +105,6 @@ void NodeView::updateData(const NodeIndex & index) {
 
 ////////////////////////////////////////// NodeWidget /////////////////////////////////////
 NodeWidget::NodeWidget(const NodeIndex & index, QWidget * parent, int tp)
-    : QFrame (parent), m_type(tp), m_index(index)
-    {setFrameShape(Box);}
+    : QFrame (parent), m_type(tp), m_index(index) {
+    setFrameShape(Box);
+    }

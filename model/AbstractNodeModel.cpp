@@ -2,10 +2,9 @@
 
 using namespace modelMPS;
 
-NodeIndex AbstractNodeModel::createIndex(int row, void * ptr) const {
+NodeIndex AbstractNodeModel::createIndex(void * ptr) const {
     NodeIndex index;
     index.m_ptr = ptr;
-    index.m_row = row;
     index.m_model = const_cast<AbstractNodeModel *>(this);
     return index;
 }
@@ -18,6 +17,9 @@ QVariant NodeIndex::data(int cible, int role, szt num) const
 Qt::ItemFlags NodeIndex::flags(int cible, szt num) const
     {return isValid() ? m_model->flags(*this, cible, num)
                       : Qt::NoItemFlags;}
+
+bool NodeIndex::leaf() const
+    {return isValid() && m_model->leaf(*this);}
 
 NodeIndex NodeIndex::parent() const
     {return isValid() ? m_model->parent(*this)

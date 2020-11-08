@@ -11,8 +11,10 @@
 
 //! Macro d'inclusion des membres virtual dans le model à node.
 #define TREE_FOR_NODE_MODEL_INDEX_PARENT_ROWCOUNT(TREE) /*! Renvoie l'index correxpondant à la ligne et colonne de parent.*/ \
-    NodeIndex index(int row, const NodeIndex &parent = NodeIndex()) const override \
+    NodeIndex index(int row, const NodeIndex & parent = NodeIndex()) const override \
         {return TREE.index(row,parent);} \
+    /*! Teste si le noeud associé à un index valide est une feuille.*/ \
+    bool leaf(const NodeIndex & index) const override {return TREE.leaf(index);} \
     /*! Renvoie l'index du parent.*/ \
     NodeIndex parent(const NodeIndex &index) const override {return TREE.parent(index);} \
     /*! Renvoie le nombre de d'enfants.*/ \
@@ -40,7 +42,6 @@ class NodeIndex {
     friend AbstractNodeModel;
 protected:
     void * m_ptr = nullptr;                     //!< Pointeur interne sur sur la donnée du model.
-    int m_row = -1;                             //!< Position dans la fratrie.
     AbstractNodeModel * m_model = nullptr;      //!< Pointeur sur le model.
 public:
     //! Constructeur.
@@ -52,13 +53,16 @@ public:
     //! Drapeaux assossiés à une donnée.
     Qt::ItemFlags flags(int cible, szt num = 0) const;
 
+    //! Teste si dans le model le noeud associé à l'index est une feuille.
+    bool leaf() const;
+
     //! Accesseur du pointeur interne.
     void * internalPointer() const noexcept
         {return m_ptr;}
 
     //! Teste si l'index est valide.
     bool isValid() const noexcept
-        {return m_model && m_row >= 0;}
+        {return m_model && m_ptr;}
 
     //! Accesseur du model.
     AbstractNodeModel * model() const noexcept
@@ -107,6 +111,9 @@ public:
     //! Insert count noeuds de nature type avant la ligne row de parent.
     virtual bool insertNodes(int type, int row, int count, const NodeIndex &parent = NodeIndex()) = 0;
 
+    //! Teste si le noeud est une feuille.
+    virtual bool leaf(const NodeIndex & index) const = 0;
+
     //! Parent de l'index.
     virtual NodeIndex parent(const NodeIndex & index) const = 0;
 
@@ -147,7 +154,7 @@ protected:
     void beginResetModel() {emit modelAboutToBeReset();}
 
     //! Crée un index sur le fils numéro row de parent.
-    NodeIndex createIndex(int row, void * ptr = nullptr) const;
+    NodeIndex createIndex(void * ptr = nullptr) const;
 
     //! Fin d'insertion de lignes.
     void endInsertRows() {}
@@ -269,12 +276,12 @@ template<class T> NodeIndex TreeForNodeModel<T>::index(int row, const NodeIndex 
         auto iter = getIter(parent);
         iter.toChild(row);
         if (iter)
-            return m_model->createIndex(row, iter.ptr());
+            return m_model->createIndex(iter.ptr());
     }
     else if (!m_racine || row == 0){
         auto iter = m_tree.cbegin().toChild(row);
         if (iter)
-            return m_model->createIndex(row, iter.ptr());
+            return m_model->createIndex(iter.ptr());
     }
     return NodeIndex();
 }
@@ -283,7 +290,7 @@ template<class T> NodeIndex TreeForNodeModel<T>::parent(const NodeIndex &index) 
         auto iter = getIter(index);
         iter.toParent();
         if(iter && !iter.root())
-            return m_model->createIndex(iter.indexBrother(), iter.ptr());
+            return m_model->createIndex(iter.ptr());
     }
     return NodeIndex();
 }

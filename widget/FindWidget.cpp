@@ -120,6 +120,7 @@ void FindWidget::setFindModel(FindModel * model) {
 //                [this](){if(m_view->selectionModel()->hasSelection())
 //                            m_model->removeNode(m_view->selectionModel()->currentIndex().row(),
 //                                                m_view->selectionModel()->currentIndex().parent().siblingAtColumn(0));});
+        connect(m_resetButton,&QPushButton::clicked,m_model,&FindModel::reset);
         connect(m_findButton,&QPushButton::clicked,m_model,&FindModel::find);
     }
     m_model->setParent(this);
@@ -129,11 +130,8 @@ void FindWidget::setFindModel(FindModel * model) {
 BoolNodeWidget::BoolNodeWidget(const NodeIndex & index, QWidget * parent,int tp)
     : ConditionNodeWidget (index,parent,tp) {
     m_falseCheck = new QCheckBox(m_index.data(FindModel::FalseCible,LabelRole).toString());
-    connect(m_falseCheck,&QCheckBox::stateChanged,this,[this]()
-        {m_index.model()->setData(m_index,FindModel::FalseCible,m_falseCheck->isChecked());});
     m_trueCheck = new QCheckBox(m_index.data(FindModel::TrueCible,LabelRole).toString());
-    connect(m_trueCheck,&QCheckBox::stateChanged,this,[this]()
-        {m_index.model()->setData(m_index,FindModel::TrueCible,m_trueCheck->isChecked());});
+    // Calque
     m_boolLayout = new QHBoxLayout;
     m_boolLayout->addWidget(m_trueCheck);
     m_boolLayout->addWidget(m_falseCheck);
@@ -152,8 +150,6 @@ ChoiceNodeWidget::ChoiceNodeWidget(const NodeIndex & index, QWidget * parent, in
         m_opCB->addItem(OperationNode::Strings[i],i);
     m_opCB->addItem("?",-1);
     m_opCB->setCurrentIndex(FindModel::NbrOperation);
-    connect(m_opCB,qOverload<int>(&QComboBox::currentIndexChanged),this,[this]()
-        {m_index.model()->setData(m_index,FindModel::OpCible,m_opCB->currentData());});
     // Colonne
     m_colonneLabel = new QLabel(tr("Colonne :"));
     m_colonneCB = new QComboBox;
@@ -165,8 +161,7 @@ ChoiceNodeWidget::ChoiceNodeWidget(const NodeIndex & index, QWidget * parent, in
         m_colonneCB->addItem(vec[i],i);
     m_colonneCB->addItem("?",-1);
     m_colonneCB->setCurrentIndex(static_cast<int>(vec.size()));
-    connect(m_colonneCB,qOverload<int>(&QComboBox::currentIndexChanged),this,[this]()
-    {m_index.model()->setData(m_index,FindModel::ColonneCible,m_colonneCB->currentData());});
+    // Calque
     m_mainLayout = new QGridLayout(this);
     m_mainLayout->addWidget(m_opLabel,LabelRow,OpCol);
     m_mainLayout->addWidget(m_opCB,ComboBoxRow,OpCol);
@@ -182,8 +177,7 @@ ComparaisonNodeWidget::ComparaisonNodeWidget(const NodeIndex & index, QWidget * 
     m_compCB->setInsertPolicy(QComboBox::NoInsert);
     for (szt i = 0; i != FindModel::NbrComparaison; ++i)
         m_compCB->addItem(AbstractComparaisonNode::Strings[i],i);
-    connect(m_compCB,qOverload<int>(&QComboBox::currentIndexChanged),this,[this]()
-        {m_index.model()->setData(m_index,FindModel::ColonneCible,m_compCB->currentData());});
+    // Calque
     m_compLayout = new QVBoxLayout;
     m_compLayout->addWidget(m_compLabel);
     m_compLayout->addWidget(m_compCB);
@@ -199,8 +193,7 @@ ConditionNodeWidget::ConditionNodeWidget(const NodeIndex & index, QWidget * pare
     auto vec = static_cast<const modelMPS::FindModel *>(index.model())->nomColonnes();
     for (szt i = 0; i != vec.size(); ++i)
         m_colonneCB->addItem(vec[i],i);
-    connect(m_colonneCB,qOverload<int>(&QComboBox::currentIndexChanged),this,[this]()
-    {m_index.model()->setData(m_index,FindModel::ColonneCible,m_colonneCB->currentData());});
+    // Calque
     m_colonneLayout = new QVBoxLayout;
     m_colonneLayout->addWidget(m_colonneLabel);
     m_colonneLayout->addWidget(m_colonneCB);
@@ -211,8 +204,7 @@ DateNodeWidget::DateNodeWidget(const NodeIndex & index, QWidget * parent,int tp)
     : ComparaisonNodeWidget (index,parent,tp) {
     m_dateLabel = new QLabel(tr("Date :"));
     m_dateEdit = new QDateEdit;
-    connect(m_dateEdit,&QDateEdit::dateChanged,this,[this]()
-        {m_index.model()->setData(m_index,FindModel::DateCible,m_dateEdit->date());});
+    // Calque
     m_dateLayout = new QVBoxLayout;
     m_dateLayout->addWidget(m_dateLabel);
     m_dateLayout->addWidget(m_dateEdit);
@@ -223,9 +215,7 @@ NegationNodeWidget::NegationNodeWidget(const NodeIndex & index, QWidget * parent
     : FindNodeWidget (index,parent,tp) {
     m_nonCheckBox = new QCheckBox(tr("Négation"));
     m_nonCheckBox->setEnabled(index.flags(FindModel::NegCible).testFlag(Qt::ItemIsEnabled));
-    connect(m_nonCheckBox,&QCheckBox::stateChanged,this,[this](){
-       m_index.model()->setData(m_index,FindModel::NegCible,m_nonCheckBox->isChecked());
-    });
+    // Calque
     m_mainLayout = new QHBoxLayout(this);
     m_mainLayout->addWidget(m_nonCheckBox);
 }
@@ -238,8 +228,6 @@ OperationNodeWidget::OperationNodeWidget(const NodeIndex & index, QWidget * pare
     m_opCB->setInsertPolicy(QComboBox::NoInsert);
     for (szt i = 0; i != FindModel::NbrOperation; ++i)
         m_opCB->addItem(OperationNode::Strings[i],i);
-    connect(m_opCB,qOverload<int>(&QComboBox::currentIndexChanged),this,[this]()
-        {m_index.model()->setData(m_index,FindModel::OpCible,m_opCB->currentData());});
     m_opLayout = new QVBoxLayout;
     m_opLayout->addWidget(m_opLabel);
     m_opLayout->addWidget(m_opCB);
@@ -250,14 +238,10 @@ TexteNodeWidget::TexteNodeWidget(const NodeIndex & index, QWidget * parent,int t
     : ConditionNodeWidget (index,parent,tp) {
     m_texteLabel = new QLabel(tr("Chercher :"));
     m_lineEdit = new QLineEdit;
-    connect(m_lineEdit,&QLineEdit::textChanged,this,[this]()
-        {m_index.model()->setData(m_index,FindModel::TexteCible,m_lineEdit->text());});
+    m_lineEdit->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Fixed);
     m_caseCheck = new QCheckBox(tr("Sensible à la case"));
-    connect(m_caseCheck,&QCheckBox::stateChanged,this,[this]()
-        {m_index.model()->setData(m_index,FindModel::TrueCible,m_caseCheck->isChecked());});
     m_regexCheck = new QCheckBox(tr("Expression régulière"));
-    connect(m_regexCheck,&QCheckBox::stateChanged,this,[this]()
-        {m_index.model()->setData(m_index,FindModel::TrueCible,m_regexCheck->isChecked());});
+    // Calque
     m_texteLayout = new QHBoxLayout;
     m_texteLayout->addWidget(m_texteLabel);
     m_texteLayout->addWidget(m_lineEdit);
@@ -267,7 +251,8 @@ TexteNodeWidget::TexteNodeWidget(const NodeIndex & index, QWidget * parent,int t
 }
 
 void TexteNodeWidget::updateData(){
-    m_texteLabel->setText(m_index.data(FindModel::TexteCible).toString());
+    ConditionNodeWidget::updateData();
+    m_lineEdit->setText(m_index.data(FindModel::TexteCible).toString());
     m_caseCheck->setChecked(m_index.data(FindModel::CaseCible).toBool());
     m_regexCheck->setChecked(m_index.data(FindModel::RegexCible).toBool());
 }

@@ -114,6 +114,9 @@ public slots:
     //! Applique la recherche au model à filtré.
     void find();
 
+    //! Réinitialise le model de recherche.
+    void reset();
+
 protected:
     //! Fabrique des noeuds.
     Node nodeFactory(int type, int row, const NodeIndex & parent) override;
