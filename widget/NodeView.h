@@ -4,7 +4,10 @@
 #ifndef NODEVIEW_H
 #define NODEVIEW_H
 
+#include <QGuiApplication>
 #include <QHBoxLayout>
+#include <QMouseEvent>
+#include <QPainter>
 #include <QPushButton>
 #include <QScrollArea>
 #include <QVBoxLayout>
@@ -14,6 +17,11 @@
  */
 namespace widgetMPS {
 class NodeView;
+/*! \ingroup groupeWidget
+ * \brief Espace de noms des widgets de la vue nodeView.
+ */
+namespace nodeViewWidget {
+class ArcWidget;
 /*! \ingroup groupeWidget
  * \brief Classe mère des widgets des noeuds de l'arbre.
  */
@@ -46,7 +54,7 @@ public slots:
     //! Met à jour les données du widget à partir des données du model.
     virtual void updateData() {}
 };
-}
+}}
 /*! \ingroup groupeDelegate
  * \brief Espace de noms des delegates.
  */
@@ -57,7 +65,7 @@ namespace delegateMPS {
 class AbstractNodeDelegate : public QObject {
 public:
     using NodeIndex = modelMPS::NodeIndex;
-    using NodeWidget = widgetMPS::NodeWidget;
+    using NodeWidget = widgetMPS::nodeViewWidget::NodeWidget;
     //! Constructeur.
     AbstractNodeDelegate(QObject * parent);
     //! Crée un widget
@@ -65,15 +73,14 @@ public:
 };
 }
 namespace widgetMPS {
-class ArcWidget;
 /*! \ingroup groupeWidget
  * \brief Vue pour un modèle hérité de AbstractNodeModel.
  */
 class NodeView : public QScrollArea {
     Q_OBJECT
-public:
-    friend ArcWidget;
 protected:
+    using ArcWidget = nodeViewWidget::ArcWidget;
+    friend ArcWidget;
     using NodeIndex = modelMPS::NodeIndex;
     delegateMPS::AbstractNodeDelegate * m_delegate = nullptr;       //!< Délégate de la vue.
     modelMPS::AbstractNodeModel * m_model = nullptr;                //!< Model associé à la vue.
@@ -101,6 +108,9 @@ public:
     void setModel(modelMPS::AbstractNodeModel * model);
 
 public slots:
+    //! Prend en compte l'insertion de nouvelle ligne.
+    void insertRows(const NodeIndex & parent, int first, int last);
+
     //! Met à jour les donnée du NodeWidget associé à l'index.
     void updateData(const NodeIndex & index);
 
@@ -111,7 +121,47 @@ protected slots:
     //! Crée la racine de l'arbre d'arc.
     void resetRoot();
 };
+namespace nodeViewWidget {
+/*! \ingroup groupeWidget
+ * \brief Widget dessinant une branche de l'arbre.
+ */
+class BrancheWidget : public QWidget {
+    Q_OBJECT
+protected:
+    bool m_expanded = false;        //!< Etat de la branche.
+public:
+    enum {HSize = 10,
+          VSize = 20,
+         WidthLine = 3,
+         WidthCircle = 2,
+         Rayon = 2,
+         Ecart = 10,
+         NbrCircle = 3,
+         HSizeCircle = 2 * Rayon + Ecart * (NbrCircle - 1) + WidthCircle,
+         VSizeCircle = 2 * Rayon + WidthCircle};
+    //! Constructeur.
+    BrancheWidget(bool expandState = false, QWidget * parent = nullptr);
 
+    //! Acceseur de l'état d'expansion.
+    bool expanded() const noexcept
+        {return m_expanded;}
+
+    //! Dessine la branche.
+    void paintEvent(QPaintEvent * event) override;
+
+    //! Gestionnaire de click de souris.
+    void mousePressEvent(QMouseEvent *event) override;
+
+    //! Mutateur de l'état d'expansion.
+    void setExpanded(bool bb);
+
+    //! Taille souhaité du widget.
+    QSize sizeHint() const override;
+
+signals:
+    //! Signal emit lors du changement d'état d'expansion.
+    void expandStateChanged(bool bb);
+};
 /*! \ingroup groupeWidget
  * \brief Widget associé à un noeud.
  */
@@ -119,13 +169,13 @@ class ArcWidget : public QWidget {
     Q_OBJECT
 protected:
     enum {NodeWidgetIndice = 0};
-    bool m_expandEtat;                      //!< Etat d'expansion des fils.
+    bool m_leaf = true;                            //!< Le noeud est une feuille.
     NodeView * m_view;                      //!< Vue contenant le widget.
     NodeWidget * m_nodeWidget = nullptr;    //!< Widget de noeud.
-    QPushButton * m_expandButton;           //!< Bouton d'expansion des fils du noeud.
+    BrancheWidget * m_brancheWgt;            //!< Branche d'expansion des fils du noeud.
+    QHBoxLayout * m_brancheLayout;           //!< Calque secondaire.
     QVBoxLayout * m_expandLayout;           //!< Calque d'expansion des fils du noeud.
-    QHBoxLayout * m_mainLayout;             //!< Calque Principale.
-    QVBoxLayout * m_secondLayout;           //!< Calque secondaire.
+    QVBoxLayout * m_mainLayout;             //!< Calque Principale.
 public:
     //! Constructeur.
     ArcWidget(NodeWidget * node, NodeView * view, QWidget * parent = nullptr);
@@ -140,11 +190,24 @@ public:
 
     //! Accesseur de l'état d'expansion des fils.
     bool expandEtat() const noexcept
-        {return m_expandEtat;}
+        {return m_brancheWgt->expanded();}
+
+    //! Prend en compte l'insertion de nouvelles lignes.
+    void insertRows(int first, int last);
+
+    //! Accesseur de l'état de feuille.
+    bool leaf() const noexcept
+        {return m_leaf;}
 
     //! Accesseur du widget de noeud.
     NodeWidget * nodeWidget() const noexcept
         {return m_nodeWidget;}
+
+    //! Mutateur de l'état d'expansion des fils.
+    void setExpandEtat(bool bb);
+
+    //! Mutateur de l'état de feuille.
+    void setLeaf(bool bb);
 
     //! Mutateur du widget de noeud.
     void setNodeWidget(NodeWidget * widget);
@@ -157,10 +220,6 @@ public:
 
     //! Taille souhaité du widget.
     QSize sizeHint() const override;
-
-public slots:
-    //! Mutateur de l'état d'expansion des fils.
-    void setExpandEtat(bool bb);
 };
-}
+}}
 #endif // NODEVIEW_H

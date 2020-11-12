@@ -21,9 +21,17 @@ Qt::ItemFlags NodeIndex::flags(int cible, szt num) const
 bool NodeIndex::leaf() const
     {return isValid() && m_model->leaf(*this);}
 
+NodeIndex NodeIndex::nextBrother() const noexcept
+    {return m_model ? m_model->nextBrother(*this)
+                    : NodeIndex();}
+
 NodeIndex NodeIndex::parent() const
     {return isValid() ? m_model->parent(*this)
                       : NodeIndex();}
+
+NodeIndex NodeIndex::prevBrother() const noexcept
+    {return m_model ? m_model->prevBrother(*this)
+                    : NodeIndex();}
 
 /////////////////////////////////// TreeNodeModel ///////////////////////////
 
