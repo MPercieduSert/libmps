@@ -82,7 +82,6 @@ public:
 namespace findNodeWidget {
 using namespace modelMPS;
 using namespace findNodeModel;
-using NodeWidget = nodeViewWidget::NodeWidget;
 /*! \ingroup groupeModel
  * \brief Classe mère des widgets associés aux neuds de recherche.
  */
