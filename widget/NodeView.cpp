@@ -74,7 +74,7 @@ void ArcNodeViewWidget::paintEvent(QPaintEvent * /*event*/) {
             painter.setPen(pen);
             painter.setBrush(QBrush(QGuiApplication::palette().color(QPalette::Active,QPalette::WindowText)));
             for (auto i = 0; i < NbrCircle; ++i) {
-                QPoint pt(m_nodeWidget->geometry().left() + WidthCircle+ Rayon + Ecart * i,
+                QPoint pt(m_nodeWidget->geometry().left() + WidthCircle + Rayon + Ecart * i,
                           m_nodeWidget->geometry().bottom() + VSpacing + WidthCircle + Rayon);
                 painter.drawEllipse(pt,Rayon,Rayon);
             }

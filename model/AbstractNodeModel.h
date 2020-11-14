@@ -34,7 +34,6 @@ enum roleDataNode {
     LabelRole
 };
 
-
 /*! \ingroup groupeModel
  * \brief Classe d'index d'un noeuds.
  */

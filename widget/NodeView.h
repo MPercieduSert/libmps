@@ -134,7 +134,7 @@ protected:
           HMaxLine = 100,
           WidthCircle = 0,
           Rayon = 3,
-          Ecart = 10,
+          Ecart = Rayon * 4,
           NbrCircle = 3,
           HSizeCircle = 2 * Rayon + Ecart * (NbrCircle - 1) + 2 * WidthCircle,
           VSizeCircle = 2 * Rayon + 2 * WidthCircle,

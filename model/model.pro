@@ -32,7 +32,8 @@ SOURCES += \
     TableModel.cpp \
     TreeColonnesModel.cpp \
     TreeNoeudModel.cpp \
-    FindModel.cpp
+    FindModel.cpp \
+    NodeSelectionModel.cpp
 
 HEADERS += \
     AbstractColonnesModel.h \
@@ -45,7 +46,8 @@ HEADERS += \
     TableModel.h \
     TreeColonnesModel.h \
     TreeNoeudModel.h \
-    FindModel.h
+    FindModel.h \
+    NodeSelectionModel.h
 
 unix {
     target.path = /usr/lib
