@@ -8,7 +8,7 @@ using namespace findNodeWidget;
 
 
 ///////////////////////////// FindDelegate ////////////////////////////
-NodeWidget * FindDelegate::createWidget(const NodeIndex &index, QWidget *parent) const {
+NodeWidget * FindDelegate::createWidget(const NodeIndex &index, ArcNodeViewWidget *parent) const {
     if(index.isValid()) {
         switch (index.data(NodeTypeCible,DataRole).toInt()) {
         case FindModel::BoolNodeType:
@@ -127,7 +127,7 @@ void FindWidget::setFindModel(FindModel * model) {
 }
 
 /////////////////////////////////////////////////// Noeud de Recherche /////////////////////////////////
-BoolNodeWidget::BoolNodeWidget(const NodeIndex & index, QWidget * parent,int tp)
+BoolNodeWidget::BoolNodeWidget(const NodeIndex & index, ArcNodeViewWidget *parent, int tp)
     : ConditionNodeWidget (index,parent,tp) {
     m_falseCheck = new QCheckBox(m_index.data(FindModel::FalseCible,LabelRole).toString());
     m_trueCheck = new QCheckBox(m_index.data(FindModel::TrueCible,LabelRole).toString());
@@ -138,7 +138,7 @@ BoolNodeWidget::BoolNodeWidget(const NodeIndex & index, QWidget * parent,int tp)
     m_mainLayout->addLayout(m_boolLayout);
 }
 
-ChoiceNodeWidget::ChoiceNodeWidget(const NodeIndex & index, QWidget * parent, int tp)
+ChoiceNodeWidget::ChoiceNodeWidget(const NodeIndex & index, ArcNodeViewWidget * parent, int tp)
     : FindNodeWidget (index,parent,tp) {
     // Opération.
     m_opLabel = new QLabel(tr("Opération :"));
@@ -169,7 +169,7 @@ ChoiceNodeWidget::ChoiceNodeWidget(const NodeIndex & index, QWidget * parent, in
     m_mainLayout->addWidget(m_colonneCB,ComboBoxRow,ColonneCol);
 }
 
-ComparaisonNodeWidget::ComparaisonNodeWidget(const NodeIndex & index, QWidget * parent, int tp)
+ComparaisonNodeWidget::ComparaisonNodeWidget(const NodeIndex & index, ArcNodeViewWidget * parent, int tp)
     : ConditionNodeWidget (index,parent,tp) {
     m_compLabel = new QLabel(tr("Comparaison :"));
     m_compCB = new QComboBox;
@@ -184,7 +184,7 @@ ComparaisonNodeWidget::ComparaisonNodeWidget(const NodeIndex & index, QWidget * 
     m_mainLayout->addLayout(m_compLayout);
 }
 
-ConditionNodeWidget::ConditionNodeWidget(const NodeIndex & index, QWidget * parent, int tp)
+ConditionNodeWidget::ConditionNodeWidget(const NodeIndex & index, ArcNodeViewWidget *parent, int tp)
     : NegationNodeWidget (index,parent,tp) {
     m_colonneLabel = new QLabel(tr("Colonne :"));
     m_colonneCB = new QComboBox;
@@ -200,7 +200,7 @@ ConditionNodeWidget::ConditionNodeWidget(const NodeIndex & index, QWidget * pare
     m_mainLayout->addLayout(m_colonneLayout);
 }
 
-DateNodeWidget::DateNodeWidget(const NodeIndex & index, QWidget * parent,int tp)
+DateNodeWidget::DateNodeWidget(const NodeIndex & index, ArcNodeViewWidget *parent, int tp)
     : ComparaisonNodeWidget (index,parent,tp) {
     m_dateLabel = new QLabel(tr("Date :"));
     m_dateEdit = new QDateEdit;
@@ -211,7 +211,7 @@ DateNodeWidget::DateNodeWidget(const NodeIndex & index, QWidget * parent,int tp)
     m_mainLayout->addLayout(m_dateLayout);
 }
 
-NegationNodeWidget::NegationNodeWidget(const NodeIndex & index, QWidget * parent, int tp)
+NegationNodeWidget::NegationNodeWidget(const NodeIndex & index, ArcNodeViewWidget * parent, int tp)
     : FindNodeWidget (index,parent,tp) {
     m_nonCheckBox = new QCheckBox(tr("Négation"));
     m_nonCheckBox->setEnabled(index.flags(FindModel::NegCible).testFlag(Qt::ItemIsEnabled));
@@ -220,7 +220,7 @@ NegationNodeWidget::NegationNodeWidget(const NodeIndex & index, QWidget * parent
     m_mainLayout->addWidget(m_nonCheckBox);
 }
 
-OperationNodeWidget::OperationNodeWidget(const NodeIndex & index, QWidget * parent, int tp)
+OperationNodeWidget::OperationNodeWidget(const NodeIndex & index, ArcNodeViewWidget * parent, int tp)
     : NegationNodeWidget (index,parent,tp) {
     m_opLabel = new QLabel(tr("Opération :"));
     m_opCB = new QComboBox;
@@ -234,7 +234,7 @@ OperationNodeWidget::OperationNodeWidget(const NodeIndex & index, QWidget * pare
     m_mainLayout->addLayout(m_opLayout);
 }
 
-TexteNodeWidget::TexteNodeWidget(const NodeIndex & index, QWidget * parent,int tp)
+TexteNodeWidget::TexteNodeWidget(const NodeIndex & index, ArcNodeViewWidget *parent, int tp)
     : ConditionNodeWidget (index,parent,tp) {
     m_texteLabel = new QLabel(tr("Chercher :"));
     m_lineEdit = new QLineEdit;

@@ -129,6 +129,10 @@ void ArcNodeViewWidget::setNodeWidget(NodeWidget * widget) {
     }
     m_nodeWidget = widget;
     m_nodeWidget->setParent(this);
+    if(m_view->selectionModel()->isCurrentIndex(m_nodeWidget->index()))
+        m_nodeWidget->setEtatSelection(NodeWidget::Current);
+    else if(m_view->selectionModel()->isSelected(m_nodeWidget->index()))
+        m_nodeWidget->setEtatSelection(NodeWidget::Selected);
     m_nodeWidget->updateData();
     m_nodeWidget->connexion();
     m_view->m_arcMap[m_nodeWidget->index()] = this;
@@ -159,6 +163,35 @@ QSize ArcNodeViewWidget::sizeHint() const{
 NodeView::NodeView(QWidget * parent)
     : QScrollArea (parent) {}
 
+void NodeView::clickLeftOn(const NodeIndex & index) {
+    switch (m_selectionMode) {
+    case SingleSelection:
+        m_selectionModel->setCurrentIndex(index,SelectionModel::Toggle);
+        break;
+    case MultiSelection:
+        break;
+    case ContinousSelection:
+        break;
+    case ExtendedSelection:
+        break;
+    case NoSelection:
+        break;
+    }
+}
+
+void NodeView::currentChanged(const NodeIndex & current, const NodeIndex & previous){
+    if(current.isValid()) {
+        auto iter = m_arcMap.find(current);
+        if(iter != m_arcMap.end())
+            iter->second->nodeWidget()->setEtatSelection(NodeWidget::Current);
+    }
+    if(previous.isValid()) {
+        auto iter = m_arcMap.find(previous);
+        if(iter != m_arcMap.end())
+            iter->second->nodeWidget()->setEtatSelection(NodeWidget::NoSelected);
+    }
+}
+
 void NodeView::deleteRoot(){
     m_arcMap.clear();
     delete takeWidget();
@@ -170,7 +203,11 @@ void NodeView::insertRows(const NodeIndex & parent, int first, int last) {
         iter->second->insertRows(first,last);
 }
 
-void NodeView::setDelegate(AbstractNodeDelegate * delegate) {
+void NodeView::setCurrentIndex(const NodeIndex & index){
+    m_selectionModel->setCurrentIndex(index,modelMPS::NodeSelectionModel::Select);
+}
+
+void NodeView::setDelegate(Delegate * delegate) {
     if(m_delegate)
         delete m_delegate;
     m_delegate = delegate;
@@ -179,20 +216,27 @@ void NodeView::setDelegate(AbstractNodeDelegate * delegate) {
         resetRoot();
 }
 
-void NodeView::setModel(AbstractNodeModel * model) {
+void NodeView::setModel(Model *model) {
     if(m_model && static_cast<QObject*>(m_model->parent()) == static_cast<QObject*>(this))
         m_model->deleteLater();
     m_model = model;
     if(!m_model->parent())
         m_model->setParent(this);
-    connect(m_model,qOverload<const NodeIndex &>(&AbstractNodeModel::dataChanged),this,&NodeView::updateData);
-    connect(m_model,&AbstractNodeModel::modelAboutToBeReset,this,&NodeView::deleteRoot);
-    connect(m_model,&AbstractNodeModel::modelReset,this,&NodeView::resetRoot);
-    connect(m_model,&AbstractNodeModel::rowsInserted,this,&NodeView::insertRows);
+    connect(m_model,qOverload<const NodeIndex &>(&Model::dataChanged),this,&NodeView::updateData);
+    connect(m_model,&Model::modelAboutToBeReset,this,&NodeView::deleteRoot);
+    connect(m_model,&Model::modelReset,this,&NodeView::resetRoot);
+    connect(m_model,&Model::rowsInserted,this,&NodeView::insertRows);
     if(m_delegate && m_model)
         resetRoot();
+    setSelectionModel(new SelectionModel(m_model,this));
 }
 
+void NodeView::setSelectionModel(SelectionModel * selectionModel) {
+    if(!m_selectionMode)
+        disconnect(m_selectionModel,nullptr,this,nullptr);
+    m_selectionModel = selectionModel;
+    connect(m_selectionModel,&SelectionModel::currentChanged,this,&NodeView::currentChanged);
+}
 void NodeView::resetRoot(){
     if(widget())
         deleteRoot();
@@ -213,7 +257,43 @@ void NodeView::updateData(const NodeIndex & index) {
 }
 
 ////////////////////////////////////////// NodeWidget /////////////////////////////////////
-NodeWidget::NodeWidget(const NodeIndex & index, QWidget * parent, int tp)
-    : QFrame(parent), m_type(tp), m_index(index) {
-    setFrameShape(Box);
+NodeWidget::NodeWidget(const NodeIndex & index, ArcNodeViewWidget *parent, int tp)
+    : QWidget(parent),
+      m_colorLine(QGuiApplication::palette().color(QPalette::Active,QPalette::WindowText)),
+      m_type(tp), m_index(index)
+    {}
+
+void NodeWidget::mousePressEvent(QMouseEvent * event) {
+    if(event->button() == Qt::LeftButton)
+        static_cast<ArcNodeViewWidget *>(parentWidget())->view()->clickLeftOn(m_index);
+}
+
+void NodeWidget::paintEvent(QPaintEvent * /*event*/) {
+    QPen pen(m_colorLine);
+    pen.setWidth(m_widthLine);
+    QPainter painter(this);
+    painter.setPen(pen);
+    painter.drawRoundedRect(m_widthLine / 2,m_widthLine / 2,width() - m_widthLine,height() - m_widthLine,Rayon,Rayon,Qt::AbsoluteSize);
+}
+
+void NodeWidget::setEtatSelection(EtatSelection etat) {
+    if(m_etatSelection != etat){
+        switch (etat) {
+        case NoSelected:
+            m_widthLine = NoSelectedWidth;
+            m_colorLine = QGuiApplication::palette().color(QPalette::Active,QPalette::WindowText);
+            break;
+        case Selected:
+            m_widthLine = SelectedWidth;
+            m_colorLine = QGuiApplication::palette().color(QPalette::Active,QPalette::Highlight);
+            break;
+        case Current:
+            m_widthLine = CurrentWidth;
+            m_colorLine = QGuiApplication::palette().color(QPalette::Active,QPalette::Highlight);
+            break;
+        case Initial:
+            break;
+        }
+        repaint();
     }
+}

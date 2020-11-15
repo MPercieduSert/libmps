@@ -31,7 +31,7 @@ public:
         : AbstractNodeDelegate (parent) {}
 
     //! Fabrique d'éditeur.
-    NodeWidget * createWidget(const NodeIndex &index, QWidget * parent) const override;
+    NodeWidget * createWidget(const NodeIndex &index, widgetMPS::ArcNodeViewWidget *parent) const override;
 };
 }
 
@@ -102,7 +102,7 @@ protected:
     QHBoxLayout * m_mainLayout;     //!< Calque principale du noeud.
 public:
     //! Constructeur.
-    NegationNodeWidget(const NodeIndex & index, QWidget * parent, int tp = NoType);
+    NegationNodeWidget(const NodeIndex & index, ArcNodeViewWidget *parent, int tp = NoType);
 
     //! Connecte les éléments du noeuds au model.
     void connexion() const override {
@@ -130,7 +130,7 @@ protected:
     QVBoxLayout * m_colonneLayout;      //!< Calque du choix de colonne.
 public:
     //! Constructeur.
-    ConditionNodeWidget(const NodeIndex & index, QWidget * parent, int tp = NoType);
+    ConditionNodeWidget(const NodeIndex & index, ArcNodeViewWidget * parent, int tp = NoType);
 
     //! Connecte les éléments du noeuds au model.
     void connexion() const override {
@@ -163,7 +163,7 @@ protected:
     QVBoxLayout * m_compLayout;      //!< Calque du choix de la comparaison.
 public:
     //! Constructeur.
-    ComparaisonNodeWidget(const NodeIndex & index, QWidget * parent, int tp = NoType);
+    ComparaisonNodeWidget(const NodeIndex & index, ArcNodeViewWidget *parent, int tp = NoType);
 
     //! Connecte les éléments du noeuds au model.
     void connexion() const override {
@@ -196,7 +196,7 @@ protected:
     QHBoxLayout * m_boolLayout;         //!< Calque filtrage sur des booléen.
 public:
     //! Constructeur.
-    BoolNodeWidget(const NodeIndex & index, QWidget * parent, int tp = FindModel::BoolNodeType);
+    BoolNodeWidget(const NodeIndex & index, ArcNodeViewWidget * parent, int tp = FindModel::BoolNodeType);
 
     //! Connecte les éléments du noeuds au model.
     void connexion() const override{
@@ -241,7 +241,7 @@ protected:
     QGridLayout * m_mainLayout;    //!< Calque du choix de l'opération.
 public:
     //! Constructeur.
-    ChoiceNodeWidget(const NodeIndex & index, QWidget * parent, int tp = FindModel::ChoiceNodeType);
+    ChoiceNodeWidget(const NodeIndex & index, ArcNodeViewWidget * parent, int tp = FindModel::ChoiceNodeType);
 
     //! Connecte les éléments du noeuds au model.
     void connexion() const override {
@@ -270,7 +270,7 @@ protected:
     QVBoxLayout * m_dateLayout; //!< Calque du choix de la date.
 public:
     //! Constructeur.
-    DateNodeWidget(const NodeIndex & index, QWidget * parent, int tp = FindModel::DateNodeType);
+    DateNodeWidget(const NodeIndex & index, ArcNodeViewWidget * parent, int tp = FindModel::DateNodeType);
 
     //! Connecte les éléments du noeuds au model.
     void connexion() const override {
@@ -303,7 +303,7 @@ protected:
     QVBoxLayout * m_opLayout;      //!< Calque du choix de l'opération.
 public:
     //! Constructeur.
-    OperationNodeWidget(const NodeIndex & index, QWidget * parent, int tp = FindModel::OperationNodeType);
+    OperationNodeWidget(const NodeIndex & index, ArcNodeViewWidget *parent, int tp = FindModel::OperationNodeType);
 
     //! Connecte les éléments du noeuds au model.
     void connexion() const override {
@@ -338,7 +338,7 @@ protected:
     QHBoxLayout * m_texteLayout;    //!< Calque du texte chercher.
 public:
     //! Constructeur.
-    TexteNodeWidget(const NodeIndex & index, QWidget * parent, int tp = FindModel::TexteNodeType);
+    TexteNodeWidget(const NodeIndex & index, ArcNodeViewWidget * parent, int tp = FindModel::TexteNodeType);
 
     //! Connecte les éléments du noeuds au model.
     void connexion() const override {

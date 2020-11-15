@@ -11,7 +11,7 @@
 #include <QPushButton>
 #include <QScrollArea>
 #include <QVBoxLayout>
-#include "AbstractNodeModel.h"
+#include "NodeSelectionModel.h"
 /*! \defgroup groupeDelegate Delegate
  * \brief Ensemble des classes des delegates.
  */
@@ -21,17 +21,30 @@ class ArcNodeViewWidget;
 /*! \ingroup groupeWidget
  * \brief Classe mère des widgets des noeuds de l'arbre.
  */
-class NodeWidget : public QFrame {
+class NodeWidget : public QWidget {
     Q_OBJECT
 public:
     using NodeIndex = modelMPS::NodeIndex;
-    enum {NoType = modelMPS::TreeNodeModel::NoType};
+    enum {NoType = modelMPS::TreeNodeModel::NoType,
+         Rayon = 10,
+         NoSelectedWidth = 2,
+         SelectedWidth = NoSelectedWidth,
+         CurrentWidth = 2 * SelectedWidth};
+    //! Etat de sélection du noeud.
+    enum EtatSelection {Initial = -1,
+                        NoSelected,
+                        Selected,
+                        Current
+                       };
 protected:
-    const int m_type;           //!< Type du Noeud.
-    const NodeIndex m_index;    //!< Index sur la donnée représentée par le noeud.
+    EtatSelection m_etatSelection = Initial;        //!< État de sélection.
+    int m_widthLine = NoSelectedWidth;              //!< Épaisseur du trait.
+    QColor m_colorLine;                             //!< Couleur de la ligne.
+    const int m_type;                               //!< Type du Noeud.
+    const NodeIndex m_index;                        //!< Index sur la donnée représentée par le noeud.
 public:
     //! Constructeur.
-    NodeWidget(const NodeIndex & index, QWidget * parent = nullptr, int tp = NoType);
+    NodeWidget(const NodeIndex & index, ArcNodeViewWidget * parent = nullptr, int tp = NoType);
 
     //! Connecte les éléments du noeuds au model.
     virtual void connexion() const {}
@@ -42,6 +55,15 @@ public:
     //! Accesseur de l'index.
     const NodeIndex & index() const noexcept
         {return m_index;}
+
+    //! Gestionnaire de click de souris.
+    void mousePressEvent(QMouseEvent *event) override;
+
+    //! Dessine la noeud.
+    void paintEvent(QPaintEvent * event) override;
+
+    //! Le noeud devient courant.
+    void setEtatSelection(EtatSelection etat);
 
     //! Accesseur du type de noeud.
     int type() const noexcept
@@ -65,7 +87,7 @@ public:
     //! Constructeur.
     AbstractNodeDelegate(QObject * parent);
     //! Crée un widget
-    virtual NodeWidget * createWidget(const NodeIndex &index, QWidget * parent = nullptr) const = 0;
+    virtual NodeWidget * createWidget(const NodeIndex &index, widgetMPS::ArcNodeViewWidget * parent = nullptr) const = 0;
 };
 }
 namespace widgetMPS {
@@ -74,12 +96,26 @@ namespace widgetMPS {
  */
 class NodeView : public QScrollArea {
     Q_OBJECT
+public:
+    //! Mode de sélection.
+    enum SelectionMode {NoSelection,
+                        SingleSelection,
+                        MultiSelection,
+                        ExtendedSelection,
+                        ContinousSelection
+                        };
 protected:
     friend ArcNodeViewWidget;
+    friend NodeWidget;
+    using Delegate = delegateMPS::AbstractNodeDelegate;
+    using Model = modelMPS::AbstractNodeModel;
     using NodeIndex = modelMPS::NodeIndex;
-    delegateMPS::AbstractNodeDelegate * m_delegate = nullptr;       //!< Délégate de la vue.
-    modelMPS::AbstractNodeModel * m_model = nullptr;                //!< Model associé à la vue.
-    std::map<NodeIndex,ArcNodeViewWidget *> m_arcMap;               //!< Map des arc.
+    using SelectionModel = modelMPS::NodeSelectionModel;
+    Delegate * m_delegate = nullptr;                    //!< Délégate de la vue.
+    Model * m_model = nullptr;                          //!< Model associé à la vue.
+    SelectionMode m_selectionMode = SingleSelection;    //!< Mode de sélection.
+    SelectionModel * m_selectionModel = nullptr;        //!< Model de sélection.
+    std::map<NodeIndex,ArcNodeViewWidget *> m_arcMap;   //!< Map des arc.
 public:
     //! Constructeur.
     NodeView(QWidget * parent = nullptr);
@@ -89,18 +125,36 @@ public:
         {deleteRoot();}
 
     //! Accesseur du delegate.
-    delegateMPS::AbstractNodeDelegate * delegate() const noexcept
+    Delegate * delegate() const noexcept
         {return m_delegate;}
 
     //! Accesseur du model.
-    modelMPS::AbstractNodeModel * model() const noexcept
+    Model * model() const noexcept
         {return m_model;}
 
+    //! Accesseur du model de sélection.
+    SelectionMode selectionMode() const noexcept
+        {return m_selectionMode;}
+
+    //! Accesseur du model de sélection.
+    SelectionModel * selectionModel() const noexcept
+        {return m_selectionModel;}
+
+    //! Selectionne l'index courant.
+    void setCurrentIndex(const NodeIndex & index);
+
     //! Mutateur du delegate.
-    void setDelegate(delegateMPS::AbstractNodeDelegate * delegate);
+    void setDelegate(Delegate * delegate);
 
     //! Mutateur du model.
-    void setModel(modelMPS::AbstractNodeModel * model);
+    void setModel(Model * model);
+
+    //! Mutateur du mode de sélection.
+    void setSelectionModel(SelectionMode selectionMode)
+        {m_selectionMode = selectionMode;}
+
+    //! Mutateur du model de sélection.
+    void setSelectionModel(SelectionModel * selectionModel);
 
 public slots:
     //! Prend en compte l'insertion de nouvelle ligne.
@@ -110,11 +164,20 @@ public slots:
     void updateData(const NodeIndex & index);
 
 protected slots:
+    //! Change le noeud courant.
+    void currentChanged(const NodeIndex & current, const NodeIndex & previous);
+
     //! Vide le map d'arc et supprime l'arbre d'arc.
     void deleteRoot();
 
     //! Crée la racine de l'arbre d'arc.
     void resetRoot();
+
+    //! Change la sélection.
+    void selectionChanged(const std::list<NodeIndex> & selected, const std::list<NodeIndex> & deselected) {}
+protected:
+    //! Gestion d'un click sur un noeud.
+    void clickLeftOn(const NodeIndex & index);
 };
 
 /*! \ingroup groupeWidget
@@ -129,7 +192,7 @@ protected:
           RightMargin = 2,
           TopNodeMargin = 3,
           VSpacing = 3,
-          HSpacing = 2,
+          HSpacing = 3,
           WidthLine = 2,
           HMaxLine = 100,
           WidthCircle = 0,
@@ -138,7 +201,9 @@ protected:
           NbrCircle = 3,
           HSizeCircle = 2 * Rayon + Ecart * (NbrCircle - 1) + 2 * WidthCircle,
           VSizeCircle = 2 * Rayon + 2 * WidthCircle,
-          RigthCircles = LeftNodeMargin + HSizeCircle};
+          RigthCircles = LeftNodeMargin + HSizeCircle
+         };
+
     bool m_adjustSize = true;                   //!< Verrou d'ajustment de la taille.
     bool m_expanded = false;                    //!< Etat de la branche.
     bool m_leaf = true;                         //!< Le noeud est une feuille.
@@ -209,6 +274,10 @@ public:
 
     //! Taille souhaité du widget.
     QSize sizeHint() const override;
+
+    //! Accesseur de la vue.
+    NodeView * view() const noexcept
+        {return m_view;}
 
 protected:
     //! Déplace les enfants suivants après changment de taille d'un des enfants.

@@ -19,6 +19,7 @@ protected:
     std::list<NodeIndex> m_selection;   //!< Sélection courant.
 
 public:
+    //! Drapeaux de sélection.
     enum flagSelection : flag::flag_type {
         NoUpdate = 0x0,         //!< Pas de mis à jour de la sélection.
         Clear = 0x1,            //!< Efface la sélection Précédente.
@@ -27,6 +28,7 @@ public:
         Toggle = 0x8,           //!< Sélectionne ou désélection les index en fonction de la sélection actuelle.
         Children = 0x10        //!< Sélection la descendance.
     };
+
     //! Constructeur.
     NodeSelectionModel(AbstractNodeModel * model = nullptr, QObject * parent = nullptr);
 
@@ -38,9 +40,13 @@ public:
     bool hasSelection() const noexcept
         {return m_hasSelection;}
 
+    //! Teste si index et l'index courant.
+    bool isCurrentIndex(const NodeIndex & index)
+        {return m_hasSelection && m_currentIndex == index;}
+
     //! Teste si un index est sélectionné.
     bool isSelected(const NodeIndex & index) {
-        if(m_hasSelection)
+        if(m_hasSelection && m_model == index.model())
             return std::find(m_selection.cbegin(),m_selection.cend(),index) != m_selection.cend();
         return false;
     }
@@ -76,7 +82,7 @@ public slots:
     void select(const std::list<NodeIndex> & index, flag selectionFlag) {}
 
     //! Mutateur de l'index courant.
-    void setCurrentIndex(const NodeIndex & index, flag selectionFlag) {}
+    void setCurrentIndex(const NodeIndex & index, flag selectionFlag);
 signals:
     //! L'index courant a changé.
     void currentChanged(const NodeIndex & current, const NodeIndex & previous);
