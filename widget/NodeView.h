@@ -204,7 +204,7 @@ protected:
           RigthCircles = LeftNodeMargin + HSizeCircle
          };
 
-    bool m_adjustSize = true;                   //!< Verrou d'ajustment de la taille.
+    bool m_drawNode = true;                     //!< Verrou de dessin des noeuds.
     bool m_expanded = false;                    //!< Etat de la branche.
     bool m_leaf = true;                         //!< Le noeud est une feuille.
     const bool m_root;                          //!< Le noeud est la racine.
@@ -223,14 +223,8 @@ public:
     ~ArcNodeViewWidget() override
         {m_view->m_arcMap.erase(m_nodeWidget->index());}
 
-    //! Ajuste la taille.
-    void adjustSize() {
-        if(m_adjustSize) {
-            QWidget::adjustSize();
-            if(!m_root)
-                static_cast<ArcNodeViewWidget *>(parentWidget())->moveNextChild(this);
-        }
-    }
+    //! Place le noeud  et les suivants et ajuste les tailles.
+    void drawNode(bool next = false);
 
     //! Acceseur de l'état d'expansion.
     bool expanded() const noexcept
@@ -278,10 +272,6 @@ public:
     //! Accesseur de la vue.
     NodeView * view() const noexcept
         {return m_view;}
-
-protected:
-    //! Déplace les enfants suivants après changment de taille d'un des enfants.
-    void moveNextChild(ArcNodeViewWidget * arc);
 };
 }
 #endif // NODEVIEW_H

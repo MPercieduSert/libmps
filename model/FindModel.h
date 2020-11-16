@@ -91,8 +91,8 @@ public:
     //! Donne la liste des noms des colonnes du model associé.
     std::vector<QString> nomColonnes() const;
 
-    //! Supprime le noeud de la ligne row de parent.
-    void removeNode(int row, const NodeIndex & parent);
+    //! Supprime le noeud et ses descendants.
+    void removeNode(const NodeIndex & index);
 
     //! Teste si l'arbre est réduit à sa racine.
     bool rootLeaf() const override
@@ -178,7 +178,7 @@ public:
  */
 class AbstractConditionNode : public AbstractNegationNode {
 protected:
-    szt m_pos = 0;            //!< Position de la colonne dans le model filtré.
+    szt m_pos;            //!< Position de la colonne dans le model filtré.
 public:
     //! Constructeur.
     AbstractConditionNode() = default;
@@ -264,7 +264,7 @@ public:
     //! Accesseur de la donnée associé à column.
     QVariant data(int type, int role = DataRole, szt num = 0) const override;
 
-    //! Test si le noeud intervient dans la recherche.
+    //! Test si le noeud n'intervient pas dans la recherche.
     bool empty() const override
         {return m_true && m_false;}
 
@@ -291,7 +291,7 @@ public:
     //! Constructeur.
     ChoiceNode() : AbstractFindNode(FindModel::ChoiceNodeType) {}
 
-    //! Test si le noeud intervient dans la recherche.
+    //! Test si le noeud n'intervient pas dans la recherche.
     bool empty() const override
         {return true;}
 
@@ -316,7 +316,7 @@ public:
     //! Accesseur de la donnée associé à column.
     QVariant data(int type, int role = DataRole, szt num = 0) const override;
 
-    //! Test si le noeud intervient dans la recherche.
+    //! Test si le noeud n'intervient pas dans la recherche.
     bool empty() const override
         {return !m_date.isValid();}
 
@@ -358,6 +358,10 @@ public:
         return AbstractNegationNode::flags(cible,num);
     }
 
+    //! Test si le noeud n'intervient pas dans la recherche.
+    bool empty() const override
+        {return true;}
+
     //! Accesseur de l'opération.
     szt operation() const
         {return m_operation;}
@@ -392,7 +396,7 @@ public:
     //! Accesseur de la donnée associé à column.
     QVariant data(int type, int role = DataRole, szt num = 0) const override;
 
-    //! Test si le noeud intervient dans la recherche.
+    //! Test si le noeud n'intervient pas dans la recherche.
     bool empty() const override
         {return m_texte.isEmpty();}
 

@@ -67,16 +67,17 @@ TreeNodeModel::Node FindModel::nodeConditionFactory(szt pos){
     }
 }
 
-void FindModel::removeNode(int row, const NodeIndex & parent){
-    if(parent.isValid() && row >= 0 && row < rowCount(parent)){
-        if(rowCount(parent) == 2) {
-            m_data.getValidData(parent) = std::move(m_data.getValidData(index(1 - row,parent)));
-            removeRows(0,2,parent);
-            emit dataChanged(parent);
-        }
-        else
-            removeRows(row,1,parent);
-    }
+void FindModel::removeNode(const NodeIndex & index){
+//    if(index.isValid() && index.model() == this){
+//        auto row = index.row();
+//        if(rowCount(index.parent()) == 2) {
+//            m_data.getValidData(index) = std::move(m_data.getValidData(index(1 - row,index.parent())));
+//            removeRows(0,2,index);
+//            emit dataChanged(index);
+//        }
+//        else
+//            removeRows(row,1,index);
+//    }
 }
 
 void FindModel::reset() {
@@ -132,7 +133,7 @@ bool FindModel::testTree(szt id) const{
     iter.toFirstLeaf();
     auto test = true;
     while (!iter.parent().root()) {
-        if(iter.leaf())
+        if(iter.leaf() && !static_cast<const AbstractFindNode &>(**iter).empty())
             test = static_cast<const AbstractConditionNode &>(**iter).test(id,m_model);
         if(static_cast<const AbstractNegationNode &>(**iter).negation())
             test = !test;

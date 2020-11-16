@@ -6,7 +6,6 @@ using namespace findNodeModel;
 using namespace widgetMPS;
 using namespace findNodeWidget;
 
-
 ///////////////////////////// FindDelegate ////////////////////////////
 NodeWidget * FindDelegate::createWidget(const NodeIndex &index, ArcNodeViewWidget *parent) const {
     if(index.isValid()) {
@@ -25,59 +24,6 @@ NodeWidget * FindDelegate::createWidget(const NodeIndex &index, ArcNodeViewWidge
     }
     return new NodeWidget(index);
 }
-//QWidget * FindDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const {
-//    if(index.isValid()) {
-//        if(index.column() == OpColumn) {
-//            auto * comboBox = new QComboBox(parent);
-//            for (szt i = 0; i != NbrOperation; ++i)
-//                comboBox->addItem(OperationNode::Strings[i],i);
-//            return comboBox;
-//        }
-//        if(index.column() == ComparaisonColumn && index.model()->data(index,Qt::UserRole).toUInt() & ComparaisonSet) {
-//            auto * comboBox = new QComboBox(parent);
-//            for (szt i = 0; i != NbrComparaison; ++i)
-//                comboBox->addItem(AbstractComparaisonNode::Strings[i],i);
-//            return comboBox;
-//        }
-//    }
-//    return QStyledItemDelegate::createEditor(parent,option,index);
-//}
-
-//bool FindDelegate::editorEvent(QEvent *event, QAbstractItemModel *model,
-//                                        const QStyleOptionViewItem &option, const QModelIndex &index) {
-//    if(index.isValid() && index.column() == NegColumn
-//            && event->type() == QEvent::MouseButtonPress
-//            && model->flags(index).testFlag(Qt::ItemIsEnabled)) {
-//        auto eventMouse = static_cast<QMouseEvent *>(event);
-//        if(eventMouse->button() == Qt::LeftButton) {
-//            model->setData(index,!model->data(index,Qt::EditRole).toBool());
-//            return true;
-//        }
-//    }
-//    return QStyledItemDelegate::editorEvent(event,model,option,index);
-//}
-
-//void FindDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const {
-//    if(index.isValid() && (index.column() == OpColumn
-//                           || index.column() == ColonneColumn
-//                           || index.model()->data(index,Qt::UserRole).toUInt() & ComparaisonSet)) {
-//        auto * comboBox = static_cast<QComboBox *>(editor);
-//        comboBox->setCurrentIndex(index.model()->data(index,Qt::EditRole).toInt());
-//    }
-//    else
-//        QStyledItemDelegate::setEditorData(editor,index);
-//}
-
-//void FindDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const {
-//    if(index.isValid() && (index.column() == OpColumn
-//                           || index.column() == ColonneColumn
-//                           || index.model()->data(index,Qt::UserRole).toUInt() & ComparaisonSet)) {
-//        auto * comboBox = static_cast<QComboBox *>(editor);
-//        model->setData(index,comboBox->currentIndex());
-//    }
-//    else
-//        QStyledItemDelegate::setModelData(editor,model,index);
-//}
 
 /////////////////////////////////////////// FindWidget //////////////////////////////////////
 FindWidget::FindWidget(FindModel *model, QWidget *parent)
@@ -113,9 +59,9 @@ void FindWidget::setFindModel(FindModel * model) {
     }
     m_model = model;
     if(m_model) {
-//        connect(m_addButton,&QPushButton::clicked,this,
-//                [this](){if(m_view->selectionModel()->hasSelection())
-//                            m_model->insertNode(0,m_view->selectionModel()->currentIndex().siblingAtColumn(0));});
+        connect(m_addButton,&QPushButton::clicked,this,
+                [this](){if(m_view->selectionModel()->hasSelection())
+                            m_model->insertNode(0,m_view->selectionModel()->currentIndex());});
 //        connect(m_delButton,&QPushButton::clicked,this,
 //                [this](){if(m_view->selectionModel()->hasSelection())
 //                            m_model->removeNode(m_view->selectionModel()->currentIndex().row(),

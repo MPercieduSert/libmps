@@ -12,18 +12,52 @@ AbstractNodeDelegate::AbstractNodeDelegate(QObject * parent)
 ArcNodeViewWidget::ArcNodeViewWidget(NodeWidget *node, NodeView *view, QWidget * parent, bool root)
     : QWidget (parent), m_root(root), m_view(view) {
     setNodeWidget(node);
-    setLeaf(m_nodeWidget->index().leaf());
+    m_leaf = m_nodeWidget->index().leaf();
+}
+
+void ArcNodeViewWidget::drawNode(bool next) {
+    adjustSize();
+    if(!m_root) {
+        auto parentArc = static_cast<ArcNodeViewWidget *>(parentWidget());
+        auto draw = false;
+        auto y = 0;
+        for (auto iter = parentArc->m_arcVec.begin(); iter != parentArc->m_arcVec.end(); ++iter) {
+            if (!next && !draw && *iter == this) {
+                draw = true;
+                if(iter ==  parentArc->m_arcVec.begin())
+                    y = parentArc->nodeWidget()->geometry().bottom();
+                else
+                    y = (*std::prev(iter))->geometry().bottom();
+            }
+            if(draw) {
+                (*iter)->move(LeftExpandMargin,y);
+                (*iter)->setVisible(true);
+                y = (*iter)->geometry().bottom();
+            }
+            else if(next && *iter == this) {
+                draw = true;
+                y = (*iter)->geometry().bottom();
+            }
+        }
+        parentArc->drawNode(true);
+    }
 }
 
 void ArcNodeViewWidget::insertRows(int first, int last){
-    setLeaf(false);
-    if(m_expanded) {
-//        auto index = m_nodeWidget->index().model()->index(first,m_nodeWidget->index());
-//        while (index.isValid() && first <= last) {
-//            m_expandLayout->insertWidget(first + 1,new ArcNodeViewWidget(index,m_view,this));
-//            ++first;
-//            index = index.nextBrother();
-//        }
+    if(last >= first) {
+        setLeaf(false);
+        if(m_expanded) {
+            auto iterfirst = m_arcVec.insert(std::next(m_arcVec.cbegin(),first),static_cast<szt>(last - first + 1), nullptr);
+            auto iter = iterfirst;
+            auto child = m_nodeWidget->index().model()->index(first,m_nodeWidget->index());
+            while (first <= last && child.isValid()) {
+                *iter = new ArcNodeViewWidget(child,m_view,this);
+                ++first;
+                ++iter;
+                child = child.nextBrother();
+            }
+            (*iterfirst)->drawNode();
+        }
     }
 }
 
@@ -32,20 +66,6 @@ void ArcNodeViewWidget::mousePressEvent(QMouseEvent *event) {
         if((m_expanded && event->x() < LeftExpandMargin && event->y() > m_nodeWidget->geometry().bottom())
                 || (! m_expanded && event->x() < RigthCircles && event->y() > m_nodeWidget->geometry().bottom()))
         setExpanded(!m_expanded);
-}
-
-void ArcNodeViewWidget::moveNextChild(ArcNodeViewWidget * arc) {
-    auto next = false;
-    auto y = arc->geometry().bottom();
-    for (auto iter = m_arcVec.begin(); iter != m_arcVec.end(); ++iter) {
-        if(next) {
-            (*iter)->move(LeftExpandMargin,y);
-            y = (*iter)->geometry().bottom();
-        }
-        else if (*iter == arc)
-            next = true;
-    }
-    adjustSize();
 }
 
 void ArcNodeViewWidget::paintEvent(QPaintEvent * /*event*/) {
@@ -86,42 +106,37 @@ void ArcNodeViewWidget::setExpanded(bool bb){
     if(m_expanded != bb) {
         m_expanded = bb;
         if(m_expanded) {
-            m_adjustSize = false;
             auto index = m_nodeWidget->index();
             m_arcVec.resize(static_cast<szt>(index.model()->rowCount(index)));
-            auto y = m_nodeWidget->geometry().bottom();
             auto child = index.model()->index(0,index);
             for (auto iterVec = m_arcVec.begin(); iterVec != m_arcVec.end(); ++iterVec) {
                 *iterVec = new ArcNodeViewWidget(child,m_view,this);
-                (*iterVec)->move(LeftExpandMargin,y);
-                (*iterVec)->setVisible(true);
-                y = (*iterVec)->geometry().bottom();
                 child = child.nextBrother();
             }
-            m_adjustSize = true;
+            m_arcVec.front()->drawNode();
         }
         else {
             for (auto iter = m_arcVec.begin(); iter != m_arcVec.end(); ++iter)
                 (*iter)->deleteLater();
             m_arcVec.clear();
+            drawNode();
         }
-        adjustSize();
     }
 }
 
 void ArcNodeViewWidget::setLeaf(bool bb) {
     if(bb && !m_leaf){
         m_leaf = bb;
-        adjustSize();
+        drawNode(true);
     }
     else if (m_leaf && !bb) {
         m_leaf = bb;
-        adjustSize();
+        drawNode(true);
     }
-
 }
 
 void ArcNodeViewWidget::setNodeWidget(NodeWidget * widget) {
+    auto draw = m_nodeWidget && m_nodeWidget->isVisible();
     if(m_nodeWidget) {
         m_view->m_arcMap.erase(m_nodeWidget->index());
         m_nodeWidget->hide();
@@ -138,7 +153,10 @@ void ArcNodeViewWidget::setNodeWidget(NodeWidget * widget) {
     m_view->m_arcMap[m_nodeWidget->index()] = this;
     m_nodeWidget->move(LeftNodeMargin,TopNodeMargin);
     m_nodeWidget->setVisible(true);
-    adjustSize();
+    if(draw)
+        drawNode();
+    else
+        adjustSize();
 }
 
 QSize ArcNodeViewWidget::sizeHint() const{
