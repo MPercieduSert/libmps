@@ -169,7 +169,7 @@ public:
     void connexion() const override {
         ConditionNodeWidget::connexion();
         connect(m_compCB,qOverload<int>(&QComboBox::currentIndexChanged),this,[this]()
-            {m_index.model()->setData(m_index,FindModel::ColonneCible,m_compCB->currentData());});
+            {m_index.model()->setData(m_index,FindModel::ComparaisonCible,m_compCB->currentData());});
     }
 
     //! Déconnecte les éléments du noeuds au model.
