@@ -43,7 +43,7 @@ void ArcNodeViewWidget::drawNode(bool next) {
     }
 }
 
-void ArcNodeViewWidget::insertRows(int first, int last){
+void ArcNodeViewWidget::insertNodes(szt first, szt last){
     if(last >= first) {
         setLeaf(false);
         if(m_expanded) {
@@ -102,12 +102,33 @@ void ArcNodeViewWidget::paintEvent(QPaintEvent * /*event*/) {
     }
 }
 
+//! Suppresion du noeud et de count frère.
+void ArcNodeViewWidget::removeNodes(szt first, szt last) {
+    if(first <= last && last < m_arcVec.size()) {
+        auto firstIter = std::next(m_arcVec.begin(), first);
+        auto lastIter = std::next(m_arcVec.begin(), last + 1);
+        for (auto iter = firstIter; iter != lastIter ; ++iter)
+            (*iter)->deleteLater();
+        m_arcVec.erase(firstIter,lastIter);
+        if(m_arcVec.size()) {
+            if(m_arcVec.size() != first)
+                m_arcVec[first]->drawNode();
+            else {
+                adjustSize();
+                drawNode(true);
+            }
+        }
+        else
+            setLeaf(true);
+    }
+}
+
 void ArcNodeViewWidget::setExpanded(bool bb){
     if(m_expanded != bb) {
         m_expanded = bb;
         if(m_expanded) {
             auto index = m_nodeWidget->index();
-            m_arcVec.resize(static_cast<szt>(index.model()->rowCount(index)));
+            m_arcVec.resize(index.model()->childCount(index));
             auto child = index.model()->index(0,index);
             for (auto iterVec = m_arcVec.begin(); iterVec != m_arcVec.end(); ++iterVec) {
                 *iterVec = new ArcNodeViewWidget(child,m_view,this);
@@ -127,6 +148,7 @@ void ArcNodeViewWidget::setExpanded(bool bb){
 void ArcNodeViewWidget::setLeaf(bool bb) {
     if(bb && !m_leaf){
         m_leaf = bb;
+        m_expanded = false;
         drawNode(true);
     }
     else if (m_leaf && !bb) {
@@ -215,10 +237,16 @@ void NodeView::deleteRoot(){
     delete takeWidget();
 }
 
-void NodeView::insertRows(const NodeIndex & parent, int first, int last) {
+void NodeView::insertNodes(const NodeIndex & parent, szt first, szt last) {
     auto iter = m_arcMap.find(parent);
     if(iter != m_arcMap.end())
-        iter->second->insertRows(first,last);
+        iter->second->insertNodes(first,last);
+}
+
+void NodeView::removeNodes(const NodeIndex & parent, szt first, szt last) {
+    auto iter = m_arcMap.find(parent);
+    if(iter != m_arcMap.end())
+        iter->second->removeNodes(first, last);
 }
 
 void NodeView::setCurrentIndex(const NodeIndex & index){
@@ -241,9 +269,10 @@ void NodeView::setModel(Model *model) {
     if(!m_model->parent())
         m_model->setParent(this);
     connect(m_model,qOverload<const NodeIndex &>(&Model::dataChanged),this,&NodeView::updateData);
+    connect(m_model,&Model::nodesAboutToBeRemoved,this,&NodeView::removeNodes);
     connect(m_model,&Model::modelAboutToBeReset,this,&NodeView::deleteRoot);
     connect(m_model,&Model::modelReset,this,&NodeView::resetRoot);
-    connect(m_model,&Model::rowsInserted,this,&NodeView::insertRows);
+    connect(m_model,&Model::nodesInserted,this,&NodeView::insertNodes);
     if(m_delegate && m_model)
         resetRoot();
     setSelectionModel(new SelectionModel(m_model,this));

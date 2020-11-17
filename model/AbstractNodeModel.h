@@ -11,14 +11,14 @@
 
 //! Macro d'inclusion des membres virtual dans le model à node.
 #define TREE_FOR_NODE_MODEL_INDEX_PARENT_ROWCOUNT(TREE) /*! Renvoie l'index correxpondant à la ligne et colonne de parent.*/ \
-    NodeIndex index(int row, const NodeIndex & parent = NodeIndex()) const override \
+    NodeIndex index(szt row, const NodeIndex & parent = NodeIndex()) const override \
         {return TREE.index(row,parent);} \
     /*! Teste si le noeud associé à un index valide est une feuille.*/ \
     bool leaf(const NodeIndex & index) const override {return TREE.leaf(index);} \
     /*! Renvoie l'index du parent.*/ \
     NodeIndex parent(const NodeIndex &index) const override {return TREE.parent(index);} \
     /*! Renvoie le nombre de d'enfants.*/ \
-    int rowCount(const NodeIndex &parent = NodeIndex()) const override {return TREE.rowCount(parent);}
+    szt childCount(const NodeIndex &parent = NodeIndex()) const override {return TREE.childCount(parent);}
 
 namespace modelMPS {
 using namespace typeMPS;
@@ -49,19 +49,28 @@ public:
     //! Accesseur des données associées à l'index.
     QVariant data(int cible, int role = DataRole, szt num = 0) const;
 
+    //! Retourne un index sur le frère ainé.
+    NodeIndex firstBrother() const noexcept;
+
     //! Drapeaux assossiés à une donnée.
     Qt::ItemFlags flags(int cible, szt num = 0) const;
-
-    //! Teste si dans le model le noeud associé à l'index est une feuille.
-    bool leaf() const;
 
     //! Accesseur du pointeur interne.
     void * internalPointer() const noexcept
         {return m_ptr;}
 
+    //! Teste si l'index est la racine.
+    bool isRoot() const noexcept;
+
     //! Teste si l'index est valide.
     bool isValid() const noexcept
         {return m_model && m_ptr;}
+
+    //! Retourne un index sur le frère benjamin.
+    NodeIndex lastBrother() const noexcept;
+
+    //! Teste si dans le model le noeud associé à l'index est une feuille.
+    bool leaf() const;
 
     //! Accesseur du model.
     AbstractNodeModel * model() const noexcept
@@ -81,6 +90,9 @@ public:
     //! Retourne un index sur le parent.
     NodeIndex parent() const;
 
+    //! Retourne la position du noeud dans la fratrie.
+    uint position() const noexcept;
+
     //! Retourne un index sur le frère précédent.
     NodeIndex prevBrother() const noexcept;
 };
@@ -93,12 +105,13 @@ class AbstractNodeModel : public QObject{
     Q_OBJECT
     template<class T> friend class TreeForNodeModel;
 protected:
-    struct RowsInfo {
-        NodeIndex parent;     //!< Index du parent des lignes insérés.
-        int first;              //!< Indice de la première ligne insérés.
-        int last;               //!< Indice de la dernière ligne insérés.
+    struct NodesInfo {
+        NodeIndex parent;       //!< Index du parent des nodes insérés.
+        szt first;              //!< Position du premier noeud insérés.
+        szt last;               //!< Position du dernier noeud insérés.
     };
-    std::forward_list<RowsInfo> m_insertRowsPile;       //!< Pile des informations d'insertion de lignes.
+    std::forward_list<NodesInfo> m_insertNodesPile;       //!< Pile des informations d'insertion de noeuds.
+    std::forward_list<NodesInfo> m_removeNodesPile;       //!< Pile des informations de suppression de noeuds.
     
 public:
     using QObject::parent;
@@ -109,20 +122,32 @@ public:
     bool checkIndex(const NodeIndex & index) const
         {return index.m_model == this && index.m_ptr;}
 
+    //! Nombre d'enfants d'un noeud.
+    virtual szt childCount(const NodeIndex & index) const = 0;
+
     //! Accesseur des données du model.
     virtual QVariant data(const NodeIndex & index, int cible, int role = DataRole, szt num = 0) const = 0;
 
     //! Nombre de donnée d'un noeud et d'un type.
     virtual szt dataCount(const NodeIndex & index, int cible) const = 0;
 
+    //! Retourne un index sur le frère ainé.
+    virtual NodeIndex firstBrother(const NodeIndex & index) const = 0;
+
     //! Drapeaux assossiés à une donnée.
     virtual Qt::ItemFlags flags(const NodeIndex & index, int cible, szt num = 0) const = 0;
 
-    //! Index du fils numéro num de parent.
-    virtual NodeIndex index(int row, const NodeIndex & parent = NodeIndex()) const = 0;
+    //! Index du fils de position pos de parent.
+    virtual NodeIndex index(szt pos, const NodeIndex & parent = NodeIndex()) const = 0;
 
     //! Insert count noeuds de nature type avant la ligne row de parent.
-    virtual bool insertNodes(int type, int row, int count, const NodeIndex &parent = NodeIndex()) = 0;
+    virtual bool insertNodes(int type, szt pos, szt count, const NodeIndex &parent = NodeIndex()) = 0;
+
+    //! Test si l'index est la racine.
+    virtual bool isRoot(const NodeIndex & index) const = 0;
+
+    //! Retourne un index sur le frère benjamin.
+    virtual NodeIndex lastBrother(const NodeIndex & index) const = 0;
 
     //! Teste si le noeud est une feuille.
     virtual bool leaf(const NodeIndex & index) const = 0;
@@ -133,14 +158,14 @@ public:
     //! Parent de l'index.
     virtual NodeIndex parent(const NodeIndex & index) const = 0;
 
+    //! Position du noeud dans la fratrie.
+    virtual szt position(const NodeIndex & index) const = 0;
+
     //! Retourne un index sur le frère suivant.
     virtual NodeIndex prevBrother(const NodeIndex & index) const = 0;
 
-    //! Supprimer count ligne en commençant par la ligne row.
-    virtual bool removeRows(int row, int count, const NodeIndex &parent = NodeIndex()) = 0;
-
-    //! Nombre d'enfants d'un noeud.
-    virtual int rowCount(const NodeIndex & index) const = 0;
+    //! Supprimer count noeud de la fratrie en commençant par le noeud node.
+    virtual bool removeNodes(const NodeIndex &index, szt count = 1) = 0;
 
     //! Mutateur des données du model.
     virtual bool setData(const NodeIndex & index, int cible, const QVariant & value, int role = DataRole, szt num = 0) = 0;
@@ -158,45 +183,60 @@ signals:
     //! Signal de fin de réinitialisation du model.
     void modelReset();
 
-    //! Signal de début d'insertion de noeud.
-    void rowsAboutToBeInserted(const NodeIndex &parent, int start, int end);
+    //! Signal de début d'insertion de noeuds.
+    void nodesAboutToBeInserted(const NodeIndex &parent, szt first, szt last);
 
-    //! Signal de début d'insertion de noeud.
-    void rowsInserted(const NodeIndex &parent, int start, int last);
+    //! Signal de début de suppression de noeuds.
+    void nodesAboutToBeRemoved(const NodeIndex &parent, szt first, szt last);
+
+    //! Signal de fin d'insertion de noeuds.
+    void nodesInserted(const NodeIndex &parent, szt first, szt last);
+
+    //! Signal de fin de suppression de noeuds.
+    void nodesRemoved(const NodeIndex &parent, szt first, szt last);
 
 protected:
     //! Début d'insertions de lignes
-    void beginInsertRows(const NodeIndex & parent, int first, int last) {
-        m_insertRowsPile.push_front({parent,first,last});
-        emit rowsAboutToBeInserted(parent,first,last);
+    void beginInsertNodes(const NodeIndex & parent, szt first, szt last) {
+        m_insertNodesPile.push_front({parent,first,last});
+        emit nodesAboutToBeInserted(parent,first,last);
     }
 
     //! Début de déplacement de lignes.
-    bool beginMoveRows(const NodeIndex & /*sourceParent*/, int /*sourceFirst*/, int /*sourceLast*/,
+    bool beginMoveNodes(const NodeIndex & /*sourceParent*/, int /*sourceFirst*/, int /*sourceLast*/,
                        const NodeIndex & /*destinationParent*/, int /*destinationChild*/) {return false;}
 
     //! Début de suppression de lignes.
-    void beginRemoveRows(const NodeIndex & /*parent*/, int /*first*/, int /*last*/) {}
+    void beginRemoveNodes(const NodeIndex & index, szt count) {
+        auto pos = index.position();
+        NodesInfo info({index.parent(),pos,pos + count - 1});
+        m_removeNodesPile.push_front(info);
+        emit nodesAboutToBeRemoved(info.parent,info.first,info.last);
+    }
 
     //! Début de réinitialisation du model.
     void beginResetModel()
         {emit modelAboutToBeReset();}
 
-    //! Crée un index sur le fils numéro row de parent.
+    //! Crée un index de pointeur ptr.
     NodeIndex createIndex(void * ptr = nullptr) const;
 
     //! Fin d'insertion de lignes.
-    void endInsertRows() {
-        auto info = m_insertRowsPile.front();
-        emit rowsInserted(info.parent,info.first,info.last);
-        m_insertRowsPile.pop_front();
+    void endInsertNodes() {
+        auto info = m_insertNodesPile.front();
+        emit nodesInserted(info.parent,info.first,info.last);
+        m_insertNodesPile.pop_front();
     }
 
     //! Fin de déplacement de lignes.
-    void endMoveRows() {}
+    void endMoveNodes() {}
 
     //! Fin de suppression de lignes.
-    void endRemoveRows() {}
+    void endRemoveNodes() {
+        auto info = m_removeNodesPile.front();
+        emit nodesRemoved(info.parent,info.first,info.last);
+        m_removeNodesPile.pop_front();
+    }
 
     //! Fin de réinitialisation du model.
     void endResetModel() {emit modelReset();}
@@ -216,8 +256,24 @@ public:
     using TempTreeForModel<T,AbstractNodeModel,NodeIndex>::TempTreeForModel;
 
     //! Renvoie l'index correxpondant à la ligne et colonne de parent.
-    NodeIndex index(int row, const NodeIndex &parent = NodeIndex()) const;
+    NodeIndex index(szt row, const NodeIndex &parent = NodeIndex()) const;
 
+    //! Retourne un index sur le frère ainé.
+    NodeIndex firstBrother(const NodeIndex & index) const
+        {return index.isValid() ? m_model->createIndex(getValidIter(index).toFirstBrother().ptr())
+                               : NodeIndex();}
+
+    //! Test si l'index est la racine.
+    bool isRoot(const NodeIndex & index) const
+        {return index.isValid() ? getValidIter(index).root()
+                       : true;}
+
+    //! Retourne un index sur le frère ainé.
+    NodeIndex lastBrother(const NodeIndex & index) const
+        {return index.isValid() ? m_model->createIndex(getValidIter(index).toLastBrother().ptr())
+                               : NodeIndex();}
+
+    //! Retourne un index sur le frère précédent.
     NodeIndex nextBrother(const NodeIndex & index) const
         {return index.isValid() ? m_model->createIndex(getValidIter(index).toNextBrother().ptr())
                                : NodeIndex();}
@@ -288,6 +344,10 @@ public:
     //! Nombre de données associées associé à un noeud pour un type donnée.
     szt dataCount(const NodeIndex & index, int cible) const override;
 
+    //! Retourne un index sur le frère ainé.
+    NodeIndex firstBrother(const NodeIndex & index) const override
+        {return m_data.firstBrother(index);}
+
     //! Renvoie les drapeaux associé à un index.
     Qt::ItemFlags flags(const NodeIndex &index, int cible, szt num = 0) const override;
 
@@ -300,37 +360,49 @@ public:
         {return **m_data.getIter(index);}
 
     //! Insert count noeuds de nature type avant la ligne row de parent.
-    bool insertNodes(int type, int row, int count, const NodeIndex &parent = NodeIndex()) override;
+    bool insertNodes(int type, szt pos, szt count, const NodeIndex &parent = NodeIndex()) override;
+
+    //! Test si l'index est la racine.
+    bool isRoot(const NodeIndex & index) const override
+        {return m_data.isRoot(index);}
+
+    //! Retourne un index sur le frère benjamin.
+    NodeIndex lastBrother(const NodeIndex & index) const override
+        {return m_data.lastBrother(index);}
 
     //! Retourne un index sur le frère suivant.
     NodeIndex nextBrother(const NodeIndex & index) const override
         {return m_data.nextBrother(index);}
+
+    //! Position du noeud dans la fratrie.
+    szt position(const NodeIndex & index) const override
+        {return m_data.position(index);}
 
     //! Retourne un index sur le frère suivant.
     NodeIndex prevBrother(const NodeIndex & index) const override
         {return m_data.prevBrother(index);}
 
     //! Supprimer count ligne en commençant par la ligne row.
-    bool removeRows(int row, int count, const NodeIndex &parent = NodeIndex()) override;
+    bool removeNodes(const NodeIndex & index, szt count = 1) override;
 
     //! Mutateur la donnée associé à un couple (index,role).
     bool setData(const NodeIndex &index, int cible, const QVariant &value, int role = DataRole, szt num = 0) override;
 
 protected:
     //! Fabrique des noeuds.
-    virtual Node nodeFactory(int /*type*/, int /*row*/, const NodeIndex & /*parent*/) {return std::make_unique<AbstractNode>();}
+    virtual Node nodeFactory(int /*type*/, szt /*row*/, const NodeIndex & /*parent*/) {return std::make_unique<AbstractNode>();}
 };
 
 ///////////////////////////////////// TreeForModel //////////////////////////////////
-template<class T> NodeIndex TreeForNodeModel<T>::index(int row, const NodeIndex &parent) const {
+template<class T> NodeIndex TreeForNodeModel<T>::index(szt row, const NodeIndex &parent) const {
     if(parent.isValid()) {
-        auto iter = getIter(parent);
-        iter.toChild(row);
+        auto iter = getValidIter(parent);
+        iter.toChildU(row);
         if (iter)
             return m_model->createIndex(iter.ptr());
     }
     else if (!m_racine || row == 0){
-        auto iter = m_tree.cbegin().toChild(row);
+        auto iter = m_tree.cbegin().toChildU(row);
         if (iter)
             return m_model->createIndex(iter.ptr());
     }
@@ -338,7 +410,7 @@ template<class T> NodeIndex TreeForNodeModel<T>::index(int row, const NodeIndex 
 }
 template<class T> NodeIndex TreeForNodeModel<T>::parent(const NodeIndex &index) const {
     if (index.isValid()) {
-        auto iter = getIter(index);
+        auto iter = getValidIter(index);
         iter.toParent();
         if(iter && !iter.root())
             return m_model->createIndex(iter.ptr());

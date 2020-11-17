@@ -82,7 +82,7 @@ public:
     //! Si le noeuds parent est un operationNode un noeud choiceNode est ajouté avant row.
     //! Si le noeuds parent n'est pas un operationNode, un nouveau operationNode prend sa place
     //! et le noeud parent devient l'ainé de ce nouveau et un noeud ChoiceNode est ajouté en cadet.
-    void insertNode(int row, const NodeIndex & parent);
+    void insertNode(szt row, const NodeIndex & parent);
 
     //! Accesseur du model filtré.
     AbstractColonnesModel * model() const
@@ -119,7 +119,7 @@ public slots:
 
 protected:
     //! Fabrique des noeuds.
-    Node nodeFactory(int type, int row, const NodeIndex & parent) override;
+    Node nodeFactory(int type, szt row, const NodeIndex & parent) override;
 
     //! Fabrique des noeuds de condition.
     Node nodeConditionFactory(szt pos);

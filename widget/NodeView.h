@@ -16,6 +16,7 @@
  * \brief Ensemble des classes des delegates.
  */
 namespace widgetMPS {
+using namespace typeMPS;
 class NodeView;
 class ArcNodeViewWidget;
 /*! \ingroup groupeWidget
@@ -157,8 +158,11 @@ public:
     void setSelectionModel(SelectionModel * selectionModel);
 
 public slots:
-    //! Prend en compte l'insertion de nouvelle ligne.
-    void insertRows(const NodeIndex & parent, int first, int last);
+    //! Prend en compte l'insertion de nouveau noeud du model.
+    void insertNodes(const NodeIndex & parent, szt first, szt last);
+
+    //! Prend en compte la suppression de noeud du model.
+    void removeNodes(const NodeIndex & parent, szt first, szt last);
 
     //! Met à jour les donnée du NodeWidget associé à l'index.
     void updateData(const NodeIndex & index);
@@ -230,8 +234,8 @@ public:
     bool expanded() const noexcept
         {return m_expanded;}
 
-    //! Prend en compte l'insertion de nouvelles lignes.
-    void insertRows(int first, int last);
+    //! Prend en compte l'insertion de noeuds enfants.
+    void insertNodes(szt first, szt last);
 
     //! Accesseur de l'état de feuille.
     bool leaf() const noexcept
@@ -246,6 +250,9 @@ public:
 
     //! Dessine la branche.
     void paintEvent(QPaintEvent * event) override;
+
+    //! Suppresion de noeud enfant de first à last.
+    void removeNodes(szt first, szt last);
 
     //! Accesseur de root.
     bool root() const noexcept

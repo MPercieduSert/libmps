@@ -11,12 +11,23 @@ NodeIndex AbstractNodeModel::createIndex(void * ptr) const {
 
 //////////////////////////////////// NodeIndex ////////////////////////////////
 QVariant NodeIndex::data(int cible, int role, szt num) const
-    {return isValid() ? m_model->data(*this, cible, role, num)
+    {return m_model ? m_model->data(*this, cible, role, num)
                       : QVariant();}
 
+NodeIndex NodeIndex::firstBrother() const noexcept
+    {return m_model ? m_model->firstBrother(*this)
+                    : NodeIndex();}
+
 Qt::ItemFlags NodeIndex::flags(int cible, szt num) const
-    {return isValid() ? m_model->flags(*this, cible, num)
+    {return m_model ? m_model->flags(*this, cible, num)
                       : Qt::NoItemFlags;}
+
+bool NodeIndex::isRoot() const noexcept
+    {return m_model ? m_model->isRoot(*this) : true;}
+
+NodeIndex NodeIndex::lastBrother() const noexcept
+    {return m_model ? m_model->lastBrother(*this)
+                    : NodeIndex();}
 
 bool NodeIndex::leaf() const
     {return isValid() && m_model->leaf(*this);}
@@ -26,8 +37,12 @@ NodeIndex NodeIndex::nextBrother() const noexcept
                     : NodeIndex();}
 
 NodeIndex NodeIndex::parent() const
-    {return isValid() ? m_model->parent(*this)
+    {return m_model ? m_model->parent(*this)
                       : NodeIndex();}
+
+uint NodeIndex::position() const noexcept
+    {return m_model ? m_model->position(*this)
+                    : 0;}
 
 NodeIndex NodeIndex::prevBrother() const noexcept
     {return m_model ? m_model->prevBrother(*this)
@@ -57,26 +72,26 @@ Qt::ItemFlags TreeNodeModel::flags(const NodeIndex & index, int cible, szt num) 
     return Qt::NoItemFlags;
 }
 
-bool TreeNodeModel::insertNodes(int type, int row, int count, const NodeIndex &parent) {
-    if (count <= 0 || row < 0 || row > rowCount(parent))
+bool TreeNodeModel::insertNodes(int type, szt pos, szt count, const NodeIndex &parent) {
+    if (pos > childCount(parent))
         return false;
     if(m_data.racine() && !parent.isValid())
         return false;
-    beginInsertRows(parent,row,row + count - 1);
-        m_data.insertRows([this,type](int row, const NodeIndex & parent){return nodeFactory(type,row,parent);},row,count,parent);
-    endInsertRows();
+    beginInsertNodes(parent,pos,pos + count - 1);
+        m_data.insertNodes([this,type](szt row, const NodeIndex & parent){return nodeFactory(type,row,parent);},pos,count,parent);
+    endInsertNodes();
     return true;
 }
 
-bool TreeNodeModel::removeRows(int row, int count, const NodeIndex &parent) {
-    if(row < 0 || count <= 0 || row >= rowCount(parent))
+bool TreeNodeModel::removeNodes(const NodeIndex &index, szt count) {
+    if(count == 0)
         return false;
-    beginRemoveRows(parent, row, row + count -1);
+    beginRemoveNodes(index, count);
         if(count == 1)
-            m_data.tree().erase(m_data.getIter(parent).toChild(row));
+            m_data.tree().erase(m_data.getIter(index));
         else
-            m_data.tree().erase(m_data.getIter(parent).toChild(row),m_data.getIter(parent).toChild(row + count));
-    endRemoveRows();
+            m_data.tree().erase(m_data.getIter(index),m_data.getIter(index).toBrotherU(count));
+    endRemoveNodes();
     return true;
 }
 

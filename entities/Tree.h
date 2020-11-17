@@ -24,6 +24,12 @@
      * Si n est trop négatif ou trop grand, l'itérateur sera nul.
      */ \
     ITER & toBrother(int n) noexcept {const_abstract_iterator::toBrother(n); return *this;} \
+    /*! \brief Place l'itérateur sur le n ieme frère du noeud courant.
+     *
+     * Positionne l'itérateur sur le n ieme frère suivant.
+     * Si n est trop grand, l'itérateur est positionné sur le dernier des frères.
+     */ \
+    ITER & toBrotherU(size_type n) noexcept {const_abstract_iterator::toBrotherU(n); return *this;} \
     /*! \brief Place l'itérateur sur le descendant direct d'indice n.
      *
      *  Place un pointeur sur le descendant direct d'indice n. Les indices négatifs sont permis.
@@ -31,6 +37,13 @@
      * l'itérateur sera nul.
      */ \
     ITER & toChild(int position) noexcept {const_abstract_iterator::toChild(position); return *this;} \
+    /*! \brief Place un pointeur sur le descendant direct d'indice n.
+     *
+     * Place un pointeur sur le descendant direct d'indice n.
+     * Si position > nombre de fils-1],
+     * l'itérateur sera placé sur le fils ainé.
+     */ \
+    ITER & toChildU(size_type position) noexcept {const_abstract_iterator::toChildU(position); return *this;} \
     /*! Place l'itérateur sur l'ainé des frères du noeud courant.*/ \
     ITER & toFirstBrother() noexcept {const_abstract_iterator::toFirstBrother(); return *this;} \
     /*! Place l'itérateur sur l'ainé des fils du noeud courant.*/ \
@@ -289,6 +302,17 @@ protected:
          */
         Item & operator = (Item && item) noexcept(noexcept (T(std::move(item.m_data))));
 
+        //! Retourne la position du noeud dans la fratrie.
+        size_type position() const noexcept {
+            size_type pos = 0;
+            auto node = m_prevBrother;
+            while (node) {
+                node = node->m_prevBrother;
+                ++pos;
+            }
+            return pos;
+        }
+
         /*!
          * \brief Ajoute le noeud pointé par child en tant que benjamin des descendants du noeud.
          * item ne doit pas pointé sur la racine d'un arbre appartenant à un objet tree.
@@ -415,6 +439,10 @@ public:
             return list;
         }
 
+        //! Retourne la position du noeud dans la fratrie.
+        size_type position() const noexcept
+            {return  m_ptr ? m_ptr->position() : 0;}
+
         //! Acceseur du pointeur.
         void * ptr() const
             {return m_ptr;}
@@ -533,13 +561,36 @@ public:
          */
         void toBrother(int n) noexcept;
 
+        /*! \brief Place l'itérateur sur le n ieme frère du noeud courant.
+         *
+         * Positionne l'itérateur sur le n ieme frère suivant.
+         * Si n est trop grand, l'itérateur est positionné sur le dernier des frères.
+         */
+        void toBrotherU(size_type n) noexcept {
+            while(n && m_ptr) {
+                to_nextBrother();
+                --n;
+            }
+        }
+
         /*! \brief Place un pointeur sur le descendant direct d'indice n.
          *
-         *  Place un pointeur sur le descendant direct d'indice n. Les indices négatifs sont permis.
+         * Place un pointeur sur le descendant direct d'indice n. Les indices négatifs sont permis.
          * Si position n'appartient pas à l'intervale [-nombre de fils, nombre de fils-1],
          * l'itérateur sera placé sur le fils ainé ou benjamin.
          */
         void toChild(int position) noexcept;
+
+        /*! \brief Place un pointeur sur le descendant direct d'indice n.
+         *
+         * Place un pointeur sur le descendant direct d'indice n.
+         * Si position > nombre de fils-1],
+         * l'itérateur sera placé sur le fils ainé.
+         */
+        void toChildU(size_type position) noexcept {
+            toFirstChild();
+            toBrother(position);
+        }
 
         //! Place l'itérateur sur l'ainé des frères du noeud courant.
         void toFirstBrother() noexcept {
@@ -1200,11 +1251,15 @@ public:
     template<class iter_tree> iter_tree erase(iter_tree pos) noexcept;
 
     //! Supprime les noeuds appartenant à [first,last) et leurs decendants.
+    //! Le noeud pointé par first ne doit pas être la racine.
     //! Les noeuds pointés par first et last doivent être d'une même fratrie sauf si last est nul.
     //! Retourne un itérateur sur le noeud suivant le dernier noeud supprimé.
     template<class iter_tree> iter_tree erase(iter_tree first, iter_tree last) noexcept {
-        first.m_ptr->erase(last.m_ptr);
-        return last;
+        //if(first && !first.root()) {
+            first.m_ptr->erase(last.m_ptr);
+            return last;
+        //}
+        //return nullptr;
     }
 
     //! Extrait le noeud pointer par pos de l'arbre pour en faire un nouvel arbre

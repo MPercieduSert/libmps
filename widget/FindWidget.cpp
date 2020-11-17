@@ -62,10 +62,9 @@ void FindWidget::setFindModel(FindModel * model) {
         connect(m_addButton,&QPushButton::clicked,this,
                 [this](){if(m_view->selectionModel()->hasSelection())
                             m_model->insertNode(0,m_view->selectionModel()->currentIndex());});
-//        connect(m_delButton,&QPushButton::clicked,this,
-//                [this](){if(m_view->selectionModel()->hasSelection())
-//                            m_model->removeNode(m_view->selectionModel()->currentIndex().row(),
-//                                                m_view->selectionModel()->currentIndex().parent().siblingAtColumn(0));});
+        connect(m_delButton,&QPushButton::clicked,this,
+                [this](){if(m_view->selectionModel()->hasSelection() && !m_view->selectionModel()->currentIndex().isRoot())
+                            m_model->removeNode(m_view->selectionModel()->currentIndex());});
         connect(m_resetButton,&QPushButton::clicked,m_model,&FindModel::reset);
         connect(m_findButton,&QPushButton::clicked,m_model,&FindModel::find);
     }

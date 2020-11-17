@@ -24,7 +24,7 @@
 
 namespace modelMPS {
 namespace cmps = conteneurMPS;
-
+using namespace typeMPS;
 template<class T> class TreeForModel;
 /*! \ingroup groupeModel
  * \brief Classe Abstraite mère des models à colonnes et à nodes de type arbre utilisant le contenant treeFroModel.
@@ -54,6 +54,13 @@ public:
     //! Constructeur.
     TempTreeForModel(Model * model, bool racine = false)
         : m_model(model), m_racine(racine) {}
+
+    //! Renvoie le nombre de d'enfants.
+    szt childCount(const Index &parent = Index()) const {
+        if(!parent.isValid())
+                return m_tree.cbegin().sizeChild();
+        return getIter(parent).sizeChild();
+    }
 
     //! Renvoie une référence sur la donné coorespondant à l'index (en supposant la validité).
     const T & getData(const Index &index) const
@@ -95,7 +102,7 @@ public:
 
     //! Renvoie une référence sur la donné coorespondant à l'index (en supposant la validité).
     T & getValidData(const Index & index)
-        {return *getIter(index);}
+        {return *getValidIter(index);}
 
     //! Renvoie un itérateur pointant sur le noeud d'index.
     const_iterator getValidIter(const Index & index) const
@@ -110,7 +117,15 @@ public:
         {return  getValidIter(index).leaf();}
 
     //! Insert des lignes dans le model, ne vérifie pas les arguments.
+    template<class Factory> bool insertNodes(Factory factory, szt row, szt count, const Index &parent = Index());
+
+    //! Insert des lignes dans le model, ne vérifie pas les arguments.
     template<class Factory> bool insertRows(Factory factory,int row, int count, const Index &parent = Index());
+
+    //! Position du noeud dans la fratrie.
+    szt position(const Index & index) const
+        {return index.isValid() ? getValidIter(index).position()
+                                : 0;}
 
     //! Acceseur de la racine.
     bool racine() const
@@ -120,11 +135,8 @@ public:
     template<class Deleter> bool removeRows(Deleter del, int row, int count, const Index &parent = Index());
 
     //! Renvoie le nombre de d'enfants.
-    int rowCount(const Index &parent = Index()) const {
-        if(!parent.isValid())
-                return m_tree.cbegin().sizeChild();
-        return getIter(parent).sizeChild();
-    }
+    int rowCount(const Index &parent = Index()) const
+        {return childCount(parent);}
 
     //! Modifie l'arbre de donnée.
     void setTree(const cmps::tree<T> & tree) {
@@ -178,6 +190,20 @@ public:
 
 ///////////////////////////////////// TempTreeForModel /////////////////////////////
 template<class T, class Model, class Index> template<class Factory>
+bool TempTreeForModel<T,Model,Index>::insertNodes(Factory factory, szt row, szt count,const Index &parent) {
+    auto iter = getIter(parent);
+    if(row == childCount(parent))
+        for(szt i = 0; i != count; ++i)
+            m_tree.push_back(iter,factory(row + i, parent));
+    else {
+        iter.toChildU(row);
+        for(szt i = count; i != 0; --i)
+            m_tree.insert(iter,factory(row + i, parent));
+    }
+    return true;
+}
+
+template<class T, class Model, class Index> template<class Factory>
 bool TempTreeForModel<T,Model,Index>::insertRows(Factory factory, int row, int count,const Index &parent) {
     auto iter = getIter(parent);
     if(row == rowCount(parent))
@@ -185,7 +211,7 @@ bool TempTreeForModel<T,Model,Index>::insertRows(Factory factory, int row, int c
             m_tree.push_back(iter,factory(row + i, parent));
     else {
         iter.toChild(row);
-        for(int i = 0; i != count; ++i)
+        for(int i = count; i != 0; --i)
             m_tree.insert(iter,factory(row + i, parent));
     }
     return true;

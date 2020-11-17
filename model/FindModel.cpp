@@ -17,17 +17,17 @@ void FindModel::find(){
         m_model->find(this);
 }
 
-void FindModel::insertNode(int row, const NodeIndex & parent) {
+void FindModel::insertNode(szt row, const NodeIndex & parent) {
     if(getData(parent).type() == OperationNodeType)
         insertNodes(ChoiceNodeType,row,1,parent);
     else {
         auto node = std::move(m_data.getData(parent));
         m_data.getData(parent) = std::make_unique<OperationNode>();
         emit dataChanged(parent);
-        beginInsertRows(parent,0,1);
+        beginInsertNodes(parent,0,1);
             m_data.tree().push_back(m_data.getIter(parent),std::move(node));
             m_data.tree().push_back(m_data.getIter(parent),static_cast<Node &&>(std::make_unique<ChoiceNode>()));
-        endInsertRows();
+        endInsertNodes();
     }
 }
 
@@ -42,7 +42,7 @@ std::vector<QString> FindModel::nomColonnes() const {
         return std::vector<QString>();
 }
 
-TreeNodeModel::Node FindModel::nodeFactory(int type, int row, const NodeIndex & parent) {
+TreeNodeModel::Node FindModel::nodeFactory(int type, szt row, const NodeIndex & parent) {
     switch (type) {
     case ChoiceNodeType:
         return std::make_unique<ChoiceNode>();
@@ -67,17 +67,16 @@ TreeNodeModel::Node FindModel::nodeConditionFactory(szt pos){
     }
 }
 
-void FindModel::removeNode(const NodeIndex & index){
-//    if(index.isValid() && index.model() == this){
-//        auto row = index.row();
-//        if(rowCount(index.parent()) == 2) {
-//            m_data.getValidData(index) = std::move(m_data.getValidData(index(1 - row,index.parent())));
-//            removeRows(0,2,index);
-//            emit dataChanged(index);
-//        }
-//        else
-//            removeRows(row,1,index);
-//    }
+void FindModel::removeNode(const NodeIndex & node){
+    if(node.isValid() && node.parent().isValid() && node.model() == this){
+        if(childCount(node.parent()) == 2) {
+            m_data.getValidData(node.parent()) = std::move(m_data.getValidData(index(1 - node.position(), node.parent())));
+            emit dataChanged(node.parent());
+            removeNodes(node.firstBrother(),2);
+        }
+        else
+            removeNodes(node);
+    }
 }
 
 void FindModel::reset() {
