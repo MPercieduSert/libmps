@@ -2,24 +2,26 @@
 
 using namespace modelMPS;
 
-NodeIndex AbstractNodeModel::createIndex(void * ptr) const {
+NodeIndex AbstractNodeModel::createIndex(void * ptr, int cible, szt num) const noexcept{
     NodeIndex index;
+    index.m_cible = cible;
+    index.m_num = num;
     index.m_ptr = ptr;
     index.m_model = const_cast<AbstractNodeModel *>(this);
     return index;
 }
 
 //////////////////////////////////// NodeIndex ////////////////////////////////
-QVariant NodeIndex::data(int cible, int role, szt num) const
-    {return m_model ? m_model->data(*this, cible, role, num)
+QVariant NodeIndex::data(int role) const
+    {return m_model ? m_model->data(*this, role)
                       : QVariant();}
 
 NodeIndex NodeIndex::firstBrother() const noexcept
     {return m_model ? m_model->firstBrother(*this)
                     : NodeIndex();}
 
-Qt::ItemFlags NodeIndex::flags(int cible, szt num) const
-    {return m_model ? m_model->flags(*this, cible, num)
+Qt::ItemFlags NodeIndex::flags() const
+    {return m_model ? m_model->flags(*this)
                       : Qt::NoItemFlags;}
 
 bool NodeIndex::isRoot() const noexcept
@@ -54,31 +56,31 @@ TreeNodeModel::AbstractNode::~AbstractNode() = default;
 
 TreeNodeModel::TreeNodeModel(bool racine, QObject *parent) : AbstractNodeModel (parent), m_data(this,racine){}
 
-QVariant TreeNodeModel::data(const NodeIndex &index, int cible, int role, szt num) const {
+QVariant TreeNodeModel::data(const NodeIndex &index, int role) const {
     if(checkIndex(index))
-        return m_data.getValidData(index)->data(cible,role,num);
+        return m_data.getValidData(index)->data(index.cible(), role, index.num());
     return QVariant();
 }
 
-szt TreeNodeModel::dataCount(const NodeIndex & index, int cible) const {
+szt TreeNodeModel::dataCount(const NodeIndex & index) const {
     if(checkIndex(index))
-        return m_data.getValidData(index)->dataCount(cible);
+        return m_data.getValidData(index)->dataCount(index.cible());
     return NoData;
 }
 
-Qt::ItemFlags TreeNodeModel::flags(const NodeIndex & index, int cible, szt num) const {
+Qt::ItemFlags TreeNodeModel::flags(const NodeIndex & index) const {
     if(checkIndex(index))
-        return m_data.getValidData(index)->flags(cible, num);
+        return m_data.getValidData(index)->flags(index.cible(), index.num());
     return Qt::NoItemFlags;
 }
 
-bool TreeNodeModel::insertNodes(int type, szt pos, szt count, const NodeIndex &parent) {
+bool TreeNodeModel::insertNodes(const NodeIndex &parent, szt pos, szt count, int type) {
     if (pos > childCount(parent))
         return false;
     if(m_data.racine() && !parent.isValid())
         return false;
     beginInsertNodes(parent,pos,pos + count - 1);
-        m_data.insertNodes([this,type](szt row, const NodeIndex & parent){return nodeFactory(type,row,parent);},pos,count,parent);
+        m_data.insertNodes([this,type](szt posArg, const NodeIndex & parentArg){return nodeFactory(parentArg,posArg,type);},pos,count,parent);
     endInsertNodes();
     return true;
 }
@@ -95,9 +97,9 @@ bool TreeNodeModel::removeNodes(const NodeIndex &index, szt count) {
     return true;
 }
 
-bool TreeNodeModel::setData(const NodeIndex &index, int cible, const QVariant &value, int role, szt num) {
-    if(checkIndex(index) && m_data.getValidData(index)->setData(cible,value,role,num)) {
-        dataChanged(index,cible,num);
+bool TreeNodeModel::setData(const NodeIndex &index, const QVariant &value, int role) {
+    if(checkIndex(index) && m_data.getValidData(index)->setData(index.cible(),value,role,index.num())) {
+        dataChanged(index);
         return true;
     }
     return false;
