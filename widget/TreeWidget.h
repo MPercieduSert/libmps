@@ -12,6 +12,7 @@ namespace  widgetMPS {
 using namespace typeMPS;
 
 class TreeWidget : public QTreeWidget{
+    //Q_OBJECT non compatible avec les méthodes template.
 public:
     //! Colonne
     enum colonne {IdColonne,
@@ -48,6 +49,7 @@ public:
      * QTreeWidgetItem * childItem(const T&)
      */
     template<class T, class ChildFactory> void setTreeRef(const conteneurMPS::tree<T> & tree, ChildFactory child);
+
 protected:
     //! Ajouter les fils de iter à item avec .
     template<class T, class ChildFactory> void addChilds(typename conteneurMPS::tree<T>::brother_iterator iter,

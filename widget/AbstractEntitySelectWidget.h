@@ -25,7 +25,7 @@ public:
 
     //! Acceseur de l'identifiant de l'entité séléctionnée.
     virtual idt id() const = 0;
-
+public slots:
     //! Mutateur de l'identifiant de l'entité séléctionnée.
     virtual void setId(idt id) = 0;
 
@@ -51,7 +51,7 @@ public:
     //! Acceseur de l'identifiant de l'entité séléctionnée.
     idt id() const override
         {return m_box->id();}
-
+public slots:
     //! Mutateur de l'identifiant de l'entité séléctionnée.
     void setId(idt id) override
         {m_box->setCurrentIndexId(id);}

@@ -182,22 +182,70 @@ protected:
 /*! \ingroup groupeWidget
  * \brief Spin Box affichant des entier strictement positif n'étant pas dans la liste transmise.
  */
-class SpinBoxNumExclu : public QAbstractSpinBox
-{
+class SpinBoxNumExclu : public QAbstractSpinBox {
     Q_OBJECT
 protected:
-    int m_value;            //!< Valeur courante.
-    QList<int> m_liste;     //!< Liste des valeurs excluses.
+    bool m_minVisible = false;  //!< Minimum visible.
+    int m_minimum = -1;         //!< Valeur minimal.
+    int m_offset = 0;           //!< Différence entre la valeur affichée et la valeur courante.
+    int m_value = m_minimum;    //!< Valeur courante.
+    std::list<int> m_list;      //!< Liste des valeurs excluses.
 
 public:
     //! Constructeur.
-    explicit SpinBoxNumExclu(const QList<int> &liste = QList<int>(), QWidget *parent = nullptr);
+    explicit SpinBoxNumExclu(const std::list<int> &liste = std::list<int>(), QWidget *parent = nullptr);
+
     //! Destructeur par default.
     ~SpinBoxNumExclu() override = default;
+
+    //! Efface la liste des numéro exclus.
+    void clearList()
+        {m_list.clear();}
+
+    //! Accesseur de la lists des valeurs à exclure.
+    const std::list<int> list() const
+        {return m_list;}
+
+    //! Accesseur du minimum.
+    int minimum() const noexcept
+        {return m_minimum;}
+
+    //! Accesseur de la visibilité du minimum.
+    bool minimumVisible() const noexcept
+        {return m_minVisible;}
+
+    //! Accesseur de l'offset.
+    int offset() const noexcept
+        {return m_offset;}
+
     //! Mutateur de la liste des valeurs à exclure.
-    void setListe(const QList<int> &liste);
+    void setList(const std::list<int> &list);
+
+    //! Mutateur du minimum.
+    void setMinimum(int min) {
+        m_minimum = min;
+        if(m_value < m_minimum)
+            setValue(m_minimum);
+    }
+
+    //! Mutateur de la visibilité du minimum.
+    void setMinimumVisible(bool bb){
+        m_minVisible = bb;
+        printValue();
+    }
+
+    //! Mutateur de l'offset.
+    void setOffset(int off){
+        m_offset = off;
+        printValue();
+    }
+
+    //! Mutateur de la valeur courante.
+    void setValue(int val);
+
     //! Méthode virtuelle d'incrémentation.
     void stepBy(int steps) override;
+
     //! Accesseur de la valeur courante.
     int value() const noexcept     {return m_value;}
 

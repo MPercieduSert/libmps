@@ -352,7 +352,7 @@ public:
                                         attribut(ordre), croissant(crois)));
         bindValue(0,value1);
         bindValue(1,value2);
-        bindValue(1,value3);
+        bindValue(2,value3);
         return listFromRequete();
     }
 
