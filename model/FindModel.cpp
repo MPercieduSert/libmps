@@ -17,9 +17,9 @@ void FindModel::find(){
         m_model->find(this);
 }
 
-void FindModel::insertNode(szt row, const NodeIndex & parent) {
+void FindModel::insertNode(const NodeIndex & parent, szt pos) {
     if(getData(parent).type() == OperationNodeType)
-        insertNodes(ChoiceNodeType,row,1,parent);
+        insertNodes(parent,pos,1,ChoiceNodeType);
     else {
         auto node = std::move(m_data.getData(parent));
         m_data.getData(parent) = std::make_unique<OperationNode>();
@@ -42,14 +42,14 @@ std::vector<QString> FindModel::nomColonnes() const {
         return std::vector<QString>();
 }
 
-TreeNodeModel::Node FindModel::nodeFactory(int type, szt row, const NodeIndex & parent) {
+TreeNodeModel::Node FindModel::nodeFactory(const NodeIndex & parent, szt pos, int type) {
     switch (type) {
     case ChoiceNodeType:
         return std::make_unique<ChoiceNode>();
     case OperationNodeType:
         return std::make_unique<OperationNode>();
     }
-    return TreeNodeModel::nodeFactory(type,row,parent);
+    return TreeNodeModel::nodeFactory(parent,pos,type);
 }
 
 TreeNodeModel::Node FindModel::nodeConditionFactory(szt pos){
@@ -70,7 +70,7 @@ TreeNodeModel::Node FindModel::nodeConditionFactory(szt pos){
 void FindModel::removeNode(const NodeIndex & node){
     if(node.isValid() && node.parent().isValid() && node.model() == this){
         if(childCount(node.parent()) == 2) {
-            m_data.getValidData(node.parent()) = std::move(m_data.getValidData(index(1 - node.position(), node.parent())));
+            m_data.getValidData(node.parent()) = std::move(m_data.getValidData(index(node.parent(), 1 - node.position())));
             emit dataChanged(node.parent());
             removeNodes(node.firstBrother(),2);
         }
@@ -85,32 +85,31 @@ void FindModel::reset() {
     endResetModel();
 }
 
-bool FindModel::setData(const NodeIndex &index, int cible, const QVariant &value, int role, szt num) {
+bool FindModel::setData(const NodeIndex &index, const QVariant &value, int role) {
     if(index.isValid()) {
         if(role == DataRole) {
-            if(cible == OpCible){
+            if(index.cible() == OpCible){
                 if(getData(index).type() == ChoiceNodeType
                         && value.toInt() >= 0 && value.toInt() < NbrOperation) {
                     m_data.getValidData(index) = std::make_unique<OperationNode>(value.toUInt());
-                    emit dataChanged(index);
-                    insertNodes(ChoiceNodeType,0,2,index);
+                    emit dataChanged(index.index(NodeTypeCible));
+                    insertNodes(index,0,2,ChoiceNodeType);
                     return true;
                 }
             }
-            else if (cible == ColonneCible) {
+            else if (index.cible() == ColonneCible) {
                 if(getData(index).type() != OperationNodeType
                         && value.toInt() >= 0 && value.toInt() < m_model->columnCount()) {
                     if(getData(index).type() != m_model->colonne(value.toUInt()).type())
                         m_data.getValidData(index) = nodeConditionFactory(value.toUInt());
                     else
                         static_cast<AbstractConditionNode &>(getData(index)).setPos(value.toUInt());
-                    emit dataChanged(index);
+                    emit dataChanged(index.index(NodeTypeCible));
                     return true;
                 }
-
             }
         }
-        return TreeNodeModel::setData(index,cible,value,role,num);
+        return TreeNodeModel::setData(index,value,role);
     }
     return false;
 }

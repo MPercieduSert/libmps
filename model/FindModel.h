@@ -82,7 +82,7 @@ public:
     //! Si le noeuds parent est un operationNode un noeud choiceNode est ajouté avant row.
     //! Si le noeuds parent n'est pas un operationNode, un nouveau operationNode prend sa place
     //! et le noeud parent devient l'ainé de ce nouveau et un noeud ChoiceNode est ajouté en cadet.
-    void insertNode(szt row, const NodeIndex & parent);
+    void insertNode(const NodeIndex & parent, szt pos);
 
     //! Accesseur du model filtré.
     AbstractColonnesModel * model() const
@@ -99,7 +99,7 @@ public:
         {return m_data.tree().cbegin().toFirstChild().leaf();}
 
     //! Mutateur des données du model.
-    bool setData(const NodeIndex &index, int cible, const QVariant &value, int role = DataRole, szt num = 0) override;
+    bool setData(const NodeIndex &index, const QVariant &value, int role = DataRole) override;
 
     //! Mutateur du model filtré.
     void setModel(AbstractColonnesModel * model);
@@ -119,7 +119,7 @@ public slots:
 
 protected:
     //! Fabrique des noeuds.
-    Node nodeFactory(int type, szt row, const NodeIndex & parent) override;
+    Node nodeFactory(const NodeIndex & parent, szt pos, int type) override;
 
     //! Fabrique des noeuds de condition.
     Node nodeConditionFactory(szt pos);

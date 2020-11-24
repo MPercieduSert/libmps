@@ -9,7 +9,7 @@ using namespace findNodeWidget;
 ///////////////////////////// FindDelegate ////////////////////////////
 NodeWidget * FindDelegate::createWidget(const NodeIndex &index, ArcNodeViewWidget *parent) const {
     if(index.isValid()) {
-        switch (index.data(NodeTypeCible,DataRole).toInt()) {
+        switch (index.data().toInt()) {
         case FindModel::BoolNodeType:
             return new BoolNodeWidget(index,parent);
         case FindModel::ChoiceNodeType:
@@ -61,7 +61,7 @@ void FindWidget::setFindModel(FindModel * model) {
     if(m_model) {
         connect(m_addButton,&QPushButton::clicked,this,
                 [this](){if(m_view->selectionModel()->hasSelection())
-                            m_model->insertNode(0,m_view->selectionModel()->currentIndex());});
+                            m_model->insertNode(m_view->selectionModel()->currentIndex(),0);});
         connect(m_delButton,&QPushButton::clicked,this,
                 [this](){if(m_view->selectionModel()->hasSelection() && !m_view->selectionModel()->currentIndex().isRoot())
                             m_model->removeNode(m_view->selectionModel()->currentIndex());});
@@ -74,8 +74,8 @@ void FindWidget::setFindModel(FindModel * model) {
 /////////////////////////////////////////////////// Noeud de Recherche /////////////////////////////////
 BoolNodeWidget::BoolNodeWidget(const NodeIndex & index, ArcNodeViewWidget *parent, int tp)
     : ConditionNodeWidget (index,parent,tp) {
-    m_falseCheck = new QCheckBox(m_index.data(FindModel::FalseCible,LabelRole).toString());
-    m_trueCheck = new QCheckBox(m_index.data(FindModel::TrueCible,LabelRole).toString());
+    m_falseCheck = new QCheckBox(m_index.index(FindModel::FalseCible).data(LabelRole).toString());
+    m_trueCheck = new QCheckBox(m_index.index(FindModel::TrueCible).data(LabelRole).toString());
     // Calque
     m_boolLayout = new QHBoxLayout;
     m_boolLayout->addWidget(m_trueCheck);
@@ -88,8 +88,8 @@ ChoiceNodeWidget::ChoiceNodeWidget(const NodeIndex & index, ArcNodeViewWidget * 
     // Opération.
     m_opLabel = new QLabel(tr("Opération :"));
     m_opCB = new QComboBox;
-    m_opCB->setEnabled(index.flags(FindModel::OpCible).testFlag(Qt::ItemIsEnabled));
-    m_opCB->setEditable(index.flags(FindModel::OpCible).testFlag(Qt::ItemIsEditable));
+    m_opCB->setEnabled(index.index(FindModel::OpCible).flags().testFlag(Qt::ItemIsEnabled));
+    m_opCB->setEditable(index.index(FindModel::OpCible).flags().testFlag(Qt::ItemIsEditable));
     m_opCB->setInsertPolicy(QComboBox::NoInsert);
     for (szt i = 0; i != FindModel::NbrOperation; ++i)
         m_opCB->addItem(OperationNode::Strings[i],i);
@@ -98,8 +98,8 @@ ChoiceNodeWidget::ChoiceNodeWidget(const NodeIndex & index, ArcNodeViewWidget * 
     // Colonne
     m_colonneLabel = new QLabel(tr("Colonne :"));
     m_colonneCB = new QComboBox;
-    m_colonneCB->setEditable(index.flags(FindModel::ColonneCible).testFlag(Qt::ItemIsEnabled));
-    m_colonneCB->setEditable(index.flags(FindModel::ColonneCible).testFlag(Qt::ItemIsEditable));
+    m_colonneCB->setEditable(index.index(FindModel::ColonneCible).flags().testFlag(Qt::ItemIsEnabled));
+    m_colonneCB->setEditable(index.index(FindModel::ColonneCible).flags().testFlag(Qt::ItemIsEditable));
     m_colonneCB->setInsertPolicy(QComboBox::NoInsert);
     auto vec = static_cast<const modelMPS::FindModel *>(index.model())->nomColonnes();
     for (szt i = 0; i != vec.size(); ++i)
@@ -118,7 +118,7 @@ ComparaisonNodeWidget::ComparaisonNodeWidget(const NodeIndex & index, ArcNodeVie
     : ConditionNodeWidget (index,parent,tp) {
     m_compLabel = new QLabel(tr("Comparaison :"));
     m_compCB = new QComboBox;
-    m_compCB->setEditable(index.flags(FindModel::ColonneCible).testFlag(Qt::ItemIsEnabled));
+    m_compCB->setEditable(index.index(FindModel::ColonneCible).flags().testFlag(Qt::ItemIsEnabled));
     m_compCB->setInsertPolicy(QComboBox::NoInsert);
     for (szt i = 0; i != FindModel::NbrComparaison; ++i)
         m_compCB->addItem(AbstractComparaisonNode::Strings[i],i);
@@ -133,7 +133,7 @@ ConditionNodeWidget::ConditionNodeWidget(const NodeIndex & index, ArcNodeViewWid
     : NegationNodeWidget (index,parent,tp) {
     m_colonneLabel = new QLabel(tr("Colonne :"));
     m_colonneCB = new QComboBox;
-    m_colonneCB->setEditable(index.flags(FindModel::ColonneCible).testFlag(Qt::ItemIsEnabled));
+    m_colonneCB->setEditable(index.index(FindModel::ColonneCible).flags().testFlag(Qt::ItemIsEnabled));
     m_colonneCB->setInsertPolicy(QComboBox::NoInsert);
     auto vec = static_cast<const modelMPS::FindModel *>(index.model())->nomColonnes();
     for (szt i = 0; i != vec.size(); ++i)
@@ -159,7 +159,7 @@ DateNodeWidget::DateNodeWidget(const NodeIndex & index, ArcNodeViewWidget *paren
 NegationNodeWidget::NegationNodeWidget(const NodeIndex & index, ArcNodeViewWidget * parent, int tp)
     : FindNodeWidget (index,parent,tp) {
     m_nonCheckBox = new QCheckBox(tr("Négation"));
-    m_nonCheckBox->setEnabled(index.flags(FindModel::NegCible).testFlag(Qt::ItemIsEnabled));
+    m_nonCheckBox->setEnabled(index.index(FindModel::NegCible).flags().testFlag(Qt::ItemIsEnabled));
     // Calque
     m_mainLayout = new QHBoxLayout(this);
     m_mainLayout->addWidget(m_nonCheckBox);
@@ -169,7 +169,7 @@ OperationNodeWidget::OperationNodeWidget(const NodeIndex & index, ArcNodeViewWid
     : NegationNodeWidget (index,parent,tp) {
     m_opLabel = new QLabel(tr("Opération :"));
     m_opCB = new QComboBox;
-    m_opCB->setEditable(index.flags(FindModel::OpCible).testFlag(Qt::ItemIsEnabled));
+    m_opCB->setEditable(index.index(FindModel::OpCible).flags().testFlag(Qt::ItemIsEnabled));
     m_opCB->setInsertPolicy(QComboBox::NoInsert);
     for (szt i = 0; i != FindModel::NbrOperation; ++i)
         m_opCB->addItem(OperationNode::Strings[i],i);

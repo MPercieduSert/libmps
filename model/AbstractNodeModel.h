@@ -61,6 +61,14 @@ public:
     //! Drapeaux assossiés à une donnée.
     Qt::ItemFlags flags() const;
 
+    //! Créer un index de même model et pointeur avec la cible et le numero spécifié.
+    NodeIndex index(int cb, szt nm = 0) const noexcept {
+        auto ind = *this;
+        ind.setCible(cb);
+        ind.setNum(nm);
+        return ind;
+    }
+
     //! Accesseur du pointeur interne.
     void * internalPointer() const noexcept
         {return m_ptr;}
@@ -143,7 +151,7 @@ public:
     virtual QVariant data(const NodeIndex & index, int role = DataRole) const = 0;
 
     //! Nombre de données associées associé à un noeud pour une cible donnée.
-    virtual szt dataCount(const NodeIndex & index) const;
+    virtual szt dataCount(const NodeIndex & index) const = 0;
 
     //! Retourne un index sur le frère ainé.
     virtual NodeIndex firstBrother(const NodeIndex & index) const = 0;

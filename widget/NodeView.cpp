@@ -49,7 +49,7 @@ void ArcNodeViewWidget::insertNodes(szt first, szt last){
         if(m_expanded) {
             auto iterfirst = m_arcVec.insert(std::next(m_arcVec.cbegin(),first),static_cast<szt>(last - first + 1), nullptr);
             auto iter = iterfirst;
-            auto child = m_nodeWidget->index().model()->index(first,m_nodeWidget->index());
+            auto child = m_nodeWidget->index().model()->index(m_nodeWidget->index(),first);
             while (first <= last && child.isValid()) {
                 *iter = new ArcNodeViewWidget(child,m_view,this);
                 ++first;
@@ -129,7 +129,7 @@ void ArcNodeViewWidget::setExpanded(bool bb){
         if(m_expanded) {
             auto index = m_nodeWidget->index();
             m_arcVec.resize(index.model()->childCount(index));
-            auto child = index.model()->index(0,index);
+            auto child = index.model()->index(index,0);
             for (auto iterVec = m_arcVec.begin(); iterVec != m_arcVec.end(); ++iterVec) {
                 *iterVec = new ArcNodeViewWidget(child,m_view,this);
                 child = child.nextBrother();
@@ -160,7 +160,7 @@ void ArcNodeViewWidget::setLeaf(bool bb) {
 void ArcNodeViewWidget::setNodeWidget(NodeWidget * widget) {
     auto draw = m_nodeWidget && m_nodeWidget->isVisible();
     if(m_nodeWidget) {
-        m_view->m_arcMap.erase(m_nodeWidget->index());
+        m_view->m_arcMap.erase(m_nodeWidget->index().internalPointer());
         m_nodeWidget->hide();
         m_nodeWidget->deleteLater();
     }
@@ -172,7 +172,7 @@ void ArcNodeViewWidget::setNodeWidget(NodeWidget * widget) {
         m_nodeWidget->setEtatSelection(NodeWidget::Selected);
     m_nodeWidget->updateData();
     m_nodeWidget->connexion();
-    m_view->m_arcMap[m_nodeWidget->index()] = this;
+    m_view->m_arcMap[m_nodeWidget->index().internalPointer()] = this;
     m_nodeWidget->move(LeftNodeMargin,TopNodeMargin);
     m_nodeWidget->setVisible(true);
     if(draw)
@@ -221,12 +221,12 @@ void NodeView::clickLeftOn(const NodeIndex & index) {
 
 void NodeView::currentChanged(const NodeIndex & current, const NodeIndex & previous){
     if(current.isValid()) {
-        auto iter = m_arcMap.find(current);
+        auto iter = m_arcMap.find(current.internalPointer());
         if(iter != m_arcMap.end())
             iter->second->nodeWidget()->setEtatSelection(NodeWidget::Current);
     }
     if(previous.isValid()) {
-        auto iter = m_arcMap.find(previous);
+        auto iter = m_arcMap.find(previous.internalPointer());
         if(iter != m_arcMap.end())
             iter->second->nodeWidget()->setEtatSelection(NodeWidget::NoSelected);
     }
@@ -238,13 +238,13 @@ void NodeView::deleteRoot(){
 }
 
 void NodeView::insertNodes(const NodeIndex & parent, szt first, szt last) {
-    auto iter = m_arcMap.find(parent);
+    auto iter = m_arcMap.find(parent.internalPointer());
     if(iter != m_arcMap.end())
         iter->second->insertNodes(first,last);
 }
 
 void NodeView::removeNodes(const NodeIndex & parent, szt first, szt last) {
-    auto iter = m_arcMap.find(parent);
+    auto iter = m_arcMap.find(parent.internalPointer());
     if(iter != m_arcMap.end())
         iter->second->removeNodes(first, last);
 }
@@ -287,11 +287,11 @@ void NodeView::setSelectionModel(SelectionModel * selectionModel) {
 void NodeView::resetRoot(){
     if(widget())
         deleteRoot();
-    setWidget(new ArcNodeViewWidget(m_model->index(0),this,this,true));
+    setWidget(new ArcNodeViewWidget(m_model->index(NodeIndex(),0),this,this,true));
 }
 
 void NodeView::updateData(const NodeIndex & index) {
-    auto iter = m_arcMap.find(index);
+    auto iter = m_arcMap.find(index.internalPointer());
     if(iter != m_arcMap.end()){
         if(index.data(NodeTypeCible) == iter->second->nodeWidget()->type()) {
             iter->second->nodeWidget()->deconnexion();

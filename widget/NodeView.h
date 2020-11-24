@@ -116,7 +116,7 @@ protected:
     Model * m_model = nullptr;                          //!< Model associé à la vue.
     SelectionMode m_selectionMode = SingleSelection;    //!< Mode de sélection.
     SelectionModel * m_selectionModel = nullptr;        //!< Model de sélection.
-    std::map<NodeIndex,ArcNodeViewWidget *> m_arcMap;   //!< Map des arc.
+    std::map<void*,ArcNodeViewWidget *> m_arcMap;   //!< Map des arc.
 public:
     //! Constructeur.
     NodeView(QWidget * parent = nullptr);
@@ -225,7 +225,7 @@ public:
 
     //! Destructeur.
     ~ArcNodeViewWidget() override
-        {m_view->m_arcMap.erase(m_nodeWidget->index());}
+        {m_view->m_arcMap.erase(m_nodeWidget->index().internalPointer());}
 
     //! Place le noeud  et les suivants et ajuste les tailles.
     void drawNode(bool next = false);
