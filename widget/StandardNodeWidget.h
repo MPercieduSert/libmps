@@ -4,12 +4,13 @@
 #ifndef STANDARDNODEWIDGET_H
 #define STANDARDNODEWIDGET_H
 
+#include <QLabel>
 #include "NodeView.h"
 
 namespace widgetMPS {
 class StandardNodeWidget;
 /*! \ingroup groupeWidget
- * \brief Classe mère des composants des noeuds standard.
+ * \brief Classe mère des sous noeuds standard.
  */
 class AbstractSubNodeWidget : public QWidget {
     Q_OBJECT
@@ -17,6 +18,7 @@ protected:
     using NodeIndex = modelMPS::NodeIndex;
     using SubIndex = modelMPS::NodeIndex::SubIndex;
     NodeIndex m_index;                  //!< Index associé aux noeuds.
+    QBoxLayout * m_mainLayout;          //!< Calque principale du sous-noeud.
 public:
     //! Constructeur.
     AbstractSubNodeWidget(const NodeIndex & index, StandardNodeWidget * parent);
@@ -24,14 +26,34 @@ public:
     //!< Destructeur.
     ~AbstractSubNodeWidget() override;
 
+    //! Connecte les éléments du noeuds au model.
+    virtual void connexion() const {}
+
+    //! Déconnecte les éléments du noeuds au model.
+    virtual void deconnexion() const {}
+
     //! Acceseur de l'index.
     NodeIndex index() const noexcept
         {return m_index;}
 public slots:
-    //! Met à jour les données du widget à partir des données du model.
+    //! Met à jour les données du sous-noeud à partir des données du model.
     virtual void updateData() = 0;
 };
 
+/*! \ingroup groupeWidget
+ * \brief Classe des sous-noeud composé d'un label.
+ */
+class LabelSubNodeWidget : public AbstractSubNodeWidget {
+    Q_OBJECT
+protected:
+    QLabel * m_label;       //! Label du sous-noeud.
+public:
+    //! Constructeur.
+    LabelSubNodeWidget(const NodeIndex & index, StandardNodeWidget * parent);
+
+    //! Met à jour les données du label à partir des données du model.
+    void updateData() override;
+};
 
 /*! \ingroup groupeWidget
  * \brief Classe standard des widgets des noeuds de l'arbre.
@@ -75,4 +97,5 @@ public:
     //! Crée un widget
     AbstractNodeWidget * createWidget(const NodeIndex &index, widgetMPS::ArcNodeViewWidget * parent = nullptr) const override;
 };
+}
 #endif // STANDARDNODEWIDGET_H
