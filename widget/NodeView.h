@@ -12,9 +12,11 @@
 #include <QScrollArea>
 #include <QVBoxLayout>
 #include "NodeSelectionModel.h"
+
 /*! \defgroup groupeDelegate Delegate
  * \brief Ensemble des classes des delegates.
  */
+
 namespace widgetMPS {
 using namespace typeMPS;
 class NodeView;
@@ -22,7 +24,7 @@ class ArcNodeViewWidget;
 /*! \ingroup groupeWidget
  * \brief Classe mère des widgets des noeuds de l'arbre.
  */
-class NodeWidget : public QWidget {
+class AbstractNodeWidget : public QWidget {
     Q_OBJECT
 public:
     using NodeIndex = modelMPS::NodeIndex;
@@ -45,7 +47,7 @@ protected:
     const NodeIndex m_index;                        //!< Index sur la donnée représentée par le noeud.
 public:
     //! Constructeur.
-    NodeWidget(const NodeIndex & index, ArcNodeViewWidget * parent = nullptr, int tp = NoType);
+    AbstractNodeWidget(const NodeIndex & index, ArcNodeViewWidget * parent = nullptr, int tp = NoType);
 
     //! Connecte les éléments du noeuds au model.
     virtual void connexion() const {}
@@ -71,7 +73,10 @@ public:
         {return m_type;}
 public slots:
     //! Met à jour les données du widget à partir des données du model.
-    virtual void updateData() {}
+    virtual void updateData() = 0;
+
+    //! Met à jour les données du widget pour l'index index à partir des données du model.
+    virtual void updateData(const NodeIndex & /*index*/) = 0;
 };
 }
 /*! \ingroup groupeDelegate
@@ -84,11 +89,11 @@ namespace delegateMPS {
 class AbstractNodeDelegate : public QObject {
 public:
     using NodeIndex = modelMPS::NodeIndex;
-    using NodeWidget = widgetMPS::NodeWidget;
+    using AbstractNodeWidget = widgetMPS::AbstractNodeWidget;
     //! Constructeur.
     AbstractNodeDelegate(QObject * parent);
     //! Crée un widget
-    virtual NodeWidget * createWidget(const NodeIndex &index, widgetMPS::ArcNodeViewWidget * parent = nullptr) const = 0;
+    virtual AbstractNodeWidget * createWidget(const NodeIndex &index, widgetMPS::ArcNodeViewWidget * parent = nullptr) const = 0;
 };
 }
 namespace widgetMPS {
@@ -107,7 +112,7 @@ public:
                         };
 protected:
     friend ArcNodeViewWidget;
-    friend NodeWidget;
+    friend AbstractNodeWidget;
     using Delegate = delegateMPS::AbstractNodeDelegate;
     using Model = modelMPS::AbstractNodeModel;
     using NodeIndex = modelMPS::NodeIndex;
@@ -164,7 +169,7 @@ public slots:
     //! Prend en compte la suppression de noeud du model.
     void removeNodes(const NodeIndex & parent, szt first, szt last);
 
-    //! Met à jour les donnée du NodeWidget associé à l'index.
+    //! Met à jour les donnée du AbstractNodeWidget associé à l'index.
     void updateData(const NodeIndex & index);
 
 protected slots:
@@ -213,11 +218,11 @@ protected:
     bool m_leaf = true;                         //!< Le noeud est une feuille.
     const bool m_root;                          //!< Le noeud est la racine.
     NodeView * m_view;                          //!< Vue contenant le widget.
-    NodeWidget * m_nodeWidget = nullptr;        //!< Widget de noeud.
+    AbstractNodeWidget * m_nodeWidget = nullptr;        //!< Widget de noeud.
     std::vector<ArcNodeViewWidget *> m_arcVec;  //!< Vecteur des arcs fils.
 public:
     //! Constructeur.
-    ArcNodeViewWidget(NodeWidget * node, NodeView * view, QWidget * parent = nullptr, bool root = false);
+    ArcNodeViewWidget(AbstractNodeWidget * node, NodeView * view, QWidget * parent = nullptr, bool root = false);
 
     //! Constructeur.
     ArcNodeViewWidget(const modelMPS::NodeIndex & index, NodeView * view, QWidget * parent = nullptr, bool root = false)
@@ -245,7 +250,7 @@ public:
     void mousePressEvent(QMouseEvent *event) override;
 
     //! Accesseur du widget de noeud.
-    NodeWidget * nodeWidget() const noexcept
+    AbstractNodeWidget * nodeWidget() const noexcept
         {return m_nodeWidget;}
 
     //! Dessine la branche.
@@ -265,7 +270,7 @@ public:
     void setLeaf(bool bb);
 
     //! Mutateur du widget de noeud.
-    void setNodeWidget(NodeWidget * widget);
+    void setNodeWidget(AbstractNodeWidget * widget);
 
     //! Mutateur du widget de noeud.
     void setNodeWidget(const modelMPS::NodeIndex & index) {

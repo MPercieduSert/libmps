@@ -48,7 +48,8 @@ SOURCES += \
     #TreeModelTemp.cpp \
     TreeWidget.cpp \
     NodeView.cpp \
-    FindWidget.cpp
+    FindWidget.cpp \
+    StandardNodeWidget.cpp
 
 HEADERS += \
     AbstractEntitySelectWidget.h \
@@ -77,7 +78,8 @@ HEADERS += \
     #TreeModelTemp.h \
     TreeWidget.h \
     NodeView.h \
-    FindWidget.h
+    FindWidget.h \
+    StandardNodeWidget.h
 
 unix {
     target.path = /usr/lib

@@ -92,7 +92,7 @@ bool FindModel::setData(const NodeIndex &index, const QVariant &value, int role)
                 if(getData(index).type() == ChoiceNodeType
                         && value.toInt() >= 0 && value.toInt() < NbrOperation) {
                     m_data.getValidData(index) = std::make_unique<OperationNode>(value.toUInt());
-                    emit dataChanged(index.index(NodeTypeCible));
+                    emit dataChanged(index.index(NodeCible));
                     insertNodes(index,0,2,ChoiceNodeType);
                     return true;
                 }
@@ -104,7 +104,7 @@ bool FindModel::setData(const NodeIndex &index, const QVariant &value, int role)
                         m_data.getValidData(index) = nodeConditionFactory(value.toUInt());
                     else
                         static_cast<AbstractConditionNode &>(getData(index)).setPos(value.toUInt());
-                    emit dataChanged(index.index(NodeTypeCible));
+                    emit dataChanged(index.index(NodeCible));
                     return true;
                 }
             }

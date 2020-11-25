@@ -54,6 +54,18 @@ NodeIndex NodeIndex::prevBrother() const noexcept
 
 TreeNodeModel::AbstractNode::~AbstractNode() = default;
 
+QVariant TreeNodeModel::AbstractNode::data(int cible, int role, szt /*num*/) const {
+    if(cible == NodeCible){
+        switch (role) {
+        case DataRole:
+            return type();
+        case OrientationRole:
+            return Qt::Horizontal;
+        }
+    }
+    return QVariant();
+}
+
 TreeNodeModel::TreeNodeModel(bool racine, QObject *parent) : AbstractNodeModel (parent), m_data(this,racine){}
 
 QVariant TreeNodeModel::data(const NodeIndex &index, int role) const {

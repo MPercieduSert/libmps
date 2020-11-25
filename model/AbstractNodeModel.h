@@ -11,7 +11,7 @@
 
 //! Macro d'inclusion des membres virtual dans le model à node.
 #define TREE_FOR_NODE_MODEL_INDEX_PARENT_ROWCOUNT(TREE) /*! Renvoie l'index correxpondant à la ligne et colonne de parent.*/ \
-    NodeIndex index(const NodeIndex &parent, szt pos, int cible = NodeTypeCible, szt num = 0) const override \
+    NodeIndex index(const NodeIndex &parent, szt pos, int cible = NodeCible, szt num = 0) const override \
         {return TREE.index(parent,pos,cible,num);} \
     /*! Teste si le noeud associé à un index valide est une feuille.*/ \
     bool leaf(const NodeIndex & index) const override {return TREE.leaf(index);} \
@@ -25,12 +25,14 @@ using namespace typeMPS;
 class AbstractNodeModel;
 //! Cible de donnée prédéfinies.
 enum cibleDataNode {
-    NodeTypeCible = -1
+    NodeCible = -1,
+    SubNodeCible = -2
 };
 
 //! Role des données
 enum roleDataNode {
     DataRole,
+    OrientationRole,
     LabelRole
 };
 
@@ -40,11 +42,13 @@ enum roleDataNode {
 class NodeIndex {
     friend AbstractNodeModel;
 protected:
-    int m_cible = NodeTypeCible;                //!< Cible de l'index.
+    int m_cible = NodeCible;                //!< Cible de l'index.
     szt m_num = 0;                              //!< Numéro.
     void * m_ptr = nullptr;                     //!< Pointeur interne sur sur la donnée du model.
     AbstractNodeModel * m_model = nullptr;      //!< Pointeur sur le model.
 public:
+    using SubIndex = std::pair<int,szt>;
+
     //! Constructeur.
     NodeIndex() = default;
 
@@ -117,6 +121,10 @@ public:
     //! Mutateur de la cible.
     void setNum(szt num) noexcept
         {m_num = num;}
+
+    //! Retourne le sous index.
+    SubIndex subIndex() const noexcept
+        {return {m_cible,m_num};}
 };
 
 template<class T> class TreeForNodeModel;
@@ -160,7 +168,7 @@ public:
     virtual Qt::ItemFlags flags(const NodeIndex & index) const = 0;
 
     //! Index du fils de position pos de parent.
-    virtual NodeIndex index(const NodeIndex & parent, szt pos, int cible = NodeTypeCible, szt num = 0) const = 0;
+    virtual NodeIndex index(const NodeIndex & parent, szt pos, int cible = NodeCible, szt num = 0) const = 0;
 
     //! Insert count noeuds de nature type avant la position pos de parent.
     virtual bool insertNodes(const NodeIndex &parent, szt pos, szt count, int type) = 0;
@@ -238,7 +246,7 @@ protected:
         {emit modelAboutToBeReset();}
 
     //! Crée un index de pointeur ptr.
-    NodeIndex createIndex(void * ptr = nullptr, int cible = NodeTypeCible, szt num = 0) const noexcept;
+    NodeIndex createIndex(void * ptr = nullptr, int cible = NodeCible, szt num = 0) const noexcept;
 
     //! Fin d'insertion de lignes.
     void endInsertNodes() {
@@ -275,7 +283,7 @@ public:
     using TempTreeForModel<T,AbstractNodeModel,NodeIndex>::TempTreeForModel;
 
     //! Renvoie l'index correxpondant à la ligne et colonne de parent.
-    NodeIndex index(const NodeIndex &parent, szt pos, int cible = NodeTypeCible, szt num = 0) const;
+    NodeIndex index(const NodeIndex &parent, szt pos, int cible = NodeCible, szt num = 0) const;
 
     //! Retourne un index sur le frère ainé.
     NodeIndex firstBrother(const NodeIndex & index) const
@@ -325,14 +333,11 @@ public:
         virtual ~AbstractNode();
 
         //! Accesseur de la donnée associé à column.
-        virtual QVariant data(int cible, int role = DataRole, szt /*num*/ = 0) const {
-            if(cible == NodeTypeCible && role == DataRole)
-                return type();
-            return QVariant();}
+        virtual QVariant data(int cible, int role = DataRole, szt /*num*/ = 0) const;
 
         //! Nombre de donnée associé au noeud pour un type donnée.
         virtual szt dataCount(int cible) const
-            {return cible == NodeTypeCible ? 1 : NoData;}
+            {return cible == NodeCible ? 1 : NoData;}
 
         //! Accesseur des drapeaux associés à column.
         virtual Qt::ItemFlags flags(int /*cible*/, szt /*num*/ = 0) const {return  Qt::NoItemFlags;}

@@ -9,7 +9,7 @@ AbstractNodeDelegate::AbstractNodeDelegate(QObject * parent)
     : QObject(parent) {}
 
 ////////////////////////////////////// ArcNodeViewWidget //////////////////////////////////////////
-ArcNodeViewWidget::ArcNodeViewWidget(NodeWidget *node, NodeView *view, QWidget * parent, bool root)
+ArcNodeViewWidget::ArcNodeViewWidget(AbstractNodeWidget *node, NodeView *view, QWidget * parent, bool root)
     : QWidget (parent), m_root(root), m_view(view) {
     setNodeWidget(node);
     m_leaf = m_nodeWidget->index().leaf();
@@ -157,7 +157,7 @@ void ArcNodeViewWidget::setLeaf(bool bb) {
     }
 }
 
-void ArcNodeViewWidget::setNodeWidget(NodeWidget * widget) {
+void ArcNodeViewWidget::setNodeWidget(AbstractNodeWidget * widget) {
     auto draw = m_nodeWidget && m_nodeWidget->isVisible();
     if(m_nodeWidget) {
         m_view->m_arcMap.erase(m_nodeWidget->index().internalPointer());
@@ -167,9 +167,9 @@ void ArcNodeViewWidget::setNodeWidget(NodeWidget * widget) {
     m_nodeWidget = widget;
     m_nodeWidget->setParent(this);
     if(m_view->selectionModel()->isCurrentIndex(m_nodeWidget->index()))
-        m_nodeWidget->setEtatSelection(NodeWidget::Current);
+        m_nodeWidget->setEtatSelection(AbstractNodeWidget::Current);
     else if(m_view->selectionModel()->isSelected(m_nodeWidget->index()))
-        m_nodeWidget->setEtatSelection(NodeWidget::Selected);
+        m_nodeWidget->setEtatSelection(AbstractNodeWidget::Selected);
     m_nodeWidget->updateData();
     m_nodeWidget->connexion();
     m_view->m_arcMap[m_nodeWidget->index().internalPointer()] = this;
@@ -223,12 +223,12 @@ void NodeView::currentChanged(const NodeIndex & current, const NodeIndex & previ
     if(current.isValid()) {
         auto iter = m_arcMap.find(current.internalPointer());
         if(iter != m_arcMap.end())
-            iter->second->nodeWidget()->setEtatSelection(NodeWidget::Current);
+            iter->second->nodeWidget()->setEtatSelection(AbstractNodeWidget::Current);
     }
     if(previous.isValid()) {
         auto iter = m_arcMap.find(previous.internalPointer());
         if(iter != m_arcMap.end())
-            iter->second->nodeWidget()->setEtatSelection(NodeWidget::NoSelected);
+            iter->second->nodeWidget()->setEtatSelection(AbstractNodeWidget::NoSelected);
     }
 }
 
@@ -293,9 +293,9 @@ void NodeView::resetRoot(){
 void NodeView::updateData(const NodeIndex & index) {
     auto iter = m_arcMap.find(index.internalPointer());
     if(iter != m_arcMap.end()){
-        if(index.data(NodeTypeCible) == iter->second->nodeWidget()->type()) {
+        if(index.cible() != NodeCible || index.data() == iter->second->nodeWidget()->type()) {
             iter->second->nodeWidget()->deconnexion();
-            iter->second->nodeWidget()->updateData();
+            iter->second->nodeWidget()->updateData(index);
             iter->second->nodeWidget()->connexion();
         }
         else
@@ -303,19 +303,19 @@ void NodeView::updateData(const NodeIndex & index) {
     }
 }
 
-////////////////////////////////////////// NodeWidget /////////////////////////////////////
-NodeWidget::NodeWidget(const NodeIndex & index, ArcNodeViewWidget *parent, int tp)
+////////////////////////////////////////// AbstractNodeWidget /////////////////////////////////////
+AbstractNodeWidget::AbstractNodeWidget(const NodeIndex & index, ArcNodeViewWidget *parent, int tp)
     : QWidget(parent),
       m_colorLine(QGuiApplication::palette().color(QPalette::Active,QPalette::WindowText)),
       m_type(tp), m_index(index)
     {}
 
-void NodeWidget::mousePressEvent(QMouseEvent * event) {
+void AbstractNodeWidget::mousePressEvent(QMouseEvent * event) {
     if(event->button() == Qt::LeftButton)
         static_cast<ArcNodeViewWidget *>(parentWidget())->view()->clickLeftOn(m_index);
 }
 
-void NodeWidget::paintEvent(QPaintEvent * /*event*/) {
+void AbstractNodeWidget::paintEvent(QPaintEvent * /*event*/) {
     QPen pen(m_colorLine);
     pen.setWidth(m_widthLine);
     QPainter painter(this);
@@ -323,7 +323,7 @@ void NodeWidget::paintEvent(QPaintEvent * /*event*/) {
     painter.drawRoundedRect(m_widthLine / 2,m_widthLine / 2,width() - m_widthLine,height() - m_widthLine,Rayon,Rayon,Qt::AbsoluteSize);
 }
 
-void NodeWidget::setEtatSelection(EtatSelection etat) {
+void AbstractNodeWidget::setEtatSelection(EtatSelection etat) {
     if(m_etatSelection != etat){
         switch (etat) {
         case NoSelected:
