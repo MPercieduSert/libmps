@@ -4,7 +4,9 @@
 #ifndef STANDARDNODEWIDGET_H
 #define STANDARDNODEWIDGET_H
 
+#include <QCheckBox>
 #include <QLabel>
+#include <QLineEdit>
 #include "NodeView.h"
 
 namespace widgetMPS {
@@ -37,11 +39,32 @@ public:
         {return m_index;}
 public slots:
     //! Met à jour les données du sous-noeud à partir des données du model.
-    virtual void updateData() = 0;
+    virtual void updateData() {}
 };
 
 /*! \ingroup groupeWidget
- * \brief Classe des sous-noeud composé d'un label.
+ * \brief Classe des sous-noeuds composés d'une case à cocher.
+ */
+class CheckSubNodeWidget : public AbstractSubNodeWidget {
+    Q_OBJECT
+protected:
+    QCheckBox * m_checkBox;       //! CheckBox du sous-noeud.
+public:
+    //! Constructeur.
+    CheckSubNodeWidget(const NodeIndex & index, StandardNodeWidget * parent);
+
+    //! Connecte les éléments du noeuds au model.
+    void connexion() const override;
+
+    //! Déconnecte les éléments du noeuds au model.
+    void deconnexion() const override;
+
+    //! Met à jour les données du label à partir des données du model.
+    void updateData() override;
+};
+
+/*! \ingroup groupeWidget
+ * \brief Classe des sous-noeuds composés d'un label.
  */
 class LabelSubNodeWidget : public AbstractSubNodeWidget {
     Q_OBJECT
@@ -50,6 +73,27 @@ protected:
 public:
     //! Constructeur.
     LabelSubNodeWidget(const NodeIndex & index, StandardNodeWidget * parent);
+
+    //! Met à jour les données du label à partir des données du model.
+    void updateData() override;
+};
+
+/*! \ingroup groupeWidget
+ * \brief Classe des sous-noeuds composés d'un label et d'une ligne d'édition de texte.
+ */
+class LineEditSubNodeWidget : public LabelSubNodeWidget {
+    Q_OBJECT
+protected:
+    QLineEdit * m_lineEdit;       //! Ligne d'édition du sous-noeud.
+public:
+    //! Constructeur.
+    LineEditSubNodeWidget(const NodeIndex & index, StandardNodeWidget * parent);
+
+    //! Connecte les éléments du noeuds au model.
+    void connexion() const override;
+
+    //! Déconnecte les éléments du noeuds au model.
+    void deconnexion() const override;
 
     //! Met à jour les données du label à partir des données du model.
     void updateData() override;
