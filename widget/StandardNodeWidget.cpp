@@ -38,10 +38,12 @@ void CheckSubNodeWidget::deconnexion() const {
     disconnect(m_checkBox,&QCheckBox::stateChanged,this,nullptr);
 }
 
-void CheckSubNodeWidget::updateData() {
-    AbstractSubNodeWidget::updateData();
-    m_checkBox->setText(m_index.data(modelMPS::LabelRole).toString());
-    m_checkBox->setChecked(m_index.data().toBool());
+void CheckSubNodeWidget::updateData(flag role) {
+    AbstractSubNodeWidget::updateData(role);
+    if(role.test(modelMPS::LabelRole))
+        m_checkBox->setText(m_index.data(modelMPS::LabelRole).toString());
+    if(role.test(modelMPS::DataRole))
+        m_checkBox->setChecked(m_index.data().toBool());
 }
 
 ////////////////////////////////////////////////// LabelSubNodeWidget //////////////////////////////////////////
@@ -51,9 +53,10 @@ LabelSubNodeWidget::LabelSubNodeWidget(const NodeIndex & index, StandardNodeWidg
     m_mainLayout->addWidget(m_label);
 }
 
-void LabelSubNodeWidget::updateData() {
-    AbstractSubNodeWidget::updateData();
-    m_label->setText(m_index.data(modelMPS::LabelRole).toString());
+void LabelSubNodeWidget::updateData(flag role) {
+    AbstractSubNodeWidget::updateData(role);
+    if(role.test(modelMPS::LabelRole))
+        m_label->setText(m_index.data(modelMPS::LabelRole).toString());
 }
 
 ////////////////////////////////////////////////// LineEditSubNodeWidget //////////////////////////////////////////
@@ -75,9 +78,10 @@ void LineEditSubNodeWidget::deconnexion() const {
     disconnect(m_lineEdit,&QLineEdit::textChanged,this,nullptr);
 }
 
-void LineEditSubNodeWidget::updateData() {
-    LabelSubNodeWidget::updateData();
-    m_lineEdit->setText(m_index.data().toString());
+void LineEditSubNodeWidget::updateData(flag role) {
+    LabelSubNodeWidget::updateData(role);
+    if(role.test(modelMPS::DataRole))
+        m_lineEdit->setText(m_index.data().toString());
 }
 
 ////////////////////////////////////////////// StandardNodeWidget //////////////////////////////////////////
@@ -92,23 +96,23 @@ StandardNodeWidget::StandardNodeWidget(const NodeIndex & index, ArcNodeViewWidge
 void StandardNodeWidget::addSubNodeWidget(AbstractSubNodeWidget *subNode) {
     m_mainLayout->addWidget(subNode);
     m_cibleMap.insert({subNode->index().subIndex(),subNode});
-    subNode->updateData();
+    subNode->updateData(modelMPS::AllRole);
     subNode->connexion();
 }
 
 void StandardNodeWidget::updateData() {
     for (auto iter = m_cibleMap.begin(); iter != m_cibleMap.end(); ++iter) {
         iter->second->deconnexion();
-        iter->second->updateData();
+        iter->second->updateData(modelMPS::AllRole);
         iter->second->connexion();
     }
 }
 
-void StandardNodeWidget::updateData(const NodeIndex & index) {
+void StandardNodeWidget::updateData(const NodeIndex & index, flag role) {
     auto iters = m_cibleMap.equal_range(index.subIndex());
     for (auto iter = iters.first; iter != iters.second; ++iter) {
         iter->second->deconnexion();
-        iter->second->updateData();
+        iter->second->updateData(role);
         iter->second->connexion();
     }
 }

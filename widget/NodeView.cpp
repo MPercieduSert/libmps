@@ -268,7 +268,7 @@ void NodeView::setModel(Model *model) {
     m_model = model;
     if(!m_model->parent())
         m_model->setParent(this);
-    connect(m_model,qOverload<const NodeIndex &>(&Model::dataChanged),this,&NodeView::updateData);
+    connect(m_model,&Model::dataChanged,this,&NodeView::updateData);
     connect(m_model,&Model::nodesAboutToBeRemoved,this,&NodeView::removeNodes);
     connect(m_model,&Model::modelAboutToBeReset,this,&NodeView::deleteRoot);
     connect(m_model,&Model::modelReset,this,&NodeView::resetRoot);
@@ -290,12 +290,12 @@ void NodeView::resetRoot(){
     setWidget(new ArcNodeViewWidget(m_model->index(NodeIndex(),0),this,this,true));
 }
 
-void NodeView::updateData(const NodeIndex & index) {
+void NodeView::updateData(const NodeIndex & index, flag role) {
     auto iter = m_arcMap.find(index.internalPointer());
     if(iter != m_arcMap.end()){
         if(index.cible() != NodeCible || index.data() == iter->second->nodeWidget()->type()) {
             iter->second->nodeWidget()->deconnexion();
-            iter->second->nodeWidget()->updateData(index);
+            iter->second->nodeWidget()->updateData(index,role);
             iter->second->nodeWidget()->connexion();
         }
         else

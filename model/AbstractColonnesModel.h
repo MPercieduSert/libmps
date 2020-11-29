@@ -258,6 +258,10 @@ public:
     //! Insert une nouvelle colonne à la postion pos.
     virtual bool insertColonne(int pos, const NewColonneInfo & info, bool allParent = false);
 
+    //! Nombre de colonne.
+    szt nbrColonne() const noexcept
+        {return static_cast<szt>(m_colonnes.size());}
+
     //! Ajoute une nouvelle colonne en dernière position.
     virtual bool push_backColonne(const NewColonneInfo & info, bool allParent = false);
 

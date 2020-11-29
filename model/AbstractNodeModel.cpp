@@ -57,7 +57,7 @@ TreeNodeModel::AbstractNode::~AbstractNode() = default;
 QVariant TreeNodeModel::AbstractNode::data(int cible, int role, szt /*num*/) const {
     if(cible == NodeCible){
         switch (role) {
-        case DataRole:
+        case TypeRole:
             return type();
         case OrientationRole:
             return Qt::Horizontal;
@@ -110,8 +110,10 @@ bool TreeNodeModel::removeNodes(const NodeIndex &index, szt count) {
 }
 
 bool TreeNodeModel::setData(const NodeIndex &index, const QVariant &value, int role) {
-    if(checkIndex(index) && m_data.getValidData(index)->setData(index.cible(),value,role,index.num())) {
-        dataChanged(index);
+    if(checkIndex(index)){
+        auto rl = m_data.getValidData(index)->setData(index.cible(),value,role,index.num());
+        if(rl)
+            dataChanged(index,rl);
         return true;
     }
     return false;

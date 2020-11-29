@@ -30,10 +30,50 @@ enum cibleDataNode {
 };
 
 //! Role des données
-enum roleDataNode {
-    DataRole,
-    OrientationRole,
-    LabelRole
+enum roleDataNode : flag::flag_type {
+    NoRole =0x0,
+    DisplayRole = 0x1,              //!< Texte principale (QString)
+    DecorationRole = 0x2,           //!< Donnée sous forme d'image (QColor,QIcon,QPixmap)
+    EditRole = 0x4,                 //!< Mise en forme de la donnée pour être édité (QString)
+    ToolTipRole = 0x8,              //!< Info bulle (QString)
+    StatusTipRole = 0x10,           //!< Info dans la barre de tache (QString)
+    WhatThisRole = 0x20,            //!< Info dans "What's this" (QString)
+    FontRole = 0x40,                //!< Police d'affichage principale (QFont)
+    TexteAlignementRole = 0x80,     //!< Alignement du texte principale (Qt:Alignment)
+    BackgroundRole = 0x100,         //!< Fond du texte principale (QBrush)
+    ForegroundRole = 0x200,         //!< Rendu du texte principale (QBrush)
+    CheckStateRole = 0x400,         //!< État des cases à cocher (Qt::CheckState)
+    AllMainRole = DisplayRole | DecorationRole | EditRole | ToolTipRole | StatusTipRole | WhatThisRole | FontRole | TexteAlignementRole
+                    | BackgroundRole | ForegroundRole | CheckStateRole,
+    LabelRole = 0x1000,             //!< Titre (QString)
+    FontLabelRole = 0x2000,         //!< Police du titre (QFont)
+    AlignementLabelRole = 0x4000,   //!< Alignement du texte du label (Qt:Alignment)
+    BackgroundLabelRole = 0x8000,   //!< Fond du label (QBrush)
+    ForegroundLabelRole = 0x10000,  //!< Rendu du label (QBrush)
+    AllLabelRole = LabelRole | FontLabelRole | AlignementLabelRole | BackgroundLabelRole | ForegroundLabelRole,
+    DataRole = 0x100000,            //!< Donnée brut (QVariant)
+    OrientationRole = 0x200000,     //!< Orientation (Qt::Orientation)
+    TypeRole = 0x400000,            //!< Type des donnée (int)
+    SubNodeRole = 0x800000,         //!< Initialisation d'un sous-noeud (QList<QVariant>).
+    ListOfValues = 0x1000000,       //!< Liste des choix possible (QMap<QString,QVariant>)
+    AllBackRole = DataRole | OrientationRole | TypeRole | ListOfValues,
+    AllRole = AllMainRole | AllLabelRole | AllBackRole
+};
+
+//! Types des sous-noeuds.
+enum subNodeType {
+    CheckSubNode,
+    ComboBoxSubNode,
+    DateSubNode,
+    LineEditSubNode
+};
+
+//! Initialisation d'un sous-noeud.
+enum initSubNode {
+    CibleSubNode,
+    NumSubNode,
+    TypeSubNode,
+    NbrInitiSubNode
 };
 
 /*! \ingroup groupeModel
@@ -202,7 +242,7 @@ public:
 
 signals:
     //! Signal le changement d'une donnée.
-    void dataChanged(const NodeIndex & index);
+    void dataChanged(const NodeIndex & index, flag role);
 
     //! Signal de début de réinitialisation du model.
     void modelAboutToBeReset();
@@ -343,7 +383,7 @@ public:
         virtual Qt::ItemFlags flags(int /*cible*/, szt /*num*/ = 0) const {return  Qt::NoItemFlags;}
 
         //! Mutateur de la donnée associé à column.
-        virtual bool setData(int /*cible*/, const QVariant & /*value*/, int /*role*/ = DataRole, szt /*num*/ = 0) {return true;}
+        virtual flag setData(int /*cible*/, const QVariant & /*value*/, int /*role*/ = DataRole, szt /*num*/ = 0) {return NoRole;}
 
         //! Accesseur du type du noeud.
         int type() const {return m_type;}

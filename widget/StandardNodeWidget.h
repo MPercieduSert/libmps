@@ -39,7 +39,7 @@ public:
         {return m_index;}
 public slots:
     //! Met à jour les données du sous-noeud à partir des données du model.
-    virtual void updateData() {}
+    virtual void updateData(flag /*role*/) {}
 };
 
 /*! \ingroup groupeWidget
@@ -60,7 +60,7 @@ public:
     void deconnexion() const override;
 
     //! Met à jour les données du label à partir des données du model.
-    void updateData() override;
+    void updateData(flag role) override;
 };
 
 /*! \ingroup groupeWidget
@@ -75,7 +75,7 @@ public:
     LabelSubNodeWidget(const NodeIndex & index, StandardNodeWidget * parent);
 
     //! Met à jour les données du label à partir des données du model.
-    void updateData() override;
+    void updateData(flag role) override;
 };
 
 /*! \ingroup groupeWidget
@@ -96,7 +96,7 @@ public:
     void deconnexion() const override;
 
     //! Met à jour les données du label à partir des données du model.
-    void updateData() override;
+    void updateData(flag role) override;
 };
 
 /*! \ingroup groupeWidget
@@ -125,7 +125,7 @@ public slots:
     void updateData() override;
 
     //! Met à jour les données du widget pour l'index index à partir des données du model.
-    void updateData(const NodeIndex & index) override;
+    void updateData(const NodeIndex & index,flag role) override;
 };
 }
 namespace delegateMPS {

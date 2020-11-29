@@ -46,10 +46,6 @@ public:
                  TrueCible
                 };
 
-    //! Ensemble de noeuds
-    enum setNode : unsigned {NoSet = 0,
-                            ComparaisonSet = 1};
-
     //! Opérations binaire.
     enum nodeOperation {Et,
                         Ou,
@@ -70,9 +66,28 @@ public:
         QString nom;      //!< Nom de la colonne.
     };
 
+    //! Position des sous-noeud.
+    enum positionNode{ZeroPosition,
+                      UnPosition,
+                      DeuxPosition,
+                      TroisPosition,
+                      QuatrePosition,
+                      CinqPosition,
+                      NegationPosition = ZeroPosition,
+                      ColonnePosition = UnPosition,
+                      ComparaisonPosition = DeuxPosition,
+                      OperationChoicePosition = ZeroPosition,
+                      OperationOperationPosition = UnPosition,
+                      TruePosition = DeuxPosition,
+                      FalsePosition = TroisPosition,
+                      DatePosition = TroisPosition,
+                      TextePosition = TroisPosition,
+                      CasePosition = QuatrePosition,
+                      RegexPosition = CinqPosition
+                     };
 protected:
     std::vector<Colonne> m_colonnes;                //!< Informations sur les colonnes.
-    AbstractColonnesModel * m_model;      //!< Model filtré.
+    AbstractColonnesModel * m_model;                //!< Model filtré.
     using AbstractNodeModel::createIndex;
 public:
     //! Constructeur.
@@ -89,7 +104,7 @@ public:
         {return m_model;}
 
     //! Donne la liste des noms des colonnes du model associé.
-    std::vector<QString> nomColonnes() const;
+    QMap<QString,QVariant> nomColonnes() const;
 
     //! Supprime le noeud et ses descendants.
     void removeNode(const NodeIndex & index);
@@ -131,31 +146,20 @@ namespace findNodeModel {
 /*! \ingroup groupeModel
  * \brief Classe mère des neuds de recherche.
  */
-class AbstractFindNode : public TreeNodeModel::AbstractNode {
-public:
-    //! Constructeur.
-    using AbstractNode::AbstractNode;
-
-    //! Destructeur.
-    virtual ~AbstractFindNode();
-
-    //! Test si le noeud n'intervient pas dans la recherche.
-    virtual bool empty() const
-        {return false;}
-};
-
-
-/*! \ingroup groupeModel
- * \brief Classe mère des noeuds de recherche avec négation.
- */
-class AbstractNegationNode : public AbstractFindNode {
+class FindNode : public TreeNodeModel::AbstractNode {
 protected:
     bool m_negation;        //!< Négation.
+    FindModel * m_model;    //!< Pointeur sur le model.
+    szt m_pos;              //!< Position de la colonne dans le model filtré.
 public:
+    enum {Vide = -1};
     //! Constructeur.
-    using AbstractFindNode::AbstractFindNode;
+    FindNode(FindModel * model, szt pos, int type = NoType);
 
-    //! Accesseur de la donnée associé à column.
+    //! Destructeur.
+    ~FindNode() override;
+
+    //! Accesseur des données du noeud.
     QVariant data(int cible, int role = DataRole, szt num = 0) const override;
 
     //! Accesseur des drapeaux associés à column.
@@ -165,67 +169,44 @@ public:
         return AbstractNode::flags(cible,num);
     }
 
+    //! Test si le noeud n'intervient pas dans la recherche.
+    virtual bool empty() const
+        {return true;}
+
     //! Accesseur de la négation.
     bool negation() const
         {return m_negation;}
-
-    //! Mutateur de la donnée associé à column.
-    bool setData(int cible, const QVariant & value, int role = DataRole, szt num = 0) override;
-};
-
-/*! \ingroup groupeModel
- * \brief Classe mère des noeuds de recherche définissant une condition.
- */
-class AbstractConditionNode : public AbstractNegationNode {
-protected:
-    szt m_pos;            //!< Position de la colonne dans le model filtré.
-public:
-    //! Constructeur.
-    AbstractConditionNode() = default;
-
-    //!Constructeur.
-    AbstractConditionNode(szt pos, int type = NoType)
-        : AbstractNegationNode(type), m_pos(pos) {}
-
-    //! Accesseur de la donnée associé à column.
-    QVariant data(int type, int role = DataRole, szt num = 0) const override;
-
-    //! Accesseur des drapeaux associés à column.
-    Qt::ItemFlags flags(int cible, szt num = 0) const override {
-        if(cible == FindModel::ColonneCible)
-            return AbstractNegationNode::flags(cible,num) | Qt::ItemIsEnabled | Qt::ItemIsEditable;
-        return AbstractNegationNode::flags(cible,num);
-    }
 
     //! Accesseur de position.
     szt pos() const
         {return m_pos;}
 
-    //! Mutateur de la donnée associé à column.
-    bool setData(int cible, const QVariant & value, int role = DataRole, szt num = 0) override;
+    //! Mutateur des données du noeud.
+    flag setData(int cible, const QVariant & value, int role = DataRole, szt num = 0) override;
 
     //! Mutateur de position.
     void setPos(szt pos)
         {m_pos = pos;}
 
     //! Teste si la ligne d'indice id vérifie la condition du noeud.
-    bool test(szt id, AbstractColonnesModel * model) const;
+    bool test(szt id, AbstractColonnesModel * model) const
+        {return testValue(model->colonne(m_pos).dataTest(id));}
 
-    //! Teste si la ligne d'indice id vérifie la condition du noeud.
-    virtual bool testValue(const QVariant & value) const = 0;
+    //! Teste une valeur.
+    virtual bool testValue(const QVariant & /*value*/) const {return true;}
 };
 
 /*! \ingroup groupeModel
  * \brief Classe mère des noeuds de recherche définissant une condition de comparaison.
  */
-class AbstractComparaisonNode : public AbstractConditionNode {
+class ComparaisonNode : public FindNode {
 protected:
     szt m_comp;            //!< Indice de la comparaison.
 public:
     static const std::array<QString, FindModel::NbrComparaison> Strings;        //!< Labels des comparaisons.
     //! Constructeur.
-    AbstractComparaisonNode(szt pos, szt comp = FindModel::Egal,int type = NoType)
-        : AbstractConditionNode(pos,type), m_comp(comp) {}
+    ComparaisonNode(FindModel * model, szt pos, szt comp = FindModel::Egal,int type = NoType)
+        : FindNode(model,pos,type), m_comp(comp) {}
 
     //! Accesseur de la donnée associé à column.
     QVariant data(int type, int role = DataRole, szt num = 0) const override;
@@ -233,18 +214,18 @@ public:
     //! Accesseur des drapeaux associés à column.
     Qt::ItemFlags flags(int cible, szt num = 0) const override {
         if(cible == FindModel::ComparaisonCible)
-            return AbstractConditionNode::flags(cible,num) | Qt::ItemIsEnabled | Qt::ItemIsEditable;
-        return AbstractConditionNode::flags(cible,num);
+            return FindNode::flags(cible,num) | Qt::ItemIsEnabled | Qt::ItemIsEditable;
+        return FindNode::flags(cible,num);
     }
 
     //! Mutateur de la donnée associé à column.
-    bool setData(int cible, const QVariant & value, int role = DataRole, szt num = 0) override;
+    flag setData(int cible, const QVariant & value, int role = DataRole, szt num = 0) override;
 };
 
 /*! \ingroup groupeModel
  * \brief Classe des noeuds de filtrage sur des booléen.
  */
-class BoolNode : public AbstractConditionNode {
+class BoolNode : public FindNode {
 protected:
     bool m_false;           //!< Filtre contenant les faux.
     bool m_true;            //!< Filtre contenant les vraies.
@@ -252,9 +233,9 @@ protected:
     QString m_trueLabel;    //!< Label du filtre faux.
 public:
     //! Constructeur.
-    BoolNode(szt pos, const QString & falseLabel = QString(), const QString trueLabel = QString(),
+    BoolNode(FindModel * model, szt pos, const QString & falseLabel = QString(), const QString trueLabel = QString(),
              bool trueChecked = true, bool falseChecked = true)
-        : AbstractConditionNode(pos,FindModel::BoolNodeType),
+        : FindNode(model,pos,FindModel::BoolNodeType),
           m_false(falseChecked), m_true(trueChecked),
           m_falseLabel(falseLabel), m_trueLabel(trueLabel)  {}
 
@@ -271,12 +252,12 @@ public:
     //! Accesseur des drapeaux associés à column.
     Qt::ItemFlags flags(int cible, szt num = 0) const override {
         if(cible == FindModel::TrueCible || cible == FindModel::FalseCible)
-            return AbstractConditionNode::flags(cible,num) | Qt::ItemIsEnabled;
-        return AbstractConditionNode::flags(cible,num);
+            return FindNode::flags(cible,num) | Qt::ItemIsEnabled;
+        return FindNode::flags(cible,num);
     }
 
     //! Mutateur de la donnée associé à column.
-    bool setData(int cible, const QVariant & value, int role = DataRole, szt num = 0) override;
+    flag setData(int cible, const QVariant & value, int role = DataRole, szt num = 0) override;
 
     //! Teste si la ligne d'indice id vérifie la condition du noeud.
     bool testValue(const QVariant & value) const override
@@ -284,31 +265,15 @@ public:
 };
 
 /*! \ingroup groupeModel
- * \brief Classe des noeuds de recherche indéterminé.
- */
-class ChoiceNode : public AbstractFindNode {
-public:
-    //! Constructeur.
-    ChoiceNode() : AbstractFindNode(FindModel::ChoiceNodeType) {}
-
-    //! Test si le noeud n'intervient pas dans la recherche.
-    bool empty() const override
-        {return true;}
-
-    //! Accesseur des drapeaux associés à column.
-    Qt::ItemFlags flags(int cible, szt /*num*/ = 0) const override;
-};
-
-/*! \ingroup groupeModel
  * \brief Classe des noeuds de filtrage sur les dates.
  */
-class DateNode : public AbstractComparaisonNode {
+class DateNode : public ComparaisonNode {
 protected:
     QDate m_date;       //!< Date de filtrage.
 public:
     //! Constructeur.
-    DateNode(szt pos,const QDate & date = QDate(), szt comp = FindModel::Egal)
-        : AbstractComparaisonNode(pos,comp,FindModel::DateNodeType), m_date(date) {}
+    DateNode(FindModel * model,szt pos,const QDate & date = QDate(), szt comp = FindModel::Egal)
+        : ComparaisonNode(model,pos,comp,FindModel::DateNodeType), m_date(date) {}
 
     //! Destructeur.
     ~DateNode() override = default;
@@ -323,57 +288,21 @@ public:
     //! Accesseur des drapeaux associés à column.
     Qt::ItemFlags flags(int cible, szt num = 0) const override {
         if(cible == FindModel::DateCible)
-            return AbstractComparaisonNode::flags(cible,num) | Qt::ItemIsEnabled | Qt::ItemIsEditable;
-        return AbstractComparaisonNode::flags(cible,num);
+            return ComparaisonNode::flags(cible,num) | Qt::ItemIsEnabled | Qt::ItemIsEditable;
+        return ComparaisonNode::flags(cible,num);
     }
 
     //! Mutateur de la donnée associé à column.
-    bool setData(int cible, const QVariant & value, int role = DataRole, szt num = 0) override;
+    flag setData(int cible, const QVariant & value, int role = DataRole, szt num = 0) override;
 
     //! Teste si la ligne d'indice id vérifie la condition du noeud.
     bool testValue(const QVariant & value) const override;
 };
 
 /*! \ingroup groupeModel
- * \brief Classe des noeuds de type opération.
- */
-class OperationNode : public AbstractNegationNode {
-protected:
-    szt m_operation;        //!< Identifiant de l'opération
-public:
-    static const std::array<QString, FindModel::NbrOperation> Strings;        //!< Labels des opération.
-    //! Constructeur.
-    OperationNode(szt op = FindModel::Et) : AbstractNegationNode(FindModel::OperationNodeType), m_operation(op) {}
-
-    //! Destructeur.
-    ~OperationNode() override = default;
-
-    //! Accesseur de la donnée associé à column.
-    QVariant data(int type, int role = DataRole, szt num = 0) const override;
-
-    //! Accesseur des drapeaux associés à column.
-    Qt::ItemFlags flags(int cible, szt num = 0) const override {
-        if(cible == FindModel::OpCible)
-            return AbstractNegationNode::flags(cible,num) | Qt::ItemIsEnabled | Qt::ItemIsEditable;
-        return AbstractNegationNode::flags(cible,num);
-    }
-
-    //! Test si le noeud n'intervient pas dans la recherche.
-    bool empty() const override
-        {return true;}
-
-    //! Accesseur de l'opération.
-    szt operation() const
-        {return m_operation;}
-
-    //! Mutateur de la donnée associé à column.
-    bool setData(int cible, const QVariant & value, int role = DataRole, szt num = 0) override;
-};
-
-/*! \ingroup groupeModel
  * \brief Classe des noeuds de filtrage sur les textes.
  */
-class TexteNode : public AbstractConditionNode {
+class TexteNode : public FindNode {
 protected:
     QString m_texte;                //!< Texte de filtrage.
     QRegularExpression m_regular;   //!< Texte de l'expression regulière.
@@ -381,8 +310,8 @@ protected:
     bool m_regex;                   //!< La recherche est une expression régulière.
 public:
     //! Constructeur.
-    TexteNode(szt pos,const QString & texte = QString(), bool c = false,bool regex = false)
-        : AbstractConditionNode(pos,FindModel::TexteNodeType), m_texte(texte), m_case(c), m_regex(regex) {
+    TexteNode(FindModel * model,szt pos,const QString & texte = QString(), bool c = false,bool regex = false)
+        : FindNode(model,pos,FindModel::TexteNodeType), m_texte(texte), m_case(c), m_regex(regex) {
         if(m_regex){
             m_regular.setPattern(m_texte);
             if(!m_case)
@@ -403,14 +332,14 @@ public:
     //! Accesseur des drapeaux associés à column.
     Qt::ItemFlags flags(int cible, szt num = 0) const override {
         if(cible == FindModel::TexteCible)
-            return AbstractConditionNode::flags(cible,num) | Qt::ItemIsEnabled | Qt::ItemIsEditable;
+            return FindNode::flags(cible,num) | Qt::ItemIsEnabled | Qt::ItemIsEditable;
         if(cible == FindModel::CaseCible || cible == FindModel::RegexCible)
-            return AbstractConditionNode::flags(cible,num) | Qt::ItemIsEnabled | Qt::ItemIsUserCheckable;
-        return AbstractConditionNode::flags(cible,num);
+            return FindNode::flags(cible,num) | Qt::ItemIsEnabled | Qt::ItemIsUserCheckable;
+        return FindNode::flags(cible,num);
     }
 
     //! Mutateur de la donnée associé à column.
-    bool setData(int cible, const QVariant & value, int role = DataRole, szt num = 0) override;
+    flag setData(int cible, const QVariant & value, int role = DataRole, szt num = 0) override;
 
     //! Teste si la ligne d'indice id vérifie la condition du noeud.
     bool testValue(const QVariant & value) const override;

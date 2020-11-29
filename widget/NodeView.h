@@ -76,7 +76,7 @@ public slots:
     virtual void updateData() = 0;
 
     //! Met à jour les données du widget pour l'index index à partir des données du model.
-    virtual void updateData(const NodeIndex & /*index*/) = 0;
+    virtual void updateData(const NodeIndex & /*index*/, flag role) = 0;
 };
 }
 /*! \ingroup groupeDelegate
@@ -170,7 +170,7 @@ public slots:
     void removeNodes(const NodeIndex & parent, szt first, szt last);
 
     //! Met à jour les donnée du AbstractNodeWidget associé à l'index.
-    void updateData(const NodeIndex & index);
+    void updateData(const NodeIndex & index, flag role);
 
 protected slots:
     //! Change le noeud courant.
