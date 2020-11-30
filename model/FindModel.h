@@ -85,6 +85,15 @@ public:
                       CasePosition = QuatrePosition,
                       RegexPosition = CinqPosition
                      };
+    //! Nombre de sous-noueds.
+    enum dataCountNode {
+        BoolDataCount = 4,
+        DateDataCount = 4,
+        ChoiceDataCount = 2,
+        OperationDatacount = 1,
+        TexteDataCount = 6
+    };
+
 protected:
     std::vector<Colonne> m_colonnes;                //!< Informations sur les colonnes.
     AbstractColonnesModel * m_model;                //!< Model filtré.
@@ -161,6 +170,9 @@ public:
 
     //! Accesseur des données du noeud.
     QVariant data(int cible, int role = DataRole, szt num = 0) const override;
+
+    //! Nombre de donnée associé au noeud pour une cible donnée.
+    szt dataCount(int cible) const override;
 
     //! Accesseur des drapeaux associés à column.
     Qt::ItemFlags flags(int cible, szt num = 0) const override {
@@ -245,6 +257,9 @@ public:
     //! Accesseur de la donnée associé à column.
     QVariant data(int type, int role = DataRole, szt num = 0) const override;
 
+    //! Nombre de donnée associé au noeud pour une cible donnée.
+    szt dataCount(int cible) const override;
+
     //! Test si le noeud n'intervient pas dans la recherche.
     bool empty() const override
         {return m_true && m_false;}
@@ -280,6 +295,9 @@ public:
 
     //! Accesseur de la donnée associé à column.
     QVariant data(int type, int role = DataRole, szt num = 0) const override;
+
+    //! Nombre de donnée associé au noeud pour une cible donnée.
+    szt dataCount(int cible) const override;
 
     //! Test si le noeud n'intervient pas dans la recherche.
     bool empty() const override
@@ -324,6 +342,9 @@ public:
 
     //! Accesseur de la donnée associé à column.
     QVariant data(int type, int role = DataRole, szt num = 0) const override;
+
+    //! Nombre de donnée associé au noeud pour une cible donnée.
+    szt dataCount(int cible) const override;
 
     //! Test si le noeud n'intervient pas dans la recherche.
     bool empty() const override

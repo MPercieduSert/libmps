@@ -375,7 +375,7 @@ public:
         //! Accesseur de la donnée associé à column.
         virtual QVariant data(int cible, int role = DataRole, szt /*num*/ = 0) const;
 
-        //! Nombre de donnée associé au noeud pour un type donnée.
+        //! Nombre de donnée associé au noeud pour une cible donnée.
         virtual szt dataCount(int cible) const
             {return cible == NodeCible ? 1 : NoData;}
 

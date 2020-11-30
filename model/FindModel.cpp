@@ -213,6 +213,19 @@ QVariant FindNode::data(int cible, int role, szt num) const {
     }
     return AbstractNode::data(cible,role,num);
 }
+
+szt FindNode::dataCount(int cible) const {
+    if(cible == SubNodeCible){
+        switch (type()) {
+        case FindModel::ChoiceNodeType:
+            return FindModel::ChoiceDataCount;
+        case FindModel::OperationNodeType:
+            return FindModel::OperationDatacount;
+        }
+    }
+    return AbstractNode::dataCount(cible);
+}
+
 flag FindNode::setData(int cible, const QVariant & value, int role, szt num) {
     switch (cible) {
     case FindModel::NegCible:
@@ -259,6 +272,7 @@ QVariant ComparaisonNode::data(int cible, int role, szt num) const{
     }
     return FindNode::data(cible,role,num);
 }
+
 flag ComparaisonNode::setData(int cible, const QVariant & value, int role, szt num) {
     if(cible == FindModel::ComparaisonCible && role == DataRole) {
         m_comp = value.toUInt();
@@ -302,6 +316,13 @@ QVariant BoolNode::data(int cible, int role, szt num) const {
     }
     return FindNode::data(cible,role,num);
 }
+
+szt BoolNode::dataCount(int cible) const {
+    if(cible == SubNodeCible)
+        return FindModel::BoolDataCount;
+    return  FindNode::dataCount(cible);
+}
+
 flag BoolNode::setData(int cible, const QVariant & value, int role, szt num) {
     if(role == CheckStateRole) {
         if(cible == FindModel::TrueCible){
@@ -315,7 +336,6 @@ flag BoolNode::setData(int cible, const QVariant & value, int role, szt num) {
     }
     return FindNode::setData(cible,value,role,num);
 }
-
 ///////////////////////////// DateNode ///////////////////////////
 QVariant DateNode::data(int cible, int role, szt num) const {
     if(cible == FindModel::DateCible) {
@@ -333,6 +353,13 @@ QVariant DateNode::data(int cible, int role, szt num) const {
     }
     return ComparaisonNode::data(cible,role,num);
 }
+
+szt DateNode::dataCount(int cible) const {
+    if(cible == SubNodeCible)
+        return FindModel::DateDataCount;
+    return  ComparaisonNode::dataCount(cible);
+}
+
 flag DateNode::setData(int cible, const QVariant & value, int role, szt num) {
     if(cible == FindModel::DateCible && role == DataRole) {
         m_date = value.toDate();
@@ -340,6 +367,7 @@ flag DateNode::setData(int cible, const QVariant & value, int role, szt num) {
     }
     return ComparaisonNode::setData(cible,value,role,num);
 }
+
 bool DateNode::testValue(const QVariant & value) const {
     switch (m_comp) {
     case FindModel::Egal:
@@ -402,6 +430,13 @@ QVariant TexteNode::data(int cible, int role, szt num) const {
     }
     return FindNode::data(cible,role,num);
 }
+
+szt TexteNode::dataCount(int cible) const {
+    if(cible == SubNodeCible)
+        return FindModel::TexteDataCount;
+    return  FindNode::dataCount(cible);
+}
+
 flag TexteNode::setData(int cible, const QVariant & value, int role, szt num) {
     switch (cible) {
     case FindModel::TexteCible:
@@ -425,6 +460,7 @@ flag TexteNode::setData(int cible, const QVariant & value, int role, szt num) {
     }
     return FindNode::setData(cible,value,role,num);
 }
+
 bool TexteNode::testValue(const QVariant & value) const {
     if(m_regex)
         return m_regular.match(value.toString(),0).hasMatch();
