@@ -5,6 +5,7 @@
 #define STANDARDNODEWIDGET_H
 
 #include <QCheckBox>
+#include <QComboBox>
 #include <QDateEdit>
 #include <QLabel>
 #include <QLineEdit>
@@ -74,6 +75,27 @@ protected:
 public:
     //! Constructeur.
     LabelSubNodeWidget(const NodeIndex & index, StandardNodeWidget * parent);
+
+    //! Met à jour les données du label à partir des données du model.
+    void updateData(flag role) override;
+};
+
+/*! \ingroup groupeWidget
+ * \brief Classe des sous-noeuds composés d'un label et d'une liste de choix.
+ */
+class ComboBoxSubNodeWidget : public LabelSubNodeWidget {
+    Q_OBJECT
+protected:
+    QComboBox * m_comboBox;       //! Liste de choix.
+public:
+    //! Constructeur.
+    ComboBoxSubNodeWidget(const NodeIndex & index, StandardNodeWidget * parent);
+
+    //! Connecte les éléments du noeuds au model.
+    void connexion() const override;
+
+    //! Déconnecte les éléments du noeuds au model.
+    void deconnexion() const override;
 
     //! Met à jour les données du label à partir des données du model.
     void updateData(flag role) override;

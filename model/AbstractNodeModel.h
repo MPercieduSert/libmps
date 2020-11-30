@@ -143,7 +143,7 @@ public:
 
     //! Teste l'équivalence de deux index.
     bool operator==(const NodeIndex & index) const noexcept
-        {return m_model == index.m_model && m_ptr == index.m_ptr & m_cible == index.m_cible && m_num == index.m_num;}
+        {return m_model == index.m_model && m_ptr == index.m_ptr && m_cible == index.m_cible && m_num == index.m_num;}
 
     //! Retourne un index sur le parent.
     NodeIndex parent() const;

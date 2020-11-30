@@ -33,7 +33,6 @@ void CheckSubNodeWidget::connexion() const {
         {m_index.model()->setData(m_index,m_checkBox->isChecked());});
 }
 
-
 void CheckSubNodeWidget::deconnexion() const {
     AbstractSubNodeWidget::deconnexion();
     disconnect(m_checkBox,&QCheckBox::stateChanged,this,nullptr);
@@ -45,6 +44,37 @@ void CheckSubNodeWidget::updateData(flag role) {
         m_checkBox->setText(m_index.data(modelMPS::LabelRole).toString());
     if(role.test(modelMPS::DataRole))
         m_checkBox->setChecked(m_index.data().toBool());
+}
+
+////////////////////////////////////////////////// ComboBoxSubNodeWidget //////////////////////////////////////////
+ComboBoxSubNodeWidget::ComboBoxSubNodeWidget(const NodeIndex & index, StandardNodeWidget * parent)
+    : LabelSubNodeWidget(index,parent) {
+    m_comboBox = new QComboBox;
+    m_mainLayout->addWidget(m_comboBox);
+}
+
+void ComboBoxSubNodeWidget::connexion() const {
+    LabelSubNodeWidget::connexion();
+    connect(m_comboBox,qOverload<int>(&QComboBox::currentIndexChanged),this,[this]()
+            {m_index.model()->setData(m_index,m_comboBox->currentData());});
+}
+
+
+void ComboBoxSubNodeWidget::deconnexion() const {
+    LabelSubNodeWidget::deconnexion();
+    disconnect(m_comboBox,qOverload<int>(&QComboBox::currentIndexChanged),this,nullptr);
+}
+
+void ComboBoxSubNodeWidget::updateData(flag role) {
+    LabelSubNodeWidget::updateData(role);
+    if(role.test(modelMPS::ListOfValues)){
+        m_comboBox->clear();
+        auto map = m_index.data(modelMPS::ListOfValues).toMap();
+        for (auto iter = map.cbegin(); iter != map.cend(); ++iter)
+            m_comboBox->addItem(iter.key(),iter.value());
+    }
+    if(role.test(modelMPS::DataRole))
+        m_comboBox->setCurrentIndex(m_comboBox->findData(m_index.data().toUInt()));
 }
 
 ////////////////////////////////////////////////// LabelSubNodeWidget //////////////////////////////////////////
@@ -164,6 +194,8 @@ AbstractSubNodeWidget * StandardNodeDelegate::createSubNode(const NodeIndex &ind
         return  new DateSubNodeWidget(indexSubNode,parent);
     case modelMPS::LineEditSubNode:
         return new LineEditSubNodeWidget(indexSubNode,parent);
+    case modelMPS::ComboBoxSubNode:
+        return new ComboBoxSubNodeWidget(indexSubNode,parent);
     }
     return new AbstractSubNodeWidget(indexSubNode,parent);
 }

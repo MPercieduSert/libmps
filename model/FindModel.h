@@ -81,17 +81,17 @@ public:
                       TruePosition = DeuxPosition,
                       FalsePosition = TroisPosition,
                       DatePosition = TroisPosition,
-                      TextePosition = TroisPosition,
-                      CasePosition = QuatrePosition,
-                      RegexPosition = CinqPosition
+                      TextePosition = DeuxPosition,
+                      CasePosition = TroisPosition,
+                      RegexPosition = QuatrePosition
                      };
     //! Nombre de sous-noueds.
     enum dataCountNode {
         BoolDataCount = 4,
         DateDataCount = 4,
         ChoiceDataCount = 2,
-        OperationDatacount = 1,
-        TexteDataCount = 6
+        OperationDatacount = 2,
+        TexteDataCount = 5
     };
 
 protected:
@@ -157,13 +157,14 @@ namespace findNodeModel {
  */
 class FindNode : public TreeNodeModel::AbstractNode {
 protected:
-    bool m_negation;        //!< Négation.
+    bool m_negation = false;        //!< Négation.
     FindModel * m_model;    //!< Pointeur sur le model.
     szt m_pos;              //!< Position de la colonne dans le model filtré.
 public:
     enum {Vide = -1};
     //! Constructeur.
-    FindNode(FindModel * model, szt pos, int type = NoType);
+    FindNode(FindModel * model, szt pos, int type = NoType)
+        : AbstractNode(type), m_model(model), m_pos(pos) {}
 
     //! Destructeur.
     ~FindNode() override;

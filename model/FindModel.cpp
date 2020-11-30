@@ -50,15 +50,16 @@ TreeNodeModel::Node FindModel::nodeFactory(const NodeIndex & parent, szt pos, in
 }
 
 TreeNodeModel::Node FindModel::nodeConditionFactory(szt pos){
-    const auto & colonne = m_model->colonne(pos);
     switch (m_model->colonne(pos).type()) {
-    case BoolNodeType:
-        {const auto & boolColonne = static_cast<const AbstractBoolColonne &>(colonne);
-        return std::make_unique<BoolNode>(pos,boolColonne.falseLabel(),boolColonne.trueLabel());}
+    case BoolNodeType: {
+        const auto & colonne = m_model->colonne(pos);
+        const auto & boolColonne = static_cast<const AbstractBoolColonne &>(colonne);
+        return std::make_unique<BoolNode>(this,pos,boolColonne.falseLabel(),boolColonne.trueLabel());
+    }
     case DateNodeType:
-        return std::make_unique<DateNode>(pos);
+        return std::make_unique<DateNode>(this,pos);
     case TexteNodeType:
-        return std::make_unique<TexteNode>(pos);
+        return std::make_unique<TexteNode>(this,pos);
     default:
         return std::make_unique<FindNode>(this,Et,ChoiceNodeType);
     }
@@ -344,7 +345,7 @@ QVariant DateNode::data(int cible, int role, szt num) const {
         if(role == DataRole)
             return m_date;
     }
-    if(cible == SubNodeCible && role == SubNodeRole && num == FindModel::DatePosition) if(num == FindModel::TruePosition) {
+    if(cible == SubNodeCible && role == SubNodeRole && num == FindModel::DatePosition) {
         QList<QVariant> init;
         init.append(FindModel::DateCible);
         init.append(0);
@@ -391,15 +392,21 @@ QVariant TexteNode::data(int cible, int role, szt num) const {
     switch (cible) {
     case FindModel::TexteCible:
         if(role == DisplayRole)
-                return m_texte;
+            return m_texte;
+        if(role == LabelRole)
+            return "Texte :";
         break;
     case FindModel::CaseCible:
         if(role == CheckStateRole)
             return m_case ? Qt::Checked : Qt::Unchecked;
+        if(role == LabelRole)
+            return "Case";
         break;
     case FindModel::RegexCible:
         if(role == CheckStateRole)
             return m_regex ? Qt::Checked : Qt::Unchecked;
+        if(role == LabelRole)
+            return "Expression régulière";
         break;
     case SubNodeCible:
         if(role == SubNodeRole){
