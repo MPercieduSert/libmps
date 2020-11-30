@@ -92,8 +92,8 @@ public:
     using AbstractNodeWidget = widgetMPS::AbstractNodeWidget;
     //! Constructeur.
     AbstractNodeDelegate(QObject * parent);
-    //! Crée un widget
-    virtual AbstractNodeWidget * createWidget(const NodeIndex &index, widgetMPS::ArcNodeViewWidget * parent = nullptr) const = 0;
+    //! Crée un noeud.
+    virtual AbstractNodeWidget * createNode(const NodeIndex &index, widgetMPS::ArcNodeViewWidget * parent = nullptr) const = 0;
 };
 }
 namespace widgetMPS {
@@ -226,7 +226,7 @@ public:
 
     //! Constructeur.
     ArcNodeViewWidget(const modelMPS::NodeIndex & index, NodeView * view, QWidget * parent = nullptr, bool root = false)
-        : ArcNodeViewWidget(view->delegate()->createWidget(index),view,parent,root) {}
+        : ArcNodeViewWidget(view->delegate()->createNode(index),view,parent,root) {}
 
     //! Destructeur.
     ~ArcNodeViewWidget() override
@@ -274,7 +274,7 @@ public:
 
     //! Mutateur du widget de noeud.
     void setNodeWidget(const modelMPS::NodeIndex & index) {
-        setNodeWidget(m_view->delegate()->createWidget(index,this));
+        setNodeWidget(m_view->delegate()->createNode(index,this));
         m_nodeWidget->updateData();
     }
 

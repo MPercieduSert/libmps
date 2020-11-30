@@ -5,6 +5,7 @@
 #define STANDARDNODEWIDGET_H
 
 #include <QCheckBox>
+#include <QDateEdit>
 #include <QLabel>
 #include <QLineEdit>
 #include "NodeView.h"
@@ -79,12 +80,33 @@ public:
 };
 
 /*! \ingroup groupeWidget
+ * \brief Classe des sous-noeuds composés d'un label et d'une ligne d'édition de date.
+ */
+class DateSubNodeWidget : public LabelSubNodeWidget {
+    Q_OBJECT
+protected:
+    QDateEdit * m_dateEdit;       //! Ligne d'édition de la date du sous-noeud.
+public:
+    //! Constructeur.
+    DateSubNodeWidget(const NodeIndex & index, StandardNodeWidget * parent);
+
+    //! Connecte les éléments du noeuds au model.
+    void connexion() const override;
+
+    //! Déconnecte les éléments du noeuds au model.
+    void deconnexion() const override;
+
+    //! Met à jour les données du label à partir des données du model.
+    void updateData(flag role) override;
+};
+
+/*! \ingroup groupeWidget
  * \brief Classe des sous-noeuds composés d'un label et d'une ligne d'édition de texte.
  */
 class LineEditSubNodeWidget : public LabelSubNodeWidget {
     Q_OBJECT
 protected:
-    QLineEdit * m_lineEdit;       //! Ligne d'édition du sous-noeud.
+    QLineEdit * m_lineEdit;       //! Ligne d'édition du texte du sous-noeud.
 public:
     //! Constructeur.
     LineEditSubNodeWidget(const NodeIndex & index, StandardNodeWidget * parent);
@@ -136,10 +158,15 @@ class StandardNodeDelegate : public AbstractNodeDelegate {
 public:
     using NodeIndex = modelMPS::NodeIndex;
     using AbstractNodeWidget = widgetMPS::AbstractNodeWidget;
+    using AbstractSubNodeWidget = widgetMPS::AbstractSubNodeWidget;
     //! Constructeur.
     using AbstractNodeDelegate::AbstractNodeDelegate;
-    //! Crée un widget
-    AbstractNodeWidget * createWidget(const NodeIndex &index, widgetMPS::ArcNodeViewWidget * parent = nullptr) const override;
+
+    //! Crée un noeud.
+    AbstractNodeWidget * createNode(const NodeIndex &index, widgetMPS::ArcNodeViewWidget * parent = nullptr) const override;
+
+    //! Crée un sous-noeud.
+    virtual AbstractSubNodeWidget * createSubNode(const NodeIndex &index, widgetMPS::StandardNodeWidget * parent = nullptr) const;
 };
 }
 #endif // STANDARDNODEWIDGET_H

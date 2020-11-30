@@ -1,5 +1,6 @@
 #include "StandardNodeWidget.h"
 
+using namespace delegateMPS;
 using namespace widgetMPS;
 
 ///////////////////////////////////////// AbstractSubNodeWidget /////////////////////////////////////////
@@ -19,7 +20,7 @@ AbstractSubNodeWidget::~AbstractSubNodeWidget() {
     if(iter != node->m_cibleMap.cend())
         node->m_cibleMap.erase(iter);
 }
-////////////////////////////////////////////////// LabelSubNodeWidget //////////////////////////////////////////
+////////////////////////////////////////////////// CheckSubNodeWidget //////////////////////////////////////////
 CheckSubNodeWidget::CheckSubNodeWidget(const NodeIndex & index, StandardNodeWidget * parent)
     : AbstractSubNodeWidget(index,parent) {
     m_checkBox = new QCheckBox;
@@ -57,6 +58,31 @@ void LabelSubNodeWidget::updateData(flag role) {
     AbstractSubNodeWidget::updateData(role);
     if(role.test(modelMPS::LabelRole))
         m_label->setText(m_index.data(modelMPS::LabelRole).toString());
+}
+
+////////////////////////////////////////////////// DateSubNodeWidget //////////////////////////////////////////
+DateSubNodeWidget::DateSubNodeWidget(const NodeIndex & index, StandardNodeWidget * parent)
+    : LabelSubNodeWidget(index,parent) {
+    m_dateEdit = new QDateEdit;
+    m_mainLayout->addWidget(m_dateEdit);
+}
+
+void DateSubNodeWidget::connexion() const {
+    LabelSubNodeWidget::connexion();
+    connect(m_dateEdit,&QDateEdit::dateChanged,this,[this]()
+        {m_index.model()->setData(m_index,m_dateEdit->date());});
+}
+
+
+void DateSubNodeWidget::deconnexion() const {
+    LabelSubNodeWidget::deconnexion();
+    disconnect(m_dateEdit,&QDateEdit::dateChanged,this,nullptr);
+}
+
+void DateSubNodeWidget::updateData(flag role) {
+    LabelSubNodeWidget::updateData(role);
+    if(role.test(modelMPS::DataRole))
+        m_dateEdit->setDate(m_index.data().toDate());
 }
 
 ////////////////////////////////////////////////// LineEditSubNodeWidget //////////////////////////////////////////
@@ -115,4 +141,29 @@ void StandardNodeWidget::updateData(const NodeIndex & index, flag role) {
         iter->second->updateData(role);
         iter->second->connexion();
     }
+}
+
+//////////////////////////////////////////////// StandardNodeDelegate /////////////////////////////////////
+AbstractNodeWidget * StandardNodeDelegate::createNode(const NodeIndex &index, widgetMPS::ArcNodeViewWidget * parent) const {
+    Q_ASSERT(index.cible() == modelMPS::NodeCible);
+    auto node = new StandardNodeWidget(index,parent);
+    auto nbrSubNode = index.model()->dataCount(index.index(modelMPS::SubNodeCible));
+    for(szt num = 0; num != nbrSubNode; ++num)
+        node->addSubNodeWidget(createSubNode(index.index(modelMPS::SubNodeCible,num),node));
+    return node;
+}
+
+AbstractSubNodeWidget * StandardNodeDelegate::createSubNode(const NodeIndex &index, widgetMPS::StandardNodeWidget * parent) const {
+    Q_ASSERT(index.cible() == modelMPS::SubNodeCible);
+    auto info = index.data(modelMPS::SubNodeRole).toList();
+    auto indexSubNode = index.index(info.at(modelMPS::CibleSubNode).toInt(),info.at(modelMPS::NumSubNode).toUInt());
+    switch (info.at(modelMPS::TypeSubNode).toInt()) {
+    case modelMPS::CheckSubNode:
+        return new CheckSubNodeWidget(indexSubNode,parent);
+    case modelMPS::DateSubNode:
+        return  new DateSubNodeWidget(indexSubNode,parent);
+    case modelMPS::LineEditSubNode:
+        return new LineEditSubNodeWidget(indexSubNode,parent);
+    }
+    return new AbstractSubNodeWidget(indexSubNode,parent);
 }
