@@ -286,13 +286,13 @@ QVariant BoolNode::data(int cible, int role, szt num) const {
     switch (cible) {
     case FindModel::TrueCible:
         if(role == CheckStateRole)
-            return m_true ? Qt::Checked : Qt::Unchecked;
+            return m_true;
         if(role == LabelRole)
             return m_trueLabel;
         break;
     case FindModel::FalseCible:
         if(role == CheckStateRole)
-            return m_false ? Qt::Checked : Qt::Unchecked;
+            return m_false;
         if(role == LabelRole)
             return m_falseLabel;
         break;
@@ -447,7 +447,7 @@ szt TexteNode::dataCount(int cible) const {
 flag TexteNode::setData(int cible, const QVariant & value, int role, szt num) {
     switch (cible) {
     case FindModel::TexteCible:
-        if(role == DisplayRole) {
+        if(role == DataRole) {
                 m_texte = value.toString();
                 if(m_regex)
                     m_regular.setPattern(m_texte);

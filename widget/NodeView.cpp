@@ -171,7 +171,6 @@ void ArcNodeViewWidget::setNodeWidget(AbstractNodeWidget * widget) {
     else if(m_view->selectionModel()->isSelected(m_nodeWidget->index()))
         m_nodeWidget->setEtatSelection(AbstractNodeWidget::Selected);
     m_nodeWidget->updateData();
-    m_nodeWidget->connexion();
     m_view->m_arcMap[m_nodeWidget->index().internalPointer()] = this;
     m_nodeWidget->move(LeftNodeMargin,TopNodeMargin);
     m_nodeWidget->setVisible(true);
@@ -293,11 +292,8 @@ void NodeView::resetRoot(){
 void NodeView::updateData(const NodeIndex & index, flag role) {
     auto iter = m_arcMap.find(index.internalPointer());
     if(iter != m_arcMap.end()){
-        if(index.cible() != NodeCible || index.data() == iter->second->nodeWidget()->type()) {
-            iter->second->nodeWidget()->deconnexion();
+        if(index.cible() != NodeCible || index.data() == iter->second->nodeWidget()->type())
             iter->second->nodeWidget()->updateData(index,role);
-            iter->second->nodeWidget()->connexion();
-        }
         else
             iter->second->setNodeWidget(index);
     }

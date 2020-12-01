@@ -49,12 +49,6 @@ public:
     //! Constructeur.
     AbstractNodeWidget(const NodeIndex & index, ArcNodeViewWidget * parent = nullptr, int tp = NoType);
 
-    //! Connecte les éléments du noeuds au model.
-    virtual void connexion() const {}
-
-    //! Déconnecte les éléments du noeuds au model.
-    virtual void deconnexion() const {}
-
     //! Accesseur de l'index.
     const NodeIndex & index() const noexcept
         {return m_index;}

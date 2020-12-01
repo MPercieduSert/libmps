@@ -21,6 +21,7 @@ class AbstractSubNodeWidget : public QWidget {
 protected:
     using NodeIndex = modelMPS::NodeIndex;
     using SubIndex = modelMPS::NodeIndex::SubIndex;
+    bool m_connexionEnable;             //!< État des connexions.
     NodeIndex m_index;                  //!< Index associé aux noeuds.
     QBoxLayout * m_mainLayout;          //!< Calque principale du sous-noeud.
 public:
@@ -30,18 +31,28 @@ public:
     //!< Destructeur.
     ~AbstractSubNodeWidget() override;
 
-    //! Connecte les éléments du noeuds au model.
-    virtual void connexion() const {}
+    //! Accesseur de l'état des connexions.
+    bool connexionEnable() const noexcept
+        {return m_connexionEnable;}
 
-    //! Déconnecte les éléments du noeuds au model.
-    virtual void deconnexion() const {}
+    //! Mutateur de l'état des connexions.
+    void setConnexion(bool bb) noexcept
+        {m_connexionEnable = bb;}
 
     //! Acceseur de l'index.
     NodeIndex index() const noexcept
         {return m_index;}
 public slots:
     //! Met à jour les données du sous-noeud à partir des données du model.
-    virtual void updateData(flag /*role*/) {}
+    void updateData(flag role) {
+        setConnexion(false);
+        updateDataSubNode(role);
+        setConnexion(true);
+    }
+
+protected:
+    //! Met à jour les données du sous-noeud à partir des données du model.
+    virtual void updateDataSubNode(flag /*role*/) {}
 };
 
 /*! \ingroup groupeWidget
@@ -54,15 +65,9 @@ protected:
 public:
     //! Constructeur.
     CheckSubNodeWidget(const NodeIndex & index, StandardNodeWidget * parent);
-
-    //! Connecte les éléments du noeuds au model.
-    void connexion() const override;
-
-    //! Déconnecte les éléments du noeuds au model.
-    void deconnexion() const override;
-
+protected:
     //! Met à jour les données du label à partir des données du model.
-    void updateData(flag role) override;
+    void updateDataSubNode(flag role) override;
 };
 
 /*! \ingroup groupeWidget
@@ -75,9 +80,9 @@ protected:
 public:
     //! Constructeur.
     LabelSubNodeWidget(const NodeIndex & index, StandardNodeWidget * parent);
-
+protected:
     //! Met à jour les données du label à partir des données du model.
-    void updateData(flag role) override;
+    void updateDataSubNode(flag role) override;
 };
 
 /*! \ingroup groupeWidget
@@ -90,15 +95,9 @@ protected:
 public:
     //! Constructeur.
     ComboBoxSubNodeWidget(const NodeIndex & index, StandardNodeWidget * parent);
-
-    //! Connecte les éléments du noeuds au model.
-    void connexion() const override;
-
-    //! Déconnecte les éléments du noeuds au model.
-    void deconnexion() const override;
-
+protected:
     //! Met à jour les données du label à partir des données du model.
-    void updateData(flag role) override;
+    void updateDataSubNode(flag role) override;
 };
 
 /*! \ingroup groupeWidget
@@ -111,15 +110,9 @@ protected:
 public:
     //! Constructeur.
     DateSubNodeWidget(const NodeIndex & index, StandardNodeWidget * parent);
-
-    //! Connecte les éléments du noeuds au model.
-    void connexion() const override;
-
-    //! Déconnecte les éléments du noeuds au model.
-    void deconnexion() const override;
-
+protected:
     //! Met à jour les données du label à partir des données du model.
-    void updateData(flag role) override;
+    void updateDataSubNode(flag role) override;
 };
 
 /*! \ingroup groupeWidget
@@ -132,15 +125,9 @@ protected:
 public:
     //! Constructeur.
     LineEditSubNodeWidget(const NodeIndex & index, StandardNodeWidget * parent);
-
-    //! Connecte les éléments du noeuds au model.
-    void connexion() const override;
-
-    //! Déconnecte les éléments du noeuds au model.
-    void deconnexion() const override;
-
+protected:
     //! Met à jour les données du label à partir des données du model.
-    void updateData(flag role) override;
+    void updateDataSubNode(flag role) override;
 };
 
 /*! \ingroup groupeWidget

@@ -25,25 +25,17 @@ CheckSubNodeWidget::CheckSubNodeWidget(const NodeIndex & index, StandardNodeWidg
     : AbstractSubNodeWidget(index,parent) {
     m_checkBox = new QCheckBox;
     m_mainLayout->addWidget(m_checkBox);
+    connect(m_checkBox,&QCheckBox::stateChanged,[this]() {
+        if(connexionEnable())
+            m_index.model()->setData(m_index,m_checkBox->isChecked(),modelMPS::CheckStateRole);});
 }
 
-void CheckSubNodeWidget::connexion() const {
-    AbstractSubNodeWidget::connexion();
-    connect(m_checkBox,&QCheckBox::stateChanged,[this]()
-        {m_index.model()->setData(m_index,m_checkBox->isChecked());});
-}
-
-void CheckSubNodeWidget::deconnexion() const {
-    AbstractSubNodeWidget::deconnexion();
-    disconnect(m_checkBox,&QCheckBox::stateChanged,this,nullptr);
-}
-
-void CheckSubNodeWidget::updateData(flag role) {
-    AbstractSubNodeWidget::updateData(role);
+void CheckSubNodeWidget::updateDataSubNode(flag role) {
+    AbstractSubNodeWidget::updateDataSubNode(role);
     if(role.test(modelMPS::LabelRole))
         m_checkBox->setText(m_index.data(modelMPS::LabelRole).toString());
-    if(role.test(modelMPS::DataRole))
-        m_checkBox->setChecked(m_index.data().toBool());
+    if(role.test(modelMPS::CheckStateRole))
+        m_checkBox->setChecked(m_index.data(modelMPS::CheckStateRole).toBool());
 }
 
 ////////////////////////////////////////////////// ComboBoxSubNodeWidget //////////////////////////////////////////
@@ -51,22 +43,13 @@ ComboBoxSubNodeWidget::ComboBoxSubNodeWidget(const NodeIndex & index, StandardNo
     : LabelSubNodeWidget(index,parent) {
     m_comboBox = new QComboBox;
     m_mainLayout->addWidget(m_comboBox);
+    connect(m_comboBox,qOverload<int>(&QComboBox::currentIndexChanged),this,[this]() {
+        if(connexionEnable())
+            m_index.model()->setData(m_index,m_comboBox->currentData());});
 }
 
-void ComboBoxSubNodeWidget::connexion() const {
-    LabelSubNodeWidget::connexion();
-    connect(m_comboBox,qOverload<int>(&QComboBox::currentIndexChanged),this,[this]()
-            {m_index.model()->setData(m_index,m_comboBox->currentData());});
-}
-
-
-void ComboBoxSubNodeWidget::deconnexion() const {
-    LabelSubNodeWidget::deconnexion();
-    disconnect(m_comboBox,qOverload<int>(&QComboBox::currentIndexChanged),this,nullptr);
-}
-
-void ComboBoxSubNodeWidget::updateData(flag role) {
-    LabelSubNodeWidget::updateData(role);
+void ComboBoxSubNodeWidget::updateDataSubNode(flag role) {
+    LabelSubNodeWidget::updateDataSubNode(role);
     if(role.test(modelMPS::ListOfValues)){
         m_comboBox->clear();
         auto map = m_index.data(modelMPS::ListOfValues).toMap();
@@ -84,8 +67,8 @@ LabelSubNodeWidget::LabelSubNodeWidget(const NodeIndex & index, StandardNodeWidg
     m_mainLayout->addWidget(m_label);
 }
 
-void LabelSubNodeWidget::updateData(flag role) {
-    AbstractSubNodeWidget::updateData(role);
+void LabelSubNodeWidget::updateDataSubNode(flag role) {
+    AbstractSubNodeWidget::updateDataSubNode(role);
     if(role.test(modelMPS::LabelRole))
         m_label->setText(m_index.data(modelMPS::LabelRole).toString());
 }
@@ -95,22 +78,13 @@ DateSubNodeWidget::DateSubNodeWidget(const NodeIndex & index, StandardNodeWidget
     : LabelSubNodeWidget(index,parent) {
     m_dateEdit = new QDateEdit;
     m_mainLayout->addWidget(m_dateEdit);
+    connect(m_dateEdit,&QDateEdit::dateChanged,this,[this]() {
+        if(connexionEnable())
+            m_index.model()->setData(m_index,m_dateEdit->date());});
 }
 
-void DateSubNodeWidget::connexion() const {
-    LabelSubNodeWidget::connexion();
-    connect(m_dateEdit,&QDateEdit::dateChanged,this,[this]()
-        {m_index.model()->setData(m_index,m_dateEdit->date());});
-}
-
-
-void DateSubNodeWidget::deconnexion() const {
-    LabelSubNodeWidget::deconnexion();
-    disconnect(m_dateEdit,&QDateEdit::dateChanged,this,nullptr);
-}
-
-void DateSubNodeWidget::updateData(flag role) {
-    LabelSubNodeWidget::updateData(role);
+void DateSubNodeWidget::updateDataSubNode(flag role) {
+    LabelSubNodeWidget::updateDataSubNode(role);
     if(role.test(modelMPS::DataRole))
         m_dateEdit->setDate(m_index.data().toDate());
 }
@@ -120,22 +94,13 @@ LineEditSubNodeWidget::LineEditSubNodeWidget(const NodeIndex & index, StandardNo
     : LabelSubNodeWidget(index,parent) {
     m_lineEdit = new QLineEdit;
     m_mainLayout->addWidget(m_lineEdit);
+    connect(m_lineEdit,&QLineEdit::textChanged,this,[this]() {
+        if(connexionEnable())
+            m_index.model()->setData(m_index,m_lineEdit->text());});
 }
 
-void LineEditSubNodeWidget::connexion() const {
-    LabelSubNodeWidget::connexion();
-    connect(m_lineEdit,&QLineEdit::textChanged,this,[this]()
-        {m_index.model()->setData(m_index,m_lineEdit->text());});
-}
-
-
-void LineEditSubNodeWidget::deconnexion() const {
-    LabelSubNodeWidget::deconnexion();
-    disconnect(m_lineEdit,&QLineEdit::textChanged,this,nullptr);
-}
-
-void LineEditSubNodeWidget::updateData(flag role) {
-    LabelSubNodeWidget::updateData(role);
+void LineEditSubNodeWidget::updateDataSubNode(flag role) {
+    LabelSubNodeWidget::updateDataSubNode(role);
     if(role.test(modelMPS::DataRole))
         m_lineEdit->setText(m_index.data().toString());
 }
@@ -153,24 +118,17 @@ void StandardNodeWidget::addSubNodeWidget(AbstractSubNodeWidget *subNode) {
     m_mainLayout->addWidget(subNode);
     m_cibleMap.insert({subNode->index().subIndex(),subNode});
     subNode->updateData(modelMPS::AllRole);
-    subNode->connexion();
 }
 
 void StandardNodeWidget::updateData() {
-    for (auto iter = m_cibleMap.begin(); iter != m_cibleMap.end(); ++iter) {
-        iter->second->deconnexion();
+    for (auto iter = m_cibleMap.begin(); iter != m_cibleMap.end(); ++iter)
         iter->second->updateData(modelMPS::AllRole);
-        iter->second->connexion();
-    }
 }
 
 void StandardNodeWidget::updateData(const NodeIndex & index, flag role) {
     auto iters = m_cibleMap.equal_range(index.subIndex());
-    for (auto iter = iters.first; iter != iters.second; ++iter) {
-        iter->second->deconnexion();
+    for (auto iter = iters.first; iter != iters.second; ++iter)
         iter->second->updateData(role);
-        iter->second->connexion();
-    }
 }
 
 //////////////////////////////////////////////// StandardNodeDelegate /////////////////////////////////////
