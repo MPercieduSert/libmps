@@ -3,8 +3,6 @@
 using namespace modelMPS;
 using namespace findNodeModel;
 
-FindNode::~FindNode() = default;
-
 FindModel::FindModel(AbstractColonnesModel * model, QObject *parent)
     :   TreeNodeModel (true,parent), m_model(model)
     {m_data.setTree(Tree(std::make_unique<FindNode>(this,Et,ChoiceNodeType)));}

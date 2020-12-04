@@ -21,6 +21,7 @@ protected:
 
 public:
     enum tabName{GestionBddTabId,
+                 GestionTypeTabId,
                 NbrPredefTabId};
 
 

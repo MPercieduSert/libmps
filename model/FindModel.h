@@ -43,8 +43,7 @@ public:
                  OpCible,
                  RegexCible,
                  TexteCible,
-                 TrueCible
-                };
+                 TrueCible};
 
     //! Opérations binaire.
     enum nodeOperation {Et,
@@ -60,6 +59,7 @@ public:
                      InfEgal,
                      SupEgal,
                      NbrComparaison};
+
    //! Structure d'informations sur une colonne du model.
     struct Colonne {
         int type = NoType;      //!< Type de la colonne.
@@ -83,16 +83,15 @@ public:
                       DatePosition = TroisPosition,
                       TextePosition = DeuxPosition,
                       CasePosition = TroisPosition,
-                      RegexPosition = QuatrePosition
-                     };
+                      RegexPosition = QuatrePosition};
+
     //! Nombre de sous-noueds.
     enum dataCountNode {
         BoolDataCount = 4,
         DateDataCount = 4,
         ChoiceDataCount = 2,
         OperationDatacount = 2,
-        TexteDataCount = 5
-    };
+        TexteDataCount = 5};
 
 protected:
     std::vector<Colonne> m_colonnes;                //!< Informations sur les colonnes.
@@ -165,9 +164,6 @@ public:
     //! Constructeur.
     FindNode(FindModel * model, szt pos, int type = NoType)
         : AbstractNode(type), m_model(model), m_pos(pos) {}
-
-    //! Destructeur.
-    ~FindNode() override;
 
     //! Accesseur des données du noeud.
     QVariant data(int cible, int role = DataRole, szt num = 0) const override;
