@@ -37,7 +37,7 @@ template<class Ent> QVariant PermissionNode<Ent>::data(int cible, int role, szt 
         if(role == LabelRole)
             return "Nom :";
         if(role == DataRole)
-            return m_permissionMap.at(m_model->cible(num));
+            return m_permissionMap.at(m_model->cible(num)).value();
         break;
     case SubNodeCible:
         if(role == SubNodeRole){

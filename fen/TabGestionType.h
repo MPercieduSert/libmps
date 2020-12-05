@@ -5,8 +5,11 @@
 #define TABGESTIONTYPE_H
 
 #include <QPushButton>
+#include <QLabel>
 #include "AbstractTabModuleWithBdd.h"
 #include "NodeView.h"
+#include "CodeWidget.h"
+#include "BddPredef.h"
 
 namespace fenMPS {
 /*! \ingroup groupeFen
@@ -15,15 +18,23 @@ namespace fenMPS {
 class TabGestionType : public AbstractTabModuleWithBdd
 {
 protected:
-    std::vector<QString> m_namesAttributs;      //!< Noms des attributs.
-     * m_model;                   //!< Model.
+    //std::vector<QString> m_namesAttributs;      //!< Noms des attributs.
+    //modelMPS:: * m_model;                   //!< Model.
+    widgetMPS::CodeWidget::Cases m_cases;       //!< Paramétrage des cases.
     widgetMPS::NodeView * m_view;               //!< Vue.
     QPushButton * m_insertButton;               //!< Bouton d'insertion d'une ligne.
     QPushButton * m_saveButton;                 //!< Bouton de sauvegarde.
     QPushButton * m_supprButton;                //!< Bouton de suppression d'une entité.
+
+    // Calque
+    QHBoxLayout * m_buttonLayout;               //!< Calque des boutons.
     QVBoxLayout * m_mainLayout;                 //!< Calque principal.
 
 public:
+    //! Position des cases.
+    enum positionCase {Visible,
+                      Attribuable};
+    //! Constructeur.
     TabGestionType(bmps::Bdd & bdd, const std::pair<int, int> &pairIndex, QWidget * parent = nullptr);
 
     //! Accesseur du titre.

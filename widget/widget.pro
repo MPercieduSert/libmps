@@ -49,7 +49,8 @@ SOURCES += \
     TreeWidget.cpp \
     NodeView.cpp \
     FindWidget.cpp \
-    StandardNodeWidget.cpp
+    StandardNodeWidget.cpp \
+    CodeWidget.cpp
 
 HEADERS += \
     AbstractEntitySelectWidget.h \
@@ -79,7 +80,8 @@ HEADERS += \
     TreeWidget.h \
     NodeView.h \
     FindWidget.h \
-    StandardNodeWidget.h
+    StandardNodeWidget.h \
+    CodeWidget.h
 
 unix {
     target.path = /usr/lib

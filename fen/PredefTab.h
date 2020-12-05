@@ -8,7 +8,7 @@
 #include "AbstractTabMenu.h"
 #include "TabMotCle.h"
 #include "TabGestionBdd.h"
-
+#include "TabGestionType.h"
 
 namespace fenMPS {
 /*! \ingroup groupeFen

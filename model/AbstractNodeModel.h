@@ -63,6 +63,7 @@ enum roleDataNode : flag::flag_type {
 //! Types des sous-noeuds.
 enum subNodeType {
     CheckSubNode,
+    CodeSubNode,
     ComboBoxSubNode,
     DateSubNode,
     LineEditSubNode

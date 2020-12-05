@@ -240,15 +240,9 @@ public:
     bool leaf() const noexcept
         {return m_leaf;}
 
-    //! Gestionnaire de click de souris.
-    void mousePressEvent(QMouseEvent *event) override;
-
     //! Accesseur du widget de noeud.
     AbstractNodeWidget * nodeWidget() const noexcept
         {return m_nodeWidget;}
-
-    //! Dessine la branche.
-    void paintEvent(QPaintEvent * event) override;
 
     //! Suppresion de noeud enfant de first à last.
     void removeNodes(szt first, szt last);
@@ -278,6 +272,12 @@ public:
     //! Accesseur de la vue.
     NodeView * view() const noexcept
         {return m_view;}
+protected:
+    //! Gestionnaire de click de souris.
+    void mousePressEvent(QMouseEvent *event) override;
+
+    //! Dessine la branche.
+    void paintEvent(QPaintEvent * event) override;
 };
 }
 #endif // NODEVIEW_H
