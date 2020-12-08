@@ -5,11 +5,10 @@ using namespace modelMPS;
 using namespace widgetMPS;
 
 ////////////////////////////////////// AbstractNodeDelegate /////////////////////////////////
-AbstractNodeDelegate::AbstractNodeDelegate(QObject * parent)
-    : QObject(parent) {}
+AbstractNodeDelegate::AbstractNodeDelegate(QObject * parent) : QObject(parent) {}
 
 ////////////////////////////////////// ArcNodeViewWidget //////////////////////////////////////////
-ArcNodeViewWidget::ArcNodeViewWidget(AbstractNodeWidget *node, NodeView *view, QWidget * parent, bool root)
+ArcNodeViewWidget::ArcNodeViewWidget(NodeWidget *node, NodeView *view, QWidget * parent, bool root)
     : QWidget (parent), m_root(root), m_view(view) {
     setNodeWidget(node);
     m_leaf = m_nodeWidget->index().leaf();
@@ -102,7 +101,6 @@ void ArcNodeViewWidget::paintEvent(QPaintEvent * /*event*/) {
     }
 }
 
-//! Suppresion du noeud et de count frère.
 void ArcNodeViewWidget::removeNodes(szt first, szt last) {
     if(first <= last && last < m_arcVec.size()) {
         auto firstIter = std::next(m_arcVec.begin(), first);
@@ -157,7 +155,7 @@ void ArcNodeViewWidget::setLeaf(bool bb) {
     }
 }
 
-void ArcNodeViewWidget::setNodeWidget(AbstractNodeWidget * widget) {
+void ArcNodeViewWidget::setNodeWidget(NodeWidget * widget) {
     auto draw = m_nodeWidget && m_nodeWidget->isVisible();
     if(m_nodeWidget) {
         m_view->m_arcMap.erase(m_nodeWidget->index().internalPointer());
@@ -167,9 +165,9 @@ void ArcNodeViewWidget::setNodeWidget(AbstractNodeWidget * widget) {
     m_nodeWidget = widget;
     m_nodeWidget->setParent(this);
     if(m_view->selectionModel()->isCurrentIndex(m_nodeWidget->index()))
-        m_nodeWidget->setEtatSelection(AbstractNodeWidget::Current);
+        m_nodeWidget->setEtatSelection(NodeWidget::Current);
     else if(m_view->selectionModel()->isSelected(m_nodeWidget->index()))
-        m_nodeWidget->setEtatSelection(AbstractNodeWidget::Selected);
+        m_nodeWidget->setEtatSelection(NodeWidget::Selected);
     m_nodeWidget->updateData();
     m_view->m_arcMap[m_nodeWidget->index().internalPointer()] = this;
     m_nodeWidget->move(LeftNodeMargin,TopNodeMargin);
@@ -198,6 +196,15 @@ QSize ArcNodeViewWidget::sizeHint() const{
     return sz;
 }
 
+///////////////////////////////////////// IndexWidget /////////////////////////////////////////
+IndexWidget::IndexWidget(const NodeIndex & index, QWidget * parent)
+    : QWidget(parent), m_index(index) {
+    if(index.data(modelMPS::OrientationRole).toUInt() == Qt::Horizontal)
+        m_mainLayout = new QHBoxLayout(this);
+    else
+        m_mainLayout = new QVBoxLayout(this);
+}
+
 /////////////////////////////////////// NodeView //////////////////////////////////////////
 NodeView::NodeView(QWidget * parent)
     : QScrollArea (parent) {}
@@ -222,12 +229,12 @@ void NodeView::currentChanged(const NodeIndex & current, const NodeIndex & previ
     if(current.isValid()) {
         auto iter = m_arcMap.find(current.internalPointer());
         if(iter != m_arcMap.end())
-            iter->second->nodeWidget()->setEtatSelection(AbstractNodeWidget::Current);
+            iter->second->nodeWidget()->setEtatSelection(NodeWidget::Current);
     }
     if(previous.isValid()) {
         auto iter = m_arcMap.find(previous.internalPointer());
         if(iter != m_arcMap.end())
-            iter->second->nodeWidget()->setEtatSelection(AbstractNodeWidget::NoSelected);
+            iter->second->nodeWidget()->setEtatSelection(NodeWidget::NoSelected);
     }
 }
 
@@ -292,51 +299,39 @@ void NodeView::resetRoot(){
 void NodeView::updateData(const NodeIndex & index, flag role) {
     auto iter = m_arcMap.find(index.internalPointer());
     if(iter != m_arcMap.end()){
-        if(index.cible() != NodeCible || index.data() == iter->second->nodeWidget()->type())
+        if(index.cible() != NodeCible)
             iter->second->nodeWidget()->updateData(index,role);
         else
             iter->second->setNodeWidget(index);
     }
 }
 
-////////////////////////////////////////// AbstractNodeWidget /////////////////////////////////////
-AbstractNodeWidget::AbstractNodeWidget(const NodeIndex & index, ArcNodeViewWidget *parent, int tp)
-    : QWidget(parent),
-      m_colorLine(QGuiApplication::palette().color(QPalette::Active,QPalette::WindowText)),
-      m_type(tp), m_index(index)
-    {}
+/////////////////////////////////////////////// NodeWidget ///////////////////////////////////////////////////
+NodeWidget::~NodeWidget() {
+    for (auto iter = m_cibleMap.cbegin(); iter != m_cibleMap.cend(); ++iter)
+        disconnect(iter->second,&QObject::destroyed,this,&NodeWidget::removeSubNodeWidget);
+}
 
-void AbstractNodeWidget::mousePressEvent(QMouseEvent * event) {
+void NodeWidget::addSubNodeWidget(SubNodeWidget * subNode) {
+    m_mainLayout->addWidget(subNode);
+    m_cibleMap.insert({subNode->index().subIndex(),subNode});
+    connect(subNode,&QObject::destroyed,this,&NodeWidget::removeSubNodeWidget);
+    subNode->updateData(modelMPS::AllRole);
+}
+
+void NodeWidget::mousePressEvent(QMouseEvent * event) {
     if(event->button() == Qt::LeftButton)
         static_cast<ArcNodeViewWidget *>(parentWidget())->view()->clickLeftOn(m_index);
 }
 
-void AbstractNodeWidget::paintEvent(QPaintEvent * /*event*/) {
-    QPen pen(m_colorLine);
-    pen.setWidth(m_widthLine);
-    QPainter painter(this);
-    painter.setPen(pen);
-    painter.drawRoundedRect(m_widthLine / 2,m_widthLine / 2,width() - m_widthLine,height() - m_widthLine,Rayon,Rayon,Qt::AbsoluteSize);
+////////////////////////////////////////////// SubNodeHandler ////////////////////////////////////////////////
+void NodeWidget::updateData() {
+    for (auto iter = m_cibleMap.begin(); iter != m_cibleMap.end(); ++iter)
+        iter->second->updateData(modelMPS::AllRole);
 }
 
-void AbstractNodeWidget::setEtatSelection(EtatSelection etat) {
-    if(m_etatSelection != etat){
-        switch (etat) {
-        case NoSelected:
-            m_widthLine = NoSelectedWidth;
-            m_colorLine = QGuiApplication::palette().color(QPalette::Active,QPalette::WindowText);
-            break;
-        case Selected:
-            m_widthLine = SelectedWidth;
-            m_colorLine = QGuiApplication::palette().color(QPalette::Active,QPalette::Highlight);
-            break;
-        case Current:
-            m_widthLine = CurrentWidth;
-            m_colorLine = QGuiApplication::palette().color(QPalette::Active,QPalette::Highlight);
-            break;
-        case Initial:
-            break;
-        }
-        repaint();
-    }
+void NodeWidget::updateData(const modelMPS::NodeIndex & index, flag role) {
+    auto iters = m_cibleMap.equal_range(index.subIndex());
+    for (auto iter = iters.first; iter != iters.second; ++iter)
+        iter->second->updateData(role);
 }

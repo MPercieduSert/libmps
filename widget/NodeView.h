@@ -19,58 +19,135 @@
 
 namespace widgetMPS {
 using namespace typeMPS;
-class NodeView;
-class ArcNodeViewWidget;
+/*! \ingroup groupeWidget
+ * \brief Classe possédant un index et calque principal orienté.
+ */
+class IndexWidget : public QWidget {
+    Q_OBJECT
+protected:
+    using NodeIndex = modelMPS::NodeIndex;
+    NodeIndex m_index;                  //!< Index associé aux noeuds.
+    QBoxLayout * m_mainLayout;          //!< Calque principale du sous-noeud.
+public:
+    //! Constructeur.
+    IndexWidget(const NodeIndex & index, QWidget * parent = nullptr);
+
+    //! Acceseur de l'index.
+    NodeIndex index() const noexcept
+        {return m_index;}
+};
+
+/*! \ingroup groupeWidget
+ * \brief Classe mère des sous noeuds standard.
+ */
+class SubNodeWidget : public IndexWidget {
+    Q_OBJECT
+protected:
+    bool m_connexionEnable;             //!< État des connexions.
+public:
+    //! Constructeur.
+    using IndexWidget::IndexWidget;
+
+    //! Accesseur de l'état des connexions.
+    bool connexionEnable() const noexcept
+        {return m_connexionEnable;}
+
+    //! Mutateur de l'état des connexions.
+    void setConnexion(bool bb) noexcept
+        {m_connexionEnable = bb;}
+
+public slots:
+    //! Met à jour les données du sous-noeud à partir des données du model.
+    void updateData(flag role) {
+        setConnexion(false);
+        updateDataSubNode(role);
+        setConnexion(true);
+    }
+
+protected:
+    //! Met à jour les données du sous-noeud à partir des données du model.
+    virtual void updateDataSubNode(flag /*role*/) {}
+};
+
 /*! \ingroup groupeWidget
  * \brief Classe mère des widgets des noeuds de l'arbre.
  */
-class AbstractNodeWidget : public QWidget {
+class NodeWidget : public IndexWidget {
     Q_OBJECT
 public:
     using NodeIndex = modelMPS::NodeIndex;
-    enum {NoType = modelMPS::TreeNodeModel::NoType,
-         Rayon = 10,
-         NoSelectedWidth = 2,
-         SelectedWidth = NoSelectedWidth,
-         CurrentWidth = 2 * SelectedWidth};
     //! Etat de sélection du noeud.
     enum EtatSelection {Initial = -1,
                         NoSelected,
                         Selected,
                         Current
                        };
+    /*! \ingroup groupeWidget
+     * \brief Dessineur du noeud.
+     */
+    class NodePainter {
+    public:
+        //! Constructeur.
+        NodePainter() = default;
+
+        //! Destructeur.
+        virtual ~NodePainter() = default;
+
+        //! Dessine widget.
+        virtual void paint(QWidget * /*widget*/) {}
+
+        //! Mutateur de l'état de sélection.
+        virtual void setEtatSelection(EtatSelection /*etat*/) {}
+    };
 protected:
-    EtatSelection m_etatSelection = Initial;        //!< État de sélection.
-    int m_widthLine = NoSelectedWidth;              //!< Épaisseur du trait.
-    QColor m_colorLine;                             //!< Couleur de la ligne.
-    const int m_type;                               //!< Type du Noeud.
-    const NodeIndex m_index;                        //!< Index sur la donnée représentée par le noeud.
+    using SubIndex = modelMPS::NodeIndex::SubIndex;
+    std::multimap<SubIndex,SubNodeWidget*> m_cibleMap;      //!< Association des sous-index et des sous-noeuds.
+    EtatSelection m_etatSelection = Initial;                //!< État de sélection.
+    std::unique_ptr<NodePainter> m_painter;                 //!< Dessineur du noeud
 public:
     //! Constructeur.
-    AbstractNodeWidget(const NodeIndex & index, ArcNodeViewWidget * parent = nullptr, int tp = NoType);
+    NodeWidget(const NodeIndex & index, QWidget * parent = nullptr)
+        : IndexWidget(index, parent), m_painter(std::make_unique<NodePainter>()) {}
 
-    //! Accesseur de l'index.
-    const NodeIndex & index() const noexcept
-        {return m_index;}
+    //! Destructeur.
+    ~NodeWidget() override;
+
+    //! Ajoute un sous-noeud.
+    void addSubNodeWidget(SubNodeWidget * subNode);
 
     //! Gestionnaire de click de souris.
     void mousePressEvent(QMouseEvent *event) override;
 
     //! Dessine la noeud.
-    void paintEvent(QPaintEvent * event) override;
+    void paintEvent(QPaintEvent * /*event*/) override
+        {m_painter->paint(this);}
 
     //! Le noeud devient courant.
-    void setEtatSelection(EtatSelection etat);
+    virtual void setEtatSelection(EtatSelection etat) {
+        if(m_etatSelection != etat) {
+            m_etatSelection = etat;
+            m_painter->setEtatSelection(etat);
+            repaint();
+        }
+    }
 
-    //! Accesseur du type de noeud.
-    int type() const noexcept
-        {return m_type;}
+    //! Mutateur du dessineur.
+    void setPainter(std::unique_ptr<NodePainter> && painter) {
+        m_painter = std::move(painter);
+        repaint();
+    }
+
 public slots:
     //! Met à jour les données du widget à partir des données du model.
-    virtual void updateData() = 0;
+    virtual void updateData();
 
     //! Met à jour les données du widget pour l'index index à partir des données du model.
-    virtual void updateData(const NodeIndex & /*index*/, flag role) = 0;
+    virtual void updateData(const NodeIndex & index, flag role);
+
+protected:
+    //! Retire un sous noeud.
+    void removeSubNodeWidget(QObject * subNode)
+        {m_cibleMap.erase(static_cast<SubNodeWidget*>(subNode)->index().subIndex());}
 };
 }
 /*! \ingroup groupeDelegate
@@ -83,14 +160,15 @@ namespace delegateMPS {
 class AbstractNodeDelegate : public QObject {
 public:
     using NodeIndex = modelMPS::NodeIndex;
-    using AbstractNodeWidget = widgetMPS::AbstractNodeWidget;
+    using NodeWidget = widgetMPS::NodeWidget;
     //! Constructeur.
     AbstractNodeDelegate(QObject * parent);
     //! Crée un noeud.
-    virtual AbstractNodeWidget * createNode(const NodeIndex &index, widgetMPS::ArcNodeViewWidget * parent = nullptr) const = 0;
+    virtual NodeWidget * createNode(const NodeIndex &index, QWidget * parent = nullptr) const = 0;
 };
 }
 namespace widgetMPS {
+class ArcNodeViewWidget;
 /*! \ingroup groupeWidget
  * \brief Vue pour un modèle hérité de AbstractNodeModel.
  */
@@ -106,7 +184,6 @@ public:
                         };
 protected:
     friend ArcNodeViewWidget;
-    friend AbstractNodeWidget;
     using Delegate = delegateMPS::AbstractNodeDelegate;
     using Model = modelMPS::AbstractNodeModel;
     using NodeIndex = modelMPS::NodeIndex;
@@ -123,6 +200,9 @@ public:
     //! Destructeur.
     ~NodeView()
         {deleteRoot();}
+
+    //! Gestion d'un click sur un noeud.
+    void clickLeftOn(const NodeIndex & index);
 
     //! Accesseur du delegate.
     Delegate * delegate() const noexcept
@@ -163,7 +243,7 @@ public slots:
     //! Prend en compte la suppression de noeud du model.
     void removeNodes(const NodeIndex & parent, szt first, szt last);
 
-    //! Met à jour les donnée du AbstractNodeWidget associé à l'index.
+    //! Met à jour les donnée du NodeWidget associé à l'index.
     void updateData(const NodeIndex & index, flag role);
 
 protected slots:
@@ -177,10 +257,7 @@ protected slots:
     void resetRoot();
 
     //! Change la sélection.
-    void selectionChanged(const std::list<NodeIndex> & selected, const std::list<NodeIndex> & deselected) {}
-protected:
-    //! Gestion d'un click sur un noeud.
-    void clickLeftOn(const NodeIndex & index);
+    void selectionChanged(const std::list<NodeIndex> & selected, const std::list<NodeIndex> & deselected) {} 
 };
 
 /*! \ingroup groupeWidget
@@ -212,11 +289,11 @@ protected:
     bool m_leaf = true;                         //!< Le noeud est une feuille.
     const bool m_root;                          //!< Le noeud est la racine.
     NodeView * m_view;                          //!< Vue contenant le widget.
-    AbstractNodeWidget * m_nodeWidget = nullptr;        //!< Widget de noeud.
+    NodeWidget * m_nodeWidget = nullptr;        //!< Widget de noeud.
     std::vector<ArcNodeViewWidget *> m_arcVec;  //!< Vecteur des arcs fils.
 public:
     //! Constructeur.
-    ArcNodeViewWidget(AbstractNodeWidget * node, NodeView * view, QWidget * parent = nullptr, bool root = false);
+    ArcNodeViewWidget(NodeWidget * node, NodeView * view, QWidget * parent = nullptr, bool root = false);
 
     //! Constructeur.
     ArcNodeViewWidget(const modelMPS::NodeIndex & index, NodeView * view, QWidget * parent = nullptr, bool root = false)
@@ -241,7 +318,7 @@ public:
         {return m_leaf;}
 
     //! Accesseur du widget de noeud.
-    AbstractNodeWidget * nodeWidget() const noexcept
+    NodeWidget * nodeWidget() const noexcept
         {return m_nodeWidget;}
 
     //! Suppresion de noeud enfant de first à last.
@@ -258,7 +335,7 @@ public:
     void setLeaf(bool bb);
 
     //! Mutateur du widget de noeud.
-    void setNodeWidget(AbstractNodeWidget * widget);
+    void setNodeWidget(NodeWidget * widget);
 
     //! Mutateur du widget de noeud.
     void setNodeWidget(const modelMPS::NodeIndex & index) {

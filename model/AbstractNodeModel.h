@@ -26,7 +26,8 @@ class AbstractNodeModel;
 //! Cible de donnée prédéfinies.
 enum cibleDataNode {
     NodeCible = -1,
-    SubNodeCible = -2
+    SubNodeCible = -2,
+    ExterneCible = -3
 };
 
 //! Role des données

@@ -3,26 +3,9 @@
 using namespace delegateMPS;
 using namespace widgetMPS;
 
-///////////////////////////////////////// AbstractSubNodeWidget /////////////////////////////////////////
-AbstractSubNodeWidget::AbstractSubNodeWidget(const NodeIndex & index, StandardNodeWidget * parent)
-    : QWidget (parent), m_index(index) {
-    if(index.data(modelMPS::OrientationRole).toUInt() == Qt::Horizontal)
-        m_mainLayout = new QHBoxLayout(this);
-    else
-        m_mainLayout = new QVBoxLayout(this);
-}
-
-AbstractSubNodeWidget::~AbstractSubNodeWidget() {
-    auto node = static_cast<StandardNodeWidget*>(parent());
-    auto iter = node->m_cibleMap.cbegin();
-    while (iter != node->m_cibleMap.cend() && iter->second != this)
-        ++iter;
-    if(iter != node->m_cibleMap.cend())
-        node->m_cibleMap.erase(iter);
-}
 ////////////////////////////////////////////////// CheckSubNodeWidget //////////////////////////////////////////
-CheckSubNodeWidget::CheckSubNodeWidget(const NodeIndex & index, StandardNodeWidget * parent)
-    : AbstractSubNodeWidget(index,parent) {
+CheckSubNodeWidget::CheckSubNodeWidget(const NodeIndex & index, QWidget * parent)
+    : SubNodeWidget(index,parent) {
     m_checkBox = new QCheckBox;
     m_mainLayout->addWidget(m_checkBox);
     connect(m_checkBox,&QCheckBox::stateChanged,[this]() {
@@ -31,7 +14,7 @@ CheckSubNodeWidget::CheckSubNodeWidget(const NodeIndex & index, StandardNodeWidg
 }
 
 void CheckSubNodeWidget::updateDataSubNode(flag role) {
-    AbstractSubNodeWidget::updateDataSubNode(role);
+    SubNodeWidget::updateDataSubNode(role);
     if(role.test(modelMPS::LabelRole))
         m_checkBox->setText(m_index.data(modelMPS::LabelRole).toString());
     if(role.test(modelMPS::CheckStateRole))
@@ -39,7 +22,7 @@ void CheckSubNodeWidget::updateDataSubNode(flag role) {
 }
 
 ////////////////////////////////////////////////// ComboBoxSubNodeWidget //////////////////////////////////////////
-ComboBoxSubNodeWidget::ComboBoxSubNodeWidget(const NodeIndex & index, StandardNodeWidget * parent)
+ComboBoxSubNodeWidget::ComboBoxSubNodeWidget(const NodeIndex & index, QWidget * parent)
     : LabelSubNodeWidget(index,parent) {
     m_comboBox = new QComboBox;
     m_mainLayout->addWidget(m_comboBox);
@@ -61,20 +44,20 @@ void ComboBoxSubNodeWidget::updateDataSubNode(flag role) {
 }
 
 ////////////////////////////////////////////////// LabelSubNodeWidget //////////////////////////////////////////
-LabelSubNodeWidget::LabelSubNodeWidget(const NodeIndex & index, StandardNodeWidget * parent)
-    : AbstractSubNodeWidget(index,parent) {
+LabelSubNodeWidget::LabelSubNodeWidget(const NodeIndex & index, QWidget * parent)
+    : SubNodeWidget(index,parent) {
     m_label = new QLabel;
     m_mainLayout->addWidget(m_label);
 }
 
 void LabelSubNodeWidget::updateDataSubNode(flag role) {
-    AbstractSubNodeWidget::updateDataSubNode(role);
+    SubNodeWidget::updateDataSubNode(role);
     if(role.test(modelMPS::LabelRole))
         m_label->setText(m_index.data(modelMPS::LabelRole).toString());
 }
 
 ////////////////////////////////////////////////// DateSubNodeWidget //////////////////////////////////////////
-DateSubNodeWidget::DateSubNodeWidget(const NodeIndex & index, StandardNodeWidget * parent)
+DateSubNodeWidget::DateSubNodeWidget(const NodeIndex & index, QWidget * parent)
     : LabelSubNodeWidget(index,parent) {
     m_dateEdit = new QDateEdit;
     m_mainLayout->addWidget(m_dateEdit);
@@ -90,7 +73,7 @@ void DateSubNodeWidget::updateDataSubNode(flag role) {
 }
 
 ////////////////////////////////////////////////// LineEditSubNodeWidget //////////////////////////////////////////
-LineEditSubNodeWidget::LineEditSubNodeWidget(const NodeIndex & index, StandardNodeWidget * parent)
+LineEditSubNodeWidget::LineEditSubNodeWidget(const NodeIndex & index, QWidget * parent)
     : LabelSubNodeWidget(index,parent) {
     m_lineEdit = new QLineEdit;
     m_mainLayout->addWidget(m_lineEdit);
@@ -105,43 +88,48 @@ void LineEditSubNodeWidget::updateDataSubNode(flag role) {
         m_lineEdit->setText(m_index.data().toString());
 }
 
-////////////////////////////////////////////// StandardNodeWidget //////////////////////////////////////////
-StandardNodeWidget::StandardNodeWidget(const NodeIndex & index, ArcNodeViewWidget * parent, int tp)
-    : AbstractNodeWidget (index,parent,tp) {
-    if(index.data(modelMPS::OrientationRole).toUInt() == Qt::Horizontal)
-        m_mainLayout = new QHBoxLayout(this);
-    else
-        m_mainLayout = new QVBoxLayout(this);
+////////////////////////////////////////////////// RoundedNodePainter //////////////////////////////////////////
+void RoundedNodePainter::paint(QWidget * widget) {
+    QPen pen(m_colorLine);
+    pen.setWidth(m_widthLine);
+    QPainter painter(widget);
+    painter.setPen(pen);
+    painter.drawRoundedRect(m_widthLine / 2, m_widthLine / 2,
+                            widget->width() - m_widthLine, widget->height() - m_widthLine,
+                            Rayon, Rayon, Qt::AbsoluteSize);
 }
 
-void StandardNodeWidget::addSubNodeWidget(AbstractSubNodeWidget *subNode) {
-    m_mainLayout->addWidget(subNode);
-    m_cibleMap.insert({subNode->index().subIndex(),subNode});
-    subNode->updateData(modelMPS::AllRole);
-}
-
-void StandardNodeWidget::updateData() {
-    for (auto iter = m_cibleMap.begin(); iter != m_cibleMap.end(); ++iter)
-        iter->second->updateData(modelMPS::AllRole);
-}
-
-void StandardNodeWidget::updateData(const NodeIndex & index, flag role) {
-    auto iters = m_cibleMap.equal_range(index.subIndex());
-    for (auto iter = iters.first; iter != iters.second; ++iter)
-        iter->second->updateData(role);
+void RoundedNodePainter::setEtatSelection(NodeWidget::EtatSelection etat) {
+    switch (etat) {
+    case NodeWidget::NoSelected:
+        m_widthLine = NoSelectedWidth;
+        m_colorLine = QGuiApplication::palette().color(QPalette::Active,QPalette::WindowText);
+        break;
+    case NodeWidget::Selected:
+        m_widthLine = SelectedWidth;
+        m_colorLine = QGuiApplication::palette().color(QPalette::Active,QPalette::Highlight);
+        break;
+    case NodeWidget::Current:
+        m_widthLine = CurrentWidth;
+        m_colorLine = QGuiApplication::palette().color(QPalette::Active,QPalette::Highlight);
+        break;
+    case NodeWidget::Initial:
+        break;
+    }
 }
 
 //////////////////////////////////////////////// StandardNodeDelegate /////////////////////////////////////
-AbstractNodeWidget * StandardNodeDelegate::createNode(const NodeIndex &index, widgetMPS::ArcNodeViewWidget * parent) const {
+NodeWidget * StandardNodeDelegate::createNode(const NodeIndex &index, QWidget * parent) const {
     Q_ASSERT(index.cible() == modelMPS::NodeCible);
-    auto node = new StandardNodeWidget(index,parent);
+    auto node = new NodeWidget(index,parent);
+    node->setPainter(std::make_unique<RoundedNodePainter>());
     auto nbrSubNode = index.model()->dataCount(index.index(modelMPS::SubNodeCible));
     for(szt num = 0; num != nbrSubNode; ++num)
         node->addSubNodeWidget(createSubNode(index.index(modelMPS::SubNodeCible,num),node));
     return node;
 }
 
-AbstractSubNodeWidget * StandardNodeDelegate::createSubNode(const NodeIndex &index, widgetMPS::StandardNodeWidget * parent) const {
+SubNodeWidget * StandardNodeDelegate::createSubNode(const NodeIndex &index, QWidget *parent) const {
     Q_ASSERT(index.cible() == modelMPS::SubNodeCible);
     auto info = index.data(modelMPS::SubNodeRole).toList();
     auto indexSubNode = index.index(info.at(modelMPS::CibleSubNode).toInt(),info.at(modelMPS::NumSubNode).toUInt());
@@ -155,5 +143,5 @@ AbstractSubNodeWidget * StandardNodeDelegate::createSubNode(const NodeIndex &ind
     case modelMPS::ComboBoxSubNode:
         return new ComboBoxSubNodeWidget(indexSubNode,parent);
     }
-    return new AbstractSubNodeWidget(indexSubNode,parent);
+    return new SubNodeWidget(indexSubNode,parent);
 }

@@ -12,59 +12,17 @@
 #include "NodeView.h"
 
 namespace widgetMPS {
-class StandardNodeWidget;
-/*! \ingroup groupeWidget
- * \brief Classe mère des sous noeuds standard.
- */
-class AbstractSubNodeWidget : public QWidget {
-    Q_OBJECT
-protected:
-    using NodeIndex = modelMPS::NodeIndex;
-    using SubIndex = modelMPS::NodeIndex::SubIndex;
-    bool m_connexionEnable;             //!< État des connexions.
-    NodeIndex m_index;                  //!< Index associé aux noeuds.
-    QBoxLayout * m_mainLayout;          //!< Calque principale du sous-noeud.
-public:
-    //! Constructeur.
-    AbstractSubNodeWidget(const NodeIndex & index, StandardNodeWidget * parent);
-
-    //!< Destructeur.
-    ~AbstractSubNodeWidget() override;
-
-    //! Accesseur de l'état des connexions.
-    bool connexionEnable() const noexcept
-        {return m_connexionEnable;}
-
-    //! Mutateur de l'état des connexions.
-    void setConnexion(bool bb) noexcept
-        {m_connexionEnable = bb;}
-
-    //! Acceseur de l'index.
-    NodeIndex index() const noexcept
-        {return m_index;}
-public slots:
-    //! Met à jour les données du sous-noeud à partir des données du model.
-    void updateData(flag role) {
-        setConnexion(false);
-        updateDataSubNode(role);
-        setConnexion(true);
-    }
-
-protected:
-    //! Met à jour les données du sous-noeud à partir des données du model.
-    virtual void updateDataSubNode(flag /*role*/) {}
-};
 
 /*! \ingroup groupeWidget
  * \brief Classe des sous-noeuds composés d'une case à cocher.
  */
-class CheckSubNodeWidget : public AbstractSubNodeWidget {
+class CheckSubNodeWidget : public SubNodeWidget {
     Q_OBJECT
 protected:
     QCheckBox * m_checkBox;       //! CheckBox du sous-noeud.
 public:
     //! Constructeur.
-    CheckSubNodeWidget(const NodeIndex & index, StandardNodeWidget * parent);
+    CheckSubNodeWidget(const NodeIndex & index, QWidget * parent);
 protected:
     //! Met à jour les données du label à partir des données du model.
     void updateDataSubNode(flag role) override;
@@ -73,13 +31,13 @@ protected:
 /*! \ingroup groupeWidget
  * \brief Classe des sous-noeuds composés d'un label.
  */
-class LabelSubNodeWidget : public AbstractSubNodeWidget {
+class LabelSubNodeWidget : public SubNodeWidget {
     Q_OBJECT
 protected:
     QLabel * m_label;       //! Label du sous-noeud.
 public:
     //! Constructeur.
-    LabelSubNodeWidget(const NodeIndex & index, StandardNodeWidget * parent);
+    LabelSubNodeWidget(const NodeIndex & index, QWidget * parent);
 protected:
     //! Met à jour les données du label à partir des données du model.
     void updateDataSubNode(flag role) override;
@@ -94,7 +52,7 @@ protected:
     QComboBox * m_comboBox;       //! Liste de choix.
 public:
     //! Constructeur.
-    ComboBoxSubNodeWidget(const NodeIndex & index, StandardNodeWidget * parent);
+    ComboBoxSubNodeWidget(const NodeIndex & index, QWidget * parent);
 protected:
     //! Met à jour les données du label à partir des données du model.
     void updateDataSubNode(flag role) override;
@@ -109,7 +67,7 @@ protected:
     QDateEdit * m_dateEdit;       //! Ligne d'édition de la date du sous-noeud.
 public:
     //! Constructeur.
-    DateSubNodeWidget(const NodeIndex & index, StandardNodeWidget * parent);
+    DateSubNodeWidget(const NodeIndex & index, QWidget * parent);
 protected:
     //! Met à jour les données du label à partir des données du model.
     void updateDataSubNode(flag role) override;
@@ -124,39 +82,44 @@ protected:
     QLineEdit * m_lineEdit;       //! Ligne d'édition du texte du sous-noeud.
 public:
     //! Constructeur.
-    LineEditSubNodeWidget(const NodeIndex & index, StandardNodeWidget * parent);
+    LineEditSubNodeWidget(const NodeIndex & index, QWidget * parent);
 protected:
     //! Met à jour les données du label à partir des données du model.
     void updateDataSubNode(flag role) override;
 };
 
 /*! \ingroup groupeWidget
- * \brief Classe standard des widgets des noeuds de l'arbre.
+ * \brief Classe dessinant les nodes widgets à angles arrondis.
  */
-class StandardNodeWidget : public AbstractNodeWidget {
-    Q_OBJECT
-    friend AbstractSubNodeWidget;
+class RoundedNodePainter : public NodeWidget::NodePainter {
+public:
+    enum {Rayon = 10,
+         NoSelectedWidth = 2,
+         SelectedWidth = NoSelectedWidth,
+         CurrentWidth = 2 * SelectedWidth};
+
 protected:
-    using SubIndex = modelMPS::NodeIndex::SubIndex;
-    std::multimap<SubIndex,AbstractSubNodeWidget*> m_cibleMap;      //!< Association des sous-index et des sous-noeuds.
-    QBoxLayout * m_mainLayout;                                      //!< Calque principale.
+    int m_widthLine = NoSelectedWidth;              //!< Épaisseur du trait.
+    QColor m_colorLine;                             //!< Couleur de la ligne.
 public:
     //! Constructeur.
-    StandardNodeWidget(const NodeIndex & index, ArcNodeViewWidget * parent = nullptr, int tp = NoType);
+    RoundedNodePainter()
+        : m_colorLine(QGuiApplication::palette().color(QPalette::Active,QPalette::WindowText)) {}
 
-    //! Destructeur.
-    ~StandardNodeWidget() override
-        {m_cibleMap.clear();}
+    //! Dessine widget.
+    void paint(QWidget * widget) override;
 
-    //! Ajoute un sous-noeud.
-    void addSubNodeWidget(AbstractSubNodeWidget * subNode);
+    //! Mutateur de l'état de sélection.
+    void setEtatSelection(NodeWidget::EtatSelection etat) override;
+};
 
-public slots:
-    //! Met à jour les données du widget à partir des données du model.
-    void updateData() override;
+/*! \ingroup groupeWidget
+ * \brief Vue standard des données externe à l'arbre d'un modèle hérité de AbstractNodeModel.
+ */
+class StandardExterneNode : public QWidget {
+    Q_OBJECT
+protected:
 
-    //! Met à jour les données du widget pour l'index index à partir des données du model.
-    void updateData(const NodeIndex & index,flag role) override;
 };
 }
 namespace delegateMPS {
@@ -166,16 +129,16 @@ namespace delegateMPS {
 class StandardNodeDelegate : public AbstractNodeDelegate {
 public:
     using NodeIndex = modelMPS::NodeIndex;
-    using AbstractNodeWidget = widgetMPS::AbstractNodeWidget;
-    using AbstractSubNodeWidget = widgetMPS::AbstractSubNodeWidget;
+    using NodeWidget = widgetMPS::NodeWidget;
+    using SubNodeWidget = widgetMPS::SubNodeWidget;
     //! Constructeur.
     using AbstractNodeDelegate::AbstractNodeDelegate;
 
     //! Crée un noeud.
-    AbstractNodeWidget * createNode(const NodeIndex &index, widgetMPS::ArcNodeViewWidget * parent = nullptr) const override;
+    NodeWidget * createNode(const NodeIndex &index, QWidget * parent = nullptr) const override;
 
     //! Crée un sous-noeud.
-    virtual AbstractSubNodeWidget * createSubNode(const NodeIndex &index, widgetMPS::StandardNodeWidget * parent = nullptr) const;
+    virtual SubNodeWidget * createSubNode(const NodeIndex &index, QWidget *parent = nullptr) const;
 };
 }
 #endif // STANDARDNODEWIDGET_H

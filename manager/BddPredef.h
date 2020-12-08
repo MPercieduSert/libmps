@@ -68,11 +68,22 @@ public:
     template<class Ent> int cible() const
         {return managers().cible<Ent>();}
 
+    //! renvoie le numéro de permission associée à la chaine de caractères, ou NbrPermission la chaine ne correspond à aucun numéro.
+    virtual flag code(idt idEntity, const QString & str) const;
+
     //! Suppresseur d'une entité enregistrée comme donnée.
     void delEntityInDonnee(idt idCible, int cible, int num = 0);
 
     //! Accesseur d'une entité enregistrée comme donnée.
     template<class Ent> Ent getEntityInDonnee(idt idCible, int cible, int num = 0);
+
+    //! Acceseur du manageur.
+    const managerMPS::ManagersPredef & managers() const
+        {return static_cast<const managerMPS::ManagersPredef &>(*m_manager);}
+
+    //! Acceseur du manageur.
+    managerMPS::ManagersPredef & managers()
+        {return static_cast<managerMPS::ManagersPredef &>(*m_manager);}
 
     //! Renvoie le nombre des entités liées à la cible.
     virtual int nbrEntityCible(int /*cible*/) const
@@ -81,9 +92,6 @@ public:
     //! Renvoie le nom des entités liées à la cible.
     virtual std::map<int,QString> nomsEntityCible(int /*cible*/) const
         {return std::map<int,QString>();}//à finir
-
-    //! renvoie le numéro de permission associée à la chaine de caractères, ou NbrPermission la chaine ne correspond à aucun numéro.
-    virtual flag code(idt idEntity, const QString & str) const;
 
     //! Mutateur d'une entité enregistrée comme donnée.
     template<class Ent> void setEntityInDonnee(const Ent & entity, idt idCible, int cible, int num = 0);
@@ -100,14 +108,6 @@ protected:
 
     //! Mise à jour de la base de donnée.
     void listeMiseAJourBdd(int version, idt type) override;
-
-    //! Acceseur du manageur.
-    const managerMPS::ManagersPredef & managers() const
-        {return static_cast<const managerMPS::ManagersPredef &>(*m_manager);}
-
-    //! Acceseur du manageur.
-    managerMPS::ManagersPredef & managers()
-        {return static_cast<managerMPS::ManagersPredef &>(*m_manager);}
 
     //! Renvoie l'autorisation de modification de l'entité donnée en argument.
     bool testAutorisationP(idt id, szt idEntity, flag autoris) override;
