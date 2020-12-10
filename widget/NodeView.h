@@ -116,7 +116,10 @@ public:
     void addSubNodeWidget(SubNodeWidget * subNode);
 
     //! Gestionnaire de click de souris.
-    void mousePressEvent(QMouseEvent *event) override;
+    void mousePressEvent(QMouseEvent *event) override {
+        if(event->button() == Qt::LeftButton)
+            emit leftClicked();
+    }
 
     //! Dessine la noeud.
     void paintEvent(QPaintEvent * /*event*/) override
@@ -143,6 +146,10 @@ public slots:
 
     //! Met à jour les données du widget pour l'index index à partir des données du model.
     virtual void updateData(const NodeIndex & index, flag role);
+
+signals:
+    //! Emit lorsque le noeud est cliqué avec le bouton gauche.
+    void leftClicked();
 
 protected:
     //! Retire un sous noeud.

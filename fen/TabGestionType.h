@@ -7,9 +7,10 @@
 #include <QPushButton>
 #include <QLabel>
 #include "AbstractTabModuleWithBdd.h"
-#include "NodeView.h"
-#include "CodeWidget.h"
 #include "BddPredef.h"
+#include "CodeWidget.h"
+#include "PredefModel.h"
+#include "StandardNodeWidget.h"
 
 namespace fenMPS {
 /*! \ingroup groupeFen
@@ -18,8 +19,8 @@ namespace fenMPS {
 class TabGestionType : public AbstractTabModuleWithBdd
 {
 protected:
-    //std::vector<QString> m_namesAttributs;      //!< Noms des attributs.
-    //modelMPS:: * m_model;                   //!< Model.
+    //std::vector<QString> m_namesAttributs;    //!< Noms des attributs.
+    modelMPS::TypePermissionModel * m_model;    //!< Model.
     widgetMPS::CodeWidget::Cases m_cases;       //!< Paramétrage des cases.
     widgetMPS::NodeView * m_view;               //!< Vue.
     QPushButton * m_insertButton;               //!< Bouton d'insertion d'une ligne.

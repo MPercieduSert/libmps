@@ -4,15 +4,6 @@
 #ifndef FINDWIDGET_H
 #define FINDWIDGET_H
 
-#include <QDateEdit>
-#include <QComboBox>
-#include <QCheckBox>
-#include <QGridLayout>
-#include <QHBoxLayout>
-#include <QLabel>
-#include <QLineEdit>
-#include <QPushButton>
-#include <QVBoxLayout>
 #include "AbstractColonnesModel.h"
 #include "ColonnesForModel.h"
 #include "FindModel.h"

@@ -173,6 +173,10 @@ protected:
         Item(const T & data) noexcept(noexcept(T(data)))
             : m_data(data) {}
 
+        //! Constructeur avec une donnée associée au noeud. Par défaut un noeud est la racine d'un arbre.
+        Item(T && data) noexcept(noexcept(T(std::move(data))))
+            : m_data(std::move(data)) {}
+
         //! Constructeur de donné en place.
         template< class... Args, typename = std::enable_if_t<std::is_convertible<T, Args...>::value>>
                     Item(Args && ... args) : m_data(std::forward<Args>(args)...) {}
@@ -1090,7 +1094,7 @@ public:
     explicit tree(T && data)
         : tree(new Item(std::move(data))){}
 
-    //! Constructeur, créer un arbre possédant la même structure et les même valeur que tree,
+    //! Constructeur, créer un arbre possédant la même structure et les même valeur que t,
     //! T doit posséder un constructeur à partir de U.
     template<class U> tree(const tree<U> & t)
         : tree(new Item(*(t.m_root))) {}

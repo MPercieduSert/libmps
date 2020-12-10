@@ -11,11 +11,11 @@ namespace modelMPS {
 /*! \ingroup groupeModel
  * \brief Model de gestion des types.
  */
-class AbstractPermissionModel : public TreeNodeModel {
+class PermissionModel : public TreeNodeModelWithBdd {
     Q_OBJECT
 protected:
     const szt m_offset;                                 //!< Offset de postion des cibles.
-    bddMPS::BddPredef & m_bdd;                          //!< Référence à la base de donnée
+    //bddMPS::BddPredef & m_bdd;                          //!< Référence à la base de donnée
     std::vector<szt> m_cibleVec;                        //!< Vecteur de cibles à afficher.
     std::vector<std::pair<int,QString>> m_idNomVec;     //!< Vecteur d'information sur les cibles.
 
@@ -31,10 +31,12 @@ public:
     //! Position des sous-noeud.
     enum positionNode{ZeroPosition,
                       UnPosition,
+                      DeuxPosition,
                       NomPosition = ZeroPosition,
-                      NcPosition = UnPosition};
+                      NcPosition = UnPosition,
+                      RefPosition = DeuxPosition};
     //! Constructeur.
-    AbstractPermissionModel(bddMPS::BddPredef & bdd, szt offset = NcNomOffset, QObject * parent = nullptr);
+    PermissionModel(bddMPS::BddPredef &bdd, szt offset = NcNomOffset, QObject * parent = nullptr);
 
     //! Accesseur la donnée associé à un couple (index,role).
     QVariant data(const NodeIndex &index, int role = DataRole) const override;
@@ -42,7 +44,11 @@ public:
     //! Nombre de donné associé à une cible.
     szt dataCount(const NodeIndex & index) const override;
 
-    //! Accesseur des cibles.
+    //! Nom d'une.
+    const QString & nomCible(szt num) const
+        {return m_idNomVec.at(m_cibleVec.at(num)).second;}
+
+    //! Numero de cible.
     int cible(szt num) const
         {return m_idNomVec.at(m_cibleVec.at(num)).first;}
 
@@ -52,17 +58,37 @@ public:
 };
 
 /*! \ingroup groupeModel
- * \brief Classe mère des neuds de recherche.
+ * \brief Classe mère des neuds d'un model de permission.
  */
-template<class Ent> class PermissionNode : public TreeNodeModel::AbstractNode {
+template<class Ent, class Permission> class PermissionNode : public TreeNodeModel::AbstractNode {
 protected:
-    Ent m_ent;                   //!< Type associé au noeud.
+    Ent m_ent;                              //!< Type associé au noeud.
     std::map<int,flag> m_permissionMap;     //!< Map des permission du type.
-    AbstractPermissionModel * m_model;      //!< Pointeur sur le model.
+    PermissionModel * m_model;      //!< Pointeur sur le model.
 public:
     //! Constructeur.
-    PermissionNode(AbstractPermissionModel * model)
-        : AbstractNode(AbstractPermissionModel::TypeNode), m_model(model) {}
+    PermissionNode(PermissionModel * model)
+        : AbstractNode(PermissionModel::TypeNode), m_model(model) {}
+
+    //! Accesseur des données du noeud.
+    QVariant data(int cible, int role = DataRole, szt num = 0) const override;
+
+    //! Mutateur des données du noeud.
+    flag setData(int cible, const QVariant & value, int role = DataRole, szt num = 0) override;
+
+    //! Mutateur de l'entité.
+    void setEnt(const Ent & entity);
+};
+
+/*! \ingroup groupeModel
+ * \brief Classe des neuds du model de  Type-permission.
+ */
+class TypePermissionNode : public PermissionNode<entityMPS::Type,entityMPS::TypePermission> {
+protected:
+    using PermNode = PermissionNode<entityMPS::Type,entityMPS::TypePermission>;
+public:
+    //! Constructeur.
+    using PermNode::PermissionNode;
 
     //! Accesseur des données du noeud.
     QVariant data(int cible, int role = DataRole, szt num = 0) const override;
@@ -71,45 +97,79 @@ public:
     flag setData(int cible, const QVariant & value, int role = DataRole, szt num = 0) override;
 };
 
-template<class Ent> QVariant PermissionNode<Ent>::data(int cible, int role, szt num) const {
+/*! \ingroup groupeModel
+ * \brief Model de gestion des type et de leur permission.
+ */
+class TypePermissionModel : public PermissionModel {
+    Q_OBJECT
+public:
+    enum {NcNomRefOffset = 3};
+    //! Constructeur.
+    TypePermissionModel(bddMPS::BddPredef &bdd, QObject * parent = nullptr);
+
+    //! Nombre de donné associé à une cible.
+    szt dataCount(const NodeIndex & index) const override;
+
+};
+
+////////////////////////////////////////////////////////// MakeArbreNode ////////////////////////////////////////////////
+/*! \ingroup groupeModel
+ * \brief Classe mère des neuds de recherche.
+ */
+template<class Ent, class Permission, class Node> class MakeArbreNode {
+public:
+    static TreeNodeModel::Tree arbre(PermissionModel * model);
+};
+
+
+template<class Ent, class Permission, class Node> TreeNodeModel::Tree MakeArbreNode<Ent,Permission,Node>::arbre(PermissionModel *model){
+    return TreeNodeModel::Tree(model->bdd().getArbre<Ent>(),[model](const Ent & entity) {
+        auto node = std::make_unique<Node>(model);
+        node->setEnt(entity);
+        return std::move(node);
+    });
+}
+
+///////////////////////////////////////////////// definition PermissionNode ///////////////////////////////////
+template<class Ent, class Permission> QVariant PermissionNode<Ent,Permission>::data(int cible, int role, szt num) const {
     switch (cible) {
-    case AbstractPermissionModel::NcCible:
+    case PermissionModel::NcCible:
         if(role == LabelRole)
             return "Nom abrégé :";
         if(role == DisplayRole)
             return m_ent.nc();
         break;
-    case AbstractPermissionModel::NomCible:
+    case PermissionModel::NomCible:
         if(role == LabelRole)
             return "Nom :";
         if(role == DisplayRole)
             return m_ent.nom();
         break;
-    case AbstractPermissionModel::CibleCible:
+    case PermissionModel::PermissionCible:
         if(role == LabelRole)
-            return "Nom :";
+            return m_model->nomCible(num);
         if(role == DataRole)
             return m_permissionMap.at(m_model->cible(num)).value();
         break;
     case SubNodeCible:
         if(role == SubNodeRole){
-            if(num == AbstractPermissionModel::NomPosition) {
+            if(num == PermissionModel::NomPosition) {
                 QList<QVariant> init;
-                init.append(AbstractPermissionModel::NomCible);
+                init.append(PermissionModel::NomCible);
                 init.append(0);
                 init.append(LineEditSubNode);
                 return init;
             }
-            if(num == AbstractPermissionModel::NcPosition) {
+            if(num == PermissionModel::NcPosition) {
                 QList<QVariant> init;
-                init.append(AbstractPermissionModel::NcCible);
+                init.append(PermissionModel::NcCible);
                 init.append(0);
                 init.append(LineEditSubNode);
                 return init;
             }
             if(num >= m_model->offset()) {
                 QList<QVariant> init;
-                init.append(AbstractPermissionModel::CibleCible);
+                init.append(PermissionModel::CibleCible);
                 init.append(num - m_model->offset());
                 init.append(LineEditSubNode);
                 return init;
@@ -119,20 +179,31 @@ template<class Ent> QVariant PermissionNode<Ent>::data(int cible, int role, szt 
     return AbstractNode::data(cible,role,num);
 }
 
-template<class Ent> flag PermissionNode<Ent>::setData(int cible, const QVariant &value, int role, szt num) {
-    if(cible == AbstractPermissionModel::NcCible && role == DisplayRole) {
+template<class Ent, class Permission> flag PermissionNode<Ent,Permission>::setData(int cible, const QVariant &value, int role, szt num) {
+    if(cible == PermissionModel::NcCible && role == DisplayRole) {
         m_ent.setNc(value.toString());
         return DisplayRole;
     }
-    if(cible == AbstractPermissionModel::NomCible && role == DisplayRole) {
+    if(cible == PermissionModel::NomCible && role == DisplayRole) {
         m_ent.setNom(value.toString());
         return DisplayRole;
     }
-    if(cible == AbstractPermissionModel::CibleCible && role == DataRole) {
+    if(cible == PermissionModel::CibleCible && role == DataRole) {
         m_permissionMap[m_model->cible(num)] = value.toUInt();
         return DataRole;
     }
     return AbstractNode::setData(cible,value,role,num);
+}
+
+template<class Ent, class Permission> void PermissionNode<Ent,Permission>::setEnt(const Ent & entity) {
+    m_ent = entity;
+    for(auto iter = m_permissionMap.begin(); iter != m_permissionMap.end(); ++iter) {
+        Permission perm;
+        perm.setIdType(entity.id());
+        perm.setCible(iter->first);
+        m_model->bdd().getUnique(perm);
+        iter->second = perm.code();
+    }
 }
 }
 #endif // PREDEFMODEL_H

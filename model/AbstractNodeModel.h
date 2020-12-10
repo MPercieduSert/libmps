@@ -8,6 +8,7 @@
 #include <QObject>
 #include <QVariant>
 #include "AbstractModel.h"
+#include "Bdd.h"
 
 //! Macro d'inclusion des membres virtual dans le model à node.
 #define TREE_FOR_NODE_MODEL_INDEX_PARENT_ROWCOUNT(TREE) /*! Renvoie l'index correxpondant à la ligne et colonne de parent.*/ \
@@ -78,6 +79,7 @@ enum initSubNode {
     NbrInitiSubNode
 };
 
+/////////////////////////////////////////////////////// NodeIndex //////////////////////////////////////////////////
 /*! \ingroup groupeModel
  * \brief Classe d'index d'un noeuds.
  */
@@ -170,6 +172,7 @@ public:
 };
 
 template<class T> class TreeForNodeModel;
+///////////////////////////////////////////////// AbstractForNodeModel ///////////////////////////////////////////////
 /*! \ingroup groupeModel
  * \brief Classe mère des models à noeuds.
  */
@@ -312,6 +315,9 @@ protected:
 };
 
 /////////////////////////////////////////// TreeForNodeModel ///////////////////////////////////////
+/*! \ingroup groupeModel
+ * \brief Arbre de noeuds pour les models à noeud.
+ */
 template<class T> class TreeForNodeModel : public TempTreeForModel<T,AbstractNodeModel,NodeIndex> {
 protected:
     using TFM = TempTreeForModel<T,AbstractNodeModel,NodeIndex>;
@@ -357,6 +363,9 @@ public:
 };
 
 //////////////////////////////////////// TreeNodeModel //////////////////////////////////////
+/*! \ingroup groupeModel
+ * \brief Classe des models à noeuds avec un arbre.
+ */
 class TreeNodeModel : public AbstractNodeModel {
     Q_OBJECT
 public:
@@ -458,8 +467,26 @@ protected:
     //! Fabrique des noeuds.
     virtual Node nodeFactory(const NodeIndex & /*parent*/, szt /*pos*/, int /*type*/) {return std::make_unique<AbstractNode>();}
 };
+////////////////////////////////////////////////// TreeNodeModelWithBdd /////////////////////////////////////////////////////
+/*! \ingroup groupeModel
+ * \brief Classe mère des models à noeuds.
+ */
+class TreeNodeModelWithBdd : public TreeNodeModel {
+    Q_OBJECT
+protected:
+    bddMPS::Bdd & m_bdd;            //!< Référence à la base de donnée.
+public:
+    //! Constructeur.
+    TreeNodeModelWithBdd(bddMPS::Bdd & bdd, bool racine, QObject * parent)
+        : TreeNodeModel(racine, parent), m_bdd(bdd) {}
 
-///////////////////////////////////// TreeForModel //////////////////////////////////
+    //! Accesseur de la base de données.
+    bddMPS::Bdd & bdd() const
+        {return m_bdd;}
+};
+
+
+///////////////////////////////////// Definition de TreeForModel //////////////////////////////////
 template<class T> NodeIndex TreeForNodeModel<T>::index(const NodeIndex &parent, szt pos, int cible, szt num) const {
     if(parent.isValid()) {
         auto iter = getValidIter(parent);

@@ -84,8 +84,8 @@ LineEditSubNodeWidget::LineEditSubNodeWidget(const NodeIndex & index, QWidget * 
 
 void LineEditSubNodeWidget::updateDataSubNode(flag role) {
     LabelSubNodeWidget::updateDataSubNode(role);
-    if(role.test(modelMPS::DataRole))
-        m_lineEdit->setText(m_index.data().toString());
+    if(role.test(modelMPS::DisplayRole))
+        m_lineEdit->setText(m_index.data(modelMPS::DisplayRole).toString());
 }
 
 ////////////////////////////////////////////////// RoundedNodePainter //////////////////////////////////////////

@@ -9,10 +9,8 @@ AbstractNodeDelegate::AbstractNodeDelegate(QObject * parent) : QObject(parent) {
 
 ////////////////////////////////////// ArcNodeViewWidget //////////////////////////////////////////
 ArcNodeViewWidget::ArcNodeViewWidget(NodeWidget *node, NodeView *view, QWidget * parent, bool root)
-    : QWidget (parent), m_root(root), m_view(view) {
-    setNodeWidget(node);
-    m_leaf = m_nodeWidget->index().leaf();
-}
+    : QWidget (parent), m_leaf(node->index().leaf()), m_root(root), m_view(view)
+    {setNodeWidget(node);}
 
 void ArcNodeViewWidget::drawNode(bool next) {
     adjustSize();
@@ -170,6 +168,8 @@ void ArcNodeViewWidget::setNodeWidget(NodeWidget * widget) {
         m_nodeWidget->setEtatSelection(NodeWidget::Selected);
     m_nodeWidget->updateData();
     m_view->m_arcMap[m_nodeWidget->index().internalPointer()] = this;
+    connect(m_nodeWidget,&NodeWidget::leftClicked,this,[this]()
+        {m_view->clickLeftOn(m_nodeWidget->index());});
     m_nodeWidget->move(LeftNodeMargin,TopNodeMargin);
     m_nodeWidget->setVisible(true);
     if(draw)
@@ -317,11 +317,6 @@ void NodeWidget::addSubNodeWidget(SubNodeWidget * subNode) {
     m_cibleMap.insert({subNode->index().subIndex(),subNode});
     connect(subNode,&QObject::destroyed,this,&NodeWidget::removeSubNodeWidget);
     subNode->updateData(modelMPS::AllRole);
-}
-
-void NodeWidget::mousePressEvent(QMouseEvent * event) {
-    if(event->button() == Qt::LeftButton)
-        static_cast<ArcNodeViewWidget *>(parentWidget())->view()->clickLeftOn(m_index);
 }
 
 ////////////////////////////////////////////// SubNodeHandler ////////////////////////////////////////////////
