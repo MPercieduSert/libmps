@@ -91,6 +91,43 @@ protected:
 /*! \ingroup groupeWidget
  * \brief Classe dessinant les nodes widgets à angles arrondis.
  */
+class RoundedArcPainter : public NodeView::ArcPainter {
+public:
+    enum parametre {
+              LeftExpandMargin = LeftNodeMargin + 10,
+              HSpacing = 3,
+              WidthLine = 2,
+              HMaxLine = 100,
+              WidthCircle = 0,
+              Rayon = 3,
+              Ecart = Rayon * 4,
+              NbrCircle = 3,
+              VSpacing = 3,
+              HSizeCircle = 2 * Rayon + Ecart * (NbrCircle - 1) + 2 * WidthCircle,
+              VSizeCircle = 2 * Rayon + 2 * WidthCircle,
+              RightCircles = LeftNodeMargin + HSizeCircle,
+              HeightCircles = 2 * VSpacing + VSizeCircle
+    };
+
+    //! Dessine l'arc liant les descendants.
+    void drawArc(ArcNodeViewWidget * arc) const override;
+
+    //! Dessine la zone permettant l'expansion du noeud.
+    void drawExpandZone(ArcNodeViewWidget * arc) const override;
+
+    //! Renvoie taille verticale de la zone de demande d'expansion.
+    int heightExpandZone() const override {return HeightCircles;}
+
+    //! Renvoie la marge à gauche pour tracer l'arc.
+    int leftExpandedMargin() const override {return LeftExpandMargin;}
+
+    //! Renvoie taille horizontale de la zone de demande d'expansion.
+    int widthExpandZone() const override {return RightCircles;}
+};
+
+/*! \ingroup groupeWidget
+ * \brief Classe dessinant les nodes widgets à angles arrondis.
+ */
 class RoundedNodePainter : public NodeWidget::NodePainter {
 public:
     enum {Rayon = 10,

@@ -18,16 +18,16 @@ void ArcNodeViewWidget::drawNode(bool next) {
         auto parentArc = static_cast<ArcNodeViewWidget *>(parentWidget());
         auto draw = false;
         auto y = 0;
-        for (auto iter = parentArc->m_arcVec.begin(); iter != parentArc->m_arcVec.end(); ++iter) {
+        for (auto iter = parentArc->m_arcChild.begin(); iter != parentArc->m_arcChild.end(); ++iter) {
             if (!next && !draw && *iter == this) {
                 draw = true;
-                if(iter ==  parentArc->m_arcVec.begin())
+                if(iter ==  parentArc->m_arcChild.begin())
                     y = parentArc->nodeWidget()->geometry().bottom();
                 else
                     y = (*std::prev(iter))->geometry().bottom();
             }
             if(draw) {
-                (*iter)->move(LeftExpandMargin,y);
+                (*iter)->move(m_view->m_arcPainter->leftExpandedMargin(),y);
                 (*iter)->setVisible(true);
                 y = (*iter)->geometry().bottom();
             }
@@ -44,7 +44,7 @@ void ArcNodeViewWidget::insertNodes(szt first, szt last){
     if(last >= first) {
         setLeaf(false);
         if(m_expanded) {
-            auto iterfirst = m_arcVec.insert(std::next(m_arcVec.cbegin(),first),static_cast<szt>(last - first + 1), nullptr);
+            auto iterfirst = m_arcChild.insert(std::next(m_arcChild.cbegin(),first),static_cast<szt>(last - first + 1), nullptr);
             auto iter = iterfirst;
             auto child = m_nodeWidget->index().model()->index(m_nodeWidget->index(),first);
             while (first <= last && child.isValid()) {
@@ -60,55 +60,30 @@ void ArcNodeViewWidget::insertNodes(szt first, szt last){
 
 void ArcNodeViewWidget::mousePressEvent(QMouseEvent *event) {
     if(!m_leaf && event->button() == Qt::LeftButton)
-        if((m_expanded && event->x() < LeftExpandMargin && event->y() > m_nodeWidget->geometry().bottom())
-                || (! m_expanded && event->x() < RigthCircles && event->y() > m_nodeWidget->geometry().bottom()))
+        if((m_expanded && event->x() < m_view->m_arcPainter->leftExpandedMargin() && event->y() > m_nodeWidget->geometry().bottom())
+                || (! m_expanded && event->x() < m_view->m_arcPainter->widthExpandZone() && event->y() > m_nodeWidget->geometry().bottom()))
         setExpanded(!m_expanded);
 }
 
 void ArcNodeViewWidget::paintEvent(QPaintEvent * /*event*/) {
     if(!m_leaf) {
-        QPainter painter(this);
-        QPen pen(QGuiApplication::palette().color(QPalette::Active,QPalette::WindowText));
-        if(m_expanded){
-            pen.setWidth(WidthLine);
-            pen.setJoinStyle(Qt::RoundJoin);
-            pen.setCapStyle(Qt::RoundCap);
-            painter.setPen(pen);
-            auto x = m_nodeWidget->geometry().left() + WidthLine / 2;
-            auto y = 0;
-            for (auto iter = m_arcVec.begin(); iter != m_arcVec.end(); ++iter) {
-                auto nodeGeo = (*iter)->nodeWidget()->geometry();
-                y = std::min<int>(((*iter)->mapToParent(nodeGeo.topLeft()).y() + (*iter)->mapToParent(nodeGeo.bottomLeft()).y() )/ 2,
-                                  (*iter)->mapToParent(nodeGeo.topLeft()).y() + HMaxLine);
-                painter.drawLine(x,y, x + LeftExpandMargin - HSpacing - WidthLine, y);
-            }
-            painter.drawLine(x,
-                             m_arcVec.front()->mapToParent(m_arcVec.front()->nodeWidget()->geometry().topLeft()).y() + WidthLine / 2,
-                             x ,y);
-        }
-        else {
-            pen.setWidth(WidthCircle);
-            painter.setPen(pen);
-            painter.setBrush(QBrush(QGuiApplication::palette().color(QPalette::Active,QPalette::WindowText)));
-            for (auto i = 0; i < NbrCircle; ++i) {
-                QPoint pt(m_nodeWidget->geometry().left() + WidthCircle + Rayon + Ecart * i,
-                          m_nodeWidget->geometry().bottom() + VSpacing + WidthCircle + Rayon);
-                painter.drawEllipse(pt,Rayon,Rayon);
-            }
-        }
+        if(m_expanded)
+            m_view->m_arcPainter->drawArc(this);
+        else
+            m_view->m_arcPainter->drawExpandZone(this);
     }
 }
 
 void ArcNodeViewWidget::removeNodes(szt first, szt last) {
-    if(first <= last && last < m_arcVec.size()) {
-        auto firstIter = std::next(m_arcVec.begin(), first);
-        auto lastIter = std::next(m_arcVec.begin(), last + 1);
+    if(first <= last && last < m_arcChild.size()) {
+        auto firstIter = std::next(m_arcChild.begin(), first);
+        auto lastIter = std::next(m_arcChild.begin(), last + 1);
         for (auto iter = firstIter; iter != lastIter ; ++iter)
             (*iter)->deleteLater();
-        m_arcVec.erase(firstIter,lastIter);
-        if(m_arcVec.size()) {
-            if(m_arcVec.size() != first)
-                m_arcVec[first]->drawNode();
+        m_arcChild.erase(firstIter,lastIter);
+        if(m_arcChild.size()) {
+            if(m_arcChild.size() != first)
+                m_arcChild[first]->drawNode();
             else {
                 adjustSize();
                 drawNode(true);
@@ -124,18 +99,18 @@ void ArcNodeViewWidget::setExpanded(bool bb){
         m_expanded = bb;
         if(m_expanded) {
             auto index = m_nodeWidget->index();
-            m_arcVec.resize(index.model()->childCount(index));
+            m_arcChild.resize(index.model()->childCount(index));
             auto child = index.model()->index(index,0);
-            for (auto iterVec = m_arcVec.begin(); iterVec != m_arcVec.end(); ++iterVec) {
+            for (auto iterVec = m_arcChild.begin(); iterVec != m_arcChild.end(); ++iterVec) {
                 *iterVec = new ArcNodeViewWidget(child,m_view,this);
                 child = child.nextBrother();
             }
-            m_arcVec.front()->drawNode();
+            m_arcChild.front()->drawNode();
         }
         else {
-            for (auto iter = m_arcVec.begin(); iter != m_arcVec.end(); ++iter)
+            for (auto iter = m_arcChild.begin(); iter != m_arcChild.end(); ++iter)
                 (*iter)->deleteLater();
-            m_arcVec.clear();
+            m_arcChild.clear();
             drawNode();
         }
     }
@@ -170,7 +145,7 @@ void ArcNodeViewWidget::setNodeWidget(NodeWidget * widget) {
     m_view->m_arcMap[m_nodeWidget->index().internalPointer()] = this;
     connect(m_nodeWidget,&NodeWidget::leftClicked,this,[this]()
         {m_view->clickLeftOn(m_nodeWidget->index());});
-    m_nodeWidget->move(LeftNodeMargin,TopNodeMargin);
+    m_nodeWidget->move(m_view->m_arcPainter->leftNodeMargin(),m_view->m_arcPainter->topNodeMargin());
     m_nodeWidget->setVisible(true);
     if(draw)
         drawNode();
@@ -180,19 +155,19 @@ void ArcNodeViewWidget::setNodeWidget(NodeWidget * widget) {
 
 QSize ArcNodeViewWidget::sizeHint() const{
     if(m_expanded) {
-        QSize sz(m_nodeWidget->geometry().right(),m_arcVec.back()->geometry().bottom() + BottomMargin);
-        for (auto iter = m_arcVec.cbegin(); iter != m_arcVec.cend(); ++iter) {
+        QSize sz(m_nodeWidget->geometry().right(),m_arcChild.back()->geometry().bottom() + m_view->m_arcPainter->bottomNodeMargin());
+        for (auto iter = m_arcChild.cbegin(); iter != m_arcChild.cend(); ++iter) {
             if((*iter)->geometry().right() > sz.width())
                 sz.rwidth() = (*iter)->geometry().right();
         }
-        sz.rwidth() += RightMargin;
+        sz.rwidth() += m_view->m_arcPainter->rightNodeMargin();
         return sz;
     }
     auto sz = m_nodeWidget->sizeHint();
-    sz.rwidth() += LeftNodeMargin + RightMargin;
-    sz.rheight() += TopNodeMargin;
+    sz.rwidth() += m_view->m_arcPainter->leftNodeMargin() + m_view->m_arcPainter->rightNodeMargin();
+    sz.rheight() += m_view->m_arcPainter->topNodeMargin();
     if(!m_leaf)
-        sz.rheight() += 2 * VSpacing + VSizeCircle;
+        sz.rheight() += m_view->m_arcPainter->heightExpandZone();
     return sz;
 }
 
@@ -206,8 +181,8 @@ IndexWidget::IndexWidget(const NodeIndex & index, QWidget * parent)
 }
 
 /////////////////////////////////////// NodeView //////////////////////////////////////////
-NodeView::NodeView(QWidget * parent)
-    : QScrollArea (parent) {}
+NodeView::NodeView(std::unique_ptr<ArcPainter> &&arcPainter, QWidget * parent)
+    : QScrollArea (parent), m_arcPainter(std::move(arcPainter)) {}
 
 void NodeView::clickLeftOn(const NodeIndex & index) {
     switch (m_selectionMode) {

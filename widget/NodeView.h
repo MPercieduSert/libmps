@@ -188,21 +188,67 @@ public:
                         MultiSelection,
                         ExtendedSelection,
                         ContinousSelection
-                        };
+     };
+
+    /*! \ingroup groupeWidget
+     * \brief Dessinant le lien entre un noeud et ses déscendant.
+     */
+    class ArcPainter {
+    public:
+        enum parametre {Zero = 0,
+            BottomNodeMargin = 2,
+            LeftNodeMargin = 3,
+            RightNodeMargin = 2,
+            TopNodeMargin = 3,
+        };
+        //! Constructeur.
+        ArcPainter() = default;
+
+        //! Destructeur.
+        virtual ~ArcPainter() = default;
+
+        //! Renvoie la marge au dessus du noeud.
+        virtual int bottomNodeMargin() const {return BottomNodeMargin;}
+
+        //! Dessine l'arc liant les descendants.
+        virtual void drawArc(ArcNodeViewWidget * /*arc*/) const {}
+
+        //! Dessine la zone permettant l'expansion du noeud.
+        virtual void drawExpandZone(ArcNodeViewWidget * /*arc*/) const {}
+
+        //! Renvoie la marge à gauche pour tracer l'arc.
+        virtual int leftExpandedMargin() const {return Zero;}
+
+        //! Renvoie la marge à gauche du noeud.
+        virtual int leftNodeMargin() const {return LeftNodeMargin;}
+
+        //! Renvoie la marge à droite du noeud.
+        virtual int rightNodeMargin() const {return RightNodeMargin;}
+
+        //! Renvoie taille verticale de la zone de demande d'expansion.
+        virtual int heightExpandZone() const {return Zero;}
+
+        //! Renvoie la marge au dessus du noeud.
+        virtual int topNodeMargin() const {return TopNodeMargin;}
+
+        //! Renvoie taille horizontale de la zone de demande d'expansion.
+        virtual int widthExpandZone() const {return Zero;}
+    };
 protected:
     friend ArcNodeViewWidget;
     using Delegate = delegateMPS::AbstractNodeDelegate;
     using Model = modelMPS::AbstractNodeModel;
     using NodeIndex = modelMPS::NodeIndex;
     using SelectionModel = modelMPS::NodeSelectionModel;
+    std::unique_ptr<ArcPainter> m_arcPainter;         //!< Dessine les arc.
     Delegate * m_delegate = nullptr;                    //!< Délégate de la vue.
     Model * m_model = nullptr;                          //!< Model associé à la vue.
     SelectionMode m_selectionMode = SingleSelection;    //!< Mode de sélection.
     SelectionModel * m_selectionModel = nullptr;        //!< Model de sélection.
-    std::map<void*,ArcNodeViewWidget *> m_arcMap;   //!< Map des arc.
+    std::map<void*,ArcNodeViewWidget *> m_arcMap;       //!< Map des arc.
 public:
     //! Constructeur.
-    NodeView(QWidget * parent = nullptr);
+    NodeView(std::unique_ptr<ArcPainter> && arcPainter = std::make_unique<ArcPainter>(), QWidget * parent = nullptr);
 
     //! Destructeur.
     ~NodeView()
@@ -226,6 +272,10 @@ public:
     //! Accesseur du model de sélection.
     SelectionModel * selectionModel() const noexcept
         {return m_selectionModel;}
+
+    //! Mutateur du dessinateur des arcs.
+    void setArcPainter(std::unique_ptr<ArcPainter> && arcPainter)
+        {m_arcPainter = std::move(arcPainter);}
 
     //! Selectionne l'index courant.
     void setCurrentIndex(const NodeIndex & index);
@@ -268,36 +318,18 @@ protected slots:
 };
 
 /*! \ingroup groupeWidget
- * \brief Widget associé à un noeud.
+ * \brief Widget contenant un noeud et ses descendants.
  */
 class ArcNodeViewWidget : public QWidget {
     Q_OBJECT
 protected:
-    enum {BottomMargin = 2,
-          LeftNodeMargin = 3,
-          LeftExpandMargin = LeftNodeMargin + 10,
-          RightMargin = 2,
-          TopNodeMargin = 3,
-          VSpacing = 3,
-          HSpacing = 3,
-          WidthLine = 2,
-          HMaxLine = 100,
-          WidthCircle = 0,
-          Rayon = 3,
-          Ecart = Rayon * 4,
-          NbrCircle = 3,
-          HSizeCircle = 2 * Rayon + Ecart * (NbrCircle - 1) + 2 * WidthCircle,
-          VSizeCircle = 2 * Rayon + 2 * WidthCircle,
-          RigthCircles = LeftNodeMargin + HSizeCircle
-         };
-
     bool m_drawNode = true;                     //!< Verrou de dessin des noeuds.
     bool m_expanded = false;                    //!< Etat de la branche.
     bool m_leaf = true;                         //!< Le noeud est une feuille.
     const bool m_root;                          //!< Le noeud est la racine.
     NodeView * m_view;                          //!< Vue contenant le widget.
     NodeWidget * m_nodeWidget = nullptr;        //!< Widget de noeud.
-    std::vector<ArcNodeViewWidget *> m_arcVec;  //!< Vecteur des arcs fils.
+    std::vector<ArcNodeViewWidget *> m_arcChild;  //!< Vecteur des arcs fils.
 public:
     //! Constructeur.
     ArcNodeViewWidget(NodeWidget * node, NodeView * view, QWidget * parent = nullptr, bool root = false);
@@ -309,6 +341,10 @@ public:
     //! Destructeur.
     ~ArcNodeViewWidget() override
         {m_view->m_arcMap.erase(m_nodeWidget->index().internalPointer());}
+
+    //! Accesseur du vecteur des arcs descendants directs.
+    const std::vector<ArcNodeViewWidget *> & arcChild() const
+        {return m_arcChild;}
 
     //! Place le noeud  et les suivants et ajuste les tailles.
     void drawNode(bool next = false);

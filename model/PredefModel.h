@@ -126,7 +126,7 @@ template<class Ent, class Permission, class Node> TreeNodeModel::Tree MakeArbreN
     return TreeNodeModel::Tree(model->bdd().getArbre<Ent>(),[model](const Ent & entity) {
         auto node = std::make_unique<Node>(model);
         node->setEnt(entity);
-        return std::move(node);
+        return node;
     });
 }
 

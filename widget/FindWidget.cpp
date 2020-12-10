@@ -13,7 +13,7 @@ FindWidget::FindWidget(FindModel *model, QWidget *parent)
     m_delButton = new QPushButton("-");
     m_findButton = new QPushButton(tr("Chercher"));
     m_resetButton = new QPushButton(tr("Réinitialiser"));
-    m_view = new NodeView;
+    m_view = new NodeView(std::make_unique<widgetMPS::RoundedArcPainter>());
     setFindModel(model);
     m_view->setDelegate(new Delegate(this));
 

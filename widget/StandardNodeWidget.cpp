@@ -88,6 +88,40 @@ void LineEditSubNodeWidget::updateDataSubNode(flag role) {
         m_lineEdit->setText(m_index.data(modelMPS::DisplayRole).toString());
 }
 
+////////////////////////////////////////////////// RoundedArcPainter //////////////////////////////////////////
+void RoundedArcPainter::drawArc(ArcNodeViewWidget * arc) const{
+    QPainter painter(arc);
+    QPen pen(QGuiApplication::palette().color(QPalette::Active,QPalette::WindowText));
+    pen.setWidth(WidthLine);
+    pen.setJoinStyle(Qt::RoundJoin);
+    pen.setCapStyle(Qt::RoundCap);
+    painter.setPen(pen);
+    auto x = arc->nodeWidget()->geometry().left() + WidthLine / 2;
+    auto y = 0;
+    for (auto iter = arc->arcChild().cbegin(); iter != arc->arcChild().cend(); ++iter) {
+        auto nodeGeo = (*iter)->nodeWidget()->geometry();
+        y = std::min<int>(((*iter)->mapToParent(nodeGeo.topLeft()).y() + (*iter)->mapToParent(nodeGeo.bottomLeft()).y() )/ 2,
+                          (*iter)->mapToParent(nodeGeo.topLeft()).y() + HMaxLine);
+        painter.drawLine(x,y, x + LeftExpandMargin - HSpacing - WidthLine, y);
+    }
+    painter.drawLine(x,
+                     arc->arcChild().front()->mapToParent(arc->arcChild().front()->nodeWidget()->geometry().topLeft()).y() + WidthLine / 2,
+                     x ,y);
+}
+
+void RoundedArcPainter::drawExpandZone(ArcNodeViewWidget * arc) const {
+    QPainter painter(arc);
+    QPen pen(QGuiApplication::palette().color(QPalette::Active,QPalette::WindowText));
+    pen.setWidth(WidthCircle);
+    painter.setPen(pen);
+    painter.setBrush(QBrush(QGuiApplication::palette().color(QPalette::Active,QPalette::WindowText)));
+    for (auto i = 0; i < NbrCircle; ++i) {
+        QPoint pt(arc->nodeWidget()->geometry().left() + WidthCircle + Rayon + Ecart * i,
+                  arc->nodeWidget()->geometry().bottom() + VSpacing + WidthCircle + Rayon);
+        painter.drawEllipse(pt,Rayon,Rayon);
+    }
+}
+
 ////////////////////////////////////////////////// RoundedNodePainter //////////////////////////////////////////
 void RoundedNodePainter::paint(QWidget * widget) {
     QPen pen(m_colorLine);

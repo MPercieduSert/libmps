@@ -10,7 +10,7 @@ TabGestionType::TabGestionType(bmps::Bdd & bdd, const std::pair<int, int> &pairI
     m_insertButton = new QPushButton("+");
     m_saveButton = new QPushButton(tr("Sauvegarder"));
     m_supprButton = new QPushButton("-");
-    m_view = new widgetMPS::NodeView;
+    m_view = new widgetMPS::NodeView(std::make_unique<widgetMPS::RoundedArcPainter>());
     m_model = new modelMPS::TypePermissionModel(static_cast<bddMPS::BddPredef &>(bdd),this);
     m_view->setModel(m_model);
     m_view->setDelegate(new delegateMPS::StandardNodeDelegate(this));
