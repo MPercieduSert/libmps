@@ -4,7 +4,7 @@ using namespace modelMPS;
 using namespace findNodeModel;
 
 FindModel::FindModel(AbstractColonnesModel * model, QObject *parent)
-    :   TreeNodeModel (true,parent), m_model(model)
+    :   TreeNodeModel (parent), m_model(model)
     {m_data.setTree(Tree(std::make_unique<FindNode>(this,Et,ChoiceNodeType)));}
 
 void FindModel::find(){
@@ -83,7 +83,7 @@ void FindModel::reset() {
 
 bool FindModel::setData(const NodeIndex &index, const QVariant &value, int role) {
     if(index.isValid()) {
-        if(role == DataRole) {
+        if(role == IntRole) {
             if(index.cible() == OpCible){
                 if(getData(index).type() == ChoiceNodeType
                         && value.toInt() >= 0 && value.toInt() < NbrOperation) {
@@ -148,7 +148,7 @@ QVariant FindNode::data(int cible, int role, szt num) const {
     switch (cible) {
     case FindModel::ColonneCible:
         switch (role) {
-        case DataRole:
+        case IntRole:
             return type() == FindModel::ChoiceNodeType ? QVariant(Vide) : m_pos;
         case LabelRole:
             return "Colonne :";
@@ -169,7 +169,7 @@ QVariant FindNode::data(int cible, int role, szt num) const {
         break;
     case FindModel::OpCible:
         switch (role) {
-        case DataRole:
+        case IntRole:
             return type() == FindModel::ChoiceNodeType ? QVariant(Vide) : m_pos;
         case LabelRole:
             return "Opération :";
@@ -235,9 +235,9 @@ flag FindNode::setData(int cible, const QVariant & value, int role, szt num) {
         break;
     case FindModel::ColonneCible:
     case FindModel::OpCible:
-        if(role == DataRole){
+        if(role == IntRole){
             m_pos = value.toUInt();
-            return DataRole;
+            return IntRole;
         }
         break;
     }
@@ -247,7 +247,7 @@ flag FindNode::setData(int cible, const QVariant & value, int role, szt num) {
 QVariant ComparaisonNode::data(int cible, int role, szt num) const{
     if(cible == FindModel::ComparaisonCible){
         switch (role) {
-        case DataRole:
+        case IntRole:
             return m_comp;
         case LabelRole:
             return "Comparaison :";
@@ -273,9 +273,9 @@ QVariant ComparaisonNode::data(int cible, int role, szt num) const{
 }
 
 flag ComparaisonNode::setData(int cible, const QVariant & value, int role, szt num) {
-    if(cible == FindModel::ComparaisonCible && role == DataRole) {
+    if(cible == FindModel::ComparaisonCible && role == NumRole) {
         m_comp = value.toUInt();
-        return DataRole;
+        return IntRole;
     }
     return FindNode::setData(cible,value,role,num);
 }
@@ -284,13 +284,13 @@ QVariant BoolNode::data(int cible, int role, szt num) const {
     switch (cible) {
     case FindModel::TrueCible:
         if(role == CheckStateRole)
-            return m_true;
+            return m_true ? Qt::Checked : Qt::Unchecked;
         if(role == LabelRole)
             return m_trueLabel;
         break;
     case FindModel::FalseCible:
         if(role == CheckStateRole)
-            return m_false;
+            return m_false ? Qt::Checked : Qt::Unchecked;
         if(role == LabelRole)
             return m_falseLabel;
         break;
@@ -340,7 +340,7 @@ QVariant DateNode::data(int cible, int role, szt num) const {
     if(cible == FindModel::DateCible) {
         if(role == LabelRole)
             return "Date :";
-        if(role == DataRole)
+        if(role == DateRole)
             return m_date;
     }
     if(cible == SubNodeCible && role == SubNodeRole && num == FindModel::DatePosition) {
@@ -360,9 +360,9 @@ szt DateNode::dataCount(int cible) const {
 }
 
 flag DateNode::setData(int cible, const QVariant & value, int role, szt num) {
-    if(cible == FindModel::DateCible && role == DataRole) {
+    if(cible == FindModel::DateCible && role == DateRole) {
         m_date = value.toDate();
-        return DataRole;
+        return DateRole;
     }
     return ComparaisonNode::setData(cible,value,role,num);
 }
@@ -389,7 +389,7 @@ bool DateNode::testValue(const QVariant & value) const {
 QVariant TexteNode::data(int cible, int role, szt num) const {
     switch (cible) {
     case FindModel::TexteCible:
-        if(role == DisplayRole)
+        if(role == StringRole)
             return m_texte;
         if(role == LabelRole)
             return "Texte :";
@@ -445,22 +445,26 @@ szt TexteNode::dataCount(int cible) const {
 flag TexteNode::setData(int cible, const QVariant & value, int role, szt num) {
     switch (cible) {
     case FindModel::TexteCible:
-        if(role == DataRole) {
+        if(role == StringRole) {
                 m_texte = value.toString();
                 if(m_regex)
                     m_regular.setPattern(m_texte);
+                return StringRole;
         }
         break;
     case FindModel::CaseCible:
-        if(role == CheckStateRole)
+        if(role == CheckStateRole) {
             m_regular.setPatternOptions((m_case = value.toBool())? QRegularExpression::NoPatternOption
                                                                  : QRegularExpression::CaseInsensitiveOption);
+            return CheckStateRole;
+        }
         break;
     case FindModel::RegexCible:
         if(role == CheckStateRole
-                && (m_regex = value.toBool()))
+                && (m_regex = value.toBool())) {
             m_regular.setPattern(m_texte);
-
+            return CheckStateRole;
+        }
         break;
     }
     return FindNode::setData(cible,value,role,num);

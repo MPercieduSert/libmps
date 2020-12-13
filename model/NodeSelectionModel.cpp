@@ -9,7 +9,7 @@ NodeSelectionModel::NodeSelectionModel(AbstractNodeModel * model, QObject * pare
 
 void NodeSelectionModel::setCurrentIndex(const NodeIndex & index, flag selectionFlag) {
     if (m_model == index.model() && index.internalPointer()) {
-        if(selectionFlag.test(Select)) {
+        if(selectionFlag.test(Select) && index.flags().test(SelectableFlagNode)) {
             auto old = m_currentIndex;
             m_currentIndex = index;
             m_hasSelection = true;

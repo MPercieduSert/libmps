@@ -20,7 +20,7 @@ NodeIndex NodeIndex::firstBrother() const noexcept
     {return m_model ? m_model->firstBrother(*this)
                     : NodeIndex();}
 
-Qt::ItemFlags NodeIndex::flags() const
+flag NodeIndex::flags() const
     {return m_model ? m_model->flags(*this)
                       : Qt::NoItemFlags;}
 
@@ -66,7 +66,7 @@ QVariant TreeNodeModel::AbstractNode::data(int cible, int role, szt /*num*/) con
     return QVariant();
 }
 
-TreeNodeModel::TreeNodeModel(bool racine, QObject *parent) : AbstractNodeModel (parent), m_data(this,racine){}
+TreeNodeModel::TreeNodeModel(QObject *parent) : AbstractNodeModel (parent), m_data(this,true){}
 
 QVariant TreeNodeModel::data(const NodeIndex &index, int role) const {
     if(checkIndex(index))
@@ -80,10 +80,10 @@ szt TreeNodeModel::dataCount(const NodeIndex & index) const {
     return NoData;
 }
 
-Qt::ItemFlags TreeNodeModel::flags(const NodeIndex & index) const {
+flag TreeNodeModel::flags(const NodeIndex & index) const {
     if(checkIndex(index))
         return m_data.getValidData(index)->flags(index.cible(), index.num());
-    return Qt::NoItemFlags;
+    return NoFlagNode;
 }
 
 bool TreeNodeModel::insertNodes(const NodeIndex &parent, szt pos, szt count, int type) {

@@ -26,6 +26,7 @@ class IndexWidget : public QWidget {
     Q_OBJECT
 protected:
     using NodeIndex = modelMPS::NodeIndex;
+    flag m_flags;             //!< Drapeaux associé aux noeud.
     NodeIndex m_index;                  //!< Index associé aux noeuds.
     QBoxLayout * m_mainLayout;          //!< Calque principale du sous-noeud.
 public:
@@ -35,7 +36,24 @@ public:
     //! Acceseur de l'index.
     NodeIndex index() const noexcept
         {return m_index;}
-};
+
+    //! Accesseur du drapeaux.
+    flag flags() const noexcept
+        {return m_flags;}
+
+    //! Met à jour les données à partir des données du model.
+    void updateData(flag role) {
+        if(role.test(modelMPS::FlagRole))
+            setFlags(m_index.flags());
+    }
+
+    //! Mutateur de flags.
+    void setFlags(flag fl) {
+        m_flags = fl;
+        setVisible(fl.test(modelMPS::VisibleFlagNode));
+        setEnabled(fl.test(modelMPS::EnableFlagNode));
+    }
+ };
 
 /*! \ingroup groupeWidget
  * \brief Classe mère des sous noeuds standard.
@@ -66,7 +84,8 @@ public slots:
 
 protected:
     //! Met à jour les données du sous-noeud à partir des données du model.
-    virtual void updateDataSubNode(flag /*role*/) {}
+    virtual void updateDataSubNode(flag role)
+        {IndexWidget::updateData(role);}
 };
 
 /*! \ingroup groupeWidget
@@ -117,7 +136,7 @@ public:
 
     //! Gestionnaire de click de souris.
     void mousePressEvent(QMouseEvent *event) override {
-        if(event->button() == Qt::LeftButton)
+        if(event->button() == Qt::LeftButton && m_flags.test(modelMPS::LeftClickableFlagNode))
             emit leftClicked();
     }
 
@@ -240,7 +259,7 @@ protected:
     using Model = modelMPS::AbstractNodeModel;
     using NodeIndex = modelMPS::NodeIndex;
     using SelectionModel = modelMPS::NodeSelectionModel;
-    std::unique_ptr<ArcPainter> m_arcPainter;         //!< Dessine les arc.
+    std::unique_ptr<ArcPainter> m_arcPainter;           //!< Dessine les arc.
     Delegate * m_delegate = nullptr;                    //!< Délégate de la vue.
     Model * m_model = nullptr;                          //!< Model associé à la vue.
     SelectionMode m_selectionMode = SingleSelection;    //!< Mode de sélection.
@@ -323,13 +342,13 @@ protected slots:
 class ArcNodeViewWidget : public QWidget {
     Q_OBJECT
 protected:
-    bool m_drawNode = true;                     //!< Verrou de dessin des noeuds.
-    bool m_expanded = false;                    //!< Etat de la branche.
-    bool m_leaf = true;                         //!< Le noeud est une feuille.
-    const bool m_root;                          //!< Le noeud est la racine.
-    NodeView * m_view;                          //!< Vue contenant le widget.
-    NodeWidget * m_nodeWidget = nullptr;        //!< Widget de noeud.
-    std::vector<ArcNodeViewWidget *> m_arcChild;  //!< Vecteur des arcs fils.
+    bool m_drawNode = true;                         //!< Verrou de dessin des noeuds.
+    bool m_expanded = false;                        //!< Etat de la branche.
+    bool m_leaf = true;                             //!< Le noeud est une feuille.
+    const bool m_root;                              //!< Le noeud est la racine.
+    NodeView * m_view;                              //!< Vue contenant le widget.
+    NodeWidget * m_nodeWidget = nullptr;            //!< Widget de noeud.
+    std::vector<ArcNodeViewWidget *> m_arcChild;    //!< Vecteur des arcs fils.
 public:
     //! Constructeur.
     ArcNodeViewWidget(NodeWidget * node, NodeView * view, QWidget * parent = nullptr, bool root = false);
@@ -398,6 +417,20 @@ protected:
 
     //! Dessine la branche.
     void paintEvent(QPaintEvent * event) override;
+};
+
+/*! \ingroup groupeWidget
+ * \brief Widget contenant un noeud et ses descendants.
+ */
+class RootNodeViewWidget : public ArcNodeViewWidget {
+    Q_OBJECT
+protected:
+
+public:
+    //! Constructeur.
+    RootNodeViewWidget(const modelMPS::NodeIndex & index, NodeView * view)
+        : ArcNodeViewWidget(new NodeWidget(index),view,view,true) {
+    }
 };
 }
 #endif // NODEVIEW_H

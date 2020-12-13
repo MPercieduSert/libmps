@@ -39,10 +39,17 @@ public:
     PermissionModel(bddMPS::BddPredef &bdd, szt offset = NcNomOffset, QObject * parent = nullptr);
 
     //! Accesseur la donnée associé à un couple (index,role).
-    QVariant data(const NodeIndex &index, int role = DataRole) const override;
+    QVariant data(const NodeIndex &index, int role) const override;
 
     //! Nombre de donné associé à une cible.
     szt dataCount(const NodeIndex & index) const override;
+
+    //! Drapeaux assossiés à une donnée.
+    flag flags(const NodeIndex & index) const override{
+        if(index.isRoot())
+            return NoFlagNode;
+        return TreeNodeModelWithBdd::flags(index);
+    }
 
     //! Nom d'une.
     const QString & nomCible(szt num) const
@@ -71,10 +78,10 @@ public:
         : AbstractNode(PermissionModel::TypeNode), m_model(model) {}
 
     //! Accesseur des données du noeud.
-    QVariant data(int cible, int role = DataRole, szt num = 0) const override;
+    QVariant data(int cible, int role, szt num = 0) const override;
 
     //! Mutateur des données du noeud.
-    flag setData(int cible, const QVariant & value, int role = DataRole, szt num = 0) override;
+    flag setData(int cible, const QVariant & value, int role, szt num = 0) override;
 
     //! Mutateur de l'entité.
     void setEnt(const Ent & entity);
@@ -91,10 +98,10 @@ public:
     using PermNode::PermissionNode;
 
     //! Accesseur des données du noeud.
-    QVariant data(int cible, int role = DataRole, szt num = 0) const override;
+    QVariant data(int cible, int role, szt num = 0) const override;
 
     //! Mutateur des données du noeud.
-    flag setData(int cible, const QVariant & value, int role = DataRole, szt num = 0) override;
+    flag setData(int cible, const QVariant & value, int role, szt num = 0) override;
 };
 
 /*! \ingroup groupeModel
@@ -136,19 +143,19 @@ template<class Ent, class Permission> QVariant PermissionNode<Ent,Permission>::d
     case PermissionModel::NcCible:
         if(role == LabelRole)
             return "Nom abrégé :";
-        if(role == DisplayRole)
+        if(role == StringRole)
             return m_ent.nc();
         break;
     case PermissionModel::NomCible:
         if(role == LabelRole)
             return "Nom :";
-        if(role == DisplayRole)
+        if(role == StringRole)
             return m_ent.nom();
         break;
     case PermissionModel::PermissionCible:
         if(role == LabelRole)
             return m_model->nomCible(num);
-        if(role == DataRole)
+        if(role == NumRole)
             return m_permissionMap.at(m_model->cible(num)).value();
         break;
     case SubNodeCible:
@@ -180,17 +187,17 @@ template<class Ent, class Permission> QVariant PermissionNode<Ent,Permission>::d
 }
 
 template<class Ent, class Permission> flag PermissionNode<Ent,Permission>::setData(int cible, const QVariant &value, int role, szt num) {
-    if(cible == PermissionModel::NcCible && role == DisplayRole) {
+    if(cible == PermissionModel::NcCible && role == StringRole) {
         m_ent.setNc(value.toString());
-        return DisplayRole;
+        return StringRole;
     }
-    if(cible == PermissionModel::NomCible && role == DisplayRole) {
+    if(cible == PermissionModel::NomCible && role == StringRole) {
         m_ent.setNom(value.toString());
-        return DisplayRole;
+        return StringRole;
     }
-    if(cible == PermissionModel::CibleCible && role == DataRole) {
+    if(cible == PermissionModel::CibleCible && role == NumRole) {
         m_permissionMap[m_model->cible(num)] = value.toUInt();
-        return DataRole;
+        return NumRole;
     }
     return AbstractNode::setData(cible,value,role,num);
 }

@@ -10,7 +10,7 @@ CheckSubNodeWidget::CheckSubNodeWidget(const NodeIndex & index, QWidget * parent
     m_mainLayout->addWidget(m_checkBox);
     connect(m_checkBox,&QCheckBox::stateChanged,[this]() {
         if(connexionEnable())
-            m_index.model()->setData(m_index,m_checkBox->isChecked(),modelMPS::CheckStateRole);});
+            m_index.model()->setData(m_index,m_checkBox->checkState(),modelMPS::CheckStateRole);});
 }
 
 void CheckSubNodeWidget::updateDataSubNode(flag role) {
@@ -25,10 +25,11 @@ void CheckSubNodeWidget::updateDataSubNode(flag role) {
 ComboBoxSubNodeWidget::ComboBoxSubNodeWidget(const NodeIndex & index, QWidget * parent)
     : LabelSubNodeWidget(index,parent) {
     m_comboBox = new QComboBox;
+    m_comboBox->setSizeAdjustPolicy(QComboBox::AdjustToContents);
     m_mainLayout->addWidget(m_comboBox);
     connect(m_comboBox,qOverload<int>(&QComboBox::currentIndexChanged),this,[this]() {
         if(connexionEnable())
-            m_index.model()->setData(m_index,m_comboBox->currentData());});
+            m_index.model()->setData(m_index,m_comboBox->currentData(),modelMPS::IntRole);});
 }
 
 void ComboBoxSubNodeWidget::updateDataSubNode(flag role) {
@@ -39,8 +40,8 @@ void ComboBoxSubNodeWidget::updateDataSubNode(flag role) {
         for (auto iter = map.cbegin(); iter != map.cend(); ++iter)
             m_comboBox->addItem(iter.key(),iter.value());
     }
-    if(role.test(modelMPS::DataRole))
-        m_comboBox->setCurrentIndex(m_comboBox->findData(m_index.data().toUInt()));
+    if(role.test(modelMPS::IntRole))
+        m_comboBox->setCurrentIndex(m_comboBox->findData(m_index.data(modelMPS::IntRole).toInt()));
 }
 
 ////////////////////////////////////////////////// LabelSubNodeWidget //////////////////////////////////////////
@@ -63,13 +64,13 @@ DateSubNodeWidget::DateSubNodeWidget(const NodeIndex & index, QWidget * parent)
     m_mainLayout->addWidget(m_dateEdit);
     connect(m_dateEdit,&QDateEdit::dateChanged,this,[this]() {
         if(connexionEnable())
-            m_index.model()->setData(m_index,m_dateEdit->date());});
+            m_index.model()->setData(m_index,m_dateEdit->date(),modelMPS::DateRole);});
 }
 
 void DateSubNodeWidget::updateDataSubNode(flag role) {
     LabelSubNodeWidget::updateDataSubNode(role);
-    if(role.test(modelMPS::DataRole))
-        m_dateEdit->setDate(m_index.data().toDate());
+    if(role.test(modelMPS::DateRole))
+        m_dateEdit->setDate(m_index.data(modelMPS::DateRole).toDate());
 }
 
 ////////////////////////////////////////////////// LineEditSubNodeWidget //////////////////////////////////////////
@@ -79,13 +80,13 @@ LineEditSubNodeWidget::LineEditSubNodeWidget(const NodeIndex & index, QWidget * 
     m_mainLayout->addWidget(m_lineEdit);
     connect(m_lineEdit,&QLineEdit::textChanged,this,[this]() {
         if(connexionEnable())
-            m_index.model()->setData(m_index,m_lineEdit->text());});
+            m_index.model()->setData(m_index,m_lineEdit->text(),modelMPS::StringRole);});
 }
 
 void LineEditSubNodeWidget::updateDataSubNode(flag role) {
     LabelSubNodeWidget::updateDataSubNode(role);
-    if(role.test(modelMPS::DisplayRole))
-        m_lineEdit->setText(m_index.data(modelMPS::DisplayRole).toString());
+    if(role.test(modelMPS::StringRole))
+        m_lineEdit->setText(m_index.data(modelMPS::StringRole).toString());
 }
 
 ////////////////////////////////////////////////// RoundedArcPainter //////////////////////////////////////////

@@ -122,7 +122,7 @@ public:
         {return m_data.tree().cbegin().toFirstChild().leaf();}
 
     //! Mutateur des données du model.
-    bool setData(const NodeIndex &index, const QVariant &value, int role = DataRole) override;
+    bool setData(const NodeIndex &index, const QVariant &value, int role) override;
 
     //! Mutateur du model filtré.
     void setModel(AbstractColonnesModel * model);
@@ -166,17 +166,10 @@ public:
         : AbstractNode(type), m_model(model), m_pos(pos) {}
 
     //! Accesseur des données du noeud.
-    QVariant data(int cible, int role = DataRole, szt num = 0) const override;
+    QVariant data(int cible, int role, szt num = 0) const override;
 
     //! Nombre de donnée associé au noeud pour une cible donnée.
     szt dataCount(int cible) const override;
-
-    //! Accesseur des drapeaux associés à column.
-    Qt::ItemFlags flags(int cible, szt num = 0) const override {
-        if(cible == FindModel::NegCible)
-            return Qt::ItemIsEnabled;
-        return AbstractNode::flags(cible,num);
-    }
 
     //! Test si le noeud n'intervient pas dans la recherche.
     virtual bool empty() const
@@ -191,7 +184,7 @@ public:
         {return m_pos;}
 
     //! Mutateur des données du noeud.
-    flag setData(int cible, const QVariant & value, int role = DataRole, szt num = 0) override;
+    flag setData(int cible, const QVariant & value, int role, szt num = 0) override;
 
     //! Mutateur de position.
     void setPos(szt pos)
@@ -218,17 +211,10 @@ public:
         : FindNode(model,pos,type), m_comp(comp) {}
 
     //! Accesseur de la donnée associé à column.
-    QVariant data(int type, int role = DataRole, szt num = 0) const override;
-
-    //! Accesseur des drapeaux associés à column.
-    Qt::ItemFlags flags(int cible, szt num = 0) const override {
-        if(cible == FindModel::ComparaisonCible)
-            return FindNode::flags(cible,num) | Qt::ItemIsEnabled | Qt::ItemIsEditable;
-        return FindNode::flags(cible,num);
-    }
+    QVariant data(int type, int role, szt num = 0) const override;
 
     //! Mutateur de la donnée associé à column.
-    flag setData(int cible, const QVariant & value, int role = DataRole, szt num = 0) override;
+    flag setData(int cible, const QVariant & value, int role, szt num = 0) override;
 };
 
 /*! \ingroup groupeModel
@@ -252,7 +238,7 @@ public:
     ~BoolNode() override = default;
 
     //! Accesseur de la donnée associé à column.
-    QVariant data(int type, int role = DataRole, szt num = 0) const override;
+    QVariant data(int type, int role, szt num = 0) const override;
 
     //! Nombre de donnée associé au noeud pour une cible donnée.
     szt dataCount(int cible) const override;
@@ -261,15 +247,8 @@ public:
     bool empty() const override
         {return m_true && m_false;}
 
-    //! Accesseur des drapeaux associés à column.
-    Qt::ItemFlags flags(int cible, szt num = 0) const override {
-        if(cible == FindModel::TrueCible || cible == FindModel::FalseCible)
-            return FindNode::flags(cible,num) | Qt::ItemIsEnabled;
-        return FindNode::flags(cible,num);
-    }
-
     //! Mutateur de la donnée associé à column.
-    flag setData(int cible, const QVariant & value, int role = DataRole, szt num = 0) override;
+    flag setData(int cible, const QVariant & value, int role, szt num = 0) override;
 
     //! Teste si la ligne d'indice id vérifie la condition du noeud.
     bool testValue(const QVariant & value) const override
@@ -291,7 +270,7 @@ public:
     ~DateNode() override = default;
 
     //! Accesseur de la donnée associé à column.
-    QVariant data(int type, int role = DataRole, szt num = 0) const override;
+    QVariant data(int type, int role, szt num = 0) const override;
 
     //! Nombre de donnée associé au noeud pour une cible donnée.
     szt dataCount(int cible) const override;
@@ -300,15 +279,8 @@ public:
     bool empty() const override
         {return !m_date.isValid();}
 
-    //! Accesseur des drapeaux associés à column.
-    Qt::ItemFlags flags(int cible, szt num = 0) const override {
-        if(cible == FindModel::DateCible)
-            return ComparaisonNode::flags(cible,num) | Qt::ItemIsEnabled | Qt::ItemIsEditable;
-        return ComparaisonNode::flags(cible,num);
-    }
-
     //! Mutateur de la donnée associé à column.
-    flag setData(int cible, const QVariant & value, int role = DataRole, szt num = 0) override;
+    flag setData(int cible, const QVariant & value, int role, szt num = 0) override;
 
     //! Teste si la ligne d'indice id vérifie la condition du noeud.
     bool testValue(const QVariant & value) const override;
@@ -338,7 +310,7 @@ public:
     ~TexteNode() override = default;
 
     //! Accesseur de la donnée associé à column.
-    QVariant data(int type, int role = DataRole, szt num = 0) const override;
+    QVariant data(int type, int role, szt num = 0) const override;
 
     //! Nombre de donnée associé au noeud pour une cible donnée.
     szt dataCount(int cible) const override;
@@ -347,17 +319,8 @@ public:
     bool empty() const override
         {return m_texte.isEmpty();}
 
-    //! Accesseur des drapeaux associés à column.
-    Qt::ItemFlags flags(int cible, szt num = 0) const override {
-        if(cible == FindModel::TexteCible)
-            return FindNode::flags(cible,num) | Qt::ItemIsEnabled | Qt::ItemIsEditable;
-        if(cible == FindModel::CaseCible || cible == FindModel::RegexCible)
-            return FindNode::flags(cible,num) | Qt::ItemIsEnabled | Qt::ItemIsUserCheckable;
-        return FindNode::flags(cible,num);
-    }
-
     //! Mutateur de la donnée associé à column.
-    flag setData(int cible, const QVariant & value, int role = DataRole, szt num = 0) override;
+    flag setData(int cible, const QVariant & value, int role, szt num = 0) override;
 
     //! Teste si la ligne d'indice id vérifie la condition du noeud.
     bool testValue(const QVariant & value) const override;

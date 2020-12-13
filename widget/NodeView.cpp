@@ -141,12 +141,11 @@ void ArcNodeViewWidget::setNodeWidget(NodeWidget * widget) {
         m_nodeWidget->setEtatSelection(NodeWidget::Current);
     else if(m_view->selectionModel()->isSelected(m_nodeWidget->index()))
         m_nodeWidget->setEtatSelection(NodeWidget::Selected);
-    m_nodeWidget->updateData();
+    m_nodeWidget->updateData(m_nodeWidget->index(),AllRole);
     m_view->m_arcMap[m_nodeWidget->index().internalPointer()] = this;
     connect(m_nodeWidget,&NodeWidget::leftClicked,this,[this]()
         {m_view->clickLeftOn(m_nodeWidget->index());});
     m_nodeWidget->move(m_view->m_arcPainter->leftNodeMargin(),m_view->m_arcPainter->topNodeMargin());
-    m_nodeWidget->setVisible(true);
     if(draw)
         drawNode();
     else
@@ -268,7 +267,11 @@ void NodeView::setSelectionModel(SelectionModel * selectionModel) {
 void NodeView::resetRoot(){
     if(widget())
         deleteRoot();
-    setWidget(new ArcNodeViewWidget(m_model->index(NodeIndex(),0),this,this,true));
+    auto rootIndex = m_model->index(NodeIndex(),0);
+    if(rootIndex.flags().test(modelMPS::VisibleFlagNode))
+        setWidget(new ArcNodeViewWidget(rootIndex,this,this,true));
+    else
+        setWidget(new RootNodeViewWidget(rootIndex,this));
 }
 
 void NodeView::updateData(const NodeIndex & index, flag role) {
@@ -294,14 +297,18 @@ void NodeWidget::addSubNodeWidget(SubNodeWidget * subNode) {
     subNode->updateData(modelMPS::AllRole);
 }
 
-////////////////////////////////////////////// SubNodeHandler ////////////////////////////////////////////////
 void NodeWidget::updateData() {
+    IndexWidget::updateData(modelMPS::AllRole);
     for (auto iter = m_cibleMap.begin(); iter != m_cibleMap.end(); ++iter)
         iter->second->updateData(modelMPS::AllRole);
 }
 
 void NodeWidget::updateData(const modelMPS::NodeIndex & index, flag role) {
-    auto iters = m_cibleMap.equal_range(index.subIndex());
-    for (auto iter = iters.first; iter != iters.second; ++iter)
-        iter->second->updateData(role);
+    if(index.cible() == modelMPS::NodeCible)
+        IndexWidget::updateData(role);
+    else {
+        auto iters = m_cibleMap.equal_range(index.subIndex());
+        for (auto iter = iters.first; iter != iters.second; ++iter)
+            iter->second->updateData(role);
+    }
 }

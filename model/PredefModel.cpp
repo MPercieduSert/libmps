@@ -4,7 +4,7 @@ using namespace modelMPS;
 
 ////////////////////////////////////////////// PermissionModel ////////////////////////////////////
 PermissionModel::PermissionModel(bddMPS::BddPredef & bdd, szt offset, QObject * parent)
-    : TreeNodeModelWithBdd(bdd, true, parent), m_offset(offset) {
+    : TreeNodeModelWithBdd(bdd, parent), m_offset(offset) {
     m_idNomVec.reserve(m_bdd.nbrEntity());
     for(szt i = 0; i < m_bdd.nbrEntity(); ++i) {
         if(m_bdd.managers().valide(i))
@@ -19,7 +19,7 @@ QVariant PermissionModel::data(const NodeIndex &index, int role) const {
         if(role == modelMPS::LabelRole && index.num() < m_idNomVec.size())
             return m_idNomVec.at(index.num()).second;
         if(role == CheckStateRole && index.num() < m_idNomVec.size())
-            return std::find(m_cibleVec.cbegin(),m_cibleVec.cend(),index.num()) != m_cibleVec.cend();
+            return std::find(m_cibleVec.cbegin(),m_cibleVec.cend(),index.num()) != m_cibleVec.cend() ? Qt::Checked : Qt::Unchecked;
     }
     return TreeNodeModel::data(index,role);
 }
@@ -45,7 +45,7 @@ QVariant TypePermissionNode::data(int cible, int role, szt num) const {
     if(cible == PermissionModel::RefCible) {
         if(role == LabelRole)
             return "Référence :";
-        if(role == DisplayRole)
+        if(role == StringRole)
             return m_ent.ref();
     }
     else if(cible == SubNodeCible && role == SubNodeRole && num == PermissionModel::RefPosition) {
@@ -59,9 +59,9 @@ QVariant TypePermissionNode::data(int cible, int role, szt num) const {
 }
 
 flag TypePermissionNode::setData(int cible, const QVariant & value, int role, szt num) {
-    if(cible == PermissionModel::RefCible && role == DisplayRole) {
+    if(cible == PermissionModel::RefCible && role == StringRole) {
         m_ent.setRef(value.toString());
-        return DisplayRole;
+        return StringRole;
     }
     return PermNode::setData(cible,value,role,num);
 }
