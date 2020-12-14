@@ -214,7 +214,7 @@ public:
      */
     class ArcPainter {
     public:
-        enum parametre {Zero = 0,
+        enum parametre {NoMargin = 0,
             BottomNodeMargin = 2,
             LeftNodeMargin = 3,
             RightNodeMargin = 2,
@@ -236,7 +236,7 @@ public:
         virtual void drawExpandZone(ArcNodeViewWidget * /*arc*/) const {}
 
         //! Renvoie la marge à gauche pour tracer l'arc.
-        virtual int leftExpandedMargin() const {return Zero;}
+        virtual int leftExpandedMargin() const {return NoMargin;}
 
         //! Renvoie la marge à gauche du noeud.
         virtual int leftNodeMargin() const {return LeftNodeMargin;}
@@ -245,13 +245,13 @@ public:
         virtual int rightNodeMargin() const {return RightNodeMargin;}
 
         //! Renvoie taille verticale de la zone de demande d'expansion.
-        virtual int heightExpandZone() const {return Zero;}
+        virtual int heightExpandZone() const {return NoMargin;}
 
         //! Renvoie la marge au dessus du noeud.
         virtual int topNodeMargin() const {return TopNodeMargin;}
 
         //! Renvoie taille horizontale de la zone de demande d'expansion.
-        virtual int widthExpandZone() const {return Zero;}
+        virtual int widthExpandZone() const {return NoMargin;}
     };
 protected:
     friend ArcNodeViewWidget;
@@ -346,16 +346,17 @@ protected:
     bool m_expanded = false;                        //!< Etat de la branche.
     bool m_leaf = true;                             //!< Le noeud est une feuille.
     const bool m_root;                              //!< Le noeud est la racine.
+    const bool m_nodeArcVisible;                    //!< Le noeud et l'arc sont visible
     NodeView * m_view;                              //!< Vue contenant le widget.
     NodeWidget * m_nodeWidget = nullptr;            //!< Widget de noeud.
     std::vector<ArcNodeViewWidget *> m_arcChild;    //!< Vecteur des arcs fils.
 public:
     //! Constructeur.
-    ArcNodeViewWidget(NodeWidget * node, NodeView * view, QWidget * parent = nullptr, bool root = false);
+    ArcNodeViewWidget(NodeWidget * node, NodeView * view, QWidget * parent = nullptr, bool root = false, bool nodeArcVisible = true);
 
     //! Constructeur.
-    ArcNodeViewWidget(const modelMPS::NodeIndex & index, NodeView * view, QWidget * parent = nullptr, bool root = false)
-        : ArcNodeViewWidget(view->delegate()->createNode(index),view,parent,root) {}
+    ArcNodeViewWidget(const modelMPS::NodeIndex & index, NodeView * view, QWidget * parent = nullptr, bool root = false, bool nodeArcVisible = true)
+        : ArcNodeViewWidget(view->delegate()->createNode(index),view,parent,root,nodeArcVisible) {}
 
     //! Destructeur.
     ~ArcNodeViewWidget() override
@@ -366,7 +367,7 @@ public:
         {return m_arcChild;}
 
     //! Place le noeud  et les suivants et ajuste les tailles.
-    void drawNode(bool next = false);
+    virtual void drawNode(bool next = false);
 
     //! Acceseur de l'état d'expansion.
     bool expanded() const noexcept
@@ -429,7 +430,8 @@ protected:
 public:
     //! Constructeur.
     RootNodeViewWidget(const modelMPS::NodeIndex & index, NodeView * view)
-        : ArcNodeViewWidget(new NodeWidget(index),view,view,true) {
+        : ArcNodeViewWidget(new NodeWidget(index),view,view,true,false) {
+        setExpanded(true);
     }
 };
 }

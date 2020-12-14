@@ -8,8 +8,8 @@ using namespace widgetMPS;
 AbstractNodeDelegate::AbstractNodeDelegate(QObject * parent) : QObject(parent) {}
 
 ////////////////////////////////////// ArcNodeViewWidget //////////////////////////////////////////
-ArcNodeViewWidget::ArcNodeViewWidget(NodeWidget *node, NodeView *view, QWidget * parent, bool root)
-    : QWidget (parent), m_leaf(node->index().leaf()), m_root(root), m_view(view)
+ArcNodeViewWidget::ArcNodeViewWidget(NodeWidget *node, NodeView *view, QWidget * parent, bool root, bool nodeArcVisible)
+    : QWidget (parent), m_leaf(node->index().leaf()), m_root(root), m_nodeArcVisible(nodeArcVisible), m_view(view)
     {setNodeWidget(node);}
 
 void ArcNodeViewWidget::drawNode(bool next) {
@@ -21,13 +21,18 @@ void ArcNodeViewWidget::drawNode(bool next) {
         for (auto iter = parentArc->m_arcChild.begin(); iter != parentArc->m_arcChild.end(); ++iter) {
             if (!next && !draw && *iter == this) {
                 draw = true;
-                if(iter ==  parentArc->m_arcChild.begin())
-                    y = parentArc->nodeWidget()->geometry().bottom();
+                if(iter ==  parentArc->m_arcChild.begin()) {
+                    if(parentArc->m_nodeArcVisible)
+                        y = parentArc->nodeWidget()->geometry().bottom();
+                }
                 else
                     y = (*std::prev(iter))->geometry().bottom();
             }
             if(draw) {
-                (*iter)->move(m_view->m_arcPainter->leftExpandedMargin(),y);
+                if(parentArc->m_nodeArcVisible)
+                    (*iter)->move(m_view->m_arcPainter->leftExpandedMargin(),y);
+                else
+                    (*iter)->move(NodeView::ArcPainter::NoMargin,y);
                 (*iter)->setVisible(true);
                 y = (*iter)->geometry().bottom();
             }
@@ -59,14 +64,14 @@ void ArcNodeViewWidget::insertNodes(szt first, szt last){
 }
 
 void ArcNodeViewWidget::mousePressEvent(QMouseEvent *event) {
-    if(!m_leaf && event->button() == Qt::LeftButton)
+    if(m_nodeArcVisible && !m_leaf && event->button() == Qt::LeftButton)
         if((m_expanded && event->x() < m_view->m_arcPainter->leftExpandedMargin() && event->y() > m_nodeWidget->geometry().bottom())
                 || (! m_expanded && event->x() < m_view->m_arcPainter->widthExpandZone() && event->y() > m_nodeWidget->geometry().bottom()))
         setExpanded(!m_expanded);
 }
 
 void ArcNodeViewWidget::paintEvent(QPaintEvent * /*event*/) {
-    if(!m_leaf) {
+    if(!m_leaf && m_nodeArcVisible) {
         if(m_expanded)
             m_view->m_arcPainter->drawArc(this);
         else
@@ -145,7 +150,8 @@ void ArcNodeViewWidget::setNodeWidget(NodeWidget * widget) {
     m_view->m_arcMap[m_nodeWidget->index().internalPointer()] = this;
     connect(m_nodeWidget,&NodeWidget::leftClicked,this,[this]()
         {m_view->clickLeftOn(m_nodeWidget->index());});
-    m_nodeWidget->move(m_view->m_arcPainter->leftNodeMargin(),m_view->m_arcPainter->topNodeMargin());
+    if(m_nodeArcVisible)
+        m_nodeWidget->move(m_view->m_arcPainter->leftNodeMargin(),m_view->m_arcPainter->topNodeMargin());
     if(draw)
         drawNode();
     else
@@ -154,12 +160,15 @@ void ArcNodeViewWidget::setNodeWidget(NodeWidget * widget) {
 
 QSize ArcNodeViewWidget::sizeHint() const{
     if(m_expanded) {
-        QSize sz(m_nodeWidget->geometry().right(),m_arcChild.back()->geometry().bottom() + m_view->m_arcPainter->bottomNodeMargin());
+        QSize sz(0,m_arcChild.back()->geometry().bottom() + m_view->m_arcPainter->bottomNodeMargin());
+        if(m_nodeArcVisible)
+            sz.rwidth() = m_nodeWidget->geometry().right();
         for (auto iter = m_arcChild.cbegin(); iter != m_arcChild.cend(); ++iter) {
             if((*iter)->geometry().right() > sz.width())
                 sz.rwidth() = (*iter)->geometry().right();
         }
-        sz.rwidth() += m_view->m_arcPainter->rightNodeMargin();
+        if(m_nodeArcVisible)
+            sz.rwidth() += m_view->m_arcPainter->rightNodeMargin();
         return sz;
     }
     auto sz = m_nodeWidget->sizeHint();
@@ -312,3 +321,6 @@ void NodeWidget::updateData(const modelMPS::NodeIndex & index, flag role) {
             iter->second->updateData(role);
     }
 }
+
+/////////////////////////////////////////////// RootNodeViewWidget ///////////////////////////////////////////////////
+
