@@ -7,21 +7,31 @@ TabGestionType::TabGestionType(bmps::Bdd & bdd, const std::pair<int, int> &pairI
     m_cases.at(Attribuable) = widgetMPS::CodeWidget::caseStyle(widgetMPS::CodeWidget::Attribuable, bddMPS::code::Attribuable);
     m_cases.at(Visible) = widgetMPS::CodeWidget::caseStyle(widgetMPS::CodeWidget::Visible, bddMPS::code::Visible);
     // Widget
-    m_insertButton = new QPushButton("+");
-    m_saveButton = new QPushButton(tr("Sauvegarder"));
-    m_supprButton = new QPushButton("-");
+//    m_insertButton = new QPushButton("+");
+//    m_saveButton = new QPushButton(tr("Sauvegarder"));
+//    m_supprButton = new QPushButton("-");
     m_view = new widgetMPS::NodeView(std::make_unique<widgetMPS::RoundedArcPainter>());
     m_model = new modelMPS::TypePermissionModel(static_cast<bddMPS::BddPredef &>(bdd),this);
     m_view->setModel(m_model);
     m_view->setDelegate(new delegateMPS::StandardNodeDelegate(this));
-
+    m_cibleListWidget = new QListWidget;
+    for (auto iter = m_model->idNomVec().cbegin(); iter != m_model->idNomVec().cend(); ++iter) {
+        auto item = new QListWidgetItem(iter->second,m_cibleListWidget);
+        item->setData(Qt::UserRole,iter->first);
+        item->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
+        item->setCheckState(Qt::Unchecked);
+    }
+    m_cibleListWidget->setSizePolicy(QSizePolicy::Minimum,QSizePolicy::Expanding);
+    connect(m_cibleListWidget,&QListWidget::itemChanged,this,[this](QListWidgetItem * item)
+        {m_model->setCible(item->data(Qt::UserRole).toUInt(), item->checkState() == Qt::Checked);});
 
     // Calque
-    m_buttonLayout = new QHBoxLayout;
-    m_buttonLayout->addWidget(m_insertButton);
-    m_buttonLayout->addWidget(m_supprButton);
-    m_buttonLayout->addWidget(m_saveButton);
-    m_mainLayout = new QVBoxLayout(this);
+//    m_buttonLayout = new QHBoxLayout;
+//    m_buttonLayout->addWidget(m_insertButton);
+//    m_buttonLayout->addWidget(m_supprButton);
+//    m_buttonLayout->addWidget(m_saveButton);
+    m_mainLayout = new QHBoxLayout(this);
     m_mainLayout->addWidget(m_view);
-    m_mainLayout->addLayout(m_buttonLayout);
+//    m_mainLayout->addLayout(m_buttonLayout);
+    m_mainLayout->addWidget(m_cibleListWidget);
 }

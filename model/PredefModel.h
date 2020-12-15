@@ -51,7 +51,7 @@ public:
         return TreeNodeModelWithBdd::flags(index);
     }
 
-    //! Nom d'une.
+    //! Nom d'une cible.
     const QString & nomCible(szt num) const
         {return m_idNomVec.at(m_cibleVec.at(num)).second;}
 
@@ -59,9 +59,16 @@ public:
     int cible(szt num) const
         {return m_idNomVec.at(m_cibleVec.at(num)).first;}
 
+    //! Accesseur de la liste des cibles.
+    const std::vector<std::pair<int,QString>> & idNomVec() const noexcept
+        {return m_idNomVec;}
+
     //! Accesseur de l'offset de postion des cibles
     szt offset() const noexcept
         {return m_offset;}
+
+    //! Muateur de la présence d'une cible.
+    void setCible(szt num, bool visible);
 };
 
 /*! \ingroup groupeModel

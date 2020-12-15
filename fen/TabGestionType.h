@@ -4,8 +4,9 @@
 #ifndef TABGESTIONTYPE_H
 #define TABGESTIONTYPE_H
 
-#include <QPushButton>
 #include <QLabel>
+#include <QListWidget>
+#include <QPushButton>
 #include "AbstractTabModuleWithBdd.h"
 #include "BddPredef.h"
 #include "CodeWidget.h"
@@ -23,13 +24,14 @@ protected:
     modelMPS::TypePermissionModel * m_model;    //!< Model.
     widgetMPS::CodeWidget::Cases m_cases;       //!< Paramétrage des cases.
     widgetMPS::NodeView * m_view;               //!< Vue.
+    QListWidget * m_cibleListWidget;            //!< Sélection des cibles.
     QPushButton * m_insertButton;               //!< Bouton d'insertion d'une ligne.
     QPushButton * m_saveButton;                 //!< Bouton de sauvegarde.
     QPushButton * m_supprButton;                //!< Bouton de suppression d'une entité.
 
     // Calque
     QHBoxLayout * m_buttonLayout;               //!< Calque des boutons.
-    QVBoxLayout * m_mainLayout;                 //!< Calque principal.
+    QHBoxLayout * m_mainLayout;                 //!< Calque principal.
 
 public:
     //! Position des cases.

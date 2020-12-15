@@ -40,6 +40,18 @@ szt PermissionModel::dataCount(const NodeIndex & index) const {
     return TreeNodeModel::dataCount(index);
 }
 
+void PermissionModel::setCible(szt num, bool visible){
+    if(visible) {
+        if(std::find(m_cibleVec.cbegin(),m_cibleVec.cend(),num) == m_cibleVec.cend())
+            m_cibleVec.push_back(num);
+    }
+    else {
+        auto iter = std::find(m_cibleVec.cbegin(),m_cibleVec.cend(),num);
+        if(iter != m_cibleVec.cend())
+            m_cibleVec.erase(iter);
+    }
+}
+
 //////////////////////////////////////////////////////// TypePermissionNode ///////////////////////////////
 QVariant TypePermissionNode::data(int cible, int role, szt num) const {
     if(cible == PermissionModel::RefCible) {
