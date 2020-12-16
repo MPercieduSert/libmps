@@ -67,5 +67,5 @@ void CodeWidget::paintEvent(QPaintEvent * /*event*/) {
 void CodeWidget::setCode(flag code) {
     m_code = code;
     update();
-    emit codechanged(m_code);
+    emit codeChanged(m_code);
 }

@@ -22,7 +22,6 @@ class TabGestionType : public AbstractTabModuleWithBdd
 protected:
     //std::vector<QString> m_namesAttributs;    //!< Noms des attributs.
     modelMPS::TypePermissionModel * m_model;    //!< Model.
-    widgetMPS::CodeWidget::Cases m_cases;       //!< Paramétrage des cases.
     widgetMPS::NodeView * m_view;               //!< Vue.
     QListWidget * m_cibleListWidget;            //!< Sélection des cibles.
     QPushButton * m_insertButton;               //!< Bouton d'insertion d'une ligne.
@@ -36,7 +35,8 @@ protected:
 public:
     //! Position des cases.
     enum positionCase {Visible,
-                      Attribuable};
+                      Attribuable,
+                      NbrCase};
     //! Constructeur.
     TabGestionType(bmps::Bdd & bdd, const std::pair<int, int> &pairIndex, QWidget * parent = nullptr);
 

@@ -136,18 +136,19 @@ void ArcNodeViewWidget::setLeaf(bool bb) {
 void ArcNodeViewWidget::setNodeWidget(NodeWidget * widget) {
     auto draw = m_nodeWidget && m_nodeWidget->isVisible();
     if(m_nodeWidget) {
-        m_view->m_arcMap.erase(m_nodeWidget->index().internalPointer());
+        if(m_nodeWidget->index().internalPointer() != widget->index().internalPointer())
+            m_view->m_arcMap.erase(m_nodeWidget->index().internalPointer());
         m_nodeWidget->hide();
         m_nodeWidget->deleteLater();
     }
     m_nodeWidget = widget;
+    m_view->m_arcMap[m_nodeWidget->index().internalPointer()] = this;
     m_nodeWidget->setParent(this);
     if(m_view->selectionModel()->isCurrentIndex(m_nodeWidget->index()))
         m_nodeWidget->setEtatSelection(NodeWidget::Current);
     else if(m_view->selectionModel()->isSelected(m_nodeWidget->index()))
         m_nodeWidget->setEtatSelection(NodeWidget::Selected);
     m_nodeWidget->updateData(m_nodeWidget->index(),AllRole);
-    m_view->m_arcMap[m_nodeWidget->index().internalPointer()] = this;
     connect(m_nodeWidget,&NodeWidget::leftClicked,this,[this]()
         {m_view->clickLeftOn(m_nodeWidget->index());});
     if(m_nodeArcVisible)
@@ -260,7 +261,11 @@ void NodeView::setModel(Model *model) {
     connect(m_model,&Model::dataChanged,this,&NodeView::updateData);
     connect(m_model,&Model::nodesAboutToBeRemoved,this,&NodeView::removeNodes);
     connect(m_model,&Model::modelAboutToBeReset,this,&NodeView::deleteRoot);
+    connect(m_model,&Model::modelAboutToResetData,this,[this](){m_connexionUpdateData = false;});
     connect(m_model,&Model::modelReset,this,&NodeView::resetRoot);
+    connect(m_model,&Model::modelResetData,this,[this](){
+        m_connexionUpdateData = true;
+        updateAllData();});
     connect(m_model,&Model::nodesInserted,this,&NodeView::insertNodes);
     if(m_delegate && m_model)
         resetRoot();
@@ -283,13 +288,21 @@ void NodeView::resetRoot(){
         setWidget(new RootNodeViewWidget(rootIndex,this));
 }
 
+void NodeView::updateAllData() {
+    if(m_connexionUpdateData)
+        for (auto iter =m_arcMap.begin(); iter != m_arcMap.cend(); ++iter)
+            iter->second->setNodeWidget(iter->second->nodeWidget()->index());
+}
+
 void NodeView::updateData(const NodeIndex & index, flag role) {
-    auto iter = m_arcMap.find(index.internalPointer());
-    if(iter != m_arcMap.end()){
-        if(index.cible() != NodeCible)
-            iter->second->nodeWidget()->updateData(index,role);
-        else
-            iter->second->setNodeWidget(index);
+    if(m_connexionUpdateData) {
+        auto iter = m_arcMap.find(index.internalPointer());
+        if(iter != m_arcMap.end()){
+            if(index.cible() != NodeCible)
+                iter->second->nodeWidget()->updateData(index,role);
+            else
+                iter->second->setNodeWidget(index);
+        }
     }
 }
 

@@ -280,8 +280,14 @@ signals:
     //! Signal de début de réinitialisation du model.
     void modelAboutToBeReset();
 
+    //! Signal de début de réinitialisation des données de l'arbre mais conservant la structure.
+    void modelAboutToResetData();
+
     //! Signal de fin de réinitialisation du model.
     void modelReset();
+
+    //! Signal de réinitialisation des données de l'arbre mais conservant la structure.
+    void modelResetData();
 
     //! Signal de début d'insertion de noeuds.
     void nodesAboutToBeInserted(const NodeIndex &parent, szt first, szt last);

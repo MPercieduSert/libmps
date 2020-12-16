@@ -14,16 +14,6 @@ PermissionModel::PermissionModel(bddMPS::BddPredef & bdd, szt offset, QObject * 
               [](const std::pair<int, QString> & p1, const std::pair<int, QString> & p2)->bool {return p1.second < p2.second;});
 }
 
-QVariant PermissionModel::data(const NodeIndex &index, int role) const {
-    if(index.cible() == CibleCible){
-        if(role == modelMPS::LabelRole && index.num() < m_idNomVec.size())
-            return m_idNomVec.at(index.num()).second;
-        if(role == CheckStateRole && index.num() < m_idNomVec.size())
-            return std::find(m_cibleVec.cbegin(),m_cibleVec.cend(),index.num()) != m_cibleVec.cend() ? Qt::Checked : Qt::Unchecked;
-    }
-    return TreeNodeModel::data(index,role);
-}
-
 szt PermissionModel::dataCount(const NodeIndex & index) const {
     switch (index.cible()) {
     case PermissionModel::NcCible:
@@ -32,8 +22,6 @@ szt PermissionModel::dataCount(const NodeIndex & index) const {
         return 1;
     case PermissionModel::PermissionCible:
         return static_cast<szt>(m_cibleVec.size());
-    case PermissionModel::CibleCible:
-        return static_cast<szt>(m_idNomVec.size());
     case SubNodeCible:
         return static_cast<szt>(m_cibleVec.size()) + m_offset;
     }
@@ -42,13 +30,21 @@ szt PermissionModel::dataCount(const NodeIndex & index) const {
 
 void PermissionModel::setCible(szt num, bool visible){
     if(visible) {
-        if(std::find(m_cibleVec.cbegin(),m_cibleVec.cend(),num) == m_cibleVec.cend())
-            m_cibleVec.push_back(num);
+        if(std::find(m_cibleVec.cbegin(),m_cibleVec.cend(),num) == m_cibleVec.cend()) {
+            modelAboutToResetData();
+                m_cibleVec.push_back(num);
+                for (auto iter = ++m_data.tree().begin(); iter; ++iter)
+                    static_cast<AbstractPermissionNode &>(**iter).addCible(m_idNomVec.at(num).first);
+            modelResetData();
+        }
     }
     else {
         auto iter = std::find(m_cibleVec.cbegin(),m_cibleVec.cend(),num);
-        if(iter != m_cibleVec.cend())
-            m_cibleVec.erase(iter);
+        if(iter != m_cibleVec.cend()) {
+            modelAboutToResetData();
+                m_cibleVec.erase(iter);
+            modelResetData();
+        }
     }
 }
 

@@ -9,6 +9,7 @@
 #include <QDateEdit>
 #include <QLabel>
 #include <QLineEdit>
+#include "CodeWidget.h"
 #include "NodeView.h"
 
 namespace widgetMPS {
@@ -42,6 +43,21 @@ protected:
     //! Met à jour les données du label à partir des données du model.
     void updateDataSubNode(flag role) override;
 };
+/*! \ingroup groupeWidget
+ * \brief Classe des sous-noeuds composés d'un label et d'une liste de choix.
+ */
+class CodeSubNodeWidget : public LabelSubNodeWidget {
+    Q_OBJECT
+protected:
+    widgetMPS::CodeWidget * m_codeWidget;       //! Choix des drapeaux.
+public:
+    //! Constructeur.
+    CodeSubNodeWidget(const CodeWidget::Cases & cases, const NodeIndex & index, QWidget * parent);
+protected:
+    //! Met à jour les données du label à partir des données du model.
+    void updateDataSubNode(flag role) override;
+};
+
 
 /*! \ingroup groupeWidget
  * \brief Classe des sous-noeuds composés d'un label et d'une liste de choix.
@@ -149,21 +165,13 @@ public:
     //! Mutateur de l'état de sélection.
     void setEtatSelection(NodeWidget::EtatSelection etat) override;
 };
-
-/*! \ingroup groupeWidget
- * \brief Vue standard des données externe à l'arbre d'un modèle hérité de AbstractNodeModel.
- */
-class StandardExterneNode : public QWidget {
-    Q_OBJECT
-protected:
-
-};
 }
 namespace delegateMPS {
 /*! \ingroup groupeDelegate
  * \brief Delegate standard à un NodeView.
  */
 class StandardNodeDelegate : public AbstractNodeDelegate {
+    Q_OBJECT
 public:
     using NodeIndex = modelMPS::NodeIndex;
     using NodeWidget = widgetMPS::NodeWidget;
@@ -176,6 +184,26 @@ public:
 
     //! Crée un sous-noeud.
     virtual SubNodeWidget * createSubNode(const NodeIndex &index, QWidget *parent = nullptr) const;
+};
+
+/*! \ingroup groupeDelegate
+ * \brief Delegate standard à un NodeView avec des noeud de type code.
+ */
+class CodeStandardNodeDelegate : public StandardNodeDelegate {
+    Q_OBJECT
+protected:
+    widgetMPS::CodeWidget::Cases  m_cases;
+public:
+    //! Constructeur.
+    CodeStandardNodeDelegate(const widgetMPS::CodeWidget::Cases cases, QObject * parent = nullptr)
+        : StandardNodeDelegate(parent), m_cases(cases) {}
+
+    //! Crée un sous-noeud.
+    SubNodeWidget * createSubNode(const NodeIndex &index, QWidget *parent = nullptr) const override;
+
+    //! Muateur de cases.
+    void setCases(const widgetMPS::CodeWidget::Cases cases)
+        {m_cases = cases;}
 };
 }
 #endif // STANDARDNODEWIDGET_H

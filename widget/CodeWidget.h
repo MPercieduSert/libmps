@@ -37,7 +37,7 @@ public:
         Attribuable};
 protected:
     int m_cote;                     //!< Taille des coté des carrés.
-    const Cases & m_cases;          //!< Référence au Mode de représantation d'un code.
+    const Cases & m_cases;          //!< Référence au mode de représantation d'un code.
     flag m_code;                    //!< Le code représenté.
 
 public:
@@ -67,7 +67,7 @@ public:
         {return QSize(m_cote * static_cast<int>(m_cases.size()),m_cote);}
 signals:
     //! Signal emit lors du changment de code.
-    void codechanged(flag code);
+    void codeChanged(flag code);
 protected:
     //! Gestionnaire de click de souris.
     void mousePressEvent(QMouseEvent *event) override;

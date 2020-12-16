@@ -26,8 +26,7 @@ public:
     enum dataCible {NcCible,
                     NomCible,
                     RefCible,
-                    PermissionCible,
-                    CibleCible = ExterneCible};
+                    PermissionCible};
     //! Position des sous-noeud.
     enum positionNode{ZeroPosition,
                       UnPosition,
@@ -37,9 +36,6 @@ public:
                       RefPosition = DeuxPosition};
     //! Constructeur.
     PermissionModel(bddMPS::BddPredef &bdd, szt offset = NcNomOffset, QObject * parent = nullptr);
-
-    //! Accesseur la donnée associé à un couple (index,role).
-    QVariant data(const NodeIndex &index, int role) const override;
 
     //! Nombre de donné associé à une cible.
     szt dataCount(const NodeIndex & index) const override;
@@ -72,17 +68,35 @@ public:
 };
 
 /*! \ingroup groupeModel
+ * \brief Classe abstraite mère des neuds d'un model de permission.
+ */
+class AbstractPermissionNode : public TreeNodeModel::AbstractNode {
+public:
+    //! Constructeur.
+    using TreeNodeModel::AbstractNode::AbstractNode;
+
+    //! Ajoute une cible aux permissions.
+    virtual void addCible(int cible) = 0;
+};
+
+
+
+/*! \ingroup groupeModel
  * \brief Classe mère des neuds d'un model de permission.
  */
-template<class Ent, class Permission> class PermissionNode : public TreeNodeModel::AbstractNode {
+template<class Ent, class Permission> class PermissionNode : public AbstractPermissionNode {
 protected:
     Ent m_ent;                              //!< Type associé au noeud.
     std::map<int,flag> m_permissionMap;     //!< Map des permission du type.
     PermissionModel * m_model;      //!< Pointeur sur le model.
 public:
+    enum {NoFlag = 0};
     //! Constructeur.
     PermissionNode(PermissionModel * model)
-        : AbstractNode(PermissionModel::TypeNode), m_model(model) {}
+        : AbstractPermissionNode(PermissionModel::TypeNode), m_model(model) {}
+
+    //! Ajoute une cible aux permissions.
+    void addCible(int cible) override;
 
     //! Accesseur des données du noeud.
     QVariant data(int cible, int role, szt num = 0) const override;
@@ -95,7 +109,7 @@ public:
 };
 
 /*! \ingroup groupeModel
- * \brief Classe des neuds du model de  Type-permission.
+ * \brief Classe des neuds du model de Type-permission.
  */
 class TypePermissionNode : public PermissionNode<entityMPS::Type,entityMPS::TypePermission> {
 protected:
@@ -145,6 +159,17 @@ template<class Ent, class Permission, class Node> TreeNodeModel::Tree MakeArbreN
 }
 
 ///////////////////////////////////////////////// definition PermissionNode ///////////////////////////////////
+template<class Ent, class Permission> void PermissionNode<Ent,Permission>::addCible(int cible) {
+    if(m_permissionMap.find(cible) == m_permissionMap.end()) {
+        Permission perm;
+        perm.setCible(cible);
+        perm.setId1(m_ent.id());
+        if(m_model->bdd().getUnique(perm))
+            m_permissionMap[cible] = perm.code();
+        else
+            m_permissionMap[cible] = NoFlag;
+    }
+}
 template<class Ent, class Permission> QVariant PermissionNode<Ent,Permission>::data(int cible, int role, szt num) const {
     switch (cible) {
     case PermissionModel::NcCible:
@@ -183,9 +208,9 @@ template<class Ent, class Permission> QVariant PermissionNode<Ent,Permission>::d
             }
             if(num >= m_model->offset()) {
                 QList<QVariant> init;
-                init.append(PermissionModel::CibleCible);
+                init.append(PermissionModel::PermissionCible);
                 init.append(num - m_model->offset());
-                init.append(LineEditSubNode);
+                init.append(CodeSubNode);
                 return init;
             }
         }
@@ -202,7 +227,7 @@ template<class Ent, class Permission> flag PermissionNode<Ent,Permission>::setDa
         m_ent.setNom(value.toString());
         return StringRole;
     }
-    if(cible == PermissionModel::CibleCible && role == NumRole) {
+    if(cible == PermissionModel::PermissionCible && role == NumRole) {
         m_permissionMap[m_model->cible(num)] = value.toUInt();
         return NumRole;
     }

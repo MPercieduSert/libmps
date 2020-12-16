@@ -184,11 +184,12 @@ namespace delegateMPS {
  * \brief Delegate associé à un NodeView.
  */
 class AbstractNodeDelegate : public QObject {
+    Q_OBJECT
 public:
     using NodeIndex = modelMPS::NodeIndex;
     using NodeWidget = widgetMPS::NodeWidget;
     //! Constructeur.
-    AbstractNodeDelegate(QObject * parent);
+    AbstractNodeDelegate(QObject * parent = nullptr);
     //! Crée un noeud.
     virtual NodeWidget * createNode(const NodeIndex &index, QWidget * parent = nullptr) const = 0;
 };
@@ -259,6 +260,7 @@ protected:
     using Model = modelMPS::AbstractNodeModel;
     using NodeIndex = modelMPS::NodeIndex;
     using SelectionModel = modelMPS::NodeSelectionModel;
+    bool m_connexionUpdateData = true;                  //!< Etat de connexion de la mise à jour des données.
     std::unique_ptr<ArcPainter> m_arcPainter;           //!< Dessine les arc.
     Delegate * m_delegate = nullptr;                    //!< Délégate de la vue.
     Model * m_model = nullptr;                          //!< Model associé à la vue.
@@ -318,6 +320,9 @@ public slots:
 
     //! Prend en compte la suppression de noeud du model.
     void removeNodes(const NodeIndex & parent, szt first, szt last);
+
+    //! Met à jour toutes les données.
+    void updateAllData();
 
     //! Met à jour les donnée du NodeWidget associé à l'index.
     void updateData(const NodeIndex & index, flag role);

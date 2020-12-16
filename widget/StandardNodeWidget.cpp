@@ -21,6 +21,22 @@ void CheckSubNodeWidget::updateDataSubNode(flag role) {
         m_checkBox->setChecked(m_index.data(modelMPS::CheckStateRole).toBool());
 }
 
+////////////////////////////////////////////////// CodeSubNodeWidget //////////////////////////////////////////
+CodeSubNodeWidget::CodeSubNodeWidget(const CodeWidget::Cases & cases, const NodeIndex & index, QWidget * parent)
+    : LabelSubNodeWidget(index,parent) {
+    m_codeWidget = new CodeWidget(cases);
+    m_mainLayout->addWidget(m_codeWidget);
+    connect(m_codeWidget,&CodeWidget::codeChanged,this,[this]() {
+        if(connexionEnable())
+            m_index.model()->setData(m_index,m_codeWidget->code().value(),modelMPS::NumRole);});
+}
+
+void CodeSubNodeWidget::updateDataSubNode(flag role) {
+    LabelSubNodeWidget::updateDataSubNode(role);
+    if(role.test(modelMPS::NumRole))
+        m_codeWidget->setCode(m_index.data(modelMPS::NumRole).toUInt());
+}
+
 ////////////////////////////////////////////////// ComboBoxSubNodeWidget //////////////////////////////////////////
 ComboBoxSubNodeWidget::ComboBoxSubNodeWidget(const NodeIndex & index, QWidget * parent)
     : LabelSubNodeWidget(index,parent) {
@@ -168,7 +184,7 @@ SubNodeWidget * StandardNodeDelegate::createSubNode(const NodeIndex &index, QWid
     Q_ASSERT(index.cible() == modelMPS::SubNodeCible);
     auto info = index.data(modelMPS::SubNodeRole).toList();
     auto indexSubNode = index.index(info.at(modelMPS::CibleSubNode).toInt(),info.at(modelMPS::NumSubNode).toUInt());
-    switch (info.at(modelMPS::TypeSubNode).toInt()) {
+    switch (info.at(modelMPS::TypeSubNode).toUInt()) {
     case modelMPS::CheckSubNode:
         return new CheckSubNodeWidget(indexSubNode,parent);
     case modelMPS::DateSubNode:
@@ -179,4 +195,14 @@ SubNodeWidget * StandardNodeDelegate::createSubNode(const NodeIndex &index, QWid
         return new ComboBoxSubNodeWidget(indexSubNode,parent);
     }
     return new SubNodeWidget(indexSubNode,parent);
+}
+
+SubNodeWidget * CodeStandardNodeDelegate::createSubNode(const NodeIndex &index, QWidget *parent) const {
+    Q_ASSERT(index.cible() == modelMPS::SubNodeCible);
+    if(index.data(modelMPS::SubNodeRole).toList().at(modelMPS::TypeSubNode).toUInt() == modelMPS::CodeSubNode) {
+        auto info = index.data(modelMPS::SubNodeRole).toList();
+        auto indexSubNode = index.index(info.at(modelMPS::CibleSubNode).toInt(),info.at(modelMPS::NumSubNode).toUInt());
+        return new CodeSubNodeWidget(m_cases,indexSubNode,parent);
+    }
+    return StandardNodeDelegate::createSubNode(index,parent);
 }
