@@ -217,8 +217,6 @@ bool TempTreeForModel<T,Model,Index>::insertRows(Factory factory, int row, int c
     return true;
 }
 
-
-
 template<class T, class Model, class Index> template<class Deleter>
 bool TempTreeForModel<T,Model,Index>::removeRows(Deleter del, int row, int count, const Index &parent) {
     if(m_racine && !parent.isValid())

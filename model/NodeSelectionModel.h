@@ -4,7 +4,7 @@
 #ifndef NODESELECTIONMODEL_H
 #define NODESELECTIONMODEL_H
 
-#include "AbstractNodeModel.h"
+#include "ItemNodeModel.h"
 
 namespace modelMPS {
 /*! \ingroup groupeModel
@@ -13,7 +13,7 @@ namespace modelMPS {
 class NodeSelectionModel : public QObject {
     Q_OBJECT
 protected:
-    AbstractNodeModel * m_model;        //!< Model associé à la selection.
+    ItemNodeModel * m_model;        //!< Model associé à la selection.
     bool m_hasSelection = false;                //!< Sélection non vide.
     NodeIndex m_currentIndex;           //!< Index courant.
     std::list<NodeIndex> m_selection;   //!< Sélection courant.
@@ -30,7 +30,7 @@ public:
     };
 
     //! Constructeur.
-    NodeSelectionModel(AbstractNodeModel * model = nullptr, QObject * parent = nullptr);
+    NodeSelectionModel(ItemNodeModel * model = nullptr, QObject * parent = nullptr);
 
     //! Accesseur de l'index courant.
     NodeIndex currentIndex() const
@@ -52,7 +52,7 @@ public:
     }
 
     //! Accesseur du model.
-    AbstractNodeModel * model() const noexcept
+    ItemNodeModel * model() const noexcept
         {return m_model;}
 
     //! Accesseur de la liste de index sélectionnés.
@@ -60,7 +60,7 @@ public:
         {return m_selection;}
 
     //! Mutateur du model.
-    void setModel(AbstractNodeModel * model)
+    void setModel(ItemNodeModel * model)
         {m_model = model;}
 public slots:
     //! Efface la sélection et l'index courant (émet selectionChanged et currentChanged).
@@ -88,7 +88,7 @@ signals:
     void currentChanged(const NodeIndex & current, const NodeIndex & previous);
 
     //! Le model a changé.
-    void modelChanged(AbstractNodeModel * model);
+    void modelChanged(ItemNodeModel * model);
 
     //! La sélection à changé.
     void selectionChanged(const std::list<NodeIndex> & selected, const std::list<NodeIndex> & deselected);

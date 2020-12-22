@@ -38,7 +38,7 @@
     /*! \brief Alias du mutateurs de id ## NUM. */ \
     void setId ## NOM (int n) {setId ## NUM (n);} \
     /*! \brief Alias du mutateurs de id ## NUM. */ \
-    void setId ## NOM (szt n) {setId ## NUM (static_cast<int>(n));} \
+    void setId ## NOM (idt n) {setId ## NUM (static_cast<int>(n));} \
     /*! Nom de identifiant*/ \
     QString nameId ## NUM() const override {return "Id"#NOM;}
 

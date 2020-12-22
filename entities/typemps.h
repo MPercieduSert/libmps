@@ -9,7 +9,7 @@
 namespace typeMPS {
 using idt = unsigned;
 //using codeType = unsigned;
-using szt = unsigned;
+using szt = long unsigned;
 
 class flag {
 public:

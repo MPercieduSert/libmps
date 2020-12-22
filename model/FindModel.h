@@ -7,7 +7,7 @@
 #include <memory>
 #include <QDate>
 #include <QRegularExpression>
-#include "AbstractNodeModel.h"
+#include "ItemNodeModel.h"
 #include "AbstractColonnesModel.h"
 #include "ColonnesForModel.h"
 
@@ -15,7 +15,7 @@ namespace modelMPS {
 /*! \ingroup groupeModel
  * \brief Classe mère des model de recherche.
  */
-class FindModel : public TreeNodeModel, public AbstractFindModel {
+class FindModel : public ItemNodeModel, public AbstractFindModel {
     Q_OBJECT
 public:
     //! Type des noeuds de l'arbre.
@@ -96,7 +96,7 @@ public:
 protected:
     std::vector<Colonne> m_colonnes;                //!< Informations sur les colonnes.
     AbstractColonnesModel * m_model;                //!< Model filtré.
-    using AbstractNodeModel::createIndex;
+    using ItemNodeModel::createIndex;
 public:
     //! Constructeur.
     FindModel(AbstractColonnesModel * model = nullptr, QObject * parent = nullptr);
@@ -154,16 +154,16 @@ namespace findNodeModel {
 /*! \ingroup groupeModel
  * \brief Classe mère des neuds de recherche.
  */
-class FindNode : public TreeNodeModel::AbstractNode {
+class FindNode : public ItemNode {
 protected:
     bool m_negation = false;        //!< Négation.
     FindModel * m_model;    //!< Pointeur sur le model.
-    szt m_pos;              //!< Position de la colonne dans le model filtré.
+    uint m_pos;              //!< Position de la colonne dans le model filtré.
 public:
     enum {Vide = -1};
     //! Constructeur.
-    FindNode(FindModel * model, szt pos, int type = NoType)
-        : AbstractNode(type), m_model(model), m_pos(pos) {}
+    FindNode(FindModel * model, uint pos, int type = NoType)
+        : ItemNode(type), m_model(model), m_pos(pos) {}
 
     //! Accesseur des données du noeud.
     QVariant data(int cible, int role, szt num = 0) const override;
@@ -187,7 +187,7 @@ public:
     flag setData(int cible, const QVariant & value, int role, szt num = 0) override;
 
     //! Mutateur de position.
-    void setPos(szt pos)
+    void setPos(uint pos)
         {m_pos = pos;}
 
     //! Teste si la ligne d'indice id vérifie la condition du noeud.
@@ -203,11 +203,11 @@ public:
  */
 class ComparaisonNode : public FindNode {
 protected:
-    szt m_comp;            //!< Indice de la comparaison.
+    uint m_comp;            //!< Indice de la comparaison.
 public:
     static const std::array<QString, FindModel::NbrComparaison> Strings;        //!< Labels des comparaisons.
     //! Constructeur.
-    ComparaisonNode(FindModel * model, szt pos, szt comp = FindModel::Egal,int type = NoType)
+    ComparaisonNode(FindModel * model, uint pos, uint comp = FindModel::Egal,int type = NoType)
         : FindNode(model,pos,type), m_comp(comp) {}
 
     //! Accesseur de la donnée associé à column.
@@ -228,7 +228,7 @@ protected:
     QString m_trueLabel;    //!< Label du filtre faux.
 public:
     //! Constructeur.
-    BoolNode(FindModel * model, szt pos, const QString & falseLabel = QString(), const QString trueLabel = QString(),
+    BoolNode(FindModel * model, uint pos, const QString & falseLabel = QString(), const QString trueLabel = QString(),
              bool trueChecked = true, bool falseChecked = true)
         : FindNode(model,pos,FindModel::BoolNodeType),
           m_false(falseChecked), m_true(trueChecked),
@@ -263,7 +263,7 @@ protected:
     QDate m_date;       //!< Date de filtrage.
 public:
     //! Constructeur.
-    DateNode(FindModel * model,szt pos,const QDate & date = QDate(), szt comp = FindModel::Egal)
+    DateNode(FindModel * model, uint pos,const QDate & date = QDate(), uint comp = FindModel::Egal)
         : ComparaisonNode(model,pos,comp,FindModel::DateNodeType), m_date(date) {}
 
     //! Destructeur.
@@ -297,7 +297,7 @@ protected:
     bool m_regex;                   //!< La recherche est une expression régulière.
 public:
     //! Constructeur.
-    TexteNode(FindModel * model,szt pos,const QString & texte = QString(), bool c = false,bool regex = false)
+    TexteNode(FindModel * model, uint pos,const QString & texte = QString(), bool c = false,bool regex = false)
         : FindNode(model,pos,FindModel::TexteNodeType), m_texte(texte), m_case(c), m_regex(regex) {
         if(m_regex){
             m_regular.setPattern(m_texte);

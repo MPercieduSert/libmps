@@ -4,7 +4,7 @@ using namespace modelMPS;
 using namespace findNodeModel;
 
 FindModel::FindModel(AbstractColonnesModel * model, QObject *parent)
-    :   TreeNodeModel (parent), m_model(model)
+    :   ItemNodeModel (parent), m_model(model)
     {m_data.setTree(Tree(std::make_unique<FindNode>(this,Et,ChoiceNodeType)));}
 
 void FindModel::find(){
@@ -13,23 +13,25 @@ void FindModel::find(){
 }
 
 void FindModel::insertNode(const NodeIndex & parent, szt pos) {
-    if(getData(parent).type() == OperationNodeType)
-        insertNodes(parent,pos,1,ChoiceNodeType);
-    else {
-        auto node = std::move(m_data.getData(parent));
-        m_data.getData(parent) = std::make_unique<FindNode>(this,Et,OperationNodeType);
-        emit dataChanged(parent,TypeRole);
-        beginInsertNodes(parent,0,1);
-            m_data.tree().push_back(m_data.getIter(parent),std::move(node));
-            m_data.tree().push_back(m_data.getIter(parent),static_cast<Node &&>(std::make_unique<FindNode>(this,Et,ChoiceNodeType)));
-        endInsertNodes();
+    if(parent.isValid()){
+        if(getNode(parent).type() == OperationNodeType)
+            insertNodes(parent,pos,1,ChoiceNodeType);
+        else {
+            auto node = std::move(*m_data.getValidIter(parent));
+            *m_data.getValidIter(parent) = std::make_unique<FindNode>(this,Et,OperationNodeType);
+            emit dataChanged(parent,TypeRole);
+            beginInsertNodes(parent,0,2);
+                m_data.tree().push_back(m_data.getIter(parent),std::move(node));
+                m_data.tree().push_back(m_data.getIter(parent),static_cast<Node &&>(std::make_unique<FindNode>(this,Et,ChoiceNodeType)));
+            endInsertNodes();
+        }
     }
 }
 
 QMap<QString,QVariant> FindModel::nomColonnes() const {
     if(m_model) {
         QMap<QString,QVariant> map;
-        for (szt i = 0; i != m_model->nbrColonne(); ++i)
+        for (uint i = 0; i != m_model->nbrColonne(); ++i)
             map.insert(m_model->colonne(i).header(),i);
         return map;
     }
@@ -37,17 +39,17 @@ QMap<QString,QVariant> FindModel::nomColonnes() const {
         return QMap<QString,QVariant>();
 }
 
-TreeNodeModel::Node FindModel::nodeFactory(const NodeIndex & parent, szt pos, int type) {
+ItemNodeModel::Node FindModel::nodeFactory(const NodeIndex & parent, szt pos, int type) {
     switch (type) {
     case ChoiceNodeType:
         return std::make_unique<FindNode>(this,0,ChoiceNodeType);
     case OperationNodeType:
         return std::make_unique<FindNode>(this,Et,OperationNodeType);
     }
-    return TreeNodeModel::nodeFactory(parent,pos,type);
+    return ItemNodeModel::nodeFactory(parent,pos,type);
 }
 
-TreeNodeModel::Node FindModel::nodeConditionFactory(szt pos){
+ItemNodeModel::Node FindModel::nodeConditionFactory(szt pos){
     switch (m_model->colonne(pos).type()) {
     case BoolNodeType: {
         const auto & colonne = m_model->colonne(pos);
@@ -64,9 +66,9 @@ TreeNodeModel::Node FindModel::nodeConditionFactory(szt pos){
 }
 
 void FindModel::removeNode(const NodeIndex & node){
-    if(node.isValid() && node.parent().isValid() && node.model() == this){
+    if(checkIndex(node) && !node.isRoot()){
         if(childCount(node.parent()) == 2) {
-            m_data.getValidData(node.parent()) = std::move(m_data.getValidData(index(node.parent(), 1 - node.position())));
+            *m_data.getValidIter(node.parent()) = std::move(*m_data.getValidIter(index(node.parent(), 1 - node.position())));
             emit dataChanged(node.parent(),TypeRole);
             removeNodes(node.firstBrother(),2);
         }
@@ -85,27 +87,27 @@ bool FindModel::setData(const NodeIndex &index, const QVariant &value, int role)
     if(index.isValid()) {
         if(role == IntRole) {
             if(index.cible() == OpCible){
-                if(getData(index).type() == ChoiceNodeType
+                if(getNode(index).type() == ChoiceNodeType
                         && value.toInt() >= 0 && value.toInt() < NbrOperation) {
-                    m_data.getValidData(index) = std::make_unique<FindNode>(this,value.toUInt(),OperationNodeType);
+                    *m_data.getValidIter(index) = std::make_unique<FindNode>(this,value.toUInt(),OperationNodeType);
                     emit dataChanged(index.index(NodeCible),TypeRole);
                     insertNodes(index,0,2,ChoiceNodeType);
                     return true;
                 }
             }
             else if (index.cible() == ColonneCible) {
-                if(getData(index).type() != OperationNodeType
+                if(getNode(index).type() != OperationNodeType
                         && value.toInt() >= 0 && value.toInt() < m_model->columnCount()) {
-                    if(getData(index).type() != m_model->colonne(value.toUInt()).type())
-                        m_data.getValidData(index) = nodeConditionFactory(value.toUInt());
+                    if(getNode(index).type() != m_model->colonne(value.toUInt()).type())
+                        *m_data.getValidIter(index) = nodeConditionFactory(value.toUInt());
                     else
-                        static_cast<FindNode &>(getData(index)).setPos(value.toUInt());
+                        static_cast<FindNode &>(getNode(index)).setPos(value.toUInt());
                     emit dataChanged(index.index(NodeCible),TypeRole);
                     return true;
                 }
             }
         }
-        return TreeNodeModel::setData(index,value,role);
+        return ItemNodeModel::setData(index,value,role);
     }
     return false;
 }
@@ -126,7 +128,7 @@ bool FindModel::testTree(szt id) const{
     auto iter = m_data.tree().crbegin();
     iter.toFirstLeaf();
     auto test = true;
-    while (!iter.parent().root()) {
+    while (!iter.root()) {
         if(iter.leaf() && !static_cast<const FindNode &>(**iter).empty())
             test = static_cast<const FindNode &>(**iter).test(id,m_model);
         if(static_cast<const FindNode &>(**iter).negation())
@@ -210,7 +212,7 @@ QVariant FindNode::data(int cible, int role, szt num) const {
         }
         break;
     }
-    return AbstractNode::data(cible,role,num);
+    return ItemNode::data(cible,role,num);
 }
 
 szt FindNode::dataCount(int cible) const {
@@ -222,7 +224,7 @@ szt FindNode::dataCount(int cible) const {
             return FindModel::OperationDatacount;
         }
     }
-    return AbstractNode::dataCount(cible);
+    return ItemNode::dataCount(cible);
 }
 
 flag FindNode::setData(int cible, const QVariant & value, int role, szt num) {
@@ -241,7 +243,7 @@ flag FindNode::setData(int cible, const QVariant & value, int role, szt num) {
         }
         break;
     }
-    return AbstractNode::setData(cible,value,role,num);
+    return ItemNode::setData(cible,value,role,num);
 }
 ///////////////////////////// ComparaisonNode ///////////////////
 QVariant ComparaisonNode::data(int cible, int role, szt num) const{

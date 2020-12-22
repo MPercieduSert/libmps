@@ -25,7 +25,6 @@ SOURCES += \
     AbstractColonnesModel.cpp \
     AbstractEntityTableau.cpp \
     AbstractModel.cpp \
-    AbstractNodeModel.cpp \
     ColonnesForModel.cpp \
     FindNoeudModel.cpp \
     TableauForModel.cpp \
@@ -34,13 +33,13 @@ SOURCES += \
     TreeNoeudModel.cpp \
     FindModel.cpp \
     NodeSelectionModel.cpp \
-    PredefModel.cpp
+    PredefModel.cpp \
+    ItemNodeModel.cpp
 
 HEADERS += \
     AbstractColonnesModel.h \
     AbstractEntityTableau.h \
     AbstractModel.h \
-    AbstractNodeModel.h \
     ColonnesForModel.h \
     FindNoeudModel.h \
     TableauForModel.h \
@@ -49,7 +48,8 @@ HEADERS += \
     TreeNoeudModel.h \
     FindModel.h \
     NodeSelectionModel.h \
-    PredefModel.h
+    PredefModel.h \
+    ItemNodeModel.h
 
 unix {
     target.path = /usr/lib

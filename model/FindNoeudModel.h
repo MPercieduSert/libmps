@@ -185,14 +185,14 @@ public:
  */
 class AbstractConditionNoeud : public AbstractNegationNoeud {
 protected:
-    szt m_pos = 0;            //!< Position de la colonne dans le model filtré.
+    uint m_pos = 0;            //!< Position de la colonne dans le model filtré.
     QString m_label;    //!< Label de la condition.
 public:
     //! Constructeur.
     AbstractConditionNoeud() = default;
 
     //!Constructeur.
-    AbstractConditionNoeud(szt pos, const QString & label, int type = NoType)
+    AbstractConditionNoeud(uint pos, const QString & label, int type = NoType)
         : AbstractNegationNoeud(type), m_pos(pos), m_label(label) {}
 
     //! Accesseur de la donnée associé à column.
@@ -223,7 +223,7 @@ public:
         {m_label = label;}
 
     //! Mutateur de position.
-    void setPos(szt pos)
+    void setPos(uint pos)
         {m_pos = pos;}
 
     //! Teste si la ligne d'indice id vérifie la condition du noeud.
@@ -238,11 +238,11 @@ public:
  */
 class AbstractComparaisonNoeud : public AbstractConditionNoeud {
 protected:
-    szt m_comp;            //!< Indice de la comparaison.
+    uint m_comp;            //!< Indice de la comparaison.
 public:
     static const std::array<QString, NbrComparaison> Strings;        //!< Labels des comparaisons.
     //! Constructeur.
-    AbstractComparaisonNoeud(szt pos, const QString & label, szt comp = Egal,int type = NoType)
+    AbstractComparaisonNoeud(uint pos, const QString & label, uint comp = Egal,int type = NoType)
         : AbstractConditionNoeud(pos,label,type), m_comp(comp) {}
 
     //! Accesseur de la donnée associé à column.
@@ -270,7 +270,7 @@ protected:
     bool m_false;            //!< Filtre contenant les faux.
 public:
     //! Constructeur.
-    BoolNoeud(szt pos, const QString & label,
+    BoolNoeud(uint pos, const QString & label,
              const QString & trueLabel = QString(), const QString & falseLabel = QString(),
              bool trueChecked = true, bool falseChecked = true)
         : AbstractConditionNoeud(pos,label,BoolNoeudType),
@@ -333,7 +333,7 @@ protected:
     QDate m_date;       //!< Date de filtrage.
 public:
     //! Constructeur.
-    DateNoeud(szt pos, const QString & label,const QDate & date = QDate(), szt comp = Egal)
+    DateNoeud(uint pos, const QString & label,const QDate & date = QDate(), uint comp = Egal)
         : AbstractComparaisonNoeud(pos,label,comp,DateNoeudType), m_date(date) {}
 
     //! Destructeur.
@@ -365,11 +365,11 @@ public:
  */
 class OperationNoeud : public AbstractNegationNoeud {
 protected:
-    szt m_operation;        //!< Identifiant de l'opération
+    uint m_operation;        //!< Identifiant de l'opération
 public:
     static const std::array<QString, NbrOperation> Strings;        //!< Labels des opération.
     //! Constructeur.
-    OperationNoeud(szt op = Et) : AbstractNegationNoeud(OperationNoeudType), m_operation(op) {}
+    OperationNoeud(uint op = Et) : AbstractNegationNoeud(OperationNoeudType), m_operation(op) {}
 
     //! Destructeur.
     ~OperationNoeud() override = default;
@@ -403,7 +403,7 @@ protected:
     bool m_regex;           //!< La recherche est une expression régulière.
 public:
     //! Constructeur.
-    TexteNoeud(szt pos, const QString & label,const QString & texte = QString(), bool c = false,bool regex = false)
+    TexteNoeud(uint pos, const QString & label,const QString & texte = QString(), bool c = false,bool regex = false)
         : AbstractConditionNoeud(pos,label,TexteNoeudType), m_texte(texte), m_case(c), m_regex(regex) {
         if(m_regex){
             m_regular.setPattern(m_texte);

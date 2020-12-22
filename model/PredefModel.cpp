@@ -4,7 +4,7 @@ using namespace modelMPS;
 
 ////////////////////////////////////////////// PermissionModel ////////////////////////////////////
 PermissionModel::PermissionModel(bddMPS::BddPredef & bdd, szt offset, QObject * parent)
-    : TreeNodeModelWithBdd(bdd, parent), m_offset(offset) {
+    : ItemNodeBddModel(bdd, parent), m_offset(offset) {
     m_idNomVec.reserve(m_bdd.nbrEntity());
     for(szt i = 0; i < m_bdd.nbrEntity(); ++i) {
         if(m_bdd.managers().valide(i))
@@ -25,7 +25,7 @@ szt PermissionModel::dataCount(const NodeIndex & index) const {
     case SubNodeCible:
         return static_cast<szt>(m_cibleVec.size()) + m_offset;
     }
-    return TreeNodeModel::dataCount(index);
+    return ItemNodeModel::dataCount(index);
 }
 
 void PermissionModel::setCible(szt num, bool visible){

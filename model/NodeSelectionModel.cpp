@@ -2,7 +2,7 @@
 
 using namespace modelMPS;
 
-NodeSelectionModel::NodeSelectionModel(AbstractNodeModel * model, QObject * parent)
+NodeSelectionModel::NodeSelectionModel(ItemNodeModel *model, QObject * parent)
     : QObject(parent), m_model(model){
 
 }

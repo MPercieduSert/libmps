@@ -491,7 +491,7 @@ public:
         sqlW.chop(4);
         QString sqlO;
         for(unsigned i =0; i != ordre.size(); ++i) {
-            sqlO.append(ordre[i]);
+            sqlO.append(attribut(ordre[i]));
             if(i < crois.size())
                 sqlO.append(" ").append(croissant(crois[i]));
             sqlO.append(",");
@@ -654,7 +654,7 @@ public:
         sql.chop(4);
         sql.append("ORDER BY ");
         for(unsigned i =0; i != ordre.size(); ++i) {
-            sql.append(ordre[i]);
+            sql.append(attribut(ordre[i]));
             if(i < crois.size())
                 sql.append(" ").append(croissant(crois[i]));
             sql.append(",");

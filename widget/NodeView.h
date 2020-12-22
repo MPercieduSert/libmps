@@ -257,7 +257,7 @@ public:
 protected:
     friend ArcNodeViewWidget;
     using Delegate = delegateMPS::AbstractNodeDelegate;
-    using Model = modelMPS::AbstractNodeModel;
+    using Model = modelMPS::ItemNodeModel;
     using NodeIndex = modelMPS::NodeIndex;
     using SelectionModel = modelMPS::NodeSelectionModel;
     bool m_connexionUpdateData = true;                  //!< Etat de connexion de la mise à jour des données.

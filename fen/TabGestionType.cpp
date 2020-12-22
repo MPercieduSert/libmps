@@ -16,7 +16,7 @@ TabGestionType::TabGestionType(bmps::Bdd & bdd, const std::pair<int, int> &pairI
     m_view->setModel(m_model);
     m_view->setDelegate(new delegateMPS::CodeStandardNodeDelegate(cases,this));
     m_cibleListWidget = new QListWidget;
-    szt num = 0;
+    uint num = 0;
     for (auto iter = m_model->idNomVec().cbegin(); iter != m_model->idNomVec().cend(); ++iter,++num) {
         auto item = new QListWidgetItem(iter->second,m_cibleListWidget);
         item->setData(Qt::UserRole,num);

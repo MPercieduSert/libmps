@@ -4,14 +4,14 @@
 #ifndef PREDEFMODEL_H
 #define PREDEFMODEL_H
 
-#include "AbstractNodeModel.h"
+#include "ItemNodeModel.h"
 #include "BddPredef.h"
 
 namespace modelMPS {
 /*! \ingroup groupeModel
  * \brief Model de gestion des types.
  */
-class PermissionModel : public TreeNodeModelWithBdd {
+class PermissionModel : public ItemNodeBddModel {
     Q_OBJECT
 protected:
     const szt m_offset;                                 //!< Offset de postion des cibles.
@@ -44,7 +44,7 @@ public:
     flag flags(const NodeIndex & index) const override{
         if(index.isRoot())
             return NoFlagNode;
-        return TreeNodeModelWithBdd::flags(index);
+        return ItemNodeBddModel::flags(index);
     }
 
     //! Nom d'une cible.
@@ -70,10 +70,10 @@ public:
 /*! \ingroup groupeModel
  * \brief Classe abstraite mère des neuds d'un model de permission.
  */
-class AbstractPermissionNode : public TreeNodeModel::AbstractNode {
+class AbstractPermissionNode : public ItemNode {
 public:
     //! Constructeur.
-    using TreeNodeModel::AbstractNode::AbstractNode;
+    using ItemNode::ItemNode;
 
     //! Ajoute une cible aux permissions.
     virtual void addCible(int cible) = 0;
@@ -146,12 +146,12 @@ public:
  */
 template<class Ent, class Permission, class Node> class MakeArbreNode {
 public:
-    static TreeNodeModel::Tree arbre(PermissionModel * model);
+    static ItemNodeModel::Tree arbre(PermissionModel * model);
 };
 
 
-template<class Ent, class Permission, class Node> TreeNodeModel::Tree MakeArbreNode<Ent,Permission,Node>::arbre(PermissionModel *model){
-    return TreeNodeModel::Tree(model->bdd().getArbre<Ent>(),[model](const Ent & entity) {
+template<class Ent, class Permission, class Node> ItemNodeModel::Tree MakeArbreNode<Ent,Permission,Node>::arbre(PermissionModel *model){
+    return ItemNodeModel::Tree(model->bdd().getArbre<Ent>(),[model](const Ent & entity) {
         auto node = std::make_unique<Node>(model);
         node->setEnt(entity);
         return node;
@@ -209,13 +209,13 @@ template<class Ent, class Permission> QVariant PermissionNode<Ent,Permission>::d
             if(num >= m_model->offset()) {
                 QList<QVariant> init;
                 init.append(PermissionModel::PermissionCible);
-                init.append(num - m_model->offset());
+                init.append(static_cast<uint>(num - m_model->offset()));
                 init.append(CodeSubNode);
                 return init;
             }
         }
     }
-    return AbstractNode::data(cible,role,num);
+    return ItemNode::data(cible,role,num);
 }
 
 template<class Ent, class Permission> flag PermissionNode<Ent,Permission>::setData(int cible, const QVariant &value, int role, szt num) {
@@ -231,7 +231,7 @@ template<class Ent, class Permission> flag PermissionNode<Ent,Permission>::setDa
         m_permissionMap[m_model->cible(num)] = value.toUInt();
         return NumRole;
     }
-    return AbstractNode::setData(cible,value,role,num);
+    return ItemNode::setData(cible,value,role,num);
 }
 
 template<class Ent, class Permission> void PermissionNode<Ent,Permission>::setEnt(const Ent & entity) {

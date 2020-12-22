@@ -10,20 +10,20 @@ QWidget * FindNoeudDelegate::createEditor(QWidget *parent, const QStyleOptionVie
     if(index.isValid()) {
         if(index.column() == OpColumn) {
             auto * comboBox = new QComboBox(parent);
-            for (szt i = 0; i != NbrOperation; ++i)
+            for (uint i = 0; i != NbrOperation; ++i)
                 comboBox->addItem(OperationNoeud::Strings[i],i);
             return comboBox;
         }
         if(index.column() == ColonneColumn) {
             auto * comboBox = new QComboBox(parent);
             auto vec = static_cast<const modelMPS::FindNoeudModel *>(index.model())->nomColonnes();
-            for (szt i = 0; i != vec.size(); ++i)
+            for (uint i = 0; i != vec.size(); ++i)
                 comboBox->addItem(vec[i],i);
             return comboBox;
         }
         if(index.column() == ComparaisonColumn && index.model()->data(index,Qt::UserRole).toUInt() & ComparaisonSet) {
             auto * comboBox = new QComboBox(parent);
-            for (szt i = 0; i != NbrComparaison; ++i)
+            for (uint i = 0; i != NbrComparaison; ++i)
                 comboBox->addItem(AbstractComparaisonNoeud::Strings[i],i);
             return comboBox;
         }
