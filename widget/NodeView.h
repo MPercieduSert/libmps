@@ -316,10 +316,10 @@ public:
 
 public slots:
     //! Prend en compte l'insertion de nouveau noeud du model.
-    void insertNodes(const NodeIndex & parent, szt first, szt last);
+    void insertNodes(const NodeIndex & parent, numt first, numt last);
 
     //! Prend en compte la suppression de noeud du model.
-    void removeNodes(const NodeIndex & parent, szt first, szt last);
+    void removeNodes(const NodeIndex & parent, numt first, numt last);
 
     //! Met à jour toutes les données.
     void updateAllData();
@@ -379,7 +379,7 @@ public:
         {return m_expanded;}
 
     //! Prend en compte l'insertion de noeuds enfants.
-    void insertNodes(szt first, szt last);
+    void insertNodes(numt first, numt last);
 
     //! Accesseur de l'état de feuille.
     bool leaf() const noexcept
@@ -390,7 +390,7 @@ public:
         {return m_nodeWidget;}
 
     //! Suppresion de noeud enfant de first à last.
-    void removeNodes(szt first, szt last);
+    void removeNodes(numt first, numt last);
 
     //! Accesseur de root.
     bool root() const noexcept

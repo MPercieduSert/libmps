@@ -28,11 +28,11 @@ namespace bddMPS {
 
     //! Structure contenant les donnée et variable associé à chaque table.
     struct Table {
-        QString name;                        //!< Nom de la table (entitée).
-        QString nameBdd;                     //!< Nom de la table dans la base de donnée.
-        std::vector<QString> namesAttributs;           //!< Liste des noms des attributs.
-        std::map<szt,QString> foreignKeys;  //!< Map des clés étrangères.
-        std::vector<Table> tablesAnnexe;    //! Vecteur des tables annexes
+        QString name;                           //!< Nom de la table (entitée).
+        QString nameBdd;                        //!< Nom de la table dans la base de donnée.
+        std::vector<QString> namesAttributs;    //!< Liste des noms des attributs.
+        std::map<post,QString> foreignKeys;      //!< Map des clés étrangères.
+        std::vector<Table> tablesAnnexe;        //! Vecteur des tables annexes
     };
 }
 
@@ -44,15 +44,15 @@ class Managers {
 protected:
     using VersionBdd = entityMPS::VersionBdd;
 
-    const szt m_nbrEntity;                          //!< Nombre d'entité associées à un managers de la base de donnée.
+    const entidt m_nbrEntity;                          //!< Nombre d'entité associées à un managers de la base de donnée.
     QSqlQuery m_requete;                            //!< Requéte commune aux manageurs.
     std::vector<std::unique_ptr<AbstractManager>> m_managers;           //!< Tableau des manageurs.
     std::unique_ptr<ManagerSql<VersionBdd>> m_managerVersion;           //!< Manager de l'entité version de la base de donnée.
 
 public:
     //! Constructeur.
-    Managers(szt nbrEntity, const QString & versionTable,
-                     std::map<szt,std::unique_ptr<AbstractManager>> && managers = std::map<szt,std::unique_ptr<AbstractManager>>(),
+    Managers(entidt nbrEntity, const QString & versionTable,
+                     std::map<entidt,std::unique_ptr<AbstractManager>> && managers = std::map<entidt,std::unique_ptr<AbstractManager>>(),
                      const QSqlQuery & req = QSqlQuery());
 
     //! Destructeur.
@@ -73,19 +73,19 @@ public:
     VersionBdd getVersion(idt type);
 
     //! Renvoie l'indice du manager associé à l'entité de nom name ou nbrEntity s'il n'existe pas.
-    szt find(const QString & name) const{
-        szt i = 0;
+    entidt find(const QString & name) const{
+        entidt i = 0;
         while(i < m_nbrEntity && (!valide(i) || info(i).name() != name))
             ++i;
         return i;
     }
 
     //! Retourne un référence sur le manager des entités de ID, id.
-    AbstractManager & get(szt id)
+    AbstractManager & get(entidt id)
         {return getP(id);}
 
     //! Retourne un référence sur le manager des entités de ID, id.
-    const AbstractManager & get(szt id) const
+    const AbstractManager & get(entidt id) const
         {return getP(id);}
 
 
@@ -98,34 +98,30 @@ public:
         {return static_cast<AbstractManagerTemp<Ent> &>(*m_managers[Ent::ID]);}
 
     //! Teste s'il existe une version d'un type donnée.
-    bool existsVersion(idt type);
+    bool existsVersion(numt type);
 
     //! Renvoie les informations sur la table associée à l'entité d'identifiant id.
-    const InfoBdd & info(szt id) const;
+    const InfoBdd & info(entidt id) const;
 
     //! Fabrique d'entité de classe nomée entity.
     std::unique_ptr<Entity> makeEntity(const QString & entity) const;
 
     //! Retourne le nombre d'entités associées à un manager dans la base de donnée.
-    szt nbrEntity() const noexcept
+    entidt nbrEntity() const noexcept
         {return m_nbrEntity;}
 
     //! Retourne le numero de version de la base de donnée.
-    int numVersion(idt type);
+    int numVersion(numt type);
 
     //! Enregistre le numéro de version de la base de donnée.
-    void saveVersion(int num, idt type);
+    void saveVersion(int num, numt type);
 
     //! Modifie le pointeur vers l'objet requête.
     void setRequete(const QSqlQuery & req);
 
     //! Teste si le manager d'identifiant id est valide.
-    bool valide(szt id) const noexcept
+    bool valide(entidt id) const noexcept
         {return id < m_nbrEntity && m_managers[id];}
-
-//    //! Renvoie les informations sur la table associée à l'entité d'identifiant id.
-//    bmps::Table table(szt id) const;
-
 protected:
     //! Construit les informations d'un arbre pour la création des managers de type arbre.
     InfoBdd infoBddArbre(const QString & table) const;
@@ -134,7 +130,7 @@ protected:
     template<class Ent> void setManager(std::unique_ptr<AbstractManagerTemp<Ent>> && manager)
         {m_managers[Ent::ID] = std::move(manager);}
 
-    AbstractManager & getP(szt id) const {
+    AbstractManager & getP(entidt id) const {
         if(id < m_nbrEntity) {
             if(m_managers[id])
                 return *m_managers[id];
@@ -144,43 +140,6 @@ protected:
         else
             throw std::invalid_argument("Identifiant d'entité invalide dans la fonction get.");
     }
-
-    /*//! Retourne le manager des entités de ID, id sans vérification.
-    virtual AbstractManager * getP(int id) const = 0;*/
 };
-/*
-template<int NbrEntity> class Managers : public AbstractManagers
-{
-protected:
-    std::array<AbstractManager *,NbrEntity> m_managers; //!< Tableau des manageurs.
-
-public:
-    //! Constructeur.
-    Managers(const std::array<AbstractManager *,NbrEntity> & managers, const QSqlQuery & req = QSqlQuery())
-        : AbstractManagers(req)
-        {std::copy(managers.cbegin(),managers.cend(),m_managers.begin());}
-
-    //! Destructeur.
-    ~AbstractManagers()
-    {
-        for(std::array::const_iterator i = m_managers.cbegin(); i != m_managers.cend(); i++)
-            delete *i;
-    }
-
-    //! Retourne le manager des entités de ID, id.
-    AbstractManager * get(int id) const
-    {
-        if(id >= 0 and id < NbrEntity)
-            return m_managers[id];
-        else
-            throw std::invalid_argument("Identifiant d'entité invalide dans la fonction get.");
-    }
-
-protected:
-    //! Retourne le manager des entités de ID, id sans vérification.
-    AbstractManager * getP(int id) const
-        {return m_managers[id];}
-}
-*/
 }
 #endif // MANAGERS_H

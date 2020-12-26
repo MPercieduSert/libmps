@@ -45,7 +45,7 @@ public:
 //                                                         Qt::ItemFlags flags,int pos) const = 0;
 
     //! Taille (nombre de lignes).
-    szt size() const override {return m_data.empty() ? 0 : static_cast<szt>(m_data.front().size());}
+    szt size() const override {return m_data.empty() ? 0 : m_data.front().size();}
 
 //    //! Selectionne les lignes à afficher vérifiant une condition
 //    template<class UnaryPredicat> void find(UnaryPredicat predicat, bool reset = true);

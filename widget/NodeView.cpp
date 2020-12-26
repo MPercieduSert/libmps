@@ -45,11 +45,11 @@ void ArcNodeViewWidget::drawNode(bool next) {
     }
 }
 
-void ArcNodeViewWidget::insertNodes(szt first, szt last){
+void ArcNodeViewWidget::insertNodes(numt first, numt last){
     if(last >= first) {
         setLeaf(false);
         if(m_expanded) {
-            auto iterfirst = m_arcChild.insert(std::next(m_arcChild.cbegin(),first),static_cast<szt>(last - first + 1), nullptr);
+            auto iterfirst = m_arcChild.insert(std::next(m_arcChild.cbegin(),first), last - first + 1, nullptr);
             auto iter = iterfirst;
             auto child = m_nodeWidget->index().model()->index(m_nodeWidget->index(),first);
             while (first <= last && child.isValid()) {
@@ -79,7 +79,7 @@ void ArcNodeViewWidget::paintEvent(QPaintEvent * /*event*/) {
     }
 }
 
-void ArcNodeViewWidget::removeNodes(szt first, szt last) {
+void ArcNodeViewWidget::removeNodes(numt first, numt last) {
     if(first <= last && last < m_arcChild.size()) {
         auto firstIter = std::next(m_arcChild.begin(), first);
         auto lastIter = std::next(m_arcChild.begin(), last + 1);
@@ -227,13 +227,13 @@ void NodeView::deleteRoot(){
     delete takeWidget();
 }
 
-void NodeView::insertNodes(const NodeIndex & parent, szt first, szt last) {
+void NodeView::insertNodes(const NodeIndex & parent, numt first, numt last) {
     auto iter = m_arcMap.find(parent.internalPointer());
     if(iter != m_arcMap.end())
         iter->second->insertNodes(first,last);
 }
 
-void NodeView::removeNodes(const NodeIndex & parent, szt first, szt last) {
+void NodeView::removeNodes(const NodeIndex & parent, numt first, numt last) {
     auto iter = m_arcMap.find(parent.internalPointer());
     if(iter != m_arcMap.end())
         iter->second->removeNodes(first, last);

@@ -247,7 +247,7 @@ public:
     }
 
     //! Renvoie un iterateur sur l'entité d'identifiant id si elle existe.
-    const_iterator findId(unsigned id) noexcept;
+    const_iterator findId(idt id) noexcept;
 
     //! Renvoie une référence sur la valeur du premier élément.
     T & front()
@@ -353,7 +353,7 @@ template<class T> template<class U> VectorPtr<T>::VectorPtr(VectorPtr<U> && vect
     }
 }
 
-template<class T> typename VectorPtr<T>::const_iterator VectorPtr<T>::findId(unsigned id) noexcept{
+template<class T> typename VectorPtr<T>::const_iterator VectorPtr<T>::findId(idt id) noexcept{
     const_iterator i = begin();
     while(i != end() && i->id() != id)
         ++i;

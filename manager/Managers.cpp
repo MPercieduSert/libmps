@@ -2,8 +2,8 @@
 
 using namespace managerMPS;
 
-Managers::Managers(const szt nbrEntity, const QString & versionTable,
-                   std::map<szt,std::unique_ptr<AbstractManager>> && managers,
+Managers::Managers(const entidt nbrEntity, const QString & versionTable,
+                   std::map<entidt,std::unique_ptr<AbstractManager>> && managers,
                    const QSqlQuery & req)
       : m_nbrEntity(nbrEntity),
         m_requete(req),
@@ -35,11 +35,11 @@ entityBaseMPS::VersionBdd Managers::getVersion(idt type) {
     return ver;
 }
 
-const InfoBdd & Managers::info(szt id) const {
+const InfoBdd & Managers::info(entidt id) const {
     if(valide(id))
             return m_managers[id]->info();
     else
-        throw std::invalid_argument(QString("Managers::info(szt) manager d'indentifiant ")
+        throw std::invalid_argument(QString("Managers::info(entidt) manager d'indentifiant ")
                                     .append(QString::number(id)).append("invalide").toStdString());
 }
 
@@ -64,10 +64,10 @@ std::unique_ptr<Entity> Managers::makeEntity(const QString & entity) const {
         return m_managers[i]->makeEntity();
 }
 
-int Managers::numVersion(idt type)
+int Managers::numVersion(numt type)
     {return m_managerVersion->fonctionAgrega(bmps::Max,VersionBdd::Num,VersionBdd::Type,type).toInt();}
 
-void Managers::saveVersion(int num, idt type)
+void Managers::saveVersion(int num, numt type)
     {m_managerVersion->save(VersionBdd(num,type));}
 
 void Managers::setRequete(const QSqlQuery & req) {
@@ -75,7 +75,7 @@ void Managers::setRequete(const QSqlQuery & req) {
     AbstractManagerSql::setRequete(&m_requete);
 }
 
-//bmps::Table Managers::table(szt id) const {
+//bmps::Table Managers::table(entidt id) const {
 //    if(id < m_nbrEntity) {
 //        if(m_managers[id]){
 //            bmps::Table tab;

@@ -81,7 +81,7 @@ public:
     QString affiche() const override;
 
     //! Retourne un QVariant contenant la donnée souhaitée ou un QVariant nulle si num est invalide.
-    virtual QVariant data(szt pos) const
+    virtual QVariant data(post pos) const
         {return pos == Id ? id() : QVariant();}
 
     //! Teste si l'entité est nouvelle ou si elle provient de la base de donnée en regardant si elle poséde un identifiant non-nul.
@@ -89,19 +89,19 @@ public:
         {return id() == 0;}
 
     //! Renvoie l'identifiant du type de l'entité.
-    virtual szt idEntity() const = 0;
+    virtual entidt idEntity() const = 0;
 
     //! Renvoie le nom de l'entité.
     virtual QString name() const = 0;
 
     //! Retourne un le nom de l'attribut d'indice num.
-    virtual QString nameAttribut(szt pos) const = 0;
+    virtual QString nameAttribut(post pos) const = 0;
 
     //! Renvoie le nombre d'attribut de l'entité.
-    virtual szt nbrAtt() const = 0;
+    virtual post nbrAtt() const = 0;
 
     //! Mutateur de l'attribut d'indice i.
-    virtual void setData(szt i, const QVariant & value) = 0;
+    virtual void setData(post i, const QVariant & value) = 0;
 
     //! Mutateur de l'attribut de nom attr.
     virtual bool hydrate(const QString & attr, const QVariant & value);
@@ -117,7 +117,7 @@ public:
         {return id() == entity.id();}
 
     //! Retourne la position de l'attribut de nom attr (retourne NbrAtt si attr est nom de aucun attribut.
-    szt position(const QString & attr) const;
+    post position(const QString & attr) const;
 
 protected:
     //! Remplace les attributs de l'entité par celle de l'entité transmise, sauf l'identifiant.
@@ -203,40 +203,40 @@ public:
 //    bool hydrate(const QString & attr, const QVariant & value) override;
 
     //! Renvoie le nombre d'attribut de l'entité.
-    szt nbrAtt() const override
+    post nbrAtt() const override
         {return NbrAtt;}
 
     //! Retourne un le nom de l'attribut d'indice num.
-    QString nameAttribut(szt pos) const override
+    QString nameAttribut(post pos) const override
         {return pos < NbrAtt ? Attributs<Entity,Attribut>::attributName(pos) : QString();}
 
     //! Retourne un vecteur contenant les noms des attributs.
     static std::vector<QString> namesAttributs() {
         std::vector<QString> vect(NbrAtt);
-        for (szt i =0; i < NbrAtt; ++i) {
+        for (post i =0; i < NbrAtt; ++i) {
             vect[i] = Attributs<Entity,Attribut>::nameAttribut(i);
         }
         return vect;
     }
 
     //! Retourne un le nom de l'attribut d'indice num.
-    static QString NameAttribut(szt pos)
+    static QString NameAttribut(post pos)
         {return pos < NbrAtt ? Attributs<Entity,Attribut>::NameAttribut(pos) : QString();}  
 
     //! Retourne un vecteur contenant les noms des attributs.
     static std::vector<QString> NamesAttributs() {
         std::vector<QString> vect(NbrAtt);
-        for (szt i =0; i < NbrAtt; ++i) {
+        for (post i =0; i < NbrAtt; ++i) {
             vect[i] = Attributs<Entity,Attribut>::NameAttribut(i);
         }
         return vect;
     }
 
 //    //! Retourne la position de l'attribut de nom attr (retourne NbrAtt si attr est nom de aucun attribut.
-//    szt position(const QString & attr) const override;
+//    post position(const QString & attr) const override;
 
     //! Mutateur de l'attribut d'indice i.
-    void setData(szt i, const QVariant & value) {
+    void setData(post i, const QVariant & value) {
         if(i < NbrAtt)
             setDataP(i, value);
     }
@@ -252,7 +252,7 @@ protected:
 /*! \ingroup groupeEntity
  * \brief Classe abstraite de base des entités implémenté les membres utilisant l'identifiant du type de l'entité.
  */
-template <szt IDM, class Attribut> class EntityID : public EntityAttributs<Attribut> {
+template <entidt IDM, class Attribut> class EntityID : public EntityAttributs<Attribut> {
 public:
     enum {ID = IDM,         //!< Identifiant de l'attribut.
          };
@@ -297,7 +297,7 @@ public:
     }
 
     //! Renvoie l'identifiant du type de l'entité.
-    szt idEntity() const override
+    entidt idEntity() const override
         {return ID;}
 
     //! Test si le pointeur entity est aussi un pointeur de ce type d'entité.
@@ -322,6 +322,6 @@ public:
         {set(Convert(entity));}
 };
 
-template <szt IDM, class... Attribut> using EntityIDs = EntityID<IDM,Attributs<Attribut...>>;
+template <entidt IDM, class... Attribut> using EntityIDs = EntityID<IDM,Attributs<Attribut...>>;
 }
 #endif // ENTITY_H

@@ -484,7 +484,7 @@ public:
     void miseAJourBdd();
 
     //! Renvoie le nombre de type d'entitée (virtuelle).
-    szt nbrEntity() const noexcept
+    entidt nbrEntity() const noexcept
         {return m_manager->nbrEntity();}
 
     //! Ouvre la base de donnée.
@@ -631,11 +631,11 @@ protected:
         {return del<Ent>(getListId<Ent>(args...));}
 
     //! Supprime l'entité d'identifiant id de type d'identifiant idEntity de la base de données.
-    virtual bool delP(idt id, szt idEntity)
+    virtual bool delP(idt id, entidt idEntity)
         {return m_manager->get(idEntity).del(id);}
 
     //! Hydrate un attribut de l'entité par la valeur contenue dans le XmlDox à l'endroit pointé par iter.
-    virtual QString hydrateAttributXml(entityMPS::Entity & entity, szt pos, fichierMPS::XmlDoc::const_brother_iterator iter);
+    virtual QString hydrateAttributXml(entityMPS::Entity & entity, post pos, fichierMPS::XmlDoc::const_brother_iterator iter);
 
     //! Hydrate l'entité avec les valeurs contenues dans le XmlDox à l'endroit pointé par iter.
     QString hydrateEntityXml(entityMPS::Entity & entity, fichierMPS::XmlDoc::const_brother_iterator iter);
@@ -650,7 +650,7 @@ protected:
     template<class Ent,class Conteneur> void saveConteneur(const Conteneur & vector);
 
     //! Renvoie l'autorisation de modification de l'entité donnée en argument.
-    virtual bool testAutorisationP(idt id, szt idEntity, flag autoris);
+    virtual bool testAutorisationP(idt id, entidt idEntity, flag autoris);
 
     //! Vérifie les autorisations des entités dont l'identifiant est dans liste.
     template<class Ent> bool testAutorisation(const std::list<idt> & liste, flag autoris) {

@@ -61,7 +61,7 @@ public:
     ~BddPredef() override = default;
 
     //! Retourne le numéro de cible associé à l'identifiant d'une entité.
-    int cible(szt id) const
+    int cible(entidt id) const
         {return managers().cible(id);}
 
     //! Retourne le numéro de cible associé à un type d'entité.
@@ -98,10 +98,10 @@ public:
 
 protected:
     //! Supprime l'entité d'identifiant id de type d'identifiant idEntity de la base de données.
-    bool delP(idt id, szt idEntity) override;
+    bool delP(idt id, entidt idEntity) override;
 
     //! Hydrate un attribut de l'entité par la valeur contenue dans le XmlDox à l'endroit pointé par iter.
-    QString hydrateAttributXml(entityMPS::Entity & entity, szt pos, fichierMPS::XmlDoc::const_brother_iterator iter) override;
+    QString hydrateAttributXml(entityMPS::Entity & entity, post pos, fichierMPS::XmlDoc::const_brother_iterator iter) override;
 
     //! Renvoie le numero de début d'enregistrement d'une entité.
     std::pair<int, int> intervalEntityInDonnee(idt idCible, int cible, int num);
@@ -110,7 +110,7 @@ protected:
     void listeMiseAJourBdd(int version, idt type) override;
 
     //! Renvoie l'autorisation de modification de l'entité donnée en argument.
-    bool testAutorisationP(idt id, szt idEntity, flag autoris) override;
+    bool testAutorisationP(idt id, entidt idEntity, flag autoris) override;
 };
 
 template<class Ent> Ent BddPredef::getEntityInDonnee(idt idCible, int Cible, int num)
@@ -135,8 +135,8 @@ template<class Ent> Ent BddPredef::getEntityInDonnee(idt idCible, int Cible, int
                                                      std::vector<condition>({SupEgal, Inf}));
     Ent entity;
     auto j = liste.begin();
-    for(szt i = 0; i != Ent::NbrAtt; ++i, ++j)
-        entity.setData(j->valeur(),i);
+    for(post i = 0; i != Ent::NbrAtt; ++i, ++j)
+        entity.setData(i,j->valeur());
     return entity;
 }
 

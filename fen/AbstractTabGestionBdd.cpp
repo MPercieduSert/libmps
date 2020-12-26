@@ -2,7 +2,7 @@
 
 using namespace fenMPS;
 
-AbstractTabGestionBdd::AbstractTabGestionBdd(QSqlDatabase & bdd, szt nbrEntity,
+AbstractTabGestionBdd::AbstractTabGestionBdd(QSqlDatabase & bdd, entidt nbrEntity,
                                              const std::pair<int, int> &pairIndex, QWidget *parent)
     : AbstractTabModule(pairIndex, parent),
       m_nbrEntity(nbrEntity),

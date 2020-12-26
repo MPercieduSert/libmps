@@ -3,10 +3,10 @@
 using namespace modelMPS;
 
 ////////////////////////////////////////////// PermissionModel ////////////////////////////////////
-PermissionModel::PermissionModel(bddMPS::BddPredef & bdd, szt offset, QObject * parent)
+PermissionModel::PermissionModel(bddMPS::BddPredef & bdd, enumt offset, QObject * parent)
     : ItemNodeBddModel(bdd, parent), m_offset(offset) {
     m_idNomVec.reserve(m_bdd.nbrEntity());
-    for(szt i = 0; i < m_bdd.nbrEntity(); ++i) {
+    for(entidt i = 0; i < m_bdd.nbrEntity(); ++i) {
         if(m_bdd.managers().valide(i))
             m_idNomVec.emplace_back(bdd.cible(i),m_bdd.managers().info(i).name());
     }
@@ -14,28 +14,28 @@ PermissionModel::PermissionModel(bddMPS::BddPredef & bdd, szt offset, QObject * 
               [](const std::pair<int, QString> & p1, const std::pair<int, QString> & p2)->bool {return p1.second < p2.second;});
 }
 
-szt PermissionModel::dataCount(const NodeIndex & index) const {
+numt PermissionModel::dataCount(const NodeIndex & index) const {
     switch (index.cible()) {
     case PermissionModel::NcCible:
         return 1;
     case PermissionModel::NomCible:
         return 1;
     case PermissionModel::PermissionCible:
-        return static_cast<szt>(m_cibleVec.size());
+        return static_cast<numt>(m_cibleVec.size());
     case SubNodeCible:
-        return static_cast<szt>(m_cibleVec.size()) + m_offset;
+        return static_cast<numt>(m_cibleVec.size()) + m_offset;
     }
     return ItemNodeModel::dataCount(index);
 }
 
-void PermissionModel::setCible(szt num, bool visible){
+void PermissionModel::setCible(entidt num, bool visible){
     if(visible) {
         if(std::find(m_cibleVec.cbegin(),m_cibleVec.cend(),num) == m_cibleVec.cend()) {
-            modelAboutToResetData();
+            beginResetData();
                 m_cibleVec.push_back(num);
-                for (auto iter = ++m_data.tree().begin(); iter; ++iter)
+                for (auto iter = m_data.tree().begin(); iter; ++iter)
                     static_cast<AbstractPermissionNode &>(**iter).addCible(m_idNomVec.at(num).first);
-            modelResetData();
+            endResetData();
         }
     }
     else {
@@ -49,7 +49,7 @@ void PermissionModel::setCible(szt num, bool visible){
 }
 
 //////////////////////////////////////////////////////// TypePermissionNode ///////////////////////////////
-QVariant TypePermissionNode::data(int cible, int role, szt num) const {
+QVariant TypePermissionNode::data(int cible, int role, numt num) const {
     if(cible == PermissionModel::RefCible) {
         if(role == LabelRole)
             return "Référence :";
@@ -66,7 +66,7 @@ QVariant TypePermissionNode::data(int cible, int role, szt num) const {
     return PermNode::data(cible,role,num);
 }
 
-flag TypePermissionNode::setData(int cible, const QVariant & value, int role, szt num) {
+flag TypePermissionNode::setData(int cible, const QVariant & value, int role, numt num) {
     if(cible == PermissionModel::RefCible && role == StringRole) {
         m_ent.setRef(value.toString());
         return StringRole;
@@ -79,7 +79,7 @@ TypePermissionModel::TypePermissionModel(bddMPS::BddPredef &bdd, QObject * paren
     : PermissionModel(bdd,NcNomRefOffset,parent)
     {m_data.setTree(MakeArbreNode<entityMPS::Type,entityMPS::TypePermission,TypePermissionNode>::arbre(this));}
 
-szt TypePermissionModel::dataCount(const NodeIndex & index) const {
+numt TypePermissionModel::dataCount(const NodeIndex & index) const {
     if(index.cible() == PermissionModel::RefCible)
         return 1;
     return PermissionModel::dataCount(index);

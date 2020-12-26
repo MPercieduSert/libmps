@@ -110,8 +110,8 @@ protected:
 
 public:
     //! Constructeur.
-    ManagersPredef(szt NbrEntity, szt nbrCible, const QString & versionTable,
-                     std::map<szt,std::unique_ptr<AbstractManager>> && managers = std::map<szt,std::unique_ptr<AbstractManager>>(),
+    ManagersPredef(entidt NbrEntity, entidt nbrCible, const QString & versionTable,
+                     std::map<entidt,std::unique_ptr<AbstractManager>> && managers = std::map<entidt,std::unique_ptr<AbstractManager>>(),
                      const QSqlQuery & req = QSqlQuery())
         : Managers (NbrEntity, versionTable, std::move(managers), req),
           m_cibleArray(nbrEntity(),bmps::natureId::Vide),
@@ -123,7 +123,7 @@ public:
     template<class Ent> int cible() const
         {return m_cibleArray[Ent::ID];}
 
-    int cible(szt id) const
+    int cible(entidt id) const
         {return id < m_nbrEntity ? m_cibleArray[id] : bmps::natureId::Vide;}
 
     //! Renvoie le nombre d'attributs d'une entité à partir du numéro de cible.

@@ -101,7 +101,7 @@ public:
                                                         amps::TpValAttribut>;
 
     //! Positions des attributs.
-    enum Position:szt {Id = PositionEnum<IdAttribut>::Position,
+    enum Position:post {Id = PositionEnum<IdAttribut>::Position,
                    Nom = PositionEnum<NomAttribut>::Position,
                    Type = PositionEnum<TypeAttribut>::Position,
                    Ref = PositionEnum<RefAttribut>::Position,
@@ -152,7 +152,7 @@ public:
                                                             amps::ExactAttribut,
                                                             amps::CibleAttribut>;
     //! Positions des attributs.
-    enum Position:szt {Id = PositionEnum<IdAttribut>::Position,
+    enum Position:post {Id = PositionEnum<IdAttribut>::Position,
                    Id1 = PositionEnum<Id1NegAttribut>::Position,
                    Card = PositionEnum<CardAttribut>::Position,
                    Cible = PositionEnum<CibleAttribut>::Position,
@@ -216,7 +216,7 @@ public:
                                                     amps::CreaModifAttribut,
                                                     amps::TitreAttribut>;
     //! Positions des attributs.
-    enum Position:szt {Id = PositionEnum<IdAttribut>::Position,
+    enum Position:post {Id = PositionEnum<IdAttribut>::Position,
                        Id1 = PositionEnum<Id1Attribut>::Position,
                        Code = PositionEnum<CodeAttribut>::Position,
                        Creation = PositionEnum<CreationAttribut>::Position,
@@ -290,7 +290,7 @@ public:
                                                         amps::PoliceTitreAttribut,
                                                         amps::TextureAttribut>;
     //! Positions des attributs.
-    enum Position:szt {Id = PositionEnum<IdAttribut>::Position,
+    enum Position:post {Id = PositionEnum<IdAttribut>::Position,
                        Bordure = PositionEnum<BordureAttribut>::Position,
                        CouleurBordure = PositionEnum<CouleurBordureAttribut>::Position,
                        CouleurFond = PositionEnum<CouleurFondAttribut>::Position,
@@ -313,7 +313,7 @@ public:
     //! Constructeur à partir des valeurs attributs.
     EvenementStyle(int bordure, const QString & CouleurBordure, const QString & CouleurFond,
                    const QString & couleurTexte, const QString & couleurTitre,
-                   int forme, const QString & nom, const QString & policeTexte, const QString & policeTitre, szt texture, idt id = 0)
+                   int forme, const QString & nom, const QString & policeTexte, const QString & policeTitre, enumt texture, idt id = 0)
         : EvenementStyle(nom,id) {
         setBordure(bordure);
         setCouleurBordure(CouleurBordure);

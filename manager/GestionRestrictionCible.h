@@ -13,12 +13,12 @@ namespace managerMPS {
  */
 template<class Ent, class Restrict> class AbstractGestionRestrictionCible : public AbstractGestionRestriction<Ent> {
 protected:
-    const szt m_cible;  //!< Identifiant de ciblage de l'entité Ent.
+    const entidt m_cible;  //!< Identifiant de ciblage de l'entité Ent.
     AbstractManagerTemp<Restrict> & m_managerRestriction;   //!< Pointeur vers le gertionnaire des restriction.
 
 public:
     //! Constructeur. (Ne posséde pas le manageur de restriction)
-    AbstractGestionRestrictionCible(szt cible, AbstractManagerTemp<Restrict> & managerRestriction,
+    AbstractGestionRestrictionCible(entidt cible, AbstractManagerTemp<Restrict> & managerRestriction,
                                      flag restriction = bddMPS::Aucune)
         : AbstractGestionRestriction<Ent>(restriction), m_cible(cible), m_managerRestriction(managerRestriction)
     {}

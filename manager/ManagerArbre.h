@@ -358,11 +358,11 @@ template<class Ent> void ManagerArbre<Ent>::writeStringSql()
 {
     m_sqlAdd.clear();
     m_sqlAdd.append("INSERT INTO ").append(table()).append("(");
-    for(szt i = 1; i != nbrAtt(); ++i)
+    for(post i = 1; i != nbrAtt(); ++i)
         m_sqlAdd.append(attribut(i)).append(",");
     m_sqlAdd.append(attribut(Ent::Id));
     m_sqlAdd.append(") VALUES(");
-    for(szt i = 0; i != nbrAtt(); ++i)
+    for(post i = 0; i != nbrAtt(); ++i)
         m_sqlAdd.append("?,");
     m_sqlAdd.chop(1);
     m_sqlAdd.append(")");

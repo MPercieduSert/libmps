@@ -7,14 +7,22 @@
 //! \ingroup groupeAttributEntity
 //! Type des attributs
 namespace typeMPS {
+//! Type des identifiants.
 using idt = unsigned;
-//using codeType = unsigned;
+//! Type des tailles et indices de veteur.
 using szt = long unsigned;
-
+//! Type des enumération.
+using enumt = unsigned;
+//! Type des numéros non signé.
+using numt = unsigned;
+//! Type de position dans les entités.
+using post = unsigned;
+//! Type de l'identifiant des entités.
+using entidt = unsigned;
 class flag {
 public:
     //! Type de la valuer du drapeau.
-    using flag_type = unsigned;
+    using flag_type = enumt;
 protected:
     flag_type m_value = 0;        //! Entier codant 32 booléen.
 public:

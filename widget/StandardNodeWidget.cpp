@@ -175,7 +175,7 @@ NodeWidget * StandardNodeDelegate::createNode(const NodeIndex &index, QWidget * 
     auto node = new NodeWidget(index,parent);
     node->setPainter(std::make_unique<RoundedNodePainter>());
     auto nbrSubNode = index.model()->dataCount(index.index(modelMPS::SubNodeCible));
-    for(szt num = 0; num != nbrSubNode; ++num)
+    for(numt num = 0; num != nbrSubNode; ++num)
         node->addSubNodeWidget(createSubNode(index.index(modelMPS::SubNodeCible,num),node));
     return node;
 }

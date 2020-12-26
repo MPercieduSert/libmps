@@ -100,27 +100,27 @@ public:
 using Caract = std::pair<typeAttributBdd, bool>;
 
 protected:
-    std::vector<QString> m_attSql;      //!< Vecteur des noms des attribut dans la base de donnée.
-    std::vector<Caract> m_attCaract;     //!< Vecteur des propriétés des attributs pour la création de la table.
-    std::vector<std::vector<szt>> m_attUnique;       //!< Tableau 2d des indices des attributs uniques.
-    std::map<szt,QString> m_foreignKeyName;         //!< Map des clés étrangères.
-    std::map<szt,QString> m_foreignKeyTable;         //!< Map des clés étrangères.
-    QString m_name;         //!< Nom de l'entité géré par le manager.
-    QString m_table;        //!< Nom de la table dans la base de donnée.
+    std::vector<QString> m_attSql;                  //!< Vecteur des noms des attribut dans la base de donnée.
+    std::vector<Caract> m_attCaract;                //!< Vecteur des propriétés des attributs pour la création de la table.
+    std::vector<std::vector<post>> m_attUnique;     //!< Tableau 2d des indices des attributs uniques.
+    std::map<post,QString> m_foreignKeyName;         //!< Map des clés étrangères.
+    std::map<post,QString> m_foreignKeyTable;        //!< Map des clés étrangères.
+    QString m_name;                                 //!< Nom de l'entité géré par le manager.
+    QString m_table;                                //!< Nom de la table dans la base de donnée.
 
 public:
     //! Constructeur.
     InfoBdd() = default;
 
     //! Constructeur.
-    InfoBdd(const QString & name, const QString & table, const std::map<szt,QString> & att,
+    InfoBdd(const QString & name, const QString & table, const std::map<post,QString> & att,
             const std::vector<Caract> & attCaract,
-            const std::vector<std::vector<szt>> & attUnique = std::vector<std::vector<szt>>(),
-            const std::map<szt,QString> & foreignKeyName = std::map<szt,QString>(),
-            const std::map<szt,QString> & foreignKeyTable = std::map<szt,QString>());
+            const std::vector<std::vector<post>> & attUnique = std::vector<std::vector<post>>(),
+            const std::map<post,QString> & foreignKeyName = std::map<post,QString>(),
+            const std::map<post,QString> & foreignKeyTable = std::map<post,QString>());
 
     //! Constructeur. Information à completer sur les attributs.
-    InfoBdd(const QString & name, const QString & table, szt nbrAtt, const std::vector<szt> & nbrAttUnique = std::vector<szt>());
+    InfoBdd(const QString & name, const QString & table, post nbrAtt, const std::vector<post> & nbrAttUnique = std::vector<post>());
 
     //! Constructeur de copie.
     InfoBdd(const InfoBdd & ) = default;
@@ -129,23 +129,23 @@ public:
     ~InfoBdd() = default;
 
     //! Retourne le nom en base de donnee du n-ième attribut.
-    const QString & attribut(szt n) const
+    const QString & attribut(post n) const
         {return m_attSql[n];}
 
     //! Liste des indices des attributs uniques.
-    const std::vector<szt> & attributUnique(szt num = 0) const
+    const std::vector<post> & attributUnique(numt num = 0) const
         {return m_attUnique[num];}
 
     //! Liste des propriétés des attributs lors de la création de la table.
-    const Caract & creerAttribut(szt num) const
+    const Caract & creerAttribut(post num) const
         {return m_attCaract[num-1];}
 
     //! Liste des clés étrangères avec le nom des entités.
-    const std::map<szt,QString> & foreignKeyName() const
+    const std::map<post,QString> & foreignKeyName() const
         {return m_foreignKeyName;}
 
     //! Liste des clés étrangères avec le nom de tables.
-    const std::map<szt,QString> & foreignKeyTable() const
+    const std::map<post,QString> & foreignKeyTable() const
         {return m_foreignKeyTable;}
 
     //! Renvoie le nom de l'entité géré par le manager.
@@ -153,22 +153,22 @@ public:
         {return m_name;}
 
     //! Nombre d'attribut de la table.
-    szt nbrAtt() const
-        {return static_cast<szt>(m_attSql.size());}
+    post nbrAtt() const
+        {return static_cast<post>(m_attSql.size());}
 
     //! Nombre de jeu d'attribut unique de la table.
-    szt nbrSetUnique() const
-        {return static_cast<szt>(m_attUnique.size());}
+    numt nbrSetUnique() const
+        {return static_cast<numt>(m_attUnique.size());}
 
 
     //! Mutateur d'un attribut.
-    void setAttribut(szt num, const QString & name, typeAttributBdd typeAtt = typeAttributBdd::Integer, bool notNull = true) {
+    void setAttribut(post num, const QString & name, typeAttributBdd typeAtt = typeAttributBdd::Integer, bool notNull = true) {
         m_attSql[num] = name;
         m_attCaract[num-1] = Caract(typeAtt,notNull);
     }
 
     //! Mutateur d'une clé étrangère.
-    void setForeignKey(szt numAtt, const InfoBdd & info) {
+    void setForeignKey(post numAtt, const InfoBdd & info) {
         m_foreignKeyName[numAtt] = info.name();
         m_foreignKeyTable[numAtt] = info.table();
     }
@@ -178,7 +178,7 @@ public:
         {m_name = name;}
 
     //! Mutateur d'un attribut unique.
-    void setUnique(szt numAtt, szt numUnique, szt numSet = 0)
+    void setUnique(post numAtt, numt numUnique, numt numSet = 0)
         {m_attUnique[numSet][numUnique] = numAtt;}
 
     //! Nom de la table.

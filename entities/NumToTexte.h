@@ -8,6 +8,7 @@
 #include <QRegularExpressionValidator>
 #include <QString>
 #include <QVariant>
+#include "typemps.h"
 
 /*! \defgroup groupeDivers Divers
  * \brief Ensemble de classes diverses.
@@ -17,12 +18,13 @@
  * \brief Espace de nom de classes diverses.
  */
 namespace diversMPS  {
+using namespace typeMPS;
 /*! \ingroup groupeDivers
  * \brief Classe de conversion entre chaine de caractères et entiers.
  */
 class NumToTexte {
 protected:
-    unsigned m_style;                           //!< Identifiant du style d'affichage des nombres.
+    enumt m_style;                           //!< Identifiant du style d'affichage des nombres.
     int (*m_toNum)(const QString &);            //!< Conversion d'une chaine de caractères en entier en fonction du style.
     QString (*m_toString)(int);                 //!< Converstion d'un entier (début à 0) en QString avec le style définie.
     QRegularExpressionValidator m_valide;       //!< Motif de validité pour le style courant.
@@ -54,7 +56,7 @@ public:
     const static std::vector<std::pair<int,QString>> m_romain;    //!< map de converions nombre <-> lettre des chifres romains.
 
     //! Constructeur.
-    NumToTexte(unsigned style = Arabe)
+    NumToTexte(enumt style = Arabe)
         {setStyle(style);}
 
     //! Constructeur par copie.
@@ -105,8 +107,8 @@ public:
     int num(const QString & str) const
         {return m_toNum(str);}
 
-    //! Convertion en un uint
-    operator uint() const noexcept
+    //! Convertion en un enumt
+    operator enumt() const noexcept
         {return m_style;}
 
     //! Opérateur de copie.
@@ -115,8 +117,8 @@ public:
         return *this;
     }
 
-    //! Opérateur d'affectation à partir d'un uint.
-    NumToTexte & operator =(unsigned style) noexcept {
+    //! Opérateur d'affectation à partir d'un enumt.
+    NumToTexte & operator =(enumt style) noexcept {
         setStyle(style);
         return *this;
     }
@@ -138,10 +140,10 @@ public:
     static int romainToNum(const QString & str);
 
     //! Mutateur du style.
-    void setStyle(unsigned style);
+    void setStyle(enumt style);
 
     //! Accesseur du style.
-    unsigned style() const noexcept
+    enumt style() const noexcept
         {return m_style;}
 
     //! Converstion d'un entier (début à 0) en QString avec le style définie.

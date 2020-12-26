@@ -110,7 +110,7 @@ void AbstractColonnesModel::setTableau(std::unique_ptr<AbstractTableau> && table
     resetRow();
 }
 
-QVariant AbstractColonnesModel::statistique(int pos, szt fonction, bool lignesVisibles) const {
+QVariant AbstractColonnesModel::statistique(int pos, enumt fonction, bool lignesVisibles) const {
     if(pos < 0 || pos >= columnCount())
         return QVariant();
     auto col = static_cast<szt>(pos);

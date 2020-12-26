@@ -62,8 +62,12 @@ public:
 
 protected:
     //! Transmet une valeur à la requète.
-    void bindValue(szt n, const QVariant & value)
+    void bindValue(numt n, const QVariant & value)
         {m_requete->bindValue(static_cast<int>(n),value);}
+
+    //! Transmet une valeur à la requète.
+    void bindValue(int n, const QVariant & value)
+        {m_requete->bindValue(n,value);}
 
     //! Exécute la dernière requète préparée et lance une execption si celle-ci n'est pas valide.
     void exec() {
@@ -94,7 +98,7 @@ protected:
         {m_requete->finish();}
 
     //! Accesseur de l'identifiant.
-    unsigned id(szt pos = Entity::Id) const
+    idt id(post pos = Entity::Id) const
         {return value<idt>(pos);}
 
     //! Place la requète sur la position suivante.
@@ -106,20 +110,20 @@ protected:
         {m_requete->prepare(requete);}
 
     //! Récupère la nième valeur de la requète au type T.
-    template<class T> inline T value(szt n = 0) const;
+    template<class T> inline T value(post n = 0) const;
 
     //! Convertit un entier en QVariant, en remplaçant 0 par QVariant(QVariant::Int).
     template<class T> QVariant zeroToNull(T n) const
         {return n != 0 ? n : QVariant(QVariant::Int);}
 };
 
-template<class T> inline T ReqSql::value(szt n) const
+template<class T> inline T ReqSql::value(post n) const
     {return m_requete->value(static_cast<int>(n)).value<T>();}
 
-template<> inline flag ReqSql::value<flag>(szt n) const
+template<> inline flag ReqSql::value<flag>(post n) const
     {return m_requete->value(static_cast<int>(n)).toUInt();}
 
-template<> inline QVariant ReqSql::value<QVariant>(szt n) const
+template<> inline QVariant ReqSql::value<QVariant>(post n) const
     {return m_requete->value(static_cast<int>(n));}
 }
 #endif // REQSQL_H

@@ -16,7 +16,7 @@
  */
 namespace infoEntity {
     //! Liste des identifiants des types d'entités de base, n'ayant pas de manageurs dans accessible par identifiant.
-    enum entityBaseId:typeMPS::szt{ArbreId,
+    enum entityBaseId:typeMPS::entidt{ArbreId,
                       VersionBddId,
                       NbrEntBaseId};
 
@@ -47,7 +47,7 @@ namespace infoEntity {
 //                    };
 
     //! Liste des identifiants des entités prédéfinies.
-    enum entityPredefinieID:typeMPS::szt{CommentaireCibleId = NbrEntBaseId,
+    enum entityPredefinieID:typeMPS::entidt{CommentaireCibleId = NbrEntBaseId,
                     DonneeCibleId,
                     TexteCibleId,
                     CommentaireId,

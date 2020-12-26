@@ -438,7 +438,7 @@ public:
     //! valeur des colonnes de la table Join key = value de std::map whereMapJoin,
     //! ordonnée suivant les colonnes de la table Ent d'identifiants key et d'ordre value de std::map orderMapTable
     //! (true -> croissant, false -> décroissant).
-    virtual ListPtr<Ent> getListJoin(const QString & tableJoin, szt colonneTable,
+    virtual ListPtr<Ent> getListJoin(const QString & tableJoin, post colonneTable,
                                      const QString & colonneJoin,
                                      const std::map<typename Ent::Position,QVariant> & whereMapTable,
                                      const std::map<QString,QVariant> & whereMapJoin,
@@ -506,7 +506,7 @@ public:
     //! Renvoie la map des entités de la table vérifiant une condition sur une jointure (colonneTable = colonneJoin),
     //! valeur des colonnes de la table Ent d'identifiant key = value de std::map whereMapTable,
     //! valeur des colonnes de la table Join key = value de std::map whereMapJoin.
-    virtual mapIdt<Ent> getMapJoin(const QString & tableJoin, szt colonneTable,
+    virtual mapIdt<Ent> getMapJoin(const QString & tableJoin, post colonneTable,
                                    const QString & colonneJoin,
                                    const std::map<typename Ent::Position,QVariant> & whereMapTable,
                                    const std::map<QString,QVariant> & whereMapJoin,

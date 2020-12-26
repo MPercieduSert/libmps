@@ -2,11 +2,11 @@
 
 using namespace bddMPS;
 
-InfoBdd::InfoBdd(const QString & name, const QString & table, const std::map<szt,QString> & att,
+InfoBdd::InfoBdd(const QString & name, const QString & table, const std::map<post,QString> & att,
                 const std::vector<Caract> & attCaract,
-                const std::vector<std::vector<szt>> & attUnique,
-                const std::map<szt,QString> & foreignKeyName,
-                const std::map<szt,QString> & foreignKeyTable)
+                const std::vector<std::vector<numt>> & attUnique,
+                const std::map<post,QString> & foreignKeyName,
+                const std::map<post,QString> & foreignKeyTable)
     : m_attSql(att.size()),
       m_attCaract(attCaract),
       m_attUnique(attUnique),
@@ -16,7 +16,7 @@ InfoBdd::InfoBdd(const QString & name, const QString & table, const std::map<szt
       m_table(table) {
     m_attSql[emps::Entity::Id] = QString("ID");
     m_attSql[emps::Entity::Id].squeeze();
-    for(std::map<szt,QString>::const_iterator i = att.cbegin(); i != att.cend(); ++i) {
+    for(auto i = att.cbegin(); i != att.cend(); ++i) {
         if(i->first >= att.size())
             throw std::invalid_argument(QString("Indice d'attribut sql invalide de la table: ")
                                         .append(m_table).append(", attribut: ")
@@ -27,7 +27,7 @@ InfoBdd::InfoBdd(const QString & name, const QString & table, const std::map<szt
     }
 }
 
-InfoBdd::InfoBdd(const QString & name, const QString & table, szt nbrAtt, const std::vector<szt> &nbrAttUnique)
+InfoBdd::InfoBdd(const QString & name, const QString & table, post nbrAtt, const std::vector<post> &nbrAttUnique)
     : m_attSql(nbrAtt),
       m_attCaract(nbrAtt-1),
       m_attUnique(nbrAttUnique.size()),

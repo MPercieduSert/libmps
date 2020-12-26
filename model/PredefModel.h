@@ -14,9 +14,8 @@ namespace modelMPS {
 class PermissionModel : public ItemNodeBddModel {
     Q_OBJECT
 protected:
-    const szt m_offset;                                 //!< Offset de postion des cibles.
-    //bddMPS::BddPredef & m_bdd;                          //!< Référence à la base de donnée
-    std::vector<szt> m_cibleVec;                        //!< Vecteur de cibles à afficher.
+    const enumt m_offset;                                 //!< Offset de postion des cibles.
+    std::vector<entidt> m_cibleVec;                        //!< Vecteur de cibles à afficher.
     std::vector<std::pair<int,QString>> m_idNomVec;     //!< Vecteur d'information sur les cibles.
 
 public:
@@ -35,10 +34,10 @@ public:
                       NcPosition = UnPosition,
                       RefPosition = DeuxPosition};
     //! Constructeur.
-    PermissionModel(bddMPS::BddPredef &bdd, szt offset = NcNomOffset, QObject * parent = nullptr);
+    PermissionModel(bddMPS::BddPredef &bdd, enumt offset = NcNomOffset, QObject * parent = nullptr);
 
     //! Nombre de donné associé à une cible.
-    szt dataCount(const NodeIndex & index) const override;
+    numt dataCount(const NodeIndex & index) const override;
 
     //! Drapeaux assossiés à une donnée.
     flag flags(const NodeIndex & index) const override{
@@ -48,11 +47,11 @@ public:
     }
 
     //! Nom d'une cible.
-    const QString & nomCible(szt num) const
+    const QString & nomCible(entidt num) const
         {return m_idNomVec.at(m_cibleVec.at(num)).second;}
 
     //! Numero de cible.
-    int cible(szt num) const
+    int cible(entidt num) const
         {return m_idNomVec.at(m_cibleVec.at(num)).first;}
 
     //! Accesseur de la liste des cibles.
@@ -60,11 +59,11 @@ public:
         {return m_idNomVec;}
 
     //! Accesseur de l'offset de postion des cibles
-    szt offset() const noexcept
+    enumt offset() const noexcept
         {return m_offset;}
 
     //! Muateur de la présence d'une cible.
-    void setCible(szt num, bool visible);
+    void setCible(entidt num, bool visible);
 };
 
 /*! \ingroup groupeModel
@@ -78,8 +77,6 @@ public:
     //! Ajoute une cible aux permissions.
     virtual void addCible(int cible) = 0;
 };
-
-
 
 /*! \ingroup groupeModel
  * \brief Classe mère des neuds d'un model de permission.
@@ -99,10 +96,10 @@ public:
     void addCible(int cible) override;
 
     //! Accesseur des données du noeud.
-    QVariant data(int cible, int role, szt num = 0) const override;
+    QVariant data(int cible, int role, numt num = 0) const override;
 
     //! Mutateur des données du noeud.
-    flag setData(int cible, const QVariant & value, int role, szt num = 0) override;
+    flag setData(int cible, const QVariant & value, int role, numt num = 0) override;
 
     //! Mutateur de l'entité.
     void setEnt(const Ent & entity);
@@ -119,10 +116,10 @@ public:
     using PermNode::PermissionNode;
 
     //! Accesseur des données du noeud.
-    QVariant data(int cible, int role, szt num = 0) const override;
+    QVariant data(int cible, int role, numt num = 0) const override;
 
     //! Mutateur des données du noeud.
-    flag setData(int cible, const QVariant & value, int role, szt num = 0) override;
+    flag setData(int cible, const QVariant & value, int role, numt num = 0) override;
 };
 
 /*! \ingroup groupeModel
@@ -136,7 +133,7 @@ public:
     TypePermissionModel(bddMPS::BddPredef &bdd, QObject * parent = nullptr);
 
     //! Nombre de donné associé à une cible.
-    szt dataCount(const NodeIndex & index) const override;
+    numt dataCount(const NodeIndex & index) const override;
 
 };
 
@@ -170,7 +167,7 @@ template<class Ent, class Permission> void PermissionNode<Ent,Permission>::addCi
             m_permissionMap[cible] = NoFlag;
     }
 }
-template<class Ent, class Permission> QVariant PermissionNode<Ent,Permission>::data(int cible, int role, szt num) const {
+template<class Ent, class Permission> QVariant PermissionNode<Ent,Permission>::data(int cible, int role, numt num) const {
     switch (cible) {
     case PermissionModel::NcCible:
         if(role == LabelRole)
@@ -209,7 +206,7 @@ template<class Ent, class Permission> QVariant PermissionNode<Ent,Permission>::d
             if(num >= m_model->offset()) {
                 QList<QVariant> init;
                 init.append(PermissionModel::PermissionCible);
-                init.append(static_cast<uint>(num - m_model->offset()));
+                init.append(num - m_model->offset());
                 init.append(CodeSubNode);
                 return init;
             }
@@ -218,7 +215,7 @@ template<class Ent, class Permission> QVariant PermissionNode<Ent,Permission>::d
     return ItemNode::data(cible,role,num);
 }
 
-template<class Ent, class Permission> flag PermissionNode<Ent,Permission>::setData(int cible, const QVariant &value, int role, szt num) {
+template<class Ent, class Permission> flag PermissionNode<Ent,Permission>::setData(int cible, const QVariant &value, int role, numt num) {
     if(cible == PermissionModel::NcCible && role == StringRole) {
         m_ent.setNc(value.toString());
         return StringRole;

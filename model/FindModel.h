@@ -105,7 +105,7 @@ public:
     //! Si le noeuds parent est un operationNode un noeud choiceNode est ajouté avant row.
     //! Si le noeuds parent n'est pas un operationNode, un nouveau operationNode prend sa place
     //! et le noeud parent devient l'ainé de ce nouveau et un noeud ChoiceNode est ajouté en cadet.
-    void insertNode(const NodeIndex & parent, szt pos);
+    void insertNode(const NodeIndex & parent, numt pos);
 
     //! Accesseur du model filtré.
     AbstractColonnesModel * model() const
@@ -142,10 +142,10 @@ public slots:
 
 protected:
     //! Fabrique des noeuds.
-    Node nodeFactory(const NodeIndex & parent, szt pos, int type) override;
+    Node nodeFactory(const NodeIndex & parent, post pos, int type) override;
 
-    //! Fabrique des noeuds de condition.
-    Node nodeConditionFactory(szt pos);
+    //! Fabrique des noeuds de condition pour une colonne.
+    Node nodeConditionFactory(szt colonne);
 };
 
 //////////////////////////////////// Noeud ///////////////////
@@ -158,18 +158,18 @@ class FindNode : public ItemNode {
 protected:
     bool m_negation = false;        //!< Négation.
     FindModel * m_model;    //!< Pointeur sur le model.
-    uint m_pos;              //!< Position de la colonne dans le model filtré.
+    numt m_pos;              //!< Position de la colonne dans le model filtré.
 public:
     enum {Vide = -1};
     //! Constructeur.
-    FindNode(FindModel * model, uint pos, int type = NoType)
+    FindNode(FindModel * model, numt pos, int type = NoType)
         : ItemNode(type), m_model(model), m_pos(pos) {}
 
     //! Accesseur des données du noeud.
-    QVariant data(int cible, int role, szt num = 0) const override;
+    QVariant data(int cible, int role, numt num = 0) const override;
 
     //! Nombre de donnée associé au noeud pour une cible donnée.
-    szt dataCount(int cible) const override;
+    post dataCount(int cible) const override;
 
     //! Test si le noeud n'intervient pas dans la recherche.
     virtual bool empty() const
@@ -180,14 +180,14 @@ public:
         {return m_negation;}
 
     //! Accesseur de position.
-    szt pos() const
+    post pos() const
         {return m_pos;}
 
     //! Mutateur des données du noeud.
-    flag setData(int cible, const QVariant & value, int role, szt num = 0) override;
+    flag setData(int cible, const QVariant & value, int role, numt num = 0) override;
 
     //! Mutateur de position.
-    void setPos(uint pos)
+    void setPos(numt pos)
         {m_pos = pos;}
 
     //! Teste si la ligne d'indice id vérifie la condition du noeud.
@@ -203,18 +203,18 @@ public:
  */
 class ComparaisonNode : public FindNode {
 protected:
-    uint m_comp;            //!< Indice de la comparaison.
+    numt m_comp;            //!< Indice de la comparaison.
 public:
     static const std::array<QString, FindModel::NbrComparaison> Strings;        //!< Labels des comparaisons.
     //! Constructeur.
-    ComparaisonNode(FindModel * model, uint pos, uint comp = FindModel::Egal,int type = NoType)
+    ComparaisonNode(FindModel * model, numt pos, numt comp = FindModel::Egal,int type = NoType)
         : FindNode(model,pos,type), m_comp(comp) {}
 
     //! Accesseur de la donnée associé à column.
-    QVariant data(int type, int role, szt num = 0) const override;
+    QVariant data(int type, int role, numt num = 0) const override;
 
     //! Mutateur de la donnée associé à column.
-    flag setData(int cible, const QVariant & value, int role, szt num = 0) override;
+    flag setData(int cible, const QVariant & value, int role, numt num = 0) override;
 };
 
 /*! \ingroup groupeModel
@@ -228,7 +228,7 @@ protected:
     QString m_trueLabel;    //!< Label du filtre faux.
 public:
     //! Constructeur.
-    BoolNode(FindModel * model, uint pos, const QString & falseLabel = QString(), const QString trueLabel = QString(),
+    BoolNode(FindModel * model, numt pos, const QString & falseLabel = QString(), const QString trueLabel = QString(),
              bool trueChecked = true, bool falseChecked = true)
         : FindNode(model,pos,FindModel::BoolNodeType),
           m_false(falseChecked), m_true(trueChecked),
@@ -238,17 +238,17 @@ public:
     ~BoolNode() override = default;
 
     //! Accesseur de la donnée associé à column.
-    QVariant data(int type, int role, szt num = 0) const override;
+    QVariant data(int type, int role, numt num = 0) const override;
 
     //! Nombre de donnée associé au noeud pour une cible donnée.
-    szt dataCount(int cible) const override;
+    numt dataCount(int cible) const override;
 
     //! Test si le noeud n'intervient pas dans la recherche.
     bool empty() const override
         {return m_true && m_false;}
 
     //! Mutateur de la donnée associé à column.
-    flag setData(int cible, const QVariant & value, int role, szt num = 0) override;
+    flag setData(int cible, const QVariant & value, int role, numt num = 0) override;
 
     //! Teste si la ligne d'indice id vérifie la condition du noeud.
     bool testValue(const QVariant & value) const override
@@ -263,24 +263,24 @@ protected:
     QDate m_date;       //!< Date de filtrage.
 public:
     //! Constructeur.
-    DateNode(FindModel * model, uint pos,const QDate & date = QDate(), uint comp = FindModel::Egal)
+    DateNode(FindModel * model, numt pos,const QDate & date = QDate(), numt comp = FindModel::Egal)
         : ComparaisonNode(model,pos,comp,FindModel::DateNodeType), m_date(date) {}
 
     //! Destructeur.
     ~DateNode() override = default;
 
     //! Accesseur de la donnée associé à column.
-    QVariant data(int type, int role, szt num = 0) const override;
+    QVariant data(int type, int role, numt num = 0) const override;
 
     //! Nombre de donnée associé au noeud pour une cible donnée.
-    szt dataCount(int cible) const override;
+    numt dataCount(int cible) const override;
 
     //! Test si le noeud n'intervient pas dans la recherche.
     bool empty() const override
         {return !m_date.isValid();}
 
     //! Mutateur de la donnée associé à column.
-    flag setData(int cible, const QVariant & value, int role, szt num = 0) override;
+    flag setData(int cible, const QVariant & value, int role, numt num = 0) override;
 
     //! Teste si la ligne d'indice id vérifie la condition du noeud.
     bool testValue(const QVariant & value) const override;
@@ -297,7 +297,7 @@ protected:
     bool m_regex;                   //!< La recherche est une expression régulière.
 public:
     //! Constructeur.
-    TexteNode(FindModel * model, uint pos,const QString & texte = QString(), bool c = false,bool regex = false)
+    TexteNode(FindModel * model, numt pos,const QString & texte = QString(), bool c = false,bool regex = false)
         : FindNode(model,pos,FindModel::TexteNodeType), m_texte(texte), m_case(c), m_regex(regex) {
         if(m_regex){
             m_regular.setPattern(m_texte);
@@ -310,17 +310,17 @@ public:
     ~TexteNode() override = default;
 
     //! Accesseur de la donnée associé à column.
-    QVariant data(int type, int role, szt num = 0) const override;
+    QVariant data(int type, int role, numt num = 0) const override;
 
     //! Nombre de donnée associé au noeud pour une cible donnée.
-    szt dataCount(int cible) const override;
+    numt dataCount(int cible) const override;
 
     //! Test si le noeud n'intervient pas dans la recherche.
     bool empty() const override
         {return m_texte.isEmpty();}
 
     //! Mutateur de la donnée associé à column.
-    flag setData(int cible, const QVariant & value, int role, szt num = 0) override;
+    flag setData(int cible, const QVariant & value, int role, numt num = 0) override;
 
     //! Teste si la ligne d'indice id vérifie la condition du noeud.
     bool testValue(const QVariant & value) const override;

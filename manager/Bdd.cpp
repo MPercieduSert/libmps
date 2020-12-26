@@ -41,7 +41,7 @@ std::pair<existeUni,idt> Bdd::existsUniqueId(const Entity & entity)
 bool Bdd::get(Entity & entity)
     {return m_manager->get(entity.idEntity()).get(entity);}
 
-bool Bdd::testAutorisationP(idt id, szt idEntity, flag autoris)
+bool Bdd::testAutorisationP(idt id, entidt idEntity, flag autoris)
     {return !(m_manager->get(idEntity).getRestriction(id) & autoris);}
 
 flag Bdd::getRestriction(const Entity & entity)
@@ -50,7 +50,7 @@ flag Bdd::getRestriction(const Entity & entity)
 bool Bdd::getUnique(Entity & entity)
     {return m_manager->get(entity.idEntity()).getUnique(entity);}
 
-QString Bdd::hydrateAttributXml(entityMPS::Entity & entity, szt pos, fichierMPS::XmlDoc::const_brother_iterator iter) {
+QString Bdd::hydrateAttributXml(entityMPS::Entity & entity, post pos, fichierMPS::XmlDoc::const_brother_iterator iter) {
     auto fkey_iter = info(entity).foreignKeyName().find(pos);
     if(fkey_iter == info(entity).foreignKeyName().end()) {
         entity.setData(pos, iter->text());
@@ -223,14 +223,14 @@ fichierMPS::XmlDoc Bdd::schemaXmlForImport() const{
     iter = schema.emplace_back(iter,"xs:complexType");
     iter = schema.emplace_back(iter,"xs:choice");
     iter->setAttribut("maxOccurs","unbounded");
-    for (szt i = 0; i <nbrEntity(); ++i) {
+    for (entidt i = 0; i <nbrEntity(); ++i) {
         if(managers().valide(i)) {
             auto iter_entity = schema.emplace_back(iter,"xs:element");
             iter_entity->setAttribut("ref",managers().info(i).name());
         }
     }
     iter.toRoot();
-    for (szt i = 0; i < nbrEntity(); ++i) {
+    for (entidt i = 0; i < nbrEntity(); ++i) {
         if(managers().valide(i)) {
             auto iter_entity = schema.emplace_back(iter,"xs:element");
             iter_entity->setAttribut("name",managers().info(i).name());
@@ -258,7 +258,7 @@ fichierMPS::XmlDoc Bdd::schemaXmlForImport() const{
                             }
                             else {
                                 iter_att = schema.emplace_back(iter_att,"xs:choice");
-                                for(szt l = 0; l != managers().info(k).nbrSetUnique(); ++l) {
+                                for(numt l = 0; l != managers().info(k).nbrSetUnique(); ++l) {
                                     auto iter_unique = schema.emplace_back(iter_att,"xs:element");
                                     iter_unique->setAttribut("ref",iter_key->second + "_Unique"+QString::number(l));
                                 }
@@ -278,9 +278,9 @@ fichierMPS::XmlDoc Bdd::schemaXmlForImport() const{
         }
 
     }
-    for (szt i = 0; i < nbrEntity(); ++i){
+    for (entidt i = 0; i < nbrEntity(); ++i){
         if(managers().valide(i)) {
-            for(szt j = 0; j != managers().info(i).nbrSetUnique(); ++j) {
+            for(numt j = 0; j != managers().info(i).nbrSetUnique(); ++j) {
                 auto iter_unique = schema.emplace_back(iter,"xs:element");
                 iter_unique->setAttribut("name",managers().info(i).name()  + "_Unique"+QString::number(j));
                 iter_unique = schema.emplace_back(iter_unique,"xs:complexType");

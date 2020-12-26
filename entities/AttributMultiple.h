@@ -47,7 +47,7 @@ public:
         {return AttributPremier::affiche().append("\n").append(Attributs<AttributSuivant...>::affiche());}
 
     //! Retourne un QVariant contenant la donnée souhaitée ou un QVariant nulle si num est invalide.
-    QVariant data(szt num) const
+    QVariant data(numt num) const
         {return num < NbrAtt ? dataP(num) : QVariant();}
 
     //! Teste si l'entité est valide.
@@ -55,12 +55,12 @@ public:
         {return AttributPremier::isValid() && Attributs<AttributSuivant...>::isValid();}
 
     //! Retourne le nom de l'attribut donnée souhaitée, pos doit être valide.
-    QString attributName(szt pos) const
+    QString attributName(numt pos) const
         {return pos < AttributPremier::NbrAtt ? AttributPremier::attributName(pos)
                                               : Attributs<AttributSuivant...>::attributName(pos - AttributPremier::NbrAtt);}
 
     //! Retourne le nom de l'attribut donnée souhaitée, pos doit être valide.
-    static QString NameAttribut(szt pos)
+    static QString NameAttribut(numt pos)
         {return pos < AttributPremier::NbrAtt ? AttributPremier::NameAttribut(pos)
                                               : Attributs<AttributSuivant...>::NameAttribut(pos - AttributPremier::NbrAtt);}
 
@@ -74,7 +74,7 @@ public:
 
 protected:
     //! Retourne un QVariant contenant la donnée souhaitée, pos doit être valide.
-    QVariant dataP(szt pos) const override
+    QVariant dataP(numt pos) const override
         {return pos < AttributPremier::NbrAtt ? AttributPremier::dataP(pos)
                                               : Attributs<AttributSuivant...>::dataP(pos - AttributPremier::NbrAtt);}
 
@@ -85,7 +85,7 @@ protected:
     }
 
     //! Modifie la donnée à partir d'un QVariant, pos doit être valide.
-   void setDataP(szt pos, const QVariant & value) override
+   void setDataP(numt pos, const QVariant & value) override
         {return pos < AttributPremier::NbrAtt ? AttributPremier::setDataP(pos, value)
                                               : Attributs<AttributSuivant...>::setDataP(pos - AttributPremier::NbrAtt, value);}
 };
@@ -93,18 +93,18 @@ protected:
 /*! \ingroup groupeEntity
  * \brief Structure template de calcul des positions des attributs multiple.
  */
-template<class AttFound, class Att, class AttPre, class AttSuiv, szt Pos> struct PosisionEnumTemp {
+template<class AttFound, class Att, class AttPre, class AttSuiv, numt Pos> struct PosisionEnumTemp {
     enum {Position = PosisionEnumTemp<AttFound,AttPre,typename AttPre::AttPre,typename AttPre::AttSuiv,Pos>::Position
           + PosisionEnumTemp<AttFound,AttSuiv,typename AttSuiv::AttPre,typename AttSuiv::AttSuiv,AttPre::NbrAtt + Pos>::Position};
 };
 
-template<class AttFound, class Att, szt Pos> struct PosisionEnumTemp<AttFound,Att,NoAttribut,NoAttribut,Pos>
+template<class AttFound, class Att, numt Pos> struct PosisionEnumTemp<AttFound,Att,NoAttribut,NoAttribut,Pos>
     {enum {Position = 0};};
 
-template<class AttFound, szt Pos> struct PosisionEnumTemp<AttFound,AttFound,NoAttribut,NoAttribut,Pos>
+template<class AttFound, numt Pos> struct PosisionEnumTemp<AttFound,AttFound,NoAttribut,NoAttribut,Pos>
     {enum {Position = Pos};};
 
-template<class AttFound, szt Pos> struct PosisionEnumTemp<AttFound,Attributs<AttFound>,NoAttribut,NoAttribut,Pos>
+template<class AttFound, numt Pos> struct PosisionEnumTemp<AttFound,Attributs<AttFound>,NoAttribut,NoAttribut,Pos>
     {enum {Position = Pos};};
 
 template<class AttFound, class Ent> using PositionEnum = PosisionEnumTemp<AttFound,Ent,typename Ent::AttPre,typename Ent::AttSuiv,0>;

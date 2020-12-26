@@ -47,7 +47,7 @@ protected:
     };
 
     using Tables = std::vector<table>;
-    const szt m_nbrEntity;
+    const entidt m_nbrEntity;
     Tables m_tables; //!< Ensemble des liens avec les tables.
     QListWidget * m_listName;   //!< Liste des noms des entitées
     QSplitter * m_splitter;     //!< Splitter entre la liste des noms des entités et les tables
@@ -58,7 +58,7 @@ protected:
 
 public:
     //! Constructeur.
-    explicit AbstractTabGestionBdd(QSqlDatabase & bdd, szt nbrEntity,
+    explicit AbstractTabGestionBdd(QSqlDatabase & bdd, entidt nbrEntity,
                                    const std::pair<int, int> &pairIndex, QWidget *parent = nullptr);
 
     //! Destructeur.

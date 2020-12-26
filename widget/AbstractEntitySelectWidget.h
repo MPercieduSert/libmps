@@ -31,7 +31,7 @@ public slots:
 
 signals :
     //! La valeur de l'identifiant change.
-    void idChanged(szt id);
+    void idChanged(idt id);
 };
 
 /*! \ingroup groupeWidget

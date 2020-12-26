@@ -19,7 +19,7 @@
  * \brief Espace de noms des widgets personnalisé.
  */
 namespace widgetMPS {
-
+using namespace typeMPS;
 /*! \ingroup groupeWidget
  * \brief Spin Box pour les années scolaires.
  */
@@ -150,19 +150,19 @@ protected:
     diversMPS::NumToTexte m_numToText;  //!< Convertisseur.
 public:
     //! Constructeur.
-    SpinBoxLettre(unsigned style = diversMPS::NumToTexte::Arabe, QWidget * parent = nullptr)
+    SpinBoxLettre(enumt style = diversMPS::NumToTexte::Arabe, QWidget * parent = nullptr)
         : QSpinBox(parent), m_numToText(style) {
         setMinimum(0);
     }
 
     //! Mutateur du style d'affichage des numéros.
-    void setStyle(unsigned style) {
+    void setStyle(enumt style) {
         m_numToText.setStyle(style);
         lineEdit()->setText(textFromValue(value()));
     }
 
     //! Acceseur du style d'affichage des numéros.
-    unsigned style() const noexcept
+    enumt style() const noexcept
         {return m_numToText.style();}
 
     //! Teste la validité d'un QString pour le style courant.

@@ -133,7 +133,7 @@ public:
         int id = 0;
         QString name = QString();
         int type = 0;
-        szt tableau = 0;
+        numt tableau = 0;
         std::vector<QVariant> args = std::vector<QVariant>();
     };
 
@@ -198,7 +198,7 @@ protected:
     bool m_valideLigne;                //!< Court-circuite la validité si false.
 
     // Etats des lignes
-    std::vector<szt> m_etats;           //!< Vecteur des états de chaque ligne.
+    std::vector<enumt> m_etats;           //!< Vecteur des états de chaque ligne.
     std::vector<QBrush> m_brush;        //!< Correspondance états <-> QBrush.
     std::map<szt,std::list<szt>> m_doubles;     //! Liste des identifiants des doubles.
 
@@ -260,7 +260,7 @@ public:
 
     //! Nombre de colonne.
     szt nbrColonne() const noexcept
-        {return static_cast<szt>(m_colonnes.size());}
+        {return m_colonnes.size();}
 
     //! Ajoute une nouvelle colonne en dernière position.
     virtual bool push_backColonne(const NewColonneInfo & info, bool allParent = false);
@@ -289,7 +289,7 @@ public:
     void setTableau(std::unique_ptr<AbstractTableau> && tableau);
 
     //! Fonctions statistiques appliquées à une colonnes.
-    QVariant statistique(int pos, szt fonction, bool lignesVisibles = true) const;
+    QVariant statistique(int pos, enumt fonction, bool lignesVisibles = true) const;
 
 signals:
     //! Signals du changement d'états d'une ligne.

@@ -16,7 +16,7 @@ const std::vector<std::pair<int,QString>> NumToTexte::m_romain{   {1000,"M"},
                                                     {4,"IV"},
                                                     {1,"I"}};
 
-void NumToTexte::setStyle(uint style){
+void NumToTexte::setStyle(enumt style){
     m_style = style;
     switch (style) {
     case ArabeSuivant:

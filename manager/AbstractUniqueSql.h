@@ -22,7 +22,7 @@
     class ENTITY ## UniqueSql: public TYPE<ENTITY>\
     {public:\
         /*! Construteur, transmettre en argument l'objet de requète utilisée par le manageur. */\
-        ENTITY ## UniqueSql(const QString & table, const std::vector<std::map<szt,QString>> & att) : TYPE(table,att){}\
+        ENTITY ## UniqueSql(const QString & table, const std::vector<std::map<numt,QString>> & att) : TYPE(table,att){}\
         /*! Destructeur.*/\
         ~ENTITY ## UniqueSql() {}
 
@@ -45,10 +45,10 @@ public:
     virtual void initialise(const InfoBdd & info) =0;
 
     //! Construit la chaine coorespondant à la requête sql d'unicité
-    QString uniqueString(const InfoBdd & info, szt num = 0) const;
+    QString uniqueString(const InfoBdd & info, numt num = 0) const;
     
     //! Construit la chaine coorespondant à la requête sql de contraite d'unicité numeroté num + 1 si numero = true.
-    QString uniqueCreerString(const InfoBdd & info, szt num = 0, bool numero = false) const;
+    QString uniqueCreerString(const InfoBdd & info, numt num = 0, bool numero = false) const;
 
 protected:
     using ReqSql::id;

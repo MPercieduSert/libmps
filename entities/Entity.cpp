@@ -10,7 +10,7 @@ QString Entity::affiche() const
         {return QString(name()).append("\n").append(IdAttribut::affiche());}
 
 bool Entity::hydrate(const QString & attr, const QVariant & value){
-    szt j = 0;
+    numt j = 0;
     while(j < NbrAtt && nameAttribut(j) != attr)
         ++j;
     if(j != NbrAtt) {
@@ -28,8 +28,8 @@ bool Entity::hydrate(std::vector<std::pair<QString,QVariant>> & values){
     return iter == values.cend();
 }
 
-szt Entity::position(const QString & attr) const {
-    szt pos = 0;
+numt Entity::position(const QString & attr) const {
+    numt pos = 0;
     while(pos < nbrAtt() && nameAttribut(pos) != attr)
         ++pos;
     return pos;

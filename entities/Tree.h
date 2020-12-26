@@ -122,7 +122,7 @@ namespace conteneurMPS {
  */
 template<class T> class tree {
 public:
-    using size_type = unsigned long;
+    using size_type = unsigned;
     class abstract_iterator;
     class brother_iterator;
     class const_abstract_iterator;

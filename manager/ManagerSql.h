@@ -121,14 +121,14 @@ public:
     ~ManagerSql() override = default;
 
     //! Renvoie le nom en base de donnée du i-ème attribut.
-    const QString & attribut(szt pos) const
+    const QString & attribut(post pos) const
         {return m_info.attribut(pos);}
 
     //! Crée dans la base de donnée la table associée l'entité du manageur.
     void creer() override;
 
     /*//! Renvoie le nom en base de donnée du i-ème attribut unique.
-    const QString & attributUnique(szt i) const
+    const QString & attributUnique(post i) const
         {return m_link.attribut(m_unique.attributUnique(i));}*/
 
     //! Teste s'il existe une entité de même identifiant que entity en base de donnée.
@@ -368,8 +368,8 @@ public:
             throw std::invalid_argument("getList le nombre de clés doit être égale au nombre de valeurs");
         QString sqlW;
 
-        for(unsigned i = 0; i != cle.size(); ++i) {
-            sqlW.append(attribut(i));
+        for(szt i = 0; i != cle.size(); ++i) {
+            sqlW.append(attribut(cle.at(i)));
             if(i < condition.size())
                 sqlW.append(m_conditionString[condition[i]]);
             else
@@ -378,7 +378,7 @@ public:
         }
         sqlW.chop(4);
         QString sqlO;
-        for(unsigned i =0; i != ordre.size(); ++i) {
+        for(szt i = 0; i != ordre.size(); ++i) {
             sqlO.append(m_conditionString[condition[i]]);
             if(i < crois.size())
                 sqlO.append(" ").append(croissant(crois[i]));
@@ -387,7 +387,7 @@ public:
         sqlO.chop(1);
 
         prepare(m_sqlGetListWhereOrderby.arg(sqlW,sqlW));
-        for(unsigned i = 0; i != value.size(); ++i)
+        for(numt i = 0; i != value.size(); ++i)
             bindValue(i,value[i]);
 
         return listFromRequete();
@@ -480,8 +480,8 @@ public:
             throw std::invalid_argument("getList le nombre de clés doit être égale au nombre de valeurs");
         QString sqlW;
 
-        for(unsigned i = 0; i != cle.size(); ++i) {
-            sqlW.append(attribut(i));
+        for(szt i = 0; i != cle.size(); ++i) {
+            sqlW.append(attribut(cle.at(i)));
             if(i < condition.size())
                 sqlW.append(m_conditionString[condition[i]]);
             else
@@ -490,7 +490,7 @@ public:
         }
         sqlW.chop(4);
         QString sqlO;
-        for(unsigned i =0; i != ordre.size(); ++i) {
+        for(szt i = 0; i != ordre.size(); ++i) {
             sqlO.append(attribut(ordre[i]));
             if(i < crois.size())
                 sqlO.append(" ").append(croissant(crois[i]));
@@ -499,7 +499,7 @@ public:
         sqlO.chop(1);
 
         prepare(m_sqlGetListIdWhereOrderby.arg(sqlW,sqlO));
-        for(szt i = 0; i != value.size(); ++i)
+        for(numt i = 0; i != value.size(); ++i)
             bindValue(i,value[i]);
 
         return listIdFromRequete();
@@ -510,7 +510,7 @@ public:
     //! valeur des colonnes de la table Join key = value de std::map whereMapJoin,
     //! ordonnée suivant les colonnes de la table Ent d'identifiants key
     //! et d'ordre value de std::map orderMapTable (true -> croissant, false -> décroissant).
-    ListPtr<Ent> getListJoin(const QString & tableJoin, szt colonneTable,
+    ListPtr<Ent> getListJoin(const QString & tableJoin, post colonneTable,
                                                    const QString & colonneJoin,
                                                    const std::map<typename Ent::Position,QVariant> & whereMapTable,
                                                    const std::map<QString,QVariant> & whereMapJoin,
@@ -530,7 +530,7 @@ public:
                                      colonneJoin,
                                      sqlWhere,
                                      sqlOrder));
-        szt j = 0;
+        auto j = 0;
         for(auto i = whereMapTable.cbegin(); i != whereMapTable.cend(); ++i, ++j)
             bindValue(j,i->second);
         for(auto i = whereMapJoin.cbegin(); i != whereMapJoin.cend(); ++i, ++j)
@@ -626,7 +626,7 @@ public:
                                         attribut(cleMap), QString()));
         bindValue(0,value1);
         bindValue(1,value2);
-        bindValue(3,value3);
+        bindValue(2,value3);
         return mapFromRequete(cleMap);
     }
 
@@ -643,8 +643,8 @@ public:
             throw std::invalid_argument("getList le nombre de clés doit être égale au nombre de valeurs");
         QString sql;
 
-        for(unsigned i = 0; i != cle.size(); ++i) {
-            sql.append(attribut(i));
+        for(szt i = 0; i != cle.size(); ++i) {
+            sql.append(attribut(cle.at(i)));
             if(i < condition.size())
                 sql.append(m_conditionString[condition[i]]);
             else
@@ -653,7 +653,7 @@ public:
         }
         sql.chop(4);
         sql.append("ORDER BY ");
-        for(unsigned i =0; i != ordre.size(); ++i) {
+        for(szt i =0; i != ordre.size(); ++i) {
             sql.append(attribut(ordre[i]));
             if(i < crois.size())
                 sql.append(" ").append(croissant(crois[i]));
@@ -662,7 +662,7 @@ public:
         sql.chop(1);
 
         prepare(m_sqlGetListWhereOrderby.arg(sql));
-        for(unsigned i = 0; i != value.size(); ++i)
+        for(numt i = 0; i != value.size(); ++i)
             bindValue(i,value[i]);
 
         return mapFromRequete(cleMap);
@@ -671,7 +671,7 @@ public:
     //! Renvoie la map des entités de la table vérifiant une condition sur une jointure (colonneTable = colonneJoin),
     //! valeur des colonnes de la table Ent d'identifiant key = value de std::map whereMapTable,
     //! valeur des colonnes de la table Join key = value de std::map whereMapJoin.
-    mapIdt<Ent> getMapJoin(const QString & tableJoin, szt colonneTable,
+    mapIdt<Ent> getMapJoin(const QString & tableJoin, post colonneTable,
                            const QString & colonneJoin,
                            const std::map<typename Ent::Position,QVariant> & whereMapTable,
                            const std::map<QString,QVariant> & whereMapJoin,
@@ -689,7 +689,7 @@ public:
                                      colonneJoin,
                                      sqlWhere,
                                      sqlOrder));
-        szt j = 0;
+        auto j = 0;
         for(auto i = whereMapTable.cbegin(); i != whereMapTable.cend(); ++i, ++j)
             bindValue(j,i->second);
         for(auto i = whereMapJoin.cbegin(); i != whereMapJoin.cend(); ++i, ++j)
@@ -726,7 +726,7 @@ public:
         {return m_info;}
 
     //! Renvoie le nombre d'attribut de l'entité dans la base de donnée.
-    szt nbrAtt() const
+    post nbrAtt() const
         {return m_info.nbrAtt();}
 
     //! Teste s'il y a dans la base de donnée une entité ayant exactement les mêmes attributs (identifiant compris).
@@ -830,7 +830,7 @@ protected:
         exec();
         exec(m_sqllastId);
         next();
-        entity.setId(value<szt>());
+        entity.setId(value<idt>());
         finish();
     }
 
@@ -923,7 +923,7 @@ template<class Ent> void ManagerSql<Ent>::creer() {
         QString sql(wordSqlString(bmps::wordSql::Create));
         sql.append(" ").append(table()).append("(").append(attribut(Entity::Id)).append(" ")
                 .append(typeAttributSqlString(bmps::typeAttributBdd::Primary));
-        for(szt i = 1; i != m_info.nbrAtt(); ++i) {
+        for(post i = 1; i != m_info.nbrAtt(); ++i) {
             sql.append(",").append(attribut(i)).append(" ").append(typeAttributSqlString(m_info.creerAttribut(i).first));
             if(m_info.creerAttribut(i).second)
                 sql.append(" ").append(wordSqlString(bmps::wordSql::NotNull));
@@ -951,12 +951,12 @@ template<class Ent> QString ManagerSql<Ent>::messageErreurs(const Entity & entit
 template<class Ent> void ManagerSql<Ent>::writeStringSql() {
     // Liste des colonnes.
     QString colonnesId;
-    for(szt i = 0; i != m_info.nbrAtt(); ++i)
+    for(post i = 0; i != m_info.nbrAtt(); ++i)
         colonnesId.append(attribut(i)).append(",");
     colonnesId.chop(1);
 
     QString colonnes;
-    for(szt i = 1; i != m_info.nbrAtt(); ++i)
+    for(post i = 1; i != m_info.nbrAtt(); ++i)
         colonnes.append(attribut(i)).append(",");
     colonnes.chop(1);
 
@@ -970,7 +970,7 @@ template<class Ent> void ManagerSql<Ent>::writeStringSql() {
 
     // Select Join
     QString selectJoin("SELECT ");
-    for(szt i = 0; i != m_info.nbrAtt(); ++i)
+    for(post i = 0; i != m_info.nbrAtt(); ++i)
         selectJoin.append("T.").append(attribut(i)).append(",");
     selectJoin.chop(1);
     selectJoin.append(" FROM ").append(table()).append(" T JOIN %1 J ON ");
@@ -978,7 +978,7 @@ template<class Ent> void ManagerSql<Ent>::writeStringSql() {
     // Add
     m_sqlAdd.append("INSERT INTO ");
     m_sqlAdd.append(table()).append("(").append(colonnes).append(") VALUES(");
-    for(szt i = 1; i != m_info.nbrAtt(); ++i)
+    for(post i = 1; i != m_info.nbrAtt(); ++i)
         m_sqlAdd.append("?,");
     m_sqlAdd.chop(1);
     m_sqlAdd.append(")");
@@ -1092,7 +1092,7 @@ template<class Ent> void ManagerSql<Ent>::writeStringSql() {
     // Modify
     m_sqlModify.append("UPDATE ");
     m_sqlModify.append(table()).append(" SET ");
-    for(szt i = 1; i != m_info.nbrAtt(); ++i)
+    for(post i = 1; i != m_info.nbrAtt(); ++i)
         m_sqlModify.append(attribut(i)).append("=?,");
     m_sqlModify.chop(1);
     m_sqlModify.append(" WHERE ").append(idEgal);

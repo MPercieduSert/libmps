@@ -19,7 +19,7 @@ flag BddPredef::code(idt idEntity, const QString & str) const {
     return code::Invalide;
 }
 
-bool BddPredef::delP(idt id, szt idEntity) {
+bool BddPredef::delP(idt id, entidt idEntity) {
     auto controle = true;
     // Spécifique
     switch (idEntity) {
@@ -154,7 +154,7 @@ void BddPredef::delEntityInDonnee(idt idCible, int cible, int num) {
     }
 }
 
-bool BddPredef::testAutorisationP(idt id, szt idEntity, flag autoris) {
+bool BddPredef::testAutorisationP(idt id, entidt idEntity, flag autoris) {
     auto controle = Bdd::testAutorisationP(id,idEntity,autoris);
     if(autoris & Suppr) {
         // Cible
@@ -258,7 +258,7 @@ bool BddPredef::testAutorisationP(idt id, szt idEntity, flag autoris) {
     return controle;
 }
 
-QString BddPredef::hydrateAttributXml(entityMPS::Entity & entity, szt pos, fichierMPS::XmlDoc::const_brother_iterator iter){
+QString BddPredef::hydrateAttributXml(entityMPS::Entity & entity, post pos, fichierMPS::XmlDoc::const_brother_iterator iter){
     if(iter->name() == "Cible") {
         auto i = m_manager->find(iter->text());
         if(i == nbrEntity())

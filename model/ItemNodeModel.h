@@ -54,7 +54,7 @@ enum roleNode : flag::flag_type {
     DateTimeRole = 0x100000,            //!< Donnée principale sous forme de date et horaire (QDateTime)
     TimeRole = 0x200000,                //!< Donnée principale sous forme d'horraire (QTime)
     IntRole = 0x400000,                 //!< Donnée principale sous forme d'un entier (int)
-    NumRole = 0x800000,                 //!< Donnée principale sous forme d'un numéro (uint)
+    NumRole = 0x800000,                 //!< Donnée principale sous forme d'un numéro (numt)
     VariantRole = 0x1000000,            //!< Donnée principale sous forme d'un variant (QVariant)
     BoolRole = 0x2000000,               //!< Donnée principale sous forme d'un booléen (bool)
     DoubleRole = 0x4000000,             //!< Donnée principale sous forme d'un double (double)
@@ -102,11 +102,11 @@ class NodeIndex {
     friend ItemNodeModel;
 protected:
     int m_cible = NodeCible;                //!< Cible de l'index.
-    szt m_num = 0;                              //!< Numéro.
+    numt m_num = 0;                              //!< Numéro.
     void * m_ptr = nullptr;                     //!< Pointeur interne sur sur la donnée du model.
     ItemNodeModel * m_model = nullptr;      //!< Pointeur sur le model.
 public:
-    using SubIndex = std::pair<int,szt>;
+    using SubIndex = std::pair<int,numt>;
 
     //! Constructeur.
     NodeIndex() = default;
@@ -125,7 +125,7 @@ public:
     flag flags() const;
 
     //! Créer un index de même model et pointeur avec la cible et le numero spécifié.
-    NodeIndex index(int cb, szt nm = 0) const noexcept {
+    NodeIndex index(int cb, numt nm = 0) const noexcept {
         auto ind = *this;
         ind.setCible(cb);
         ind.setNum(nm);
@@ -157,7 +157,7 @@ public:
     NodeIndex nextBrother() const noexcept;
 
     //! Accesseur du numéro.
-    szt num() const noexcept
+    numt num() const noexcept
         {return m_num;}
 
     //! Teste l'équivalence de deux index.
@@ -168,7 +168,7 @@ public:
     NodeIndex parent() const;
 
     //! Retourne la position du noeud dans la fratrie.
-    szt position() const noexcept;
+    numt position() const noexcept;
 
     //! Retourne un index sur le frère précédent.
     NodeIndex prevBrother() const noexcept;
@@ -178,7 +178,7 @@ public:
         {m_cible = cb;}
 
     //! Mutateur de la cible.
-    void setNum(szt num) noexcept
+    void setNum(numt num) noexcept
         {m_num = num;}
 
     //! Retourne le sous index.
@@ -199,23 +199,23 @@ public:
     virtual ~ItemNode();
 
     //! Accesseur de la donnée associé à column.
-    virtual QVariant data(int cible, int role, szt /*num*/ = 0) const;
+    virtual QVariant data(int cible, int role, numt /*num*/ = 0) const;
 
     //! Nombre de donnée associé au noeud pour une cible donnée.
-    virtual szt dataCount(int cible) const
+    virtual numt dataCount(int cible) const
         {return cible == NodeCible ? 1 : NoData;}
 
     //! Supprime les donnée du noeud.
     virtual bool del() {return true;}
 
     //! Accesseur des drapeaux associés à column.
-    virtual flag flags(int /*cible*/, szt /*num*/ = 0) const {return  DefaultFalgNode;}
+    virtual flag flags(int /*cible*/, numt /*num*/ = 0) const {return  DefaultFalgNode;}
 
     //! Enregistre les données du noeud.
-    virtual void save(idt /*parent*/, szt /*num*/) {}
+    virtual void save(idt /*parent*/, numt /*num*/) {}
 
     //! Mutateur de la donnée associé à column.
-    virtual flag setData(int /*cible*/, const QVariant & /*value*/, int /*role*/, szt /*num*/ = 0) {return NoRole;}
+    virtual flag setData(int /*cible*/, const QVariant & /*value*/, int /*role*/, numt /*num*/ = 0) {return NoRole;}
 
     //! Accesseur du type du noeud.
     int type() const {return m_type;}
@@ -289,10 +289,10 @@ public:
         {return index.internalPointer();}
 
     //! Insert des noeud du model, ne vérifie pas les arguments.
-    template<class Factory> bool insertNodes(const NodeIndex &parent, szt pos, szt count, Factory factory);
+    template<class Factory> bool insertNodes(const NodeIndex &parent, numt pos, numt count, Factory factory);
 
     //! Supprime des noeuds du model.
-    bool removeNodes(const NodeIndex & parent, szt pos, szt count);
+    bool removeNodes(const NodeIndex & parent, numt pos, numt count);
 
     //! Modifie l'arbre de donnée.
     void setTree(Tree && tree)
@@ -315,8 +315,8 @@ class ItemNodeModel : public QObject{
 protected:
     struct NodesInfo {
         NodeIndex parent;           //!< Index du parent des nodes insérés.
-        szt pos;                    //!< Position du premier noeud insérés.
-        szt count;                  //!< Position du dernier noeud insérés.
+        numt pos;                    //!< Position du premier noeud insérés.
+        numt count;                  //!< Position du dernier noeud insérés.
     };
     std::forward_list<NodesInfo> m_insertNodesPile;         //!< Pile des informations d'insertion de noeuds.
     std::forward_list<NodesInfo> m_removeNodesPile;         //!< Pile des informations de suppression de noeuds.
@@ -337,7 +337,7 @@ public:
         {return index.m_model == this && index.m_ptr;}
 
     //! Renvoie le nombre de d'enfants.
-    szt childCount(const NodeIndex &parent) const {
+    numt childCount(const NodeIndex &parent) const {
         return parent.isValid() ? m_data.getValidIter(parent).sizeChild()
                                 : RootCount;}
 
@@ -345,7 +345,7 @@ public:
     virtual QVariant data(const NodeIndex & index, int role) const;
 
     //! Nombre de données associées associé à un noeud pour une cible donnée.
-    virtual szt dataCount(const NodeIndex & index) const;
+    virtual numt dataCount(const NodeIndex & index) const;
 
     //! Retourne un index sur le frère ainé.
     NodeIndex firstBrother(const NodeIndex & index) const
@@ -363,10 +363,10 @@ public:
         {return m_data.getValidNode(index);}
 
     //! Renvoie l'index correxpondant au noeud pos de parent.
-    NodeIndex index(const NodeIndex &parent, szt pos, int cible = NodeCible, szt num = 0) const;
+    NodeIndex index(const NodeIndex &parent, numt pos, int cible = NodeCible, numt num = 0) const;
 
     //! Insert count noeuds de nature type avant la position pos de parent.
-    bool insertNodes(const NodeIndex &parent, szt pos, szt count, int type);
+    bool insertNodes(const NodeIndex &parent, numt pos, numt count, int type);
 
     //! Test si l'index est la racine.
     bool isRoot(const NodeIndex & index) const {
@@ -398,7 +398,7 @@ public:
     }
 
     //! Position du noeud dans la fratrie.
-    szt position(const NodeIndex & index) const
+    numt position(const NodeIndex & index) const
         {return index.isValid() ? m_data.getValidIter(index).position()
                                 : AucunePosition;}
 
@@ -408,7 +408,7 @@ public:
                                 : NodeIndex();}
 
     //! Supprimer count noeud de la fratrie en commençant par le noeud node.
-    virtual bool removeNodes(const NodeIndex &index, szt count = 1);
+    virtual bool removeNodes(const NodeIndex &index, numt count = 1);
 
     //! Mutateur des données du model.
     virtual bool setData(const NodeIndex & index, const QVariant & value, int role);
@@ -432,20 +432,20 @@ signals:
     void modelResetData();
 
     //! Signal de début d'insertion de noeuds.
-    void nodesAboutToBeInserted(const NodeIndex &parent, szt pos, szt count);
+    void nodesAboutToBeInserted(const NodeIndex &parent, numt pos, numt count);
 
     //! Signal de début de suppression de noeuds.
-    void nodesAboutToBeRemoved(const NodeIndex &parent, szt pos, szt count);
+    void nodesAboutToBeRemoved(const NodeIndex &parent, numt pos, numt count);
 
     //! Signal de fin d'insertion de noeuds.
-    void nodesInserted(const NodeIndex &parent, szt pos, szt count);
+    void nodesInserted(const NodeIndex &parent, numt pos, numt count);
 
     //! Signal de fin de suppression de noeuds.
-    void nodesRemoved(const NodeIndex &parent, szt pos, szt count);
+    void nodesRemoved(const NodeIndex &parent, numt pos, numt count);
 
 protected:
     //! Début d'insertions de noeuds.
-    void beginInsertNodes(const NodeIndex & parent, szt pos, szt count) {
+    void beginInsertNodes(const NodeIndex & parent, numt pos, numt count) {
         m_insertNodesPile.push_front({parent,pos,count});
         emit nodesAboutToBeInserted(parent,pos,count);
     }
@@ -455,19 +455,23 @@ protected:
                        const NodeIndex & /*destinationParent*/, int /*destinationChild*/) {return false;}
 
     //! Début de suppression de lignes [first,last).
-    void beginRemoveNodes(const NodeIndex & index, szt count) {
+    void beginRemoveNodes(const NodeIndex & index, numt count) {
         auto pos = index.position();
         NodesInfo info({index.parent(),pos,count});
         m_removeNodesPile.push_front(info);
         emit nodesAboutToBeRemoved(info.parent,info.pos,info.count);
     }
 
+    //! Début de réinitialisation des données du model.
+    void beginResetData()
+        {emit modelAboutToResetData();}
+
     //! Début de réinitialisation du model.
     void beginResetModel()
         {emit modelAboutToBeReset();}
 
     //! Crée un index de pointeur ptr.
-    NodeIndex createIndex(void * ptr = nullptr, int cible = NodeCible, szt num = 0) const noexcept;
+    NodeIndex createIndex(void * ptr = nullptr, int cible = NodeCible, numt num = 0) const noexcept;
 
     //! Fin d'insertion de lignes.
     void endInsertNodes() {
@@ -487,10 +491,15 @@ protected:
     }
 
     //! Fin de réinitialisation du model.
-    void endResetModel() {emit modelReset();}
+    void endResetModel()
+        {emit modelReset();}
+
+    //! Fin de réinitialisation des données du model.
+    void endResetData()
+        {emit modelResetData();}
 
     //! Fabrique des noeuds.
-    virtual Node nodeFactory(const NodeIndex & /*parent*/, szt /*pos*/, int /*type*/) {return std::make_unique<ItemNode>();}
+    virtual Node nodeFactory(const NodeIndex & /*parent*/, numt /*pos*/, int /*type*/) {return std::make_unique<ItemNode>();}
 };
 
 ////////////////////////////////////////////////// TreeNodeModelWithBdd /////////////////////////////////////////////////////
@@ -512,14 +521,14 @@ public:
 };
 
 ///////////////////////////////////// Definition de TreeForNodeModel //////////////////////////////////
-template<class Factory> bool TreeForNodeModel::insertNodes(const NodeIndex &parent, szt pos, szt count, Factory factory) {
+template<class Factory> bool TreeForNodeModel::insertNodes(const NodeIndex &parent, numt pos, numt count, Factory factory) {
     auto iter = getIter(parent);
     if(pos == iter.sizeChild())
-        for(szt i = 0; i != count; ++i)
+        for(numt i = 0; i != count; ++i)
             m_tree.push_back(iter,factory(parent, pos + i));
     else {
         iter.toChildU(pos);
-        for(szt i = count; i != 0; --i)
+        for(numt i = count; i != 0; --i)
             m_tree.insert(iter,factory(parent, pos + i));
     }
     return true;

@@ -57,7 +57,7 @@
     /*! Positions des attributs.*/ \
     enum Position {NOM, NbrAtt}; \
     /*! Nom de l'attribut.*/ \
-    static QString NameAttribut(szt /*pos*/=0) {return #NOM;} \
+    static QString NameAttribut(post /*pos*/=0) {return #NOM;} \
     /*! Nom de la classe de l'attribut.*/ \
     QString nameClasseAttribut() const override {return #ATTRIBUT;} \
     /*! Accesseur de l'attribut nom.*/ \
@@ -91,9 +91,7 @@
  * \brief Espace de nom des attributs des entités.
  */
 namespace attributMPS {
-
 using namespace typeMPS;
-
 /*! \ingroup groupeAttributEntity
  * \brief Classe signalant la fin d'une branche d'attribut.
  */
@@ -115,7 +113,7 @@ public:
     virtual QString affiche() const;
 
     //! Retourne un QVariant contenant la donnée souhaitée, pos doit être valide.
-    virtual QVariant dataP(szt /*pos*/) const = 0;
+    virtual QVariant dataP(post /*pos*/) const = 0;
 
     //! Accesseur de l'attribut pour la base de données.
     virtual QVariant getToBdd() const = 0;
@@ -132,14 +130,14 @@ public:
     virtual QString nameAtt() const = 0;
 
     //! Renvoie le nom de l'attribut.
-    QString attributName(szt /*Pos*/) const
+    QString attributName(post /*Pos*/) const
         {return nameAtt();}
 
     //! Renvoie le nom de l'attribut.
     virtual QString nameClasseAttribut() const = 0;
 
     //! Modifie la donnée à partir d'un QVariant.
-    virtual void setDataP(szt /*pos*/, const QVariant & value) = 0;
+    virtual void setDataP(post /*pos*/, const QVariant & value) = 0;
 
     //! Renvoie une chaine de caractère contenant la valeur de l'attribut.
     virtual QString toString() const
@@ -175,7 +173,7 @@ public:
     ~AttributEntityTemp() override;
 
     //! Retourne un QVariant contenant la donnée souhaitée, pos doit être valide.
-    QVariant dataP(szt /*pos*/) const override
+    QVariant dataP(post /*pos*/) const override
         {return m_valeur;}
 
     //! Accesseur de l'attribut.
@@ -191,7 +189,7 @@ public:
         {m_valeur = valeur;}
 
     //! Modifie la donnée à partir d'un QVariant.
-    void setDataP(szt /*pos*/, const QVariant & value) override
+    void setDataP(post /*pos*/, const QVariant & value) override
         {set(value.value<AttType>());}
 
     //! Renvoie une chaine de caractère contenant la valeur de l'attribut.
@@ -221,7 +219,7 @@ template<> inline AttributEntityVal<int>::AttributEntityTemp() : m_valeur(0) {}
 template<> inline AttributEntityVal<idt>::AttributEntityTemp() : m_valeur(0) {}
 
 // Spécilisation du setDatat pour les Variants.
-template<> inline void AttributEntityRef<QVariant>::setDataP(szt /*pos*/, const QVariant & value) {set(value);}
+template<> inline void AttributEntityRef<QVariant>::setDataP(post /*pos*/, const QVariant & value) {set(value);}
 
 // Alis de spécialiations totales.
 using AttributBool = AttributEntityVal<bool>;
@@ -500,7 +498,7 @@ public:
         {m_valeur |= valeur;}
 
     //! Retourne un QVariant contenant la donnée souhaitée, pos doit être valide.
-    QVariant dataP(szt /*pos*/) const override
+    QVariant dataP(post /*pos*/) const override
         {return m_valeur.value();}
 
     //! Accesseur de l'attribut.
@@ -518,9 +516,9 @@ public:
         {return m_valeur.value();}
 
     //! retourne la liste des valeurs contenue
-    std::vector<unsigned> list() const {
-        std::vector<unsigned> L;
-        for(unsigned i = 1; i <= sizeof (unsigned); ++i) {
+    std::vector<flag_type> list() const {
+        std::vector<flag_type> L;
+        for(flag_type i = 1; i <= sizeof (flag_type); ++i) {
             flag::flag_type val = 1<<i;
             if(test(val))
                 L.push_back(val);
@@ -533,7 +531,7 @@ public:
         {m_valeur = valeur;}
 
     //! Modifie la donnée à partir d'un QVariant.
-    void setDataP(szt /*pos*/, const QVariant & value) override
+    void setDataP(post /*pos*/, const QVariant & value) override
         {set(value.toUInt());}
 
     //! Teste si l'intersection est non vide.

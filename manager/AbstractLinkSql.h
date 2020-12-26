@@ -13,11 +13,11 @@ namespace managerMPS {
 /*! \ingroup groupeManager
  * \brief Classe template frabriquant les liens avec la base de donnée à partir de l'ordre des attributs des entité.
  */
-template<class Attribut, class AttPre, class AttSuiv, szt Pos> class LinkSqlDichot;
-template<class Attribut, szt Pos = 0> using LinkSqlAttribut
+template<class Attribut, class AttPre, class AttSuiv, post Pos> class LinkSqlDichot;
+template<class Attribut, post Pos = 0> using LinkSqlAttribut
                                             = LinkSqlDichot<Attribut, typename Attribut::AttPre, typename Attribut::AttSuiv, Pos>;
 
-template<class Attribut, class AttPre, class AttSuiv, szt Pos> class LinkSqlDichot :
+template<class Attribut, class AttPre, class AttSuiv, post Pos> class LinkSqlDichot :
         public LinkSqlAttribut<AttPre, Pos>,
         public LinkSqlAttribut<AttSuiv, AttPre::NbrAtt + Pos> {
 public:
@@ -44,7 +44,7 @@ public:
     }
 };
 
-template<class Attribut, szt Pos> class LinkSqlDichot<Attribut, attributMPS::NoAttribut, attributMPS::NoAttribut, Pos>
+template<class Attribut, post Pos> class LinkSqlDichot<Attribut, attributMPS::NoAttribut, attributMPS::NoAttribut, Pos>
         : public virtual ReqSql {
 public:
     enum {PosPre = Pos};
@@ -72,12 +72,8 @@ public:
     void fromRequete(Entity & entity) const
         {entity.setId(value<Entity::AttType>(PosPre));}
 
-    ////! Accesseur de l'identifiant.
-    //unsigned id(int pos = Entity::Id) const
-    //    {return value<unsigned>(pos);}
-
     //! Mutateur de l'identifiant.
-    void setId(const Entity & entity, szt pos = 0)
+    void setId(const Entity & entity, post pos = 0)
         {m_requete->bindValue(static_cast<int>(pos),entity.id());}
 };
 
@@ -92,7 +88,6 @@ public:
     //! Puis retourne un  pointeur vers cette nouvelle entité.
     Ent * newFromRequete() const {
         Ent * ptr = new Ent();
-        //entity->setId(id());
         fromRequete(*ptr);
         return ptr;
     }

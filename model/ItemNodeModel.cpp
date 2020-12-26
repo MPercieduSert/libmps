@@ -5,7 +5,7 @@ using namespace modelMPS;
 //////////////////////////////////// ItemNode ////////////////////////////////
 ItemNode::~ItemNode() = default;
 
-QVariant ItemNode::data(int cible, int role, szt /*num*/) const {
+QVariant ItemNode::data(int cible, int role, numt /*num*/) const {
     if(cible == NodeCible){
         switch (role) {
         case TypeRole:
@@ -24,7 +24,7 @@ QVariant ItemNodeModel::data(const NodeIndex &index, int role) const {
     return QVariant();
 }
 
-szt ItemNodeModel::dataCount(const NodeIndex & index) const {
+numt ItemNodeModel::dataCount(const NodeIndex & index) const {
     if(checkIndex(index))
         return m_data.getValidNode(index).dataCount(index.cible());
     return ItemNode::NoData;
@@ -35,7 +35,7 @@ flag ItemNodeModel::flags(const NodeIndex & index) const {
         return m_data.getValidNode(index).flags(index.cible(), index.num());
     return NoFlagNode;
 }
-NodeIndex ItemNodeModel::createIndex(void * ptr, int cible, szt num) const noexcept{
+NodeIndex ItemNodeModel::createIndex(void * ptr, int cible, numt num) const noexcept{
     NodeIndex index;
     index.m_cible = cible;
     index.m_num = num;
@@ -44,7 +44,7 @@ NodeIndex ItemNodeModel::createIndex(void * ptr, int cible, szt num) const noexc
     return index;
 }
 
-NodeIndex ItemNodeModel::index(const NodeIndex &parent, szt pos, int cible, szt num) const {
+NodeIndex ItemNodeModel::index(const NodeIndex &parent, numt pos, int cible, numt num) const {
     if(parent.isValid()) {
         auto iter = m_data.getValidIter(parent);
         iter.toChildU(pos);
@@ -56,17 +56,17 @@ NodeIndex ItemNodeModel::index(const NodeIndex &parent, szt pos, int cible, szt 
     return NodeIndex();
 }
 
-bool ItemNodeModel::insertNodes(const NodeIndex &parent, szt pos, szt count, int type) {
+bool ItemNodeModel::insertNodes(const NodeIndex &parent, numt pos, numt count, int type) {
     if (!parent.isValid() || pos > childCount(parent))
         return false;
     beginInsertNodes(parent,pos,count);
         m_data.insertNodes(parent,pos,count,
-                           [this,type](const NodeIndex & parentArg, szt posArg){return nodeFactory(parentArg,posArg,type);});
+                           [this,type](const NodeIndex & parentArg, numt posArg){return nodeFactory(parentArg,posArg,type);});
     endInsertNodes();
     return true;
 }
 
-bool ItemNodeModel::removeNodes(const NodeIndex &index, szt count) {
+bool ItemNodeModel::removeNodes(const NodeIndex &index, numt count) {
     if(count == 0 || !index.isValid() || index.isRoot())
         return false;
     beginRemoveNodes(index, count);
@@ -122,7 +122,7 @@ NodeIndex NodeIndex::parent() const
     {return m_model ? m_model->parent(*this)
                       : NodeIndex();}
 
-szt NodeIndex::position() const noexcept
+numt NodeIndex::position() const noexcept
     {return m_model ? m_model->position(*this)
                     : 0;}
 
@@ -131,11 +131,11 @@ NodeIndex NodeIndex::prevBrother() const noexcept
                     : NodeIndex();}
 
 /////////////////////////////////// TreeForNodeModel ///////////////////////////
-bool TreeForNodeModel::removeNodes(const NodeIndex &parent, szt pos, szt count) {
+bool TreeForNodeModel::removeNodes(const NodeIndex &parent, numt pos, numt count) {
     if(!parent.isValid())
         return false;
-    szt comp = 0;
-    for(szt i = 0; i != count; ++i) {
+    numt comp = 0;
+    for(numt i = 0; i != count; ++i) {
         std::forward_list<iterator> pile;
         pile.push_front(getIter(parent).toChildU(pos));
         bool remove = true;
