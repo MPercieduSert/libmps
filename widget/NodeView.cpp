@@ -18,19 +18,21 @@ void ArcNodeViewWidget::drawNode(bool next) {
         auto parentArc = static_cast<ArcNodeViewWidget *>(parentWidget());
         auto draw = false;
         auto y = 0;
+        auto & arcPainter = *m_view->m_arcPainter;
         for (auto iter = parentArc->m_arcChild.begin(); iter != parentArc->m_arcChild.end(); ++iter) {
             if (!next && !draw && *iter == this) {
                 draw = true;
                 if(iter ==  parentArc->m_arcChild.begin()) {
                     if(parentArc->m_nodeArcVisible)
-                        y = parentArc->nodeWidget()->geometry().bottom();
+                        y = parentArc->nodeWidget()->geometry().bottom()
+                                + arcPainter.heightToolZone() + arcPainter.bottomToolsZoneMargin();
                 }
                 else
                     y = (*std::prev(iter))->geometry().bottom();
             }
             if(draw) {
                 if(parentArc->m_nodeArcVisible)
-                    (*iter)->move(m_view->m_arcPainter->leftExpandedMargin(),y);
+                    (*iter)->move(arcPainter.leftExpandedMargin(),y);
                 else
                     (*iter)->move(NodeView::ArcPainter::NoMargin,y);
                 (*iter)->setVisible(true);
@@ -64,19 +66,37 @@ void ArcNodeViewWidget::insertNodes(numt first, numt last){
 }
 
 void ArcNodeViewWidget::mousePressEvent(QMouseEvent *event) {
-    if(m_nodeArcVisible && !m_leaf && event->button() == Qt::LeftButton)
-        if((m_expanded && event->x() < m_view->m_arcPainter->leftExpandedMargin() && event->y() > m_nodeWidget->geometry().bottom())
-                || (! m_expanded && event->x() < m_view->m_arcPainter->widthExpandZone() && event->y() > m_nodeWidget->geometry().bottom()))
-        setExpanded(!m_expanded);
+    if(event->button() == Qt::LeftButton) {
+        if(event->y() > m_nodeWidget->geometry().bottom() + m_view->m_arcPainter->bottomNodeMargin()
+                && event->y() <= m_nodeWidget->geometry().bottom() + m_view->m_arcPainter->bottomNodeMargin() + m_view->m_arcPainter->heightToolZone()
+                && event->x() < m_view->m_arcPainter->widthToolZone(NodeView::EndOfTool)){
+            if(event->x() < m_view->m_arcPainter->widthToolZone(NodeView::ExpandTool)) {
+                if(!m_leaf && m_nodeWidget->index().flags().test(ExpendableFLagNode))
+                    setExpanded(!m_expanded);
+            }
+            else if (event->x() < m_view->m_arcPainter->widthToolZone(NodeView::ElderTool)) {
+                if(m_nodeWidget->index().flags().test(ElderEnableFlagNode))
+                    m_nodeWidget->index().model()->insertNodes(m_nodeWidget->index(),0,1);
+            }
+            else if (event->x() < m_view->m_arcPainter->widthToolZone(NodeView::BrotherTool)) {
+                if(m_nodeWidget->index().flags().test(BrotherEnableFlagNode))
+                    m_nodeWidget->index().model()->insertNodes(m_nodeWidget->index().parent(),0,1);
+
+            }
+            else if (event->x() < m_view->m_arcPainter->widthToolZone(NodeView::DelTool)) {
+                if(m_nodeWidget->index().flags().test(DelEnableFlagNode))
+                    m_nodeWidget->index().model()->removeNodes(m_nodeWidget->index());
+            }
+        }
+        else if((m_expanded && event->x() < m_view->m_arcPainter->leftExpandedMargin() && event->y() > m_nodeWidget->geometry().bottom()))
+            setExpanded(false);
+    }
 }
 
 void ArcNodeViewWidget::paintEvent(QPaintEvent * /*event*/) {
-    if(!m_leaf && m_nodeArcVisible) {
-        if(m_expanded)
-            m_view->m_arcPainter->drawArc(this);
-        else
-            m_view->m_arcPainter->drawExpandZone(this);
-    }
+    m_view->m_arcPainter->drawToolZone(this);
+    if(!m_leaf && m_nodeArcVisible && m_expanded)
+        m_view->m_arcPainter->drawArc(this);
 }
 
 void ArcNodeViewWidget::removeNodes(numt first, numt last) {
@@ -160,8 +180,10 @@ void ArcNodeViewWidget::setNodeWidget(NodeWidget * widget) {
 }
 
 QSize ArcNodeViewWidget::sizeHint() const{
+    auto & arcPainter = *m_view->m_arcPainter;
     if(m_expanded) {
-        QSize sz(0,m_arcChild.back()->geometry().bottom() + m_view->m_arcPainter->bottomNodeMargin());
+        QSize sz(0,m_arcChild.back()->geometry().bottom() + arcPainter.bottomNodeMargin()
+                 + arcPainter.heightToolZone() + arcPainter.bottomToolsZoneMargin());
         if(m_nodeArcVisible)
             sz.rwidth() = m_nodeWidget->geometry().right();
         for (auto iter = m_arcChild.cbegin(); iter != m_arcChild.cend(); ++iter) {
@@ -169,14 +191,15 @@ QSize ArcNodeViewWidget::sizeHint() const{
                 sz.rwidth() = (*iter)->geometry().right();
         }
         if(m_nodeArcVisible)
-            sz.rwidth() += m_view->m_arcPainter->rightNodeMargin();
+            sz.rwidth() += arcPainter.rightNodeMargin();
         return sz;
     }
     auto sz = m_nodeWidget->sizeHint();
-    sz.rwidth() += m_view->m_arcPainter->leftNodeMargin() + m_view->m_arcPainter->rightNodeMargin();
-    sz.rheight() += m_view->m_arcPainter->topNodeMargin();
-    if(!m_leaf)
-        sz.rheight() += m_view->m_arcPainter->heightExpandZone();
+    if(sz.width() < arcPainter.widthToolZone(NodeView::EndOfTool))
+        sz.rwidth() = arcPainter.widthToolZone(NodeView::EndOfTool);
+    sz.rwidth() += arcPainter.leftNodeMargin() + arcPainter.rightNodeMargin();
+    sz.rheight() += arcPainter.topNodeMargin() + arcPainter.bottomNodeMargin()
+                    + arcPainter.heightToolZone() + arcPainter.bottomToolsZoneMargin();
     return sz;
 }
 

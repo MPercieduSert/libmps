@@ -210,6 +210,15 @@ public:
                         ContinousSelection
      };
 
+    //! Outils des noeuds.
+    enum toolsNode {
+        ExpandTool,
+        ElderTool,
+        BrotherTool,
+        DelTool,
+        EndOfTool = DelTool
+    };
+
     /*! \ingroup groupeWidget
      * \brief Dessinant le lien entre un noeud et ses déscendant.
      */
@@ -227,14 +236,17 @@ public:
         //! Destructeur.
         virtual ~ArcPainter() = default;
 
-        //! Renvoie la marge au dessus du noeud.
+        //! Renvoie la marge au dessous du noeud.
         virtual int bottomNodeMargin() const {return BottomNodeMargin;}
+
+        //! Renvoie la marge au dessous de la zone outils.
+        virtual int bottomToolsZoneMargin() const {return BottomNodeMargin;}
 
         //! Dessine l'arc liant les descendants.
         virtual void drawArc(ArcNodeViewWidget * /*arc*/) const {}
 
-        //! Dessine la zone permettant l'expansion du noeud.
-        virtual void drawExpandZone(ArcNodeViewWidget * /*arc*/) const {}
+        //! Dessine la zone outils.
+        virtual void drawToolZone(ArcNodeViewWidget * /*arc*/) const {}
 
         //! Renvoie la marge à gauche pour tracer l'arc.
         virtual int leftExpandedMargin() const {return NoMargin;}
@@ -245,14 +257,14 @@ public:
         //! Renvoie la marge à droite du noeud.
         virtual int rightNodeMargin() const {return RightNodeMargin;}
 
-        //! Renvoie taille verticale de la zone de demande d'expansion.
-        virtual int heightExpandZone() const {return NoMargin;}
+        //! Renvoie taille verticale de la zone outils.
+        virtual int heightToolZone() const {return NoMargin;}
 
         //! Renvoie la marge au dessus du noeud.
         virtual int topNodeMargin() const {return TopNodeMargin;}
 
         //! Renvoie taille horizontale de la zone de demande d'expansion.
-        virtual int widthExpandZone() const {return NoMargin;}
+        virtual int widthToolZone(toolsNode /*num*/) const {return NoMargin;}
     };
 protected:
     friend ArcNodeViewWidget;
@@ -268,6 +280,7 @@ protected:
     SelectionModel * m_selectionModel = nullptr;        //!< Model de sélection.
     std::map<void*,ArcNodeViewWidget *> m_arcMap;       //!< Map des arc.
 public:
+
     //! Constructeur.
     NodeView(std::unique_ptr<ArcPainter> && arcPainter = std::make_unique<ArcPainter>(), QWidget * parent = nullptr);
 
@@ -338,7 +351,7 @@ protected slots:
     void resetRoot();
 
     //! Change la sélection.
-    void selectionChanged(const std::list<NodeIndex> & selected, const std::list<NodeIndex> & deselected) {} 
+    void selectionChanged(const std::list<NodeIndex> & /*selected*/, const std::list<NodeIndex> & /*deselected*/) {}
 };
 
 /*! \ingroup groupeWidget

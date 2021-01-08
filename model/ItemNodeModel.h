@@ -91,7 +91,12 @@ enum flagNode : flag::flag_type {
     EnableFlagNode = 0x2,
     LeftClickableFlagNode = 0x4,
     SelectableFlagNode = 0x8,
-    DefaultFalgNode = VisibleFlagNode | EnableFlagNode | LeftClickableFlagNode | SelectableFlagNode
+    ExpendableFLagNode = 0x10,
+    ElderEnableFlagNode = 0x20,
+    BrotherEnableFlagNode = 0x40,
+    DelEnableFlagNode = 0x80,
+    DefaultFalgNode = VisibleFlagNode | EnableFlagNode | LeftClickableFlagNode | SelectableFlagNode,
+    DefaultNodeFlagNode = DefaultFalgNode | ExpendableFLagNode | ElderEnableFlagNode | BrotherEnableFlagNode | DelEnableFlagNode
 };
 
 /////////////////////////////////////////////////////// NodeIndex //////////////////////////////////////////////////
@@ -209,7 +214,9 @@ public:
     virtual bool del() {return true;}
 
     //! Accesseur des drapeaux associés à column.
-    virtual flag flags(int /*cible*/, numt /*num*/ = 0) const {return  DefaultFalgNode;}
+    virtual flag flags(int cible, numt /*num*/ = 0) const
+        {return cible == NodeCible ? DefaultNodeFlagNode
+                                   : DefaultFalgNode;}
 
     //! Enregistre les données du noeud.
     virtual void save(idt /*parent*/, numt /*num*/) {}
@@ -324,6 +331,7 @@ protected:
     enum {RootCount = 1,
          AucunePosition = 0};
 public:
+    enum {DefaultType};
     //! Classe des noeud de l'arbre de données
     using Node = std::unique_ptr<ItemNode>;
     //! Classe structurant les données.
@@ -338,8 +346,10 @@ public:
 
     //! Renvoie le nombre de d'enfants.
     numt childCount(const NodeIndex &parent) const {
-        return parent.isValid() ? m_data.getValidIter(parent).sizeChild()
-                                : RootCount;}
+        if(!parent.isValid())
+            return RootCount;
+        return m_data.getValidIter(parent).sizeChild();
+    }
 
     //! Accesseur des données du model.
     virtual QVariant data(const NodeIndex & index, int role) const;
@@ -366,7 +376,7 @@ public:
     NodeIndex index(const NodeIndex &parent, numt pos, int cible = NodeCible, numt num = 0) const;
 
     //! Insert count noeuds de nature type avant la position pos de parent.
-    bool insertNodes(const NodeIndex &parent, numt pos, numt count, int type);
+    bool insertNodes(const NodeIndex &parent, numt pos, numt count, int type = DefaultType);
 
     //! Test si l'index est la racine.
     bool isRoot(const NodeIndex & index) const {
@@ -398,9 +408,11 @@ public:
     }
 
     //! Position du noeud dans la fratrie.
-    numt position(const NodeIndex & index) const
-        {return index.isValid() ? m_data.getValidIter(index).position()
-                                : AucunePosition;}
+    numt position(const NodeIndex & index) const {
+        if(!index.isValid())
+            return AucunePosition;
+        return m_data.getValidIter(index).position();
+    }
 
     //! Retourne un index sur le frère suivant.
     NodeIndex prevBrother(const NodeIndex & index) const

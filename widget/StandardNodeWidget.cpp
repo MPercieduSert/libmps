@@ -126,17 +126,44 @@ void RoundedArcPainter::drawArc(ArcNodeViewWidget * arc) const{
                      x ,y);
 }
 
-void RoundedArcPainter::drawExpandZone(ArcNodeViewWidget * arc) const {
+void RoundedArcPainter::drawToolZone(ArcNodeViewWidget * arc) const {
     QPainter painter(arc);
     QPen pen(QGuiApplication::palette().color(QPalette::Active,QPalette::WindowText));
-    pen.setWidth(WidthCircle);
+    pen.setWidth(WidthLine);
     painter.setPen(pen);
-    painter.setBrush(QBrush(QGuiApplication::palette().color(QPalette::Active,QPalette::WindowText)));
-    for (auto i = 0; i < NbrCircle; ++i) {
-        QPoint pt(arc->nodeWidget()->geometry().left() + WidthCircle + Rayon + Ecart * i,
-                  arc->nodeWidget()->geometry().bottom() + VSpacing + WidthCircle + Rayon);
-        painter.drawEllipse(pt,Rayon,Rayon);
-    }
+    painter.drawRoundedRect(leftNodeMargin() + WidthLine / 2,
+                            arc->nodeWidget()->geometry().bottom() + bottomNodeMargin() + WidthLine / 2,
+                            widthToolZone(NodeView::EndOfTool) - WidthLine / 2,
+                            heightToolZone() - WidthLine / 2,
+                            RayonToolZone, RayonToolZone, Qt::AbsoluteSize);
+    auto top = arc->nodeWidget()->geometry().bottom() + bottomNodeMargin() + WidthLine / 2;
+    auto bottom = top +  heightToolZone() - WidthLine / 2;
+    auto xo = leftNodeMargin() + WidthLine / 2;
+    auto xLine = xo + widthToolZone(NodeView::ExpandTool);
+    painter.setFont(QFont("FontAwesome"));
+    painter.drawLine(xLine,top,xLine,bottom);
+    if(arc->leaf())
+        painter.drawText(xo,top,widthToolZone(NodeView::ExpandTool),bottom - top,Qt::AlignCenter,"\uf10c");
+    else if(arc->expanded())
+        painter.drawText(xo,top,widthToolZone(NodeView::ExpandTool),bottom - top,Qt::AlignCenter,"\uf151");
+    else
+        painter.drawText(xo,top,widthToolZone(NodeView::ExpandTool),bottom - top,Qt::AlignCenter,"\uf150");
+
+    painter.drawText(xLine,top,
+                     widthToolZone(NodeView::ElderTool) - widthToolZone(NodeView::ExpandTool),bottom - top,
+                     Qt::AlignCenter,"\uf149");
+    xLine = xo + widthToolZone(NodeView::ElderTool);
+    painter.drawLine(xLine,top,xLine,bottom);
+    painter.drawText(xLine,top,
+                     widthToolZone(NodeView::DelTool) - widthToolZone(NodeView::BrotherTool),bottom - top,
+                     Qt::AlignCenter,"\uf07e");
+    xLine = xo + widthToolZone(NodeView::BrotherTool);
+    painter.drawLine(xLine,top,xLine,bottom);
+    painter.drawText(xLine,top,
+                     widthToolZone(NodeView::BrotherTool) - widthToolZone(NodeView::ElderTool),bottom - top,
+                     Qt::AlignCenter,"\uf12d");
+//    xLine = xo + widthToolZone(NodeView::DelTool);
+//    painter.drawLine(xLine,top,xLine,bottom);
 }
 
 ////////////////////////////////////////////////// RoundedNodePainter //////////////////////////////////////////

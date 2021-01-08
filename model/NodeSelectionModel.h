@@ -76,10 +76,10 @@ public slots:
     void reset() {}
 
     //! Sélectionne (émet selectionChanged)
-    void select(const NodeIndex & index, flag selectionFlag) {}
+    void select(const NodeIndex & /*index*/, flag /*selectionFlag*/) {}
 
     //! Sélectionne (émet selectionChanged)
-    void select(const std::list<NodeIndex> & index, flag selectionFlag) {}
+    void select(const std::list<NodeIndex> & /*index*/, flag /*selectionFlag*/) {}
 
     //! Mutateur de l'index courant.
     void setCurrentIndex(const NodeIndex & index, flag selectionFlag);
@@ -94,7 +94,7 @@ signals:
     void selectionChanged(const std::list<NodeIndex> & selected, const std::list<NodeIndex> & deselected);
 protected:
     //! Compare les deux sélections puis émét selectionChanged.
-    void emitSelectionChanged(const std::list<NodeIndex> & newSelection, const std::list<NodeIndex> & oldSelection) {}
+    void emitSelectionChanged(const std::list<NodeIndex> & /*newSelection*/, const std::list<NodeIndex> & /*oldSelection*/) {}
 };
 }
 #endif // NODESELECTIONMODEL_H
