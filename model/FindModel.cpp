@@ -111,7 +111,7 @@ void FindModel::setModel(AbstractColonnesModel * model) {
 }
 
 bool FindModel::testRoot(szt id) const{
-    auto & root = static_cast<const FindNode &>(**m_data.tree().cbegin().toFirstChild());
+    auto & root = static_cast<const FindNode &>(m_data.getRoot());
     return root.negation() ? !root.test(id,m_model)
                            : root.test(id,m_model);
 }

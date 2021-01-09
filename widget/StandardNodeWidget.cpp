@@ -10,7 +10,7 @@ CheckSubNodeWidget::CheckSubNodeWidget(const NodeIndex & index, QWidget * parent
     m_mainLayout->addWidget(m_checkBox);
     connect(m_checkBox,&QCheckBox::stateChanged,[this]() {
         if(connexionEnable())
-            m_index.model()->setData(m_index,m_checkBox->checkState(),modelMPS::CheckStateRole);});
+            m_index.model()->setData(m_index,m_checkBox->isChecked(),modelMPS::CheckStateRole);});
 }
 
 void CheckSubNodeWidget::updateDataSubNode(flag role) {

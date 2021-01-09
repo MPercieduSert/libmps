@@ -120,7 +120,7 @@ public:
 
     //! Teste si l'arbre est réduit à sa racine.
     bool rootLeaf() const override
-        {return m_data.tree().cbegin().toFirstChild().leaf();}
+        {return m_data.getRootIter().leaf();}
 
     //! Mutateur des données du model.
     bool setData(const NodeIndex &index, const QVariant &value, int role) override;
