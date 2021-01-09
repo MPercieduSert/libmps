@@ -47,16 +47,16 @@ void ArcNodeViewWidget::drawNode(bool next) {
     }
 }
 
-void ArcNodeViewWidget::insertNodes(numt first, numt last){
-    if(last >= first) {
+void ArcNodeViewWidget::insertNodes(numt pos, numt count){
+    if(count > 0 && pos <= m_arcChild.size()) {
         setLeaf(false);
         if(m_expanded) {
-            auto iterfirst = m_arcChild.insert(std::next(m_arcChild.cbegin(),first), last - first + 1, nullptr);
+            auto iterfirst = m_arcChild.insert(std::next(m_arcChild.cbegin(),pos), count, nullptr);
             auto iter = iterfirst;
-            auto child = m_nodeWidget->index().model()->index(m_nodeWidget->index(),first);
-            while (first <= last && child.isValid()) {
+            auto child = m_nodeWidget->index().model()->index(m_nodeWidget->index(),pos);
+            while (count && child.isValid()) {
                 *iter = new ArcNodeViewWidget(child,m_view,this);
-                ++first;
+                --count;
                 ++iter;
                 child = child.nextBrother();
             }
@@ -80,7 +80,7 @@ void ArcNodeViewWidget::mousePressEvent(QMouseEvent *event) {
             }
             else if (event->x() < m_view->m_arcPainter->widthToolZone(NodeView::BrotherTool)) {
                 if(m_nodeWidget->index().flags().test(BrotherEnableFlagNode))
-                    m_nodeWidget->index().model()->insertNodes(m_nodeWidget->index().parent(),0,1);
+                    m_nodeWidget->index().model()->insertNodes(m_nodeWidget->index().parent(),m_nodeWidget->index().position() + 1,1);
 
             }
             else if (event->x() < m_view->m_arcPainter->widthToolZone(NodeView::DelTool)) {
@@ -99,16 +99,25 @@ void ArcNodeViewWidget::paintEvent(QPaintEvent * /*event*/) {
         m_view->m_arcPainter->drawArc(this);
 }
 
-void ArcNodeViewWidget::removeNodes(numt first, numt last) {
-    if(first <= last && last < m_arcChild.size()) {
-        auto firstIter = std::next(m_arcChild.begin(), first);
-        auto lastIter = std::next(m_arcChild.begin(), last + 1);
-        for (auto iter = firstIter; iter != lastIter ; ++iter)
+void ArcNodeViewWidget::removeNodes(numt pos, numt count) {
+    if(count && pos < m_arcChild.size()) {
+        auto iter = std::next(m_arcChild.begin(), pos);
+        if(count == 1) {
             (*iter)->deleteLater();
-        m_arcChild.erase(firstIter,lastIter);
+            m_arcChild.erase(iter);
+        }
+        else {
+            auto firstIter = iter;
+            while(count && iter != m_arcChild.end()) {
+                (*iter)->deleteLater();
+                ++iter;
+                --count;
+            }
+            m_arcChild.erase(firstIter,iter);
+        }
         if(m_arcChild.size()) {
-            if(m_arcChild.size() != first)
-                m_arcChild[first]->drawNode();
+            if(m_arcChild.size() != pos)
+                m_arcChild[pos]->drawNode();
             else {
                 adjustSize();
                 drawNode(true);
@@ -182,8 +191,7 @@ void ArcNodeViewWidget::setNodeWidget(NodeWidget * widget) {
 QSize ArcNodeViewWidget::sizeHint() const{
     auto & arcPainter = *m_view->m_arcPainter;
     if(m_expanded) {
-        QSize sz(0,m_arcChild.back()->geometry().bottom() + arcPainter.bottomNodeMargin()
-                 + arcPainter.heightToolZone() + arcPainter.bottomToolsZoneMargin());
+        QSize sz(0,m_arcChild.back()->geometry().bottom() + arcPainter.bottomToolsZoneMargin());
         if(m_nodeArcVisible)
             sz.rwidth() = m_nodeWidget->geometry().right();
         for (auto iter = m_arcChild.cbegin(); iter != m_arcChild.cend(); ++iter) {
@@ -250,16 +258,16 @@ void NodeView::deleteRoot(){
     delete takeWidget();
 }
 
-void NodeView::insertNodes(const NodeIndex & parent, numt first, numt last) {
+void NodeView::insertNodes(const NodeIndex & parent, numt pos, numt count) {
     auto iter = m_arcMap.find(parent.internalPointer());
     if(iter != m_arcMap.end())
-        iter->second->insertNodes(first,last);
+        iter->second->insertNodes(pos,count);
 }
 
-void NodeView::removeNodes(const NodeIndex & parent, numt first, numt last) {
+void NodeView::removeNodes(const NodeIndex & parent, numt pos, numt count) {
     auto iter = m_arcMap.find(parent.internalPointer());
     if(iter != m_arcMap.end())
-        iter->second->removeNodes(first, last);
+        iter->second->removeNodes(pos, count);
 }
 
 void NodeView::setCurrentIndex(const NodeIndex & index){

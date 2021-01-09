@@ -12,20 +12,21 @@ void FindModel::find(){
         m_model->find(this);
 }
 
-void FindModel::insertNode(const NodeIndex & parent, numt pos) {
+bool FindModel::insertNodes(const NodeIndex & parent, numt pos, numt count, int type) {
     if(parent.isValid()){
         if(getNode(parent).type() == OperationNodeType)
-            insertNodes(parent,pos,1,ChoiceNodeType);
-        else {
+            return ItemNodeModel::insertNodes(parent,pos,count,type);
+        else if (count != 0 && pos == 0) {
             auto node = std::move(*m_data.getValidIter(parent));
             *m_data.getValidIter(parent) = std::make_unique<FindNode>(this,Et,OperationNodeType);
             emit dataChanged(parent,TypeRole);
-            beginInsertNodes(parent,0,2);
+            beginInsertNodes(parent,0,1);
                 m_data.tree().push_back(m_data.getIter(parent),std::move(node));
-                m_data.tree().push_back(m_data.getIter(parent),static_cast<Node &&>(std::make_unique<FindNode>(this,Et,ChoiceNodeType)));
             endInsertNodes();
+            return ItemNodeModel::insertNodes(parent,1,count,type);
         }
     }
+    return false;
 }
 
 QMap<QString,QVariant> FindModel::nomColonnes() const {
@@ -42,6 +43,7 @@ QMap<QString,QVariant> FindModel::nomColonnes() const {
 ItemNodeModel::Node FindModel::nodeFactory(const NodeIndex & parent, numt pos, int type) {
     switch (type) {
     case ChoiceNodeType:
+    case ItemNodeModel::DefaultType:
         return std::make_unique<FindNode>(this,0,ChoiceNodeType);
     case OperationNodeType:
         return std::make_unique<FindNode>(this,Et,OperationNodeType);
@@ -65,16 +67,20 @@ ItemNodeModel::Node FindModel::nodeConditionFactory(szt col){
     }
 }
 
-void FindModel::removeNode(const NodeIndex & node){
+bool FindModel::removeNodes(const NodeIndex & node, numt count){
     if(checkIndex(node) && !node.isRoot()){
-        if(childCount(node.parent()) == 2) {
-            *m_data.getValidIter(node.parent()) = std::move(*m_data.getValidIter(index(node.parent(), 1 - node.position())));
+        if(childCount(node.parent()) == count + 1) {
+            if(m_data.getValidIter(node).firstBrother())
+                *m_data.getValidIter(node.parent()) = std::move(*m_data.getValidIter(node).toLastBrother());
+            else
+                *m_data.getValidIter(node.parent()) = std::move(*m_data.getValidIter(node).toFirstBrother());
             emit dataChanged(node.parent(),TypeRole);
-            removeNodes(node.firstBrother(),2);
+            return ItemNodeModel::removeNodes(node.firstBrother(),count + 1);
         }
         else
-            removeNodes(node);
+            return ItemNodeModel::removeNodes(node,count);
     }
+    return false;
 }
 
 void FindModel::reset() {
@@ -85,27 +91,13 @@ void FindModel::reset() {
 
 bool FindModel::setData(const NodeIndex &index, const QVariant &value, int role) {
     if(index.isValid()) {
-        if(role == IntRole) {
-            if(index.cible() == OpCible){
-                if(getNode(index).type() == ChoiceNodeType
-                        && value.toInt() >= 0 && value.toInt() < NbrOperation) {
-                    *m_data.getValidIter(index) = std::make_unique<FindNode>(this,value.toUInt(),OperationNodeType);
-                    emit dataChanged(index.index(NodeCible),TypeRole);
-                    insertNodes(index,0,2,ChoiceNodeType);
-                    return true;
-                }
-            }
-            else if (index.cible() == ColonneCible) {
-                if(getNode(index).type() != OperationNodeType
-                        && value.toInt() >= 0 && value.toInt() < m_model->columnCount()) {
-                    if(getNode(index).type() != m_model->colonne(value.toUInt()).type())
-                        *m_data.getValidIter(index) = nodeConditionFactory(value.toUInt());
-                    else
-                        static_cast<FindNode &>(getNode(index)).setPos(value.toUInt());
-                    emit dataChanged(index.index(NodeCible),TypeRole);
-                    return true;
-                }
-            }
+        if(index.cible() == ColonneCible && value.toInt() >= 0 && value.toInt() < m_model->columnCount()) {
+            if(getNode(index).type() != m_model->colonne(value.toUInt()).type())
+                *m_data.getValidIter(index) = nodeConditionFactory(value.toUInt());
+            else
+                static_cast<FindNode &>(getNode(index)).setPos(value.toUInt());
+            emit dataChanged(index.index(NodeCible),TypeRole);
+            return true;
         }
         return ItemNodeModel::setData(index,value,role);
     }
@@ -194,15 +186,15 @@ QVariant FindNode::data(int cible, int role, numt num) const {
                 init.append(CheckSubNode);
                 return init;
             }
-            if(num == FindModel::ColonnePosition && type() != FindModel::OperationNodeType) {
+            if(num == FindModel::NegationPosition
+                    || (num == FindModel::ColonnePosition && type() != FindModel::OperationNodeType)) {
                 QList<QVariant> init;
                 init.append(FindModel::ColonneCible);
                 init.append(0);
                 init.append(ComboBoxSubNode);
                 return init;
             }
-            if((num == FindModel::OperationChoicePosition && type() == FindModel::ChoiceNodeType)
-                    || (num == FindModel::OperationOperationPosition && type() == FindModel::OperationNodeType)) {
+            if(num == FindModel::OperationOperationPosition && type() == FindModel::OperationNodeType) {
                 QList<QVariant> init;
                 init.append(FindModel::OpCible);
                 init.append(0);

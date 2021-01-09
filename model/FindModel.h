@@ -89,7 +89,7 @@ public:
     enum dataCountNode {
         BoolDataCount = 4,
         DateDataCount = 4,
-        ChoiceDataCount = 2,
+        ChoiceDataCount = 1,
         OperationDatacount = 2,
         TexteDataCount = 5};
 
@@ -102,10 +102,11 @@ public:
     FindModel(AbstractColonnesModel * model = nullptr, QObject * parent = nullptr);
 
     //! Insert un nouveau noeud.
-    //! Si le noeuds parent est un operationNode un noeud choiceNode est ajouté avant row.
+    //! Si le noeuds parent est un operationNode un noeud choiceNode est ajouté avant pos.
     //! Si le noeuds parent n'est pas un operationNode, un nouveau operationNode prend sa place
     //! et le noeud parent devient l'ainé de ce nouveau et un noeud ChoiceNode est ajouté en cadet.
-    void insertNode(const NodeIndex & parent, numt pos);
+    //! Insert count noeuds de nature type avant la position pos de parent.
+    bool insertNodes(const NodeIndex &parent, numt pos, numt count, int type = DefaultType) override;
 
     //! Accesseur du model filtré.
     AbstractColonnesModel * model() const
@@ -115,7 +116,7 @@ public:
     QMap<QString,QVariant> nomColonnes() const;
 
     //! Supprime le noeud et ses descendants.
-    void removeNode(const NodeIndex & index);
+    bool removeNodes(const NodeIndex & index, numt count = 1) override;
 
     //! Teste si l'arbre est réduit à sa racine.
     bool rootLeaf() const override

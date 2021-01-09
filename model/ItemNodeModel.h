@@ -331,7 +331,7 @@ protected:
     enum {RootCount = 1,
          AucunePosition = 0};
 public:
-    enum {DefaultType};
+    enum {DefaultType = -2};
     //! Classe des noeud de l'arbre de données
     using Node = std::unique_ptr<ItemNode>;
     //! Classe structurant les données.
@@ -376,7 +376,7 @@ public:
     NodeIndex index(const NodeIndex &parent, numt pos, int cible = NodeCible, numt num = 0) const;
 
     //! Insert count noeuds de nature type avant la position pos de parent.
-    bool insertNodes(const NodeIndex &parent, numt pos, numt count, int type = DefaultType);
+    virtual bool insertNodes(const NodeIndex &parent, numt pos, numt count, int type = DefaultType);
 
     //! Test si l'index est la racine.
     bool isRoot(const NodeIndex & index) const {
