@@ -135,6 +135,8 @@ public:
     //! Nombre de donné associé à une cible.
     numt dataCount(const NodeIndex & index) const override;
 
+    //! Fabrique des noeuds.
+    Node nodeFactory(const NodeIndex & /*parent*/, numt /*pos*/, int /*type*/) override {return std::make_unique<TypePermissionNode>(this);}
 };
 
 ////////////////////////////////////////////////////////// MakeArbreNode ////////////////////////////////////////////////

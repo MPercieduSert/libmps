@@ -24,12 +24,10 @@ protected:
     modelMPS::TypePermissionModel * m_model;    //!< Model.
     widgetMPS::NodeView * m_view;               //!< Vue.
     QListWidget * m_cibleListWidget;            //!< Sélection des cibles.
-    QPushButton * m_insertButton;               //!< Bouton d'insertion d'une ligne.
     QPushButton * m_saveButton;                 //!< Bouton de sauvegarde.
-    QPushButton * m_supprButton;                //!< Bouton de suppression d'une entité.
 
     // Calque
-    QHBoxLayout * m_buttonLayout;               //!< Calque des boutons.
+    QVBoxLayout * m_cibleLayout;                //!< Calque des cibles.
     QHBoxLayout * m_mainLayout;                 //!< Calque principal.
 
 public:

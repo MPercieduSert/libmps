@@ -96,7 +96,8 @@ enum flagNode : flag::flag_type {
     BrotherEnableFlagNode = 0x40,
     DelEnableFlagNode = 0x80,
     DefaultFalgNode = VisibleFlagNode | EnableFlagNode | LeftClickableFlagNode | SelectableFlagNode,
-    DefaultNodeFlagNode = DefaultFalgNode | ExpendableFLagNode | ElderEnableFlagNode | BrotherEnableFlagNode | DelEnableFlagNode
+    DefaultRootFlagNode = DefaultFalgNode | ExpendableFLagNode | ElderEnableFlagNode,
+    DefaultNodeFlagNode = DefaultRootFlagNode | BrotherEnableFlagNode | DelEnableFlagNode
 };
 
 /////////////////////////////////////////////////////// NodeIndex //////////////////////////////////////////////////
@@ -107,8 +108,8 @@ class NodeIndex {
     friend ItemNodeModel;
 protected:
     int m_cible = NodeCible;                //!< Cible de l'index.
-    numt m_num = 0;                              //!< Numéro.
-    void * m_ptr = nullptr;                     //!< Pointeur interne sur sur la donnée du model.
+    numt m_num = 0;                         //!< Numéro.
+    void * m_ptr = nullptr;                 //!< Pointeur interne sur sur la donnée du model.
     ItemNodeModel * m_model = nullptr;      //!< Pointeur sur le model.
 public:
     using SubIndex = std::pair<int,numt>;
@@ -214,9 +215,13 @@ public:
     virtual bool del() {return true;}
 
     //! Accesseur des drapeaux associés à column.
-    virtual flag flags(int cible, numt /*num*/ = 0) const
-        {return cible == NodeCible ? DefaultNodeFlagNode
-                                   : DefaultFalgNode;}
+    virtual flag flags(int cible, numt /*num*/ = 0) const {
+        if(cible == NodeCible){
+//            if(isRoot)
+//                return DefaultRootFlagNode;
+            return DefaultNodeFlagNode;
+        }
+        return DefaultFalgNode;}
 
     //! Enregistre les données du noeud.
     virtual void save(idt /*parent*/, numt /*num*/) {}
@@ -424,9 +429,7 @@ public:
 
     //! Mutateur des données du model.
     virtual bool setData(const NodeIndex & index, const QVariant & value, int role);
-public slots:
-    //! Enregistre les données du model.
-    virtual void save();
+
 signals:
     //! Signal le changement d'une donnée.
     void dataChanged(const NodeIndex & index, flag role);
@@ -530,6 +533,10 @@ public:
     //! Accesseur de la base de données.
     bddMPS::Bdd & bdd() const
         {return m_bdd;}
+
+public slots:
+    //! Enregistre les données du model.
+    virtual void save();
 };
 
 ///////////////////////////////////// Definition de TreeForNodeModel //////////////////////////////////

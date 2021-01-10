@@ -131,39 +131,53 @@ void RoundedArcPainter::drawToolZone(ArcNodeViewWidget * arc) const {
     QPen pen(QGuiApplication::palette().color(QPalette::Active,QPalette::WindowText));
     pen.setWidth(WidthLine);
     painter.setPen(pen);
-    painter.drawRoundedRect(leftNodeMargin() + WidthLine / 2,
-                            arc->nodeWidget()->geometry().bottom() + bottomNodeMargin() + WidthLine / 2,
-                            widthToolZone(NodeView::EndOfTool) - WidthLine / 2,
-                            heightToolZone() - WidthLine / 2,
-                            RayonToolZone, RayonToolZone, Qt::AbsoluteSize);
     auto top = arc->nodeWidget()->geometry().bottom() + bottomNodeMargin() + WidthLine / 2;
-    auto bottom = top +  heightToolZone() - WidthLine / 2;
+    auto height =  heightToolZone() - WidthLine;
     auto xo = leftNodeMargin() + WidthLine / 2;
-    auto xLine = xo + widthToolZone(NodeView::ExpandTool);
+    auto xEx = xo + widthToolZone(NodeView::ExpandTool);
+    auto xEl = xo + widthToolZone(NodeView::ElderTool);
+    auto xBr = xo + widthToolZone(NodeView::BrotherTool);
+    auto xEnd = xo + widthToolZone(NodeView::EndOfTool);
+    // Rectangle
+    painter.drawRoundedRect(xo,top,
+                            widthToolZone(NodeView::EndOfTool) - WidthLine / 2, height,
+                            RayonToolZone, RayonToolZone, Qt::AbsoluteSize);
+    //Line
+    painter.drawLine(xEx,top,xEx,top + height);
+    painter.drawLine(xEl,top,xEl,top + height);
+    painter.drawLine(xBr,top,xBr,top + height);
+    //Icon
+    QPen penDisabled(QGuiApplication::palette().color(QPalette::Disabled,QPalette::WindowText));
     painter.setFont(QFont("FontAwesome"));
-    painter.drawLine(xLine,top,xLine,bottom);
+    //Icon : Expand
+    if(!arc->nodeWidget()->index().flags().test(modelMPS::ExpendableFLagNode))
+        painter.setPen(penDisabled);
+    QString strExpand;
     if(arc->leaf())
-        painter.drawText(xo,top,widthToolZone(NodeView::ExpandTool),bottom - top,Qt::AlignCenter,"\uf10c");
+        strExpand = "\uf10c";
     else if(arc->expanded())
-        painter.drawText(xo,top,widthToolZone(NodeView::ExpandTool),bottom - top,Qt::AlignCenter,"\uf151");
+        strExpand = "\uf151";
     else
-        painter.drawText(xo,top,widthToolZone(NodeView::ExpandTool),bottom - top,Qt::AlignCenter,"\uf150");
-
-    painter.drawText(xLine,top,
-                     widthToolZone(NodeView::ElderTool) - widthToolZone(NodeView::ExpandTool),bottom - top,
-                     Qt::AlignCenter,"\uf149");
-    xLine = xo + widthToolZone(NodeView::ElderTool);
-    painter.drawLine(xLine,top,xLine,bottom);
-    painter.drawText(xLine,top,
-                     widthToolZone(NodeView::DelTool) - widthToolZone(NodeView::BrotherTool),bottom - top,
-                     Qt::AlignCenter,"\uf07e");
-    xLine = xo + widthToolZone(NodeView::BrotherTool);
-    painter.drawLine(xLine,top,xLine,bottom);
-    painter.drawText(xLine,top,
-                     widthToolZone(NodeView::BrotherTool) - widthToolZone(NodeView::ElderTool),bottom - top,
-                     Qt::AlignCenter,"\uf12d");
-//    xLine = xo + widthToolZone(NodeView::DelTool);
-//    painter.drawLine(xLine,top,xLine,bottom);
+        strExpand = "\uf150";
+    painter.drawText(xo,top,xEx-xo,height,Qt::AlignCenter,strExpand);
+    //Icon : Elder
+    if(arc->nodeWidget()->index().flags().test(modelMPS::ElderEnableFlagNode))
+        painter.setPen(pen);
+    else
+        painter.setPen(penDisabled);
+    painter.drawText(xEx,top,xEl-xEx,height,Qt::AlignCenter,"\uf149");
+    //Icon : Brother
+    if(arc->nodeWidget()->index().flags().test(modelMPS::BrotherEnableFlagNode))
+        painter.setPen(pen);
+    else
+        painter.setPen(penDisabled);
+    painter.drawText(xEl,top,xBr-xEl,height,Qt::AlignCenter,"\uf07e");
+    //Icon : Del
+    if(arc->nodeWidget()->index().flags().test(modelMPS::DelEnableFlagNode))
+        painter.setPen(pen);
+    else
+        painter.setPen(penDisabled);
+    painter.drawText(xBr,top,xEnd-xBr,height,Qt::AlignCenter,"\uf12d");
 }
 
 ////////////////////////////////////////////////// RoundedNodePainter //////////////////////////////////////////

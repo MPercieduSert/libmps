@@ -8,9 +8,7 @@ TabGestionType::TabGestionType(bmps::Bdd & bdd, const std::pair<int, int> &pairI
     cases.at(Attribuable) = widgetMPS::CodeWidget::caseStyle(widgetMPS::CodeWidget::Attribuable, bddMPS::code::Attribuable);
     cases.at(Visible) = widgetMPS::CodeWidget::caseStyle(widgetMPS::CodeWidget::Visible, bddMPS::code::Visible);
     // Widget
-//    m_insertButton = new QPushButton("+");
-//    m_saveButton = new QPushButton(tr("Sauvegarder"));
-//    m_supprButton = new QPushButton("-");
+    m_saveButton = new QPushButton(tr("Sauvegarder"));
     m_view = new widgetMPS::NodeView(std::make_unique<widgetMPS::RoundedArcPainter>());
     m_model = new modelMPS::TypePermissionModel(static_cast<bddMPS::BddPredef &>(bdd),this);
     m_view->setModel(m_model);
@@ -26,14 +24,13 @@ TabGestionType::TabGestionType(bmps::Bdd & bdd, const std::pair<int, int> &pairI
     m_cibleListWidget->setSizePolicy(QSizePolicy::Minimum,QSizePolicy::Expanding);
     connect(m_cibleListWidget,&QListWidget::itemChanged,this,[this](QListWidgetItem * item)
         {m_model->setCible(item->data(Qt::UserRole).toUInt(), item->checkState() == Qt::Checked);});
+    connect(m_saveButton,&QPushButton::clicked,m_model,&modelMPS::TypePermissionModel::save);
 
     // Calque
-//    m_buttonLayout = new QHBoxLayout;
-//    m_buttonLayout->addWidget(m_insertButton);
-//    m_buttonLayout->addWidget(m_supprButton);
-//    m_buttonLayout->addWidget(m_saveButton);
+    m_cibleLayout = new QVBoxLayout;
+    m_cibleLayout->addWidget(m_cibleListWidget);
+    m_cibleLayout->addWidget(m_saveButton);
     m_mainLayout = new QHBoxLayout(this);
     m_mainLayout->addWidget(m_view);
-//    m_mainLayout->addLayout(m_buttonLayout);
-    m_mainLayout->addWidget(m_cibleListWidget);
+    m_mainLayout->addLayout(m_cibleLayout);
 }

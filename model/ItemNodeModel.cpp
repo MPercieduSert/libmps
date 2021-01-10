@@ -78,10 +78,6 @@ bool ItemNodeModel::removeNodes(const NodeIndex &index, numt count) {
     return true;
 }
 
-void ItemNodeModel::save() {
-
-}
-
 bool ItemNodeModel::setData(const NodeIndex &index, const QVariant &value, int role) {
     if(checkIndex(index)){
         auto changeRole = m_data.getValidNode(index).setData(index.cible(),value,role,index.num());
@@ -129,6 +125,11 @@ numt NodeIndex::position() const noexcept
 NodeIndex NodeIndex::prevBrother() const noexcept
     {return m_model ? m_model->prevBrother(*this)
                     : NodeIndex();}
+
+//////////////////////////////////// ItemNodeModel ////////////////////////////
+void ItemNodeBddModel::save() {
+
+}
 
 /////////////////////////////////// TreeForNodeModel ///////////////////////////
 bool TreeForNodeModel::removeNodes(const NodeIndex &parent, numt pos, numt count) {

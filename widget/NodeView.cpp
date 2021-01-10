@@ -66,7 +66,7 @@ void ArcNodeViewWidget::insertNodes(numt pos, numt count){
 }
 
 void ArcNodeViewWidget::mousePressEvent(QMouseEvent *event) {
-    if(event->button() == Qt::LeftButton) {
+    if(m_nodeArcVisible && event->button() == Qt::LeftButton) {
         if(event->y() > m_nodeWidget->geometry().bottom() + m_view->m_arcPainter->bottomNodeMargin()
                 && event->y() <= m_nodeWidget->geometry().bottom() + m_view->m_arcPainter->bottomNodeMargin() + m_view->m_arcPainter->heightToolZone()
                 && event->x() < m_view->m_arcPainter->widthToolZone(NodeView::EndOfTool)){
@@ -94,7 +94,8 @@ void ArcNodeViewWidget::mousePressEvent(QMouseEvent *event) {
 }
 
 void ArcNodeViewWidget::paintEvent(QPaintEvent * /*event*/) {
-    m_view->m_arcPainter->drawToolZone(this);
+    if(m_nodeArcVisible)
+        m_view->m_arcPainter->drawToolZone(this);
     if(!m_leaf && m_nodeArcVisible && m_expanded)
         m_view->m_arcPainter->drawArc(this);
 }
