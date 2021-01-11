@@ -106,7 +106,7 @@ public:
     //! Si le noeuds parent n'est pas un operationNode, un nouveau operationNode prend sa place
     //! et le noeud parent devient l'ainé de ce nouveau et un noeud ChoiceNode est ajouté en cadet.
     //! Insert count noeuds de nature type avant la position pos de parent.
-    bool insertNodes(const NodeIndex &parent, numt pos, numt count, int type = DefaultType) override;
+    void insertNodes(const NodeIndex &parent, numt pos, numt count, int type = DefaultType) override;
 
     //! Accesseur du model filtré.
     AbstractColonnesModel * model() const
@@ -120,7 +120,7 @@ public:
 
     //! Teste si l'arbre est réduit à sa racine.
     bool rootLeaf() const override
-        {return m_data.getRootIter().leaf();}
+        {return m_data.cbegin().leaf();}
 
     //! Mutateur des données du model.
     bool setData(const NodeIndex &index, const QVariant &value, int role) override;

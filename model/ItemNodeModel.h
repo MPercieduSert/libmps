@@ -13,7 +13,6 @@
 
 namespace modelMPS {
 using namespace typeMPS;
-class ItemNodeModel;
 //! Cible de donnée prédéfinies.
 enum cibleDataNode {
     NodeCible = -1,
@@ -100,98 +99,6 @@ enum flagNode : flag::flag_type {
     DefaultNodeFlagNode = DefaultRootFlagNode | BrotherEnableFlagNode | DelEnableFlagNode
 };
 
-/////////////////////////////////////////////////////// NodeIndex //////////////////////////////////////////////////
-/*! \ingroup groupeModel
- * \brief Classe d'index d'un noeuds.
- */
-class NodeIndex {
-    friend ItemNodeModel;
-protected:
-    int m_cible = NodeCible;                //!< Cible de l'index.
-    numt m_num = 0;                         //!< Numéro.
-    void * m_ptr = nullptr;                 //!< Pointeur interne sur sur la donnée du model.
-    ItemNodeModel * m_model = nullptr;      //!< Pointeur sur le model.
-public:
-    using SubIndex = std::pair<int,numt>;
-
-    //! Constructeur.
-    NodeIndex() = default;
-
-    //! Accesseur de la cible.
-    int cible() const noexcept
-        {return m_cible;}
-
-    //! Accesseur des données associées à l'index.
-    QVariant data(int role) const;
-
-    //! Retourne un index sur le frère ainé.
-    NodeIndex firstBrother() const noexcept;
-
-    //! Drapeaux assossiés à une donnée.
-    flag flags() const;
-
-    //! Créer un index de même model et pointeur avec la cible et le numero spécifié.
-    NodeIndex index(int cb, numt nm = 0) const noexcept {
-        auto ind = *this;
-        ind.setCible(cb);
-        ind.setNum(nm);
-        return ind;
-    }
-
-    //! Accesseur du pointeur interne.
-    void * internalPointer() const noexcept
-        {return m_ptr;}
-
-    //! Teste si l'index est la racine.
-    bool isRoot() const noexcept;
-
-    //! Teste si l'index est valide.
-    bool isValid() const noexcept
-        {return m_model && m_ptr;}
-
-    //! Retourne un index sur le frère benjamin.
-    NodeIndex lastBrother() const noexcept;
-
-    //! Teste si dans le model le noeud associé à l'index est une feuille.
-    bool leaf() const;
-
-    //! Accesseur du model.
-    ItemNodeModel * model() const noexcept
-        {return m_model;}
-
-    //! Retourne un index sur le frère suivant.
-    NodeIndex nextBrother() const noexcept;
-
-    //! Accesseur du numéro.
-    numt num() const noexcept
-        {return m_num;}
-
-    //! Teste l'équivalence de deux index.
-    bool operator==(const NodeIndex & index) const noexcept
-        {return m_model == index.m_model && m_ptr == index.m_ptr && m_cible == index.m_cible && m_num == index.m_num;}
-
-    //! Retourne un index sur le parent.
-    NodeIndex parent() const;
-
-    //! Retourne la position du noeud dans la fratrie.
-    numt position() const noexcept;
-
-    //! Retourne un index sur le frère précédent.
-    NodeIndex prevBrother() const noexcept;
-
-    //! Mutateur de la cible.
-    void setCible(int cb) noexcept
-        {m_cible = cb;}
-
-    //! Mutateur de la cible.
-    void setNum(numt num) noexcept
-        {m_num = num;}
-
-    //! Retourne le sous index.
-    SubIndex subIndex() const noexcept
-        {return {m_cible,m_num};}
-};
-
 //! Node abstré de l'arbre de recherche.
 class ItemNode {
 protected:
@@ -233,10 +140,136 @@ public:
     int type() const {return m_type;}
 };
 
+class ItemNodeModel;
+class TreeForNodeModel;
+/*! \ingroup groupeModel
+ * \brief Classe d'index d'un noeuds.
+ */
+class NodeIndex {
+    friend ItemNodeModel;
+    friend TreeForNodeModel;
+protected:
+    //using Iter = conteneurMPS::tree<std::unique_ptr<ItemNode>>::const_iterator;
+    using Iter = conteneurMPS::tree<std::unique_ptr<ItemNode>>::iterator;
+    int m_cible = NodeCible;                        //!< Cible de l'index.
+    numt m_num = 0;                                 //!< Numéro.
+    Iter m_iter = static_cast<void *>(nullptr);    //!< Itérateur pointant sur un noeud du model.
+    ItemNodeModel * m_model = nullptr;              //!< Pointeur sur le model.
+    enum {RootCount = 1};
+public:
+    using SubIndex = std::pair<int,numt>;
+
+    //! Constructeur.
+    NodeIndex() = default;
+
+    //! Renvoie le nombre de d'enfants.
+    numt childCount() const noexcept {
+        if(!isValid())
+            return RootCount;
+        return m_iter.sizeChild();
+    }
+
+    //! Accesseur de la cible.
+    int cible() const noexcept
+        {return m_cible;}
+
+    //! Accesseur des données associées à l'index.
+    QVariant data(int role) const;
+
+    //! Retourne un index sur le frère ainé.
+    NodeIndex firstBrother() const noexcept;
+
+    //! Drapeaux assossiés à une donnée.
+    flag flags() const;
+
+    //! Créer un index de même model et pointeur avec la cible et le numero spécifié.
+    NodeIndex index(int cb, numt nm = 0) const noexcept {
+        auto ind = *this;
+        ind.setCible(cb);
+        ind.setNum(nm);
+        return ind;
+    }
+
+    //! Accesseur du pointeur interne.
+    void * internalPointer() const noexcept
+        {return m_iter.ptr();}
+
+    //! Teste si l'index est la racine.
+    bool isRoot() const
+        {return m_iter.root();}
+
+    //! Teste si l'index est valide.
+    bool isValid() const noexcept
+        {return m_iter;}
+
+    //! Retourne un index sur le frère benjamin.
+    NodeIndex lastBrother() const noexcept;
+
+    //! Teste si dans le model le noeud associé à l'index est une feuille.
+    bool leaf() const
+        {return m_iter.leaf();}
+
+    //! Accesseur du model.
+    ItemNodeModel * model() const noexcept
+        {return m_model;}
+
+    //! Retourne un index sur le frère suivant.
+    NodeIndex nextBrother() const noexcept;
+
+    //! Accesseur du numéro.
+    numt num() const noexcept
+        {return m_num;}
+
+    //! Teste l'équivalence de deux index.
+    bool operator==(const NodeIndex & index) const noexcept
+        {return m_model == index.m_model && m_iter == index.m_iter && m_cible == index.m_cible && m_num == index.m_num;}
+
+    //! Retourne un index sur le parent.
+    NodeIndex parent() const noexcept;
+
+    //! Retourne la position du noeud dans la fratrie.
+    numt position() const
+        {return m_iter.position() ;}
+
+    //! Retourne un index sur le frère précédent.
+    NodeIndex prevBrother() const noexcept;
+
+    //! Mutateur de la cible.
+    void setCible(int cb) noexcept
+        {m_cible = cb;}
+
+    //! Mutateur de la cible.
+    void setNum(numt num) noexcept
+        {m_num = num;}
+
+    //! Retourne le sous index.
+    SubIndex subIndex() const noexcept
+        {return {m_cible,m_num};}
+
+protected:
+//    //! Accesseur de l'itérateur.
+//    const_Iter citerator() const noexcept
+//        {return m_iter;}
+
+    //! Accesseur de l'itérateur.
+    Iter iter() const noexcept
+        {return m_iter;}
+
+//    //! Accesseur de l'itérateur.
+//    Iter & rIterator() noexcept
+//        {return m_iter;}
+
+//    //! Mutateur de l'itérateur.
+//    void setIterator(Iter iter)
+//        {m_iter = iter;}
+
+};
+
 /*! \ingroup groupeModel
  * \brief Arbre de noeuds pour les models à noeud.
  */
 class TreeForNodeModel {
+    //friend ItemNodeModel;
 protected:
     //! Classe des noeud de l'arbre de données
     using Node = std::unique_ptr<ItemNode>;
@@ -250,23 +283,39 @@ protected:
     //const bool m_racine;        //!< Racine permise.
     Tree m_tree;                //!< Arbre de donnée.
 public:
-    //! Renvoie une référence sur le noeud coorespondant à l'index.
+    //! Iterateur sur la racine.
+    const_iterator cbegin() const noexcept
+        {return m_tree.cbegin();}
+
+    //! Iterateur sur la racine.
+    Tree::const_reverse_iterator crbegin() const noexcept
+        {return m_tree.crbegin();}
+
+    //! Efface un noeud de l'arbre.
+    void erase(const NodeIndex & index)
+        {m_tree.erase(index.m_iter);}
+
+    //! Efface les count frère de index.
+    void erase(const NodeIndex & index, numt count)
+        {m_tree.erase(index.m_iter,index.iter().toBrotherU(count));}
+
+    //! Renvoie une référence sur le noeud coorespondant à l'index (en supposant sa validité).
     const ItemNode & getNode(const NodeIndex &index) const
-        {return **getIter(index);}
+        {return **index.m_iter;}
 
-    //! Renvoie une référence sur le noeud coorespondant à l'index.
+    //! Renvoie une référence sur le noeud coorespondant à l'index (en supposant sa validité).
     ItemNode & getNode(const NodeIndex &index)
-        {return **getIter(index);}
+        {return **index.m_iter;}
 
-    //! Renvoie un itérateur pointant sur le noeud désigné par index.
-    const_iterator getIter(const NodeIndex &index) const
-        {return index.isValid() ? getValidIter(index)
-                                : m_tree.cbegin();}
+//    //! Renvoie un itérateur pointant sur le noeud désigné par index.
+//    const_iterator getIter(const NodeIndex &index) const
+//        {return index.isValid() ? getValidIter(index)
+//                                : m_tree.cbegin();}
 
-    //! Renvoie un itérateur pointant sur le noeud désigné par index.
-    iterator getIter(const NodeIndex &index)
-        {return index.isValid() ? getValidIter(index)
-                                : m_tree.begin();}
+//    //! Renvoie un itérateur pointant sur le noeud désigné par index.
+//    iterator getIter(const NodeIndex &index)
+//        {return index.isValid() ? getValidIter(index)
+//                                : m_tree.begin();}
 
     //! Renvoie une référence sur le noeud de la racine.
     const ItemNode & getRoot() const
@@ -276,47 +325,57 @@ public:
     ItemNode & getRoot()
         {return **m_tree.begin();}
 
-    //! Renvoie un itérateur sur la racine.
-    const_iterator getRootIter() const
-        {return m_tree.cbegin();}
+//    //! Renvoie une référence sur la donné coorespondant à l'index (en supposant la validité).
+//    const ItemNode & getValidNode(const NodeIndex & index) const
+//        {return **index.m_iter;}
 
-    //! Renvoie un itérateur sur la racine.
-    iterator getRootIter()
-        {return m_tree.begin();}
+//    //! Renvoie une référence sur la donné coorespondant à l'index (en supposant la validité).
+//    ItemNode & getValidNode(const NodeIndex & index)
+//        {return **index.m_iter;}
 
-    //! Renvoie une référence sur la donné coorespondant à l'index (en supposant la validité).
-    const ItemNode & getValidNode(const NodeIndex & index) const
-        {return **getValidIter(index);}
+//    //! Renvoie un itérateur pointant sur le noeud d'index.
+//    const_iterator getValidIter(const NodeIndex & index) const
+//        {return index.internalPointer();}
 
-    //! Renvoie une référence sur la donné coorespondant à l'index (en supposant la validité).
-    ItemNode & getValidNode(const NodeIndex & index)
-        {return **getValidIter(index);}
-
-    //! Renvoie un itérateur pointant sur le noeud d'index.
-    const_iterator getValidIter(const NodeIndex & index) const
-        {return index.internalPointer();}
-
-    //! Renvoie un itérateur pointant sur le noeud d'index.
-    iterator getValidIter(const NodeIndex & index)
-        {return index.internalPointer();}
+//    //! Renvoie un itérateur pointant sur le noeud d'index.
+//    iterator getValidIter(const NodeIndex & index)
+//        {return index.internalPointer();}
 
     //! Insert des noeud du model, ne vérifie pas les arguments.
-    template<class Factory> bool insertNodes(const NodeIndex &parent, numt pos, numt count, Factory factory);
+    template<class Factory> void insertNodes(const NodeIndex &parent, numt pos, numt count, Factory factory);
+
+    //! Remplace le noeud index par node.
+    Node moveNode(const NodeIndex & index, Node && node);
+
+    //! Déplace le noeud d'index from à la position to, le noeud de position from devient invalide.
+    Node moveNode(const NodeIndex & from, const NodeIndex & to);
+
+    //! Déplace le noeud d'index from à la position to, le noeud de position from devient invalide.
+    void move(const NodeIndex & from, const NodeIndex & to)
+        {setNode(to,takeNode(from));}
+
+    //! Ajoute un fils cadet au noeud index.
+    void push_back(const NodeIndex & index, Node && node)
+        {m_tree.push_back(index.m_iter,std::move(node));}
+
+    //! Ajoute un fils ainé au noeud index.
+    void push_front(const NodeIndex & index, Node && node)
+        {m_tree.push_front(index.m_iter,std::move(node));}
 
     //! Supprime des noeuds du model.
     bool removeNodes(const NodeIndex & parent, numt pos, numt count);
+
+    //! Modifie un noeud de l'arbre.
+    void setNode(const NodeIndex & index, Node && node)
+        {*static_cast<Tree::iterator>(index.m_iter) = std::move(node);}
 
     //! Modifie l'arbre de donnée.
     void setTree(Tree && tree)
         {m_tree = std::move(tree);}
 
-    //! Accesseur de l'arbre.
-    const Tree & tree() const
-        {return m_tree;}
-
-    //! Accesseur de l'arbre.
-    Tree & tree()
-        {return m_tree;}
+    //! Prend le noeud index, ce noeud devient invalide.
+    Node takeNode(const NodeIndex & index)
+        {return std::move(*static_cast<Tree::iterator>(index.m_iter));}
 };
 ///////////////////////////////////////////////// AbstractForNodeModel ///////////////////////////////////////////////
 /*! \ingroup groupeModel
@@ -333,8 +392,7 @@ protected:
     std::forward_list<NodesInfo> m_insertNodesPile;         //!< Pile des informations d'insertion de noeuds.
     std::forward_list<NodesInfo> m_removeNodesPile;         //!< Pile des informations de suppression de noeuds.
     TreeForNodeModel m_data;                                //!< Arbre de données.
-    enum {RootCount = 1,
-         AucunePosition = 0};
+    enum {AucunePosition = 0};
 public:
     enum {DefaultType = -2};
     //! Classe des noeud de l'arbre de données
@@ -347,14 +405,7 @@ public:
 
     //! Teste si l'index est valide pour ce model.
     bool checkIndex(const NodeIndex & index) const
-        {return index.m_model == this && index.m_ptr;}
-
-    //! Renvoie le nombre de d'enfants.
-    numt childCount(const NodeIndex &parent) const {
-        if(!parent.isValid())
-            return RootCount;
-        return m_data.getValidIter(parent).sizeChild();
-    }
+        {return index.m_model == this && index.m_iter;}
 
     //! Accesseur des données du model.
     virtual QVariant data(const NodeIndex & index, int role) const;
@@ -362,67 +413,58 @@ public:
     //! Nombre de données associées associé à un noeud pour une cible donnée.
     virtual numt dataCount(const NodeIndex & index) const;
 
-    //! Retourne un index sur le frère ainé.
-    NodeIndex firstBrother(const NodeIndex & index) const
-        {return index.isValid() ? createIndex(m_data.getValidIter(index).toFirstBrother().ptr())
-                                : NodeIndex();}
     //! Drapeaux assossiés à une donnée.
     virtual flag flags(const NodeIndex & index) const;
 
-    //! Renvoie une référence sur la donné coorespondant à l'index (en supposant la validité).
+    //! Renvoie une référence sur la donné coorespondant à l'index (en supposant la validité de l'index).
     const ItemNode & getNode(const NodeIndex &index) const
-        {return m_data.getValidNode(index);}
+        {return m_data.getNode(index);}
 
-    //! Renvoie une référence sur la donné coorespondant à l'index (en supposant la validité).
+    //! Renvoie une référence sur la donné coorespondant à l'index (en supposant la validité de l'index).
     ItemNode & getNode(const NodeIndex &index)
-        {return m_data.getValidNode(index);}
+        {return m_data.getNode(index);}
 
     //! Renvoie l'index correxpondant au noeud pos de parent.
     NodeIndex index(const NodeIndex &parent, numt pos, int cible = NodeCible, numt num = 0) const;
 
     //! Insert count noeuds de nature type avant la position pos de parent.
-    virtual bool insertNodes(const NodeIndex &parent, numt pos, numt count, int type = DefaultType);
+    virtual void insertNodes(const NodeIndex &parent, numt pos, numt count, int type = DefaultType);
 
-    //! Test si l'index est la racine.
-    bool isRoot(const NodeIndex & index) const {
-        return index.isValid() ? m_data.getValidIter(index).root()
-                               : true;}
+//    //! Retourne un index sur le frère benjamin.
+//    NodeIndex lastBrother(const NodeIndex & index) const
+//        {return index.isValid() ? createIndex(m_data.getValidIter(index).toLastBrother().ptr())
+//                           : NodeIndex();}
 
-    //! Retourne un index sur le frère benjamin.
-    NodeIndex lastBrother(const NodeIndex & index) const
-        {return index.isValid() ? createIndex(m_data.getValidIter(index).toLastBrother().ptr())
-                           : NodeIndex();}
+//    //! Teste si le noeud associé à un index valide est une feuille.
+//    bool leaf(const NodeIndex & index) const
+//        {return m_data.getValidIter(index).leaf();}
 
-    //! Teste si le noeud associé à un index valide est une feuille.
-    bool leaf(const NodeIndex & index) const
-        {return m_data.getValidIter(index).leaf();}
+//    //! Retourne un index sur le frère suivant.
+//    NodeIndex nextBrother(const NodeIndex & index) const
+//        {return index.isValid() ? createIndex(m_data.getValidIter(index).toNextBrother().ptr())
+//                                : NodeIndex();}
 
-    //! Retourne un index sur le frère suivant.
-    NodeIndex nextBrother(const NodeIndex & index) const
-        {return index.isValid() ? createIndex(m_data.getValidIter(index).toNextBrother().ptr())
-                                : NodeIndex();}
+//    //! Renvoie l'index du parent.
+//    NodeIndex parent(const NodeIndex &index) const {
+//        if(index.isValid()){
+//            auto ptr = m_data.getValidIter(index).toParent().ptr();
+//            if(ptr)
+//                return createIndex(ptr);
+//        }
+//        return NodeIndex();
+//    }
 
-    //! Renvoie l'index du parent.
-    NodeIndex parent(const NodeIndex &index) const {
-        if(index.isValid()){
-            auto ptr = m_data.getValidIter(index).toParent().ptr();
-            if(ptr)
-                return createIndex(ptr);
-        }
-        return NodeIndex();
-    }
+//    //! Position du noeud dans la fratrie.
+//    numt position(const NodeIndex & index) const {
+//        if(!index.isValid())
+//            return AucunePosition;
+//        return m_data.getValidIter(index).position();
+//    }
 
-    //! Position du noeud dans la fratrie.
-    numt position(const NodeIndex & index) const {
-        if(!index.isValid())
-            return AucunePosition;
-        return m_data.getValidIter(index).position();
-    }
-
-    //! Retourne un index sur le frère suivant.
-    NodeIndex prevBrother(const NodeIndex & index) const
-        {return index.isValid() ? createIndex(m_data.getValidIter(index).toPrevBrother().ptr())
-                                : NodeIndex();}
+//    //! Retourne un index sur le frère suivant.
+//    NodeIndex prevBrother(const NodeIndex & index) const
+//        {return index.isValid() ? createIndex(m_data.getValidIter(index).toPrevBrother().ptr())
+//                                : NodeIndex();}
 
     //! Supprimer count noeud de la fratrie en commençant par le noeud node.
     virtual bool removeNodes(const NodeIndex &index, numt count = 1);
@@ -486,7 +528,7 @@ protected:
         {emit modelAboutToBeReset();}
 
     //! Crée un index de pointeur ptr.
-    NodeIndex createIndex(void * ptr = nullptr, int cible = NodeCible, numt num = 0) const noexcept;
+    NodeIndex createIndex(NodeIndex::Iter iter, int cible = NodeCible, numt num = 0) const noexcept;
 
     //! Fin d'insertion de lignes.
     void endInsertNodes() {
@@ -513,8 +555,20 @@ protected:
     void endResetData()
         {emit modelResetData();}
 
+    //! Convertie un index en itérateur.
+    NodeIndex::Iter indexToIterator(const NodeIndex & index) const
+        {return index.m_iter;}
+
     //! Fabrique des noeuds.
     virtual Node nodeFactory(const NodeIndex & /*parent*/, numt /*pos*/, int /*type*/) {return std::make_unique<ItemNode>();}
+
+//    //! Accesseur de l'arbre.
+//    const Tree & tree() const
+//        {return m_data.m_tree;}
+
+//    //! Accesseur de l'arbre.
+//    Tree & tree()
+//        {return m_data.m_tree;}
 };
 
 ////////////////////////////////////////////////// TreeNodeModelWithBdd /////////////////////////////////////////////////////
@@ -540,9 +594,9 @@ public slots:
 };
 
 ///////////////////////////////////// Definition de TreeForNodeModel //////////////////////////////////
-template<class Factory> bool TreeForNodeModel::insertNodes(const NodeIndex &parent, numt pos, numt count, Factory factory) {
-    auto iter = getIter(parent);
-    if(pos == iter.sizeChild())
+template<class Factory> void TreeForNodeModel::insertNodes(const NodeIndex &parent, numt pos, numt count, Factory factory) {
+    auto iter = parent.m_iter;
+    if(pos == parent.childCount())
         for(numt i = 0; i != count; ++i)
             m_tree.push_back(iter,factory(parent, pos + i));
     else {
@@ -550,7 +604,6 @@ template<class Factory> bool TreeForNodeModel::insertNodes(const NodeIndex &pare
         for(numt i = count; i != 0; --i)
             m_tree.insert(iter,factory(parent, pos + i));
     }
-    return true;
 }
 }
 #endif // ITEMNODEMODEL_H

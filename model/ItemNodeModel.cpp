@@ -20,67 +20,66 @@ QVariant ItemNode::data(int cible, int role, numt /*num*/) const {
 //////////////////////////////////// ItemNodeModel ////////////////////////////
 QVariant ItemNodeModel::data(const NodeIndex &index, int role) const {
     if(checkIndex(index))
-        return m_data.getValidNode(index).data(index.cible(), role, index.num());
+        return m_data.getNode(index).data(index.cible(), role, index.num());
     return QVariant();
 }
 
 numt ItemNodeModel::dataCount(const NodeIndex & index) const {
     if(checkIndex(index))
-        return m_data.getValidNode(index).dataCount(index.cible());
+        return m_data.getNode(index).dataCount(index.cible());
     return ItemNode::NoData;
 }
 
 flag ItemNodeModel::flags(const NodeIndex & index) const {
     if(checkIndex(index))
-        return m_data.getValidNode(index).flags(index.cible(), index.num());
+        return m_data.getNode(index).flags(index.cible(), index.num());
     return NoFlagNode;
 }
-NodeIndex ItemNodeModel::createIndex(void * ptr, int cible, numt num) const noexcept{
+NodeIndex ItemNodeModel::createIndex(NodeIndex::Iter iter, int cible, numt num) const noexcept{
     NodeIndex index;
     index.m_cible = cible;
     index.m_num = num;
-    index.m_ptr = ptr;
+    index.m_iter = iter;
     index.m_model = const_cast<ItemNodeModel *>(this);
     return index;
 }
 
 NodeIndex ItemNodeModel::index(const NodeIndex &parent, numt pos, int cible, numt num) const {
     if(parent.isValid()) {
-        auto iter = m_data.getValidIter(parent);
+        auto iter = indexToIterator(parent);
         iter.toChildU(pos);
         if (iter)
-            return createIndex(iter.ptr(),cible,num);
+            return createIndex(iter,cible,num);
     }
     else if (pos == 0)
-        return createIndex(m_data.getRootIter().ptr(),cible,num);
+        return createIndex(m_data.cbegin(),cible,num);
     return NodeIndex();
 }
 
-bool ItemNodeModel::insertNodes(const NodeIndex &parent, numt pos, numt count, int type) {
-    if (!parent.isValid() || pos > childCount(parent))
-        return false;
-    beginInsertNodes(parent,pos,count);
-        m_data.insertNodes(parent,pos,count,
-                           [this,type](const NodeIndex & parentArg, numt posArg){return nodeFactory(parentArg,posArg,type);});
-    endInsertNodes();
-    return true;
+void ItemNodeModel::insertNodes(const NodeIndex &parent, numt pos, numt count, int type) {
+    if (checkIndex(parent) && pos <= parent.childCount()) {
+        beginInsertNodes(parent,pos,count);
+            m_data.insertNodes(parent,pos,count,
+                               [this,type](const NodeIndex & parentArg, numt posArg){return nodeFactory(parentArg,posArg,type);});
+        endInsertNodes();
+    }
 }
 
 bool ItemNodeModel::removeNodes(const NodeIndex &index, numt count) {
-    if(count == 0 || !index.isValid() || index.isRoot())
+    if(count == 0 || !checkIndex(index) || index.isRoot())
         return false;
     beginRemoveNodes(index, count);
         if(count == 1)
-            m_data.tree().erase(m_data.getIter(index));
+            m_data.erase(index);
         else
-            m_data.tree().erase(m_data.getIter(index),m_data.getIter(index).toBrotherU(count));
+            m_data.erase(index,count);
     endRemoveNodes();
     return true;
 }
 
 bool ItemNodeModel::setData(const NodeIndex &index, const QVariant &value, int role) {
     if(checkIndex(index)){
-        auto changeRole = m_data.getValidNode(index).setData(index.cible(),value,role,index.num());
+        auto changeRole = m_data.getNode(index).setData(index.cible(),value,role,index.num());
         if(changeRole)
             dataChanged(index,changeRole);
         return true;
@@ -89,42 +88,56 @@ bool ItemNodeModel::setData(const NodeIndex &index, const QVariant &value, int r
 }
 //////////////////////////////////// NodeIndex ////////////////////////////////
 QVariant NodeIndex::data(int role) const
-    {return m_model ? m_model->data(*this, role)
-                      : QVariant();}
+    {return m_model ? m_model->data(*this, role) : QVariant();}
 
-NodeIndex NodeIndex::firstBrother() const noexcept
-    {return m_model ? m_model->firstBrother(*this)
-                    : NodeIndex();}
+NodeIndex NodeIndex::firstBrother() const noexcept {
+    if(isValid()) {
+        auto ind = *this;
+        ind.m_iter.toFirstBrother();
+        return ind;
+    }
+    return NodeIndex();
+}
 
 flag NodeIndex::flags() const
     {return m_model ? m_model->flags(*this)
                       : Qt::NoItemFlags;}
 
-bool NodeIndex::isRoot() const noexcept
-    {return m_model ? m_model->isRoot(*this) : true;}
+NodeIndex NodeIndex::lastBrother() const noexcept {
+    if(isValid()) {
+        auto ind = *this;
+        ind.m_iter.toLastBrother();
+        return ind;
+    }
+    return NodeIndex();
+}
 
-NodeIndex NodeIndex::lastBrother() const noexcept
-    {return m_model ? m_model->lastBrother(*this)
-                    : NodeIndex();}
+NodeIndex NodeIndex::nextBrother() const noexcept {
+    if(isValid()) {
+        auto ind = *this;
+        ind.m_iter.toNextBrother();
+        return ind;
+    }
+    return NodeIndex();
+}
 
-bool NodeIndex::leaf() const
-    {return isValid() && m_model->leaf(*this);}
+NodeIndex NodeIndex::parent() const noexcept {
+    if(isValid()) {
+        auto ind = *this;
+        ind.m_iter.toParent();
+        return ind;
+    }
+    return NodeIndex();
+}
 
-NodeIndex NodeIndex::nextBrother() const noexcept
-    {return m_model ? m_model->nextBrother(*this)
-                    : NodeIndex();}
-
-NodeIndex NodeIndex::parent() const
-    {return m_model ? m_model->parent(*this)
-                      : NodeIndex();}
-
-numt NodeIndex::position() const noexcept
-    {return m_model ? m_model->position(*this)
-                    : 0;}
-
-NodeIndex NodeIndex::prevBrother() const noexcept
-    {return m_model ? m_model->prevBrother(*this)
-                    : NodeIndex();}
+NodeIndex NodeIndex::prevBrother() const noexcept {
+    if(isValid()) {
+        auto ind = *this;
+        ind.m_iter.toPrevBrother();
+        return ind;
+    }
+    return NodeIndex();
+}
 
 //////////////////////////////////// ItemNodeModel ////////////////////////////
 void ItemNodeBddModel::save() {
@@ -132,13 +145,26 @@ void ItemNodeBddModel::save() {
 }
 
 /////////////////////////////////// TreeForNodeModel ///////////////////////////
+TreeForNodeModel::Node TreeForNodeModel::moveNode(const NodeIndex & index, Node && node){
+    Node old = takeNode(index);
+    setNode(index,std::move(node));
+    return old;
+}
+
+TreeForNodeModel::Node TreeForNodeModel::moveNode(const NodeIndex & from, const NodeIndex & to) {
+    Node old = takeNode(to);
+    move(from,to);
+    return old;
+}
+
 bool TreeForNodeModel::removeNodes(const NodeIndex &parent, numt pos, numt count) {
     if(!parent.isValid())
         return false;
     numt comp = 0;
     for(numt i = 0; i != count; ++i) {
         std::forward_list<iterator> pile;
-        pile.push_front(getIter(parent).toChildU(pos));
+        auto iter = parent.m_iter;
+        pile.push_front(iter.toChildU(pos));
         bool remove = true;
         while(!pile.empty() && remove) {
             if(!pile.front().leaf())

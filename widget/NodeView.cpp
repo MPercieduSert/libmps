@@ -134,7 +134,7 @@ void ArcNodeViewWidget::setExpanded(bool bb){
         m_expanded = bb;
         if(m_expanded) {
             auto index = m_nodeWidget->index();
-            m_arcChild.resize(index.model()->childCount(index));
+            m_arcChild.resize(index.childCount());
             auto child = index.model()->index(index,0);
             for (auto iterVec = m_arcChild.begin(); iterVec != m_arcChild.end(); ++iterVec) {
                 *iterVec = new ArcNodeViewWidget(child,m_view,this);

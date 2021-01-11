@@ -33,7 +33,7 @@ void PermissionModel::setCible(entidt num, bool visible){
         if(std::find(m_cibleVec.cbegin(),m_cibleVec.cend(),num) == m_cibleVec.cend()) {
             beginResetData();
                 m_cibleVec.push_back(num);
-                for (auto iter = m_data.tree().begin(); iter; ++iter)
+                for (auto iter = m_data.cbegin(); iter; ++iter)
                     static_cast<AbstractPermissionNode &>(**iter).addCible(m_idNomVec.at(num).first);
             endResetData();
         }
