@@ -76,8 +76,13 @@ flag TypePermissionNode::setData(int cible, const QVariant & value, int role, nu
 
 //////////////////////////////////////////////////////// TypePermissionModel ///////////////////////////////
 TypePermissionModel::TypePermissionModel(bddMPS::BddPredef &bdd, QObject * parent)
-    : PermissionModel(bdd,NcNomRefOffset,parent)
-    {m_data.setTree(MakeArbreNode<entityMPS::Type,entityMPS::TypePermission,TypePermissionNode>::arbre(this));}
+    : PermissionModel(bdd,NcNomRefOffset,parent) {
+    m_data.setTree(bdd.getArbre<entityMPS::Type>(),[this](const entityMPS::Type & entity) {
+        auto node = std::make_unique<TypePermissionNode>(this);
+        node->setEnt(entity);
+        return node;
+    });
+}
 
 numt TypePermissionModel::dataCount(const NodeIndex & index) const {
     if(index.cible() == PermissionModel::RefCible)

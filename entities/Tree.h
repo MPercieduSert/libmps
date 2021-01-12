@@ -720,6 +720,7 @@ public:
      * \brief Itérateur constant sur une fratrie.
      */
     class const_brother_iterator : public virtual const_abstract_iterator {
+        friend tree;
     protected:
         using const_abstract_iterator::m_ptr;
         using const_abstract_iterator::toNextBrother;
@@ -751,6 +752,7 @@ public:
      * \brief Itérateur-inverse constant sur une fratrie.
      */
     class const_reverse_brother_iterator : public const_brother_iterator {
+        friend tree;
     protected:
         using const_abstract_iterator::toNextBrother;
         using const_abstract_iterator::toPrevBrother;
@@ -781,6 +783,7 @@ public:
      * \brief Itérateur constant sur l'arbre parcourant les noeuds uniquement à la descente en commeçant par les ainés.
      */
     class const_iterator : public virtual const_abstract_iterator {
+        friend tree;
     protected:
         using const_abstract_iterator::m_ptr;
         using const_abstract_iterator::to_firstChild;
@@ -817,8 +820,8 @@ public:
     /*! \ingroup groupeConteneur
      * \brief Itérateur-inverse constant sur l'arbre parcourant les noeuds uniquement à la descente en commeçant par les benjamins.
      */
-    class const_reverse_iterator : public const_iterator
-    {
+    class const_reverse_iterator : public const_iterator {
+        friend tree;
     protected:
         using const_abstract_iterator::m_ptr;
         using const_abstract_iterator::to_firstLeaf;
@@ -856,6 +859,7 @@ public:
      * \brief Itérateur constant sur les feuilles de l'arbre.
      */
     class const_leaf_iterator : public virtual const_abstract_iterator {
+        friend tree;
     protected:
         using const_abstract_iterator::m_ptr;
         using const_abstract_iterator::to_nextBrotherIfNotUncle;
@@ -895,8 +899,8 @@ public:
     /*! \ingroup groupeConteneur
      * \brief Itérateur-inverse constant sur les feuilles de l'arbre.
      */
-    class const_reverse_leaf_iterator : public const_leaf_iterator
-    {
+    class const_reverse_leaf_iterator : public const_leaf_iterator {
+        friend tree;
     protected:
         using const_abstract_iterator::m_ptr;
         using const_abstract_iterator::to_nextBrotherIfNotUncle;
@@ -936,6 +940,7 @@ public:
      * \brief Itérateur constant sur l'arbre parcourant les noeuds à la descente et à la remonté en commeçant par les ainés.
      */
     class const_prevsuiv_iterator : public virtual const_abstract_iterator {
+        friend tree;
     protected:
         using const_abstract_iterator::m_ptr;
         bool m_sens = true;            //!< Indicateur du sens de parcours: true -> descente; false -> remontée.
@@ -1101,9 +1106,7 @@ public:
 
     //! Constructeur d'un arbre de donnée de type T à partir d'un arbre de donnée de type U,
     //! le foncteur usine construit une donnée de type T à partir d'une donnée de type U.
-    template<class U, class F> tree(const tree<U> & t, F usine)
-       // : tree(new Item(*(t.m_root),usine)) {}
-    {
+    template<class U, class F> tree(const tree<U> & t, F usine) {
         auto iterU = t.cbegin();
         m_root = new Item(usine(*iterU));
         auto iterT = begin();

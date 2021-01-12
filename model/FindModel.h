@@ -161,7 +161,8 @@ protected:
     FindModel * m_model;    //!< Pointeur sur le model.
     numt m_pos;              //!< Position de la colonne dans le model filtré.
 public:
-    enum {Vide = -1};
+    enum {Vide = -1,
+          NoColonne = 0};
     //! Constructeur.
     FindNode(FindModel * model, numt pos, int type = NoType)
         : ItemNode(type), m_model(model), m_pos(pos) {}

@@ -35,7 +35,7 @@ flag ItemNodeModel::flags(const NodeIndex & index) const {
         return m_data.getNode(index).flags(index.cible(), index.num());
     return NoFlagNode;
 }
-NodeIndex ItemNodeModel::createIndex(NodeIndex::Iter iter, int cible, numt num) const noexcept{
+NodeIndex ItemNodeModel::createIndex(IterNode iter, int cible, numt num) const noexcept{
     NodeIndex index;
     index.m_cible = cible;
     index.m_num = num;
@@ -145,13 +145,13 @@ void ItemNodeBddModel::save() {
 }
 
 /////////////////////////////////// TreeForNodeModel ///////////////////////////
-TreeForNodeModel::Node TreeForNodeModel::moveNode(const NodeIndex & index, Node && node){
+Node TreeForNodeModel::moveNode(const NodeIndex & index, Node && node){
     Node old = takeNode(index);
     setNode(index,std::move(node));
     return old;
 }
 
-TreeForNodeModel::Node TreeForNodeModel::moveNode(const NodeIndex & from, const NodeIndex & to) {
+Node TreeForNodeModel::moveNode(const NodeIndex & from, const NodeIndex & to) {
     Node old = takeNode(to);
     move(from,to);
     return old;

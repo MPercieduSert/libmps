@@ -5,7 +5,7 @@ using namespace findNodeModel;
 
 FindModel::FindModel(AbstractColonnesModel * model, QObject *parent)
     :   ItemNodeModel (parent), m_model(model)
-    {m_data.setTree(Tree(std::make_unique<FindNode>(this,Et,ChoiceNodeType)));}
+    {m_data.setRoot(std::make_unique<FindNode>(this,FindNode::NoColonne,ChoiceNodeType));}
 
 void FindModel::find(){
     if(m_model)
@@ -17,7 +17,7 @@ void FindModel::insertNodes(const NodeIndex & parent, numt pos, numt count, int 
         if(getNode(parent).type() == OperationNodeType)
             ItemNodeModel::insertNodes(parent,pos,count,type);
         else if (count != 0 && pos == 0) {
-            ItemNodeModel::Node node = m_data.moveNode(parent, std::make_unique<FindNode>(this,Et,OperationNodeType));
+            Node node = m_data.moveNode(parent, std::make_unique<FindNode>(this,Et,OperationNodeType));
             emit dataChanged(parent,TypeRole);
             beginInsertNodes(parent,0,1);
                 m_data.push_front(parent,std::move(node));
@@ -38,18 +38,18 @@ QMap<QString,QVariant> FindModel::nomColonnes() const {
         return QMap<QString,QVariant>();
 }
 
-ItemNodeModel::Node FindModel::nodeFactory(const NodeIndex & parent, numt pos, int type) {
+Node FindModel::nodeFactory(const NodeIndex & parent, numt pos, int type) {
     switch (type) {
     case ChoiceNodeType:
     case ItemNodeModel::DefaultType:
-        return std::make_unique<FindNode>(this,0,ChoiceNodeType);
+        return std::make_unique<FindNode>(this,FindNode::NoColonne,ChoiceNodeType);
     case OperationNodeType:
         return std::make_unique<FindNode>(this,Et,OperationNodeType);
     }
     return ItemNodeModel::nodeFactory(parent,pos,type);
 }
 
-ItemNodeModel::Node FindModel::nodeConditionFactory(szt col){
+Node FindModel::nodeConditionFactory(szt col){
     switch (m_model->colonne(col).type()) {
     case BoolNodeType: {
         const auto & colonne = m_model->colonne(col);
@@ -61,7 +61,7 @@ ItemNodeModel::Node FindModel::nodeConditionFactory(szt col){
     case TexteNodeType:
         return std::make_unique<TexteNode>(this,col);
     default:
-        return std::make_unique<FindNode>(this,Et,ChoiceNodeType);
+        return std::make_unique<FindNode>(this,FindNode::NoColonne,ChoiceNodeType);
     }
 }
 
@@ -83,7 +83,7 @@ bool FindModel::removeNodes(const NodeIndex & node, numt count){
 
 void FindModel::reset() {
     beginResetModel();
-        m_data.setTree(Tree(std::make_unique<FindNode>(this,Et,ChoiceNodeType)));
+        m_data.setRoot(std::make_unique<FindNode>(this,FindNode::NoColonne,ChoiceNodeType));
     endResetModel();
 }
 

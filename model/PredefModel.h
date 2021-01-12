@@ -139,24 +139,6 @@ public:
     Node nodeFactory(const NodeIndex & /*parent*/, numt /*pos*/, int /*type*/) override {return std::make_unique<TypePermissionNode>(this);}
 };
 
-////////////////////////////////////////////////////////// MakeArbreNode ////////////////////////////////////////////////
-/*! \ingroup groupeModel
- * \brief Classe mère des neuds de recherche.
- */
-template<class Ent, class Permission, class Node> class MakeArbreNode {
-public:
-    static ItemNodeModel::Tree arbre(PermissionModel * model);
-};
-
-
-template<class Ent, class Permission, class Node> ItemNodeModel::Tree MakeArbreNode<Ent,Permission,Node>::arbre(PermissionModel *model){
-    return ItemNodeModel::Tree(model->bdd().getArbre<Ent>(),[model](const Ent & entity) {
-        auto node = std::make_unique<Node>(model);
-        node->setEnt(entity);
-        return node;
-    });
-}
-
 ///////////////////////////////////////////////// definition PermissionNode ///////////////////////////////////
 template<class Ent, class Permission> void PermissionNode<Ent,Permission>::addCible(int cible) {
     if(m_permissionMap.find(cible) == m_permissionMap.end()) {
