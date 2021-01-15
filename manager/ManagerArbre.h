@@ -115,6 +115,12 @@ public:
     virtual InfoBdd infoArbre() const
         {return m_managerArbre.info();}
 
+    //! Enregistre l'entité entity en base avec le parent et la position spécifiés.
+    void insert(Ent & entity, idt idParent, int num = 0) override;
+
+    //! Enregistre l'entité entity en base avec le parent et la position spécifiés.
+    void insert(const Ent & entity, idt idParent, int num = 0) override;
+
     //! Enregistre l'entité entity en base de donnée.
     void save(Ent & entity) override
         {saveConst(entity);}
@@ -123,12 +129,6 @@ public:
     void save(const Ent & entity) override
         {saveConst(entity);}
 
-    //! Enregistre l'entité entity en base avec le parent et la position spécifiés.
-    void save(Ent & entity, const Ent & parent, int num = 0) override;
-
-    //! Enregistre l'entité entity en base avec le parent et la position spécifiés.
-    void save(const Ent & entity, const Ent & parent, int num = 0) override;
-
     //! Retourne le type du manager.
     virtual flag typeManager() const override
         {return bmps::ArbreTypeManager;}
@@ -136,15 +136,6 @@ public:
 protected:
     //! Constructeur.
     ManagerArbre(const InfoBdd & infoArbre);
-
-    /*//! Insert la nouvelle entité entity dans la base de donnée.
-    void add(Ent & entity)
-    {
-        prepare(m_sqlAdd);
-        m_link.bindValues(entity);
-        m_link.setId(entity,m_link.nbrAtt()-1);
-        execFinish();
-    }*/
 
     //! Insert la nouvelle entité entity dans la base de donnée.
     void add(const Ent & entity) override {
@@ -184,16 +175,8 @@ protected:
     //! Sauve la racine de l'arbre (donnée et structure).
     void saveRoot(tree<Ent> & tree) override;
 
-    //! Enregistre l'entité valide entity en base de donnée et assigne l'identifiant de l'entité insérée en base de donnée à entity.
-    void saveValide(Ent & entity)
-        {saveValideConst(entity);}
-
-    //! Enregistre l'entité valide entity en base de donnée.
-    void saveValide(const Ent & entity)
-        {saveValideConst(entity);}
-
     //! Enregistre l'entité valide et d'identifiant non nul entity en base de donnée.
-    void saveValideConst(const Ent & entity) {
+    void saveValide(const Ent & entity) {
         auto controle = bmps::None;
         if(exists(entity)) {
             if(!sameInBdd(entity)) {
@@ -244,15 +227,15 @@ template<class Ent> ManagerArbre<Ent>::ManagerArbre(const InfoBdd &infoArbre)
 
 
 
-template<class Ent> void ManagerArbre<Ent>::save(Ent & entity, const Ent & parent, int num) {
+template<class Ent> void ManagerArbre<Ent>::insert(Ent & entity, idt idParent, int num) {
     if(entity.isValid()) {
         if(entity.isNew()) {
-            Arbre node(num,parent.id());
+            Arbre node(num,idParent);
             m_managerArbre.save(node);
             entity.setId(node.id());
         }
         else
-            m_managerArbre.save(Arbre(num,parent.id(),entity.id()));
+            m_managerArbre.save(Arbre(num,idParent,entity.id()));
         saveValide(entity);
     }
     else
@@ -261,17 +244,17 @@ template<class Ent> void ManagerArbre<Ent>::save(Ent & entity, const Ent & paren
                                                  .append(" &,int)"),entity);
 }
 
-template<class Ent> void ManagerArbre<Ent>::save(const Ent & entity, const Ent & parent, int num) {
+template<class Ent> void ManagerArbre<Ent>::insert(const Ent & entity, idt idParent, int num) {
     if(entity.isValid()) {
         if(entity.isNew()) {
-            Arbre node(num,parent.id());
+            Arbre node(num,idParent);
             m_managerArbre.save(node);
             Ent entityTemp(entity);
             entityTemp.setId(node.id());
             saveValide(entityTemp);
         }
         else {
-            m_managerArbre.save(Arbre(num,parent.id(),entity.id()));
+            m_managerArbre.save(Arbre(num,idParent,entity.id()));
             saveValide(entity);
         }
     }

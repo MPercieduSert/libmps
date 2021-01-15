@@ -455,18 +455,23 @@ public:
          return existsUnique(entity) ? entity.id() : 0;
     }
 
-    //! Renvoie l'identifiant de l'entité de type Ent de référence fourni ou 0 si elle n'existe pas.
-    template<class Ent> idt refToId(const QString & ref) {
-         Ent entity;
-         entity.setRef(ref);
-         return existsUnique(entity) ? entity.id() : 0;
-    }
-
     //! Importation de donnée à partir d'un xmlDoc
     QString importXml(const fichierMPS::XmlDoc & doc);
 
     //! Renvoie les informations de la base de donnée sur les Entity du même type que entity.
     const managerMPS::InfoBdd & info(const Entity & entity) const;
+
+    //! Enregistre l'entité entity en base avec le parent et la position spécifiés.
+    void insert(Entity & entity, idt idParent, int num = 0);
+
+    //! Enregistre l'entité entity en base avec le parent et la position spécifiés.
+    template<class Ent> void insert(Ent & entity, idt idParent, int num = 0);
+
+    //! Enregistre l'entité entity en base avec le parent et la position spécifiés.
+    void insert(const Entity & entity, idt idParent, int num = 0);
+
+    //! Enregistre l'entité entity en base avec le parent et la position spécifiés.
+    template<class Ent> void insert(const Ent & entity, idt idParent, int num = 0);
 
     //! Teste si la base de donnée est valide.
     bool isValid() noexcept override
@@ -489,6 +494,13 @@ public:
 
     //! Ouvre la base de donnée.
     bool open() override;
+
+    //! Renvoie l'identifiant de l'entité de type Ent de référence fourni ou 0 si elle n'existe pas.
+    template<class Ent> idt refToId(const QString & ref) {
+         Ent entity;
+         entity.setRef(ref);
+         return existsUnique(entity) ? entity.id() : 0;
+    }
 
     //! Renvoie un vector faisant la correspondance emun <-> QString pour les restrictions.
     static std::map<flag::flag_type, QString> RestrictionToStr();
@@ -521,18 +533,6 @@ public:
 
     //! Enregistre l'entité entity en base de donnée ainsi que ses nouvelles restrictions de modification.
     template<class Ent> void save(const Ent & entity, flag restrict);
-
-    //! Enregistre l'entité entity en base avec le parent et la position spécifiés.
-    void save(Entity & entity, const Entity & parent, int num = 0);
-
-    //! Enregistre l'entité entity en base avec le parent et la position spécifiés.
-    template<class Ent> void save(Ent & entity, const Ent & parent, int num = 0);
-
-    //! Enregistre l'entité entity en base avec le parent et la position spécifiés.
-    void save(const Entity & entity, const Entity & parent, int num = 0);
-
-    //! Enregistre l'entité entity en base avec le parent et la position spécifiés.
-    template<class Ent> void save(const Ent & entity, const Ent & parent, int num = 0);
 
     //! Enregistre les entités de vector dans la base de donnée.
     template<class Ent> void save(mapIdt<Ent> & vector)
@@ -799,15 +799,17 @@ template<class Ent> VectorPtr<Ent> Bdd::getList(typename Ent::Position cle1, con
                                               condition cond1, condition cond2, condition cond3, bool croissant)
     {return m_manager->get<Ent>().getList(cle1, value1, cle2, value2, cle3, value3, order, cond1, cond2, cond3, croissant);}
 
-template<class Ent> VectorPtr<Ent> Bdd::getList(const std::vector<typename Ent::Position> &cle, const std::vector<QVariant> &value,
-                     const std::vector<typename Ent::Position> &ordre,
-                     const std::vector<condition> &condition, const std::vector<bool> &crois)
+template<class Ent> VectorPtr<Ent> Bdd::getList(const std::vector<typename Ent::Position> &cle,
+                                                const std::vector<QVariant> &value,
+                                                const std::vector<typename Ent::Position> &ordre,
+                                                const std::vector<condition> &condition, const std::vector<bool> &crois)
     {return m_manager->get<Ent>().getList(cle,value,ordre,condition,crois);}
 
-template<class Ent, class Join> VectorPtr<Ent> Bdd::getList(typename Ent::Position colonneTable, typename Join::Position colonneJoin,
-                                               const std::map<typename Ent::Position, QVariant> &whereMapTable,
-                                               const std::map<typename Join::Position, QVariant> &whereMapJoin,
-                                               const std::vector<std::pair<typename Ent::Position, bool>> &orderMapTable) {
+template<class Ent, class Join> VectorPtr<Ent> Bdd::getList(typename Ent::Position colonneTable,
+                                                            typename Join::Position colonneJoin,
+                                                            const std::map<typename Ent::Position, QVariant> &whereMapTable,
+                                                            const std::map<typename Join::Position, QVariant> &whereMapJoin,
+                                                            const std::vector<std::pair<typename Ent::Position, bool>> &orderMapTable) {
     std::map<QString,QVariant> whereMapJoinString;
     for(auto i = whereMapJoin.cbegin(); i != whereMapJoin.cend(); i++)
         whereMapJoinString[m_manager->get<Join>().info().attribut(i->first)] = i->second;
@@ -834,7 +836,8 @@ template<class Ent, class Join> VectorPtr<Ent> Bdd::getList(typename Join::Posit
     mapWhere[cleWhere1] = valueWhere1;
     mapWhere[cleWhere2] = valueWhere2;
     return getList<Ent,Join>(Ent::Id,cleJoin,std::map<typename Ent::Position, QVariant>(),mapWhere,
-                             std::vector<std::pair<typename Ent::Position, bool>>({std::pair<typename Ent::Position, bool>(ordre,crois)}));
+                             std::vector<std::pair<typename Ent::Position, bool>>
+                             ({std::pair<typename Ent::Position, bool>(ordre,crois)}));
 }
 
 template<class Ent , class Join1, class Join2> VectorPtr<Ent> Bdd::getList(typename Join1::Position cle1,
@@ -895,7 +898,8 @@ template<class Ent> std::list<idt> Bdd::getListId(typename Ent::Position cle1, c
                                  bool crois)
     {return m_manager->get<Ent>().getListId(cle1,value1,cle2,value2,cle3,value3,ordre,cond1,cond2,cond3,crois);}
 
-template<class Ent> std::list<idt> Bdd::getListId(const std::vector<typename Ent::Position> & cle, const std::vector<QVariant> & value,
+template<class Ent> std::list<idt> Bdd::getListId(const std::vector<typename Ent::Position> & cle,
+                         const std::vector<QVariant> & value,
                          const std::vector<typename Ent::Position> & ordre,
                          const std::vector<condition> & condition,
                          const std::vector<bool> & crois)
@@ -920,11 +924,12 @@ template<class Ent> mapIdt<Ent> Bdd::getMap(typename Ent::Position cle1, const Q
                                             condition cond1, condition cond2, condition cond3)
     {return m_manager->get<Ent>().getMap(cle1, value1, cle2, value2, cle3, value3, cleMap, cond1, cond2, cond3);}
 
-template<class Ent> mapIdt<Ent> Bdd::getMap(const std::vector<typename Ent::Position> & cle, const std::vector<QVariant> & value,
-                     typename Ent::Position cleMap,
-                     const std::vector<typename Ent::Position> & ordre,
-                     const std::vector<condition> & cond,
-                     const std::vector<bool> & crois)
+template<class Ent> mapIdt<Ent> Bdd::getMap(const std::vector<typename Ent::Position> & cle,
+                                            const std::vector<QVariant> & value,
+                                            typename Ent::Position cleMap,
+                                            const std::vector<typename Ent::Position> & ordre,
+                                            const std::vector<condition> & cond,
+                                            const std::vector<bool> & crois)
     {return m_manager->get<Ent>().getMap(cle,value,cleMap,ordre,cond,crois);}
 
 template<class Ent, class Join> mapIdt<Ent> Bdd::getMap(typename Ent::Position colonneTable,
@@ -935,8 +940,9 @@ template<class Ent, class Join> mapIdt<Ent> Bdd::getMap(typename Ent::Position c
     std::map<QString,QVariant> whereMapJoinString;
     for(auto i = whereMapJoin.cbegin(); i != whereMapJoin.cend(); i++)
         whereMapJoinString[m_manager->get<Join>().attribut(i->first)] = i->second;
-    return m_manager->get<Ent>().getMapJoin(m_manager->get<Join>().table(),colonneTable, m_manager->get<Join>().attribut(colonneJoin),
-                                                      whereMapTable, whereMapJoinString, cleMap);
+    return m_manager->get<Ent>().getMapJoin(m_manager->get<Join>().table(),colonneTable,
+                                            m_manager->get<Join>().attribut(colonneJoin),
+                                            whereMapTable, whereMapJoinString, cleMap);
 }
 
 template<class Ent, class Join> mapIdt<Ent> Bdd::getMap(typename Join::Position cleJoin,
@@ -953,6 +959,12 @@ template<class Ent> flag Bdd::getRestriction(const Ent & entity)
 template<class Ent> bool Bdd::getUnique(Ent & entity)
     {return m_manager->get<Ent>().getUnique(entity);}
 
+template<class Ent> void Bdd::insert(Ent & entity, idt idParent, int num)
+    {m_manager->get<Ent>().insert(entity,idParent,num);}
+
+template<class Ent> void Bdd::insert(const Ent & entity, idt idParent, int num)
+    {m_manager->get<Ent>().insert(entity,idParent,num);}
+
 template<class Ent> bool Bdd::sameInBdd(const Ent & entity)
     {return m_manager->get<Ent>().sameInBdd(entity);}
 
@@ -967,12 +979,6 @@ template<class Ent> void Bdd::save(Ent & entity, flag restrict)
 
 template<class Ent> void Bdd::save(const Ent & entity, flag restrict)
     {m_manager->get<Ent>().save(entity, restrict);}
-
-template<class Ent> void Bdd::save(Ent & entity, const Ent & parent, int num)
-    {m_manager->get<Ent>().save(entity,parent,num);}
-
-template<class Ent> void Bdd::save(const Ent & entity, const Ent & parent, int num)
-    {m_manager->get<Ent>().save(entity,parent,num);}
 
 template<class Ent> void Bdd::saveUnique(Ent & entity)
     {m_manager->get<Ent>().saveUnique(entity);}

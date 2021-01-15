@@ -401,6 +401,9 @@ public:
         //! Détermine la position du noeud courant dans la fratrie.
         int indexBrother() const noexcept;
 
+        static bool less_ptr (const_abstract_iterator iter1, const_abstract_iterator iter2) noexcept
+            {return iter1.m_ptr < iter2.m_ptr;}
+
         //! Test si le noeud courant est l'ainé des frères.
         bool lastBrother() const noexcept
             {return m_ptr && !m_ptr->m_nextBrother;}
@@ -428,6 +431,9 @@ public:
         //! Test d'égalité entre deux itérateurs.
         bool operator !=(const const_abstract_iterator & i) const noexcept
             {return m_ptr != i.m_ptr;}
+
+        //! Test d'ordre inférieur strict entre deux itérateurs.
+        bool operator <(const const_abstract_iterator & i) const noexcept;
 
         //! Crée un const_brother_iterator initialisé sur le parent.
         const_abstract_iterator parent() const noexcept
@@ -1977,6 +1983,35 @@ template<class T> template<class iter> iter & tree<T>::const_abstract_iterator::
         while(n && iter::operator--())
             ++n;
     return *this;
+}
+
+template<class T> bool tree<T>::const_abstract_iterator::operator <(const const_abstract_iterator & i) const noexcept {
+    std::list<const_abstract_iterator> list1;
+    auto iter = *this;
+    while(iter) {
+        list1.push_front(iter);
+        iter.to_parent();
+    }
+    iter = i;
+    std::list<const_abstract_iterator> list2;
+    while(iter) {
+        list2.push_front(iter);
+        iter.to_parent();
+    }
+    auto il1 = list1.cbegin();
+    auto il2 = list2.cbegin();
+    while(il1 != list1.cend() && il2 != list2.cend() && *il1 == *il2) {
+        ++il1;
+        ++il2;
+    }
+    if(il2 == list2.cend())
+        return false;
+    if(il1 == list1.cend()) // place de if avant le précédent pour obtenir une inégalité large.
+        return true;
+    iter = *il1;
+    while(iter && iter != *il2)
+        iter.to_prevBrother();
+    return !iter;
 }
 
 template<class T> void tree<T>::const_abstract_iterator::toBrother(int n) noexcept {

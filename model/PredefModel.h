@@ -14,8 +14,8 @@ namespace modelMPS {
 class PermissionModel : public ItemNodeBddModel {
     Q_OBJECT
 protected:
-    const enumt m_offset;                                 //!< Offset de postion des cibles.
-    std::vector<entidt> m_cibleVec;                        //!< Vecteur de cibles à afficher.
+    const enumt m_offset;                               //!< Offset de postion des cibles.
+    std::vector<entidt> m_cibleVec;                     //!< Vecteur de cibles à afficher.
     std::vector<std::pair<int,QString>> m_idNomVec;     //!< Vecteur d'information sur les cibles.
 
 public:
@@ -69,10 +69,10 @@ public:
 /*! \ingroup groupeModel
  * \brief Classe abstraite mère des neuds d'un model de permission.
  */
-class AbstractPermissionNode : public ItemNode {
+class AbstractPermissionNode : public ItemBddNode {
 public:
     //! Constructeur.
-    using ItemNode::ItemNode;
+    using ItemBddNode::ItemBddNode;
 
     //! Ajoute une cible aux permissions.
     virtual void addCible(int cible) = 0;
@@ -85,18 +85,42 @@ template<class Ent, class Permission> class PermissionNode : public AbstractPerm
 protected:
     Ent m_ent;                              //!< Type associé au noeud.
     std::map<int,flag> m_permissionMap;     //!< Map des permission du type.
-    PermissionModel * m_model;      //!< Pointeur sur le model.
+    PermissionModel * m_model;              //!< Pointeur sur le model.
 public:
     enum {NoFlag = 0};
     //! Constructeur.
     PermissionNode(PermissionModel * model)
         : AbstractPermissionNode(PermissionModel::TypeNode), m_model(model) {}
 
+    NODE_COPIE(PermissionNode)
+
     //! Ajoute une cible aux permissions.
     void addCible(int cible) override;
 
     //! Accesseur des données du noeud.
     QVariant data(int cible, int role, numt num = 0) const override;
+
+    //! Enregistre les données du noeud.
+    void insert(bddMPS::Bdd & bdd) override{
+        if(!m_iter.parent().root())
+            m_ent.setParent(static_cast<const PermissionNode &>(**m_iter.parent()).m_ent.id());
+        bdd.save(m_ent);
+        savePermission(bdd);
+//        idt idParent = 0;
+//        if(!m_iter.parent().root())
+//            idParent = static_cast<const PermissionNode &>(**m_iter.parent()).m_ent.id();
+//        bdd.insert(m_ent,idParent,m_iter.position());
+//        savePermission(bdd);
+    }
+
+    //! Enregistre les données du noeud.
+    void save(bddMPS::Bdd & bdd) override{
+        bdd.save(m_ent);
+        savePermission(bdd);
+    }
+
+    //! Enregistre les données du noeud.
+    void savePermission(bddMPS::Bdd & bdd);
 
     //! Mutateur des données du noeud.
     flag setData(int cible, const QVariant & value, int role, numt num = 0) override;
@@ -114,6 +138,8 @@ protected:
 public:
     //! Constructeur.
     using PermNode::PermissionNode;
+
+    NODE_COPIE(TypePermissionNode)
 
     //! Accesseur des données du noeud.
     QVariant data(int cible, int role, numt num = 0) const override;
@@ -197,6 +223,16 @@ template<class Ent, class Permission> QVariant PermissionNode<Ent,Permission>::d
         }
     }
     return ItemNode::data(cible,role,num);
+}
+
+template<class Ent, class Permission> void PermissionNode<Ent,Permission>::savePermission(bddMPS::Bdd & bdd) {
+    for(auto iter = m_permissionMap.cbegin(); iter != m_permissionMap.cend(); ++iter) {
+        Permission perm;
+        perm.setIdType(m_ent.id());
+        perm.setCible(iter->first);
+        perm.setCode(iter->second);
+        bdd.save(perm);
+    }
 }
 
 template<class Ent, class Permission> flag PermissionNode<Ent,Permission>::setData(int cible, const QVariant &value, int role, numt num) {

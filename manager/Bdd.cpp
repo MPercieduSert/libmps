@@ -129,6 +129,12 @@ QString Bdd::importXml(const fichierMPS::XmlDoc & doc){
 const managerMPS::InfoBdd & Bdd::info(const Entity & entity) const
     {return m_manager->get(entity.idEntity()).info();}
 
+void Bdd::insert(Entity & entity, idt idParent, int num)
+    {m_manager->get(entity.idEntity()).insert(entity,idParent,num);}
+
+void Bdd::insert(const Entity & entity, idt idParent, int num)
+    {m_manager->get(entity.idEntity()).insert(entity,idParent,num);}
+
 void Bdd::miseAJourBdd() {
     for (idt type = 0; type != m_version.size(); ++type) {
         if(!m_manager->existsVersion(type))
@@ -187,12 +193,6 @@ void Bdd::save(const Entity & entity)
 
 void Bdd::save(Entity & entity, flag restrict)
     {m_manager->get(entity.idEntity()).save(entity, restrict);}
-
-void Bdd::save(Entity & entity, const Entity & parent, int num)
-    {m_manager->get(entity.idEntity()).save(entity,parent,num);}
-
-void Bdd::save(const Entity & entity, const Entity & parent, int num)
-    {m_manager->get(entity.idEntity()).save(entity,parent,num);}
 
 void Bdd::save(VectorPtr<Entity> & vector) {
     for (auto iter = vector.begin(); iter != vector.end(); ++iter)

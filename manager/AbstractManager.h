@@ -125,6 +125,12 @@ public:
     virtual InfoBdd infoArbre() const
         {return InfoBdd();}
 
+    //! Enregistre l'entité entity en base avec le parent et la position spécifiés.
+    virtual void insert(Entity & entity, idt idParent, int num = 0) = 0;
+
+    //! Enregistre l'entité entity en base avec le parent et la position spécifiés.
+    virtual void insert(const Entity & entity, idt idParent, int num = 0) = 0;
+
     //! Renvoie un pointeur sur une entité du type géré par le manager.
     virtual std::unique_ptr<Entity> makeEntity() const = 0;
 
@@ -149,12 +155,6 @@ public:
         saveByPass(entity);
         setRestriction(entity.id(), restict);
     }
-
-    //! Enregistre l'entité entity en base avec le parent et la position spécifiés.
-    virtual void save(Entity & entity, const Entity & parent, int num = 0) = 0;
-
-    //! Enregistre l'entité entity en base avec le parent et la position spécifiés.
-    virtual void save(const Entity & entity, const Entity & parent, int num = 0) = 0;
 
     //! Sauve l'entité en ignorant les restrictions.
     virtual void saveByPass(Entity & entity)
@@ -536,6 +536,20 @@ public:
     bool getUnique(Entity & entity) override
         {return getUnique(Ent::Convert(entity));}
 
+    //! Enregistre l'entité entity en base avec le parent et la position spécifiés.
+    virtual void insert(Ent & entity, idt idParent, int num = 0);
+
+    //! Enregistre l'entité entity en base avec le parent et la position spécifiés.
+    void insert(Entity & entity, idt idParent, int num = 0) override
+        {insert(Ent::Convert(entity), idParent, num);}
+
+    //! Enregistre l'entité entity en base avec le parent et la position spécifiés.
+    virtual void insert(const Ent & entity, idt idParent, int num = 0);
+
+    //! Enregistre l'entité entity en base avec le parent et la position spécifiés.
+    void insert(const Entity & entity, idt idParent, int num = 0) override
+        {insert(Ent::Convert(entity), idParent, num);}
+
     //! Renvoie un pointeur sur une entité du type géré par le manager.
     std::unique_ptr<Entity> makeEntity() const override
         {return std::make_unique<Ent>();}
@@ -585,20 +599,6 @@ public:
         saveByPass(ent);
         setRestriction(entity.id(), restrict);
     }
-
-    //! Enregistre l'entité entity en base avec le parent et la position spécifiés.
-    virtual void save(Ent & entity, const Ent & parent, int num = 0);
-
-    //! Enregistre l'entité entity en base avec le parent et la position spécifiés.
-    void save(Entity & entity, const Entity & parent, int num = 0) override
-        {save(Ent::Convert(entity), Ent::Convert(parent), num);}
-
-    //! Enregistre l'entité entity en base avec le parent et la position spécifiés.
-    virtual void save(const Ent & entity, const Ent & parent, int num = 0);
-
-    //! Enregistre l'entité entity en base avec le parent et la position spécifiés.
-    void save(const Entity & entity, const Entity & parent, int num = 0) override
-        {save(Ent::Convert(entity), Ent::Convert(parent), num);}
 
     //! Enregistre l'arbre d'entités dans la base de donnée pour les entités de type arbre.
     virtual void save(tree<Ent> & arbre, bmps::treeSave n = bmps::treeSave::ExternalChange);
@@ -667,13 +667,13 @@ template<class Ent> tree<Ent> AbstractManagerTemp<Ent>::getArbre(idt /*id*/)
                                          "n'est pas définie pour le manager des : ")
                                  .append(Ent::Name()).append(".").toStdString());}*/
 
-template<class Ent> void AbstractManagerTemp<Ent>::save(Ent & /*entity*/, const Ent & /*parent*/, int /*num*/)
+template<class Ent> void AbstractManagerTemp<Ent>::insert(Ent & /*entity*/, idt /*idParent*/, int /*num*/)
     {throw std::invalid_argument(QString("La méthode 'save(Ent & entity, const Ent & parent, int num)' "
                                          "n'est pas définie pour le manager des : ")
                                  .append(Ent::Name()).append(".").toStdString());}
 
-template<class Ent> void AbstractManagerTemp<Ent>::save(const Ent & /*entity*/, const Ent & /*parent*/, int /*num*/)
-{throw std::invalid_argument(QString("La méthode 'save(const Ent & entity, const Ent & parent, int num)' "
+template<class Ent> void AbstractManagerTemp<Ent>::insert(const Ent & /*entity*/, idt /*idParent*/, int /*num*/)
+{throw std::invalid_argument(QString("La méthode 'insert(const Ent & entity, const Ent & parent, int num)' "
                                      "n'est pas définie pour le manager des : ")
                              .append(Ent::Name()).append(".").toStdString());}
 

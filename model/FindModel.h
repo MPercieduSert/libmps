@@ -101,12 +101,7 @@ public:
     //! Constructeur.
     FindModel(AbstractColonnesModel * model = nullptr, QObject * parent = nullptr);
 
-    //! Insert un nouveau noeud.
-    //! Si le noeuds parent est un operationNode un noeud choiceNode est ajouté avant pos.
-    //! Si le noeuds parent n'est pas un operationNode, un nouveau operationNode prend sa place
-    //! et le noeud parent devient l'ainé de ce nouveau et un noeud ChoiceNode est ajouté en cadet.
-    //! Insert count noeuds de nature type avant la position pos de parent.
-    void insertNodes(const NodeIndex &parent, numt pos, numt count, int type = DefaultType) override;
+
 
     //! Accesseur du model filtré.
     AbstractColonnesModel * model() const
@@ -115,15 +110,9 @@ public:
     //! Donne la liste des noms des colonnes du model associé.
     QMap<QString,QVariant> nomColonnes() const;
 
-    //! Supprime le noeud et ses descendants.
-    bool removeNodes(const NodeIndex & index, numt count = 1) override;
-
     //! Teste si l'arbre est réduit à sa racine.
     bool rootLeaf() const override
         {return m_data.cbegin().leaf();}
-
-    //! Mutateur des données du model.
-    bool setData(const NodeIndex &index, const QVariant &value, int role) override;
 
     //! Mutateur du model filtré.
     void setModel(AbstractColonnesModel * model);
@@ -142,11 +131,24 @@ public slots:
     void reset();
 
 protected:
+    //! Insert un nouveau noeud.
+    //! Si le noeuds parent est un operationNode un noeud choiceNode est ajouté avant pos.
+    //! Si le noeuds parent n'est pas un operationNode, un nouveau operationNode prend sa place
+    //! et le noeud parent devient l'ainé de ce nouveau et un noeud ChoiceNode est ajouté en cadet.
+    //! Insert count noeuds de nature type avant la position pos de parent.
+    std::list<IterNode> insert(const NodeIndex &parent, numt pos, numt count, int type = DefaultType) override;
+
     //! Fabrique des noeuds.
     Node nodeFactory(const NodeIndex & parent, post pos, int type) override;
 
     //! Fabrique des noeuds de condition pour une colonne.
     Node nodeConditionFactory(szt colonne);
+
+    //! Supprime le noeud et ses descendants.
+    bool remove(const NodeIndex & index, numt count = 1) override;
+
+    //! Mutateur des données du model.
+    bool set(const NodeIndex &index, const QVariant &value, int role) override;
 };
 
 //////////////////////////////////// Noeud ///////////////////
@@ -166,6 +168,8 @@ public:
     //! Constructeur.
     FindNode(FindModel * model, numt pos, int type = NoType)
         : ItemNode(type), m_model(model), m_pos(pos) {}
+
+    NODE_COPIE(FindNode)
 
     //! Accesseur des données du noeud.
     QVariant data(int cible, int role, numt num = 0) const override;
@@ -212,6 +216,8 @@ public:
     ComparaisonNode(FindModel * model, numt pos, numt comp = FindModel::Egal,int type = NoType)
         : FindNode(model,pos,type), m_comp(comp) {}
 
+    NODE_COPIE(ComparaisonNode)
+
     //! Accesseur de la donnée associé à column.
     QVariant data(int type, int role, numt num = 0) const override;
 
@@ -238,6 +244,8 @@ public:
 
     //! Destructeur.
     ~BoolNode() override = default;
+
+    NODE_COPIE(BoolNode)
 
     //! Accesseur de la donnée associé à column.
     QVariant data(int type, int role, numt num = 0) const override;
@@ -270,6 +278,8 @@ public:
 
     //! Destructeur.
     ~DateNode() override = default;
+
+    NODE_COPIE(DateNode)
 
     //! Accesseur de la donnée associé à column.
     QVariant data(int type, int role, numt num = 0) const override;
@@ -310,6 +320,8 @@ public:
 
     //! Destructeur.
     ~TexteNode() override = default;
+
+    NODE_COPIE(TexteNode)
 
     //! Accesseur de la donnée associé à column.
     QVariant data(int type, int role, numt num = 0) const override;

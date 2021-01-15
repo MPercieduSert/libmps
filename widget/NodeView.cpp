@@ -152,14 +152,10 @@ void ArcNodeViewWidget::setExpanded(bool bb){
 }
 
 void ArcNodeViewWidget::setLeaf(bool bb) {
-    if(bb && !m_leaf){
+    if((bb && !m_leaf) || (m_leaf && !bb)){
         m_leaf = bb;
         m_expanded = false;
-        drawNode(true);
-    }
-    else if (m_leaf && !bb) {
-        m_leaf = bb;
-        drawNode(true);
+        repaint();
     }
 }
 

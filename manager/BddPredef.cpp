@@ -383,7 +383,7 @@ void BddPredef::listeMiseAJourBdd(int version, idt type) {
                 style.setForme(EvenementStyle::Rectangle);
                 style.setNom("Style par défaut");
                 style.setPoliceTexte(QFont("Times", 10).toString());
-                style.setPoliceTitre(QFont("Times", 14,QFont::Bold).toString());
+                style.setPoliceTitre(QFont("Times", 14, QFont::Bold).toString());
                 style.setTexture(Qt::SolidPattern);
                 save(style);
                 creerTable<Evenement>();

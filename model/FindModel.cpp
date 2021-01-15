@@ -12,19 +12,22 @@ void FindModel::find(){
         m_model->find(this);
 }
 
-void FindModel::insertNodes(const NodeIndex & parent, numt pos, numt count, int type) {
+std::list<IterNode> FindModel::insert(const NodeIndex & parent, numt pos, numt count, int type) {
     if(checkIndex(parent)){
         if(getNode(parent).type() == OperationNodeType)
-            ItemNodeModel::insertNodes(parent,pos,count,type);
+            return ItemNodeModel::insert(parent,pos,count,type);
         else if (count != 0 && pos == 0) {
             Node node = m_data.moveNode(parent, std::make_unique<FindNode>(this,Et,OperationNodeType));
             emit dataChanged(parent,TypeRole);
+            std::list<IterNode> list;
             beginInsertNodes(parent,0,1);
-                m_data.push_front(parent,std::move(node));
+                list.push_back(m_data.push_front(parent,std::move(node)));
             endInsertNodes();
-            ItemNodeModel::insertNodes(parent,0,count,type);
+            list.splice(list.cend(),ItemNodeModel::insert(parent,0,count,type));
+            return list;
         }
     }
+    return std::list<IterNode>();
 }
 
 QMap<QString,QVariant> FindModel::nomColonnes() const {
@@ -65,7 +68,7 @@ Node FindModel::nodeConditionFactory(szt col){
     }
 }
 
-bool FindModel::removeNodes(const NodeIndex & node, numt count){
+bool FindModel::remove(const NodeIndex & node, numt count){
     if(checkIndex(node) && !node.isRoot()){
         if(node.parent().childCount() == count + 1) {
             if(indexToIterator(node).firstBrother())
@@ -73,10 +76,10 @@ bool FindModel::removeNodes(const NodeIndex & node, numt count){
             else
                 m_data.move(node.firstBrother(),node.parent());
             emit dataChanged(node.parent(),TypeRole);
-            return ItemNodeModel::removeNodes(node.firstBrother(),count + 1);
+            return ItemNodeModel::remove(node.firstBrother(),count + 1);
         }
         else
-            return ItemNodeModel::removeNodes(node,count);
+            return ItemNodeModel::remove(node,count);
     }
     return false;
 }
@@ -87,7 +90,7 @@ void FindModel::reset() {
     endResetModel();
 }
 
-bool FindModel::setData(const NodeIndex &index, const QVariant &value, int role) {
+bool FindModel::set(const NodeIndex &index, const QVariant &value, int role) {
     if(index.isValid()) {
         if(index.cible() == ColonneCible && value.toInt() >= 0 && value.toInt() < m_model->columnCount()) {
             if(getNode(index).type() != m_model->colonne(value.toUInt()).type())
@@ -97,7 +100,7 @@ bool FindModel::setData(const NodeIndex &index, const QVariant &value, int role)
             emit dataChanged(index.index(NodeCible),TypeRole);
             return true;
         }
-        return ItemNodeModel::setData(index,value,role);
+        return ItemNodeModel::set(index,value,role);
     }
     return false;
 }

@@ -56,16 +56,18 @@ NodeIndex ItemNodeModel::index(const NodeIndex &parent, numt pos, int cible, num
     return NodeIndex();
 }
 
-void ItemNodeModel::insertNodes(const NodeIndex &parent, numt pos, numt count, int type) {
+std::list<IterNode> ItemNodeModel::insert(const NodeIndex &parent, numt pos, numt count, int type) {
     if (checkIndex(parent) && pos <= parent.childCount()) {
         beginInsertNodes(parent,pos,count);
-            m_data.insertNodes(parent,pos,count,
+            auto r = m_data.insertNodes(parent,pos,count,
                                [this,type](const NodeIndex & parentArg, numt posArg){return nodeFactory(parentArg,posArg,type);});
         endInsertNodes();
+        return r;
     }
+    return std::list<IterNode>();
 }
 
-bool ItemNodeModel::removeNodes(const NodeIndex &index, numt count) {
+bool ItemNodeModel::remove(const NodeIndex &index, numt count) {
     if(count == 0 || !checkIndex(index) || index.isRoot())
         return false;
     beginRemoveNodes(index, count);
@@ -77,7 +79,7 @@ bool ItemNodeModel::removeNodes(const NodeIndex &index, numt count) {
     return true;
 }
 
-bool ItemNodeModel::setData(const NodeIndex &index, const QVariant &value, int role) {
+bool ItemNodeModel::set(const NodeIndex &index, const QVariant &value, int role) {
     if(checkIndex(index)){
         auto changeRole = m_data.getNode(index).setData(index.cible(),value,role,index.num());
         if(changeRole)
@@ -139,8 +141,26 @@ NodeIndex NodeIndex::prevBrother() const noexcept {
     return NodeIndex();
 }
 
-//////////////////////////////////// ItemNodeModel ////////////////////////////
+//////////////////////////////////// ItemNodeBddModel ////////////////////////////
 void ItemNodeBddModel::save() {
+    std::set<IterNode,decltype (&IterNode::less_ptr)> changeSet(&IterNode::less_ptr);
+    std::list<IterNode> insertList;
+    for(auto iter = m_changeList.cbegin(); iter != m_changeList.cend(); ++iter)
+        switch (iter->type) {
+        case SetData:
+            changeSet.insert(iter->iter);
+            break;
+        case InsertNode:
+            insertList.push_back(iter->iter);
+            break;
+        }
+    insertList.sort();
+    for(auto iter = insertList.cbegin(); iter != insertList.cend(); ++iter){
+        static_cast<ItemBddNode &>(***iter).insert(bdd());
+        changeSet.erase(*iter);
+    }
+    for(auto iter = changeSet.cbegin(); iter != changeSet.cend(); ++iter)
+        static_cast<ItemBddNode &>(***iter).save(bdd());
 
 }
 

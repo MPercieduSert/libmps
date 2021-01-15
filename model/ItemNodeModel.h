@@ -7,9 +7,15 @@
 #include <memory>
 #include <QObject>
 #include <QVariant>
+#include <set>
 #include "Bdd.h"
 #include "Tree.h"
 #include "typemps.h"
+
+//! \ingroup groupeModel
+//! Copie l'état du noeud.
+#define NODE_COPIE(TYPE) /*! Copie l'état du noeud */ \
+    Node copie() const override {return std::make_unique<TYPE>(*this);}
 
 namespace modelMPS {
 using namespace typeMPS;
@@ -110,7 +116,9 @@ enum flagNode : flag::flag_type {
     DefaultNodeFlagNode = DefaultRootFlagNode | BrotherEnableFlagNode | DelEnableFlagNode
 };
 
-//! Node abstré de l'arbre de recherche.
+/*! \ingroup groupeModel
+ * \brief Classe mère des noeuds.
+ */
 class ItemNode {
     friend TreeForNodeModel;
 protected:
@@ -122,7 +130,12 @@ public:
     //! Constructeur.
     ItemNode(int type = NoType) : m_type(type){}
 
+    //! Destructeur.
     virtual ~ItemNode();
+
+    //! Copie l'état du noeud
+    virtual Node copie() const
+        {return std::make_unique<ItemNode>(*this);}
 
     //! Accesseur de la donnée associé à column.
     virtual QVariant data(int cible, int role, numt /*num*/ = 0) const;
@@ -132,7 +145,7 @@ public:
         {return cible == NodeCible ? 1 : NoData;}
 
     //! Supprime les donnée du noeud.
-    virtual bool del() {return true;}
+    virtual bool del(/*bddMPS::Bdd &*/) {return true;}
 
     //! Accesseur des drapeaux associés à column.
     virtual flag flags(int cible, numt /*num*/ = 0) const {
@@ -143,9 +156,6 @@ public:
         }
         return DefaultFalgNode;
     }
-
-    //! Enregistre les données du noeud.
-    virtual void save(idt /*parent*/, numt /*num*/) {}
 
     //! Mutateur de la donnée associé à column.
     virtual flag setData(int /*cible*/, const QVariant & /*value*/, int /*role*/, numt /*num*/ = 0) {return NoRole;}
@@ -307,7 +317,7 @@ public:
         {return **m_tree.begin();}
 
     //! Insert des noeud du model, ne vérifie pas les arguments.
-    template<class Factory> void insertNodes(const NodeIndex &parent, numt pos, numt count, Factory factory);
+    template<class Factory> std::list<IterNode> insertNodes(const NodeIndex &parent, numt pos, numt count, Factory factory);
 
     //! Remplace le noeud index par node.
     Node moveNode(const NodeIndex & index, Node && node);
@@ -320,12 +330,12 @@ public:
         {setNode(to,takeNode(from));}
 
     //! Ajoute un fils cadet au noeud index.
-    void push_back(const NodeIndex & index, Node && node)
-        {updateIter(m_tree.push_back(index.m_iter,std::move(node)));}
+    IterNode push_back(const NodeIndex & index, Node && node)
+        {return updateIter(m_tree.push_back(index.m_iter,std::move(node)));}
 
     //! Ajoute un fils ainé au noeud index.
-    void push_front(const NodeIndex & index, Node && node)
-        {updateIter(m_tree.push_front(index.m_iter,std::move(node)));}
+    IterNode push_front(const NodeIndex & index, Node && node)
+        {return updateIter(m_tree.push_front(index.m_iter,std::move(node)));}
 
     //! Supprime des noeuds du model.
     bool removeNodes(const NodeIndex & parent, numt pos, numt count);
@@ -352,25 +362,42 @@ public:
 
 protected:
     //! Met à jour l'itérateur du noeud pointé par l'itérateur.
-    void updateIter(IterNode iter) const
-        {(**iter).m_iter = iter;}
+    IterNode updateIter(IterNode iter) const
+        {return (**iter).m_iter = iter;}
 };
-///////////////////////////////////////////////// AbstractForNodeModel ///////////////////////////////////////////////
+
 /*! \ingroup groupeModel
  * \brief Classe mère des models à noeuds.
  */
 class ItemNodeModel : public QObject{
     Q_OBJECT
 protected:
-    struct NodesInfo {
-        NodeIndex parent;           //!< Index du parent des nodes insérés.
-        numt pos;                    //!< Position du premier noeud insérés.
-        numt count;                  //!< Position du dernier noeud insérés.
+    //! Type de modification.
+    enum changeType {
+        SetData,
+        InsertNode,
+        RemoveNode
     };
+    enum {AucunePosition = 0};
+    //! Information sur la position d'un noeud
+    struct NodesInfo {
+        NodeIndex parent;       //!< Index du parent des noeuds.
+        numt pos;               //!< Position du premier noeud.
+        numt count;             //!< Nombre de noeuds concerné.
+    };
+    //! Information sur les modifications apporté à un noeud.
+    struct Change {
+        numt type;
+        numt pos;
+        numt count;
+        IterNode iter = static_cast<void *>(nullptr);
+        Node node;
+    };
+    std::list<Change> m_changeList;                         //!< Liste des modifications du model.
     std::forward_list<NodesInfo> m_insertNodesPile;         //!< Pile des informations d'insertion de noeuds.
     std::forward_list<NodesInfo> m_removeNodesPile;         //!< Pile des informations de suppression de noeuds.
     TreeForNodeModel m_data;                                //!< Arbre de données.
-    enum {AucunePosition = 0};
+
 public:
     enum {DefaultType = -2};
     using QObject::parent;
@@ -394,21 +421,36 @@ public:
     const ItemNode & getNode(const NodeIndex &index) const
         {return m_data.getNode(index);}
 
-    //! Renvoie une référence sur la donné coorespondant à l'index (en supposant la validité de l'index).
-    ItemNode & getNode(const NodeIndex &index)
-        {return m_data.getNode(index);}
-
     //! Renvoie l'index correxpondant au noeud pos de parent.
     NodeIndex index(const NodeIndex &parent, numt pos, int cible = NodeCible, numt num = 0) const;
 
     //! Insert count noeuds de nature type avant la position pos de parent.
-    virtual void insertNodes(const NodeIndex &parent, numt pos, numt count, int type = DefaultType);
+    void insertNodes(const NodeIndex &parent, numt pos, numt count, int type = DefaultType) {
+        auto list = insert(parent,pos,count,type);
+        for (auto iter = list.cbegin(); iter != list.cend(); ++iter) {
+            Change change;
+            change.type = InsertNode;
+            change.iter = *iter;
+            m_changeList.push_back(std::move(change));
+        }
+    }
 
     //! Supprimer count noeud de la fratrie en commençant par le noeud node.
-    virtual bool removeNodes(const NodeIndex &index, numt count = 1);
+    bool removeNodes(const NodeIndex &index, numt count = 1)
+        {return remove(index,count);}
 
     //! Mutateur des données du model.
-    virtual bool setData(const NodeIndex & index, const QVariant & value, int role);
+    bool setData(const NodeIndex & index, const QVariant & value, int role) {
+        Change change;
+        change.type = SetData;
+        change.iter = indexToIterator(index);
+        change.node = getNode(index).copie();
+        if(set(index,value,role)) {
+            m_changeList.push_back(std::move(change));
+            return true;
+        }
+        return false;
+    }
 
 signals:
     //! Signal le changement d'une donnée.
@@ -493,17 +535,46 @@ protected:
     void endResetData()
         {emit modelResetData();}
 
+    //! Renvoie une référence sur la donné coorespondant à l'index (en supposant la validité de l'index).
+    ItemNode & getNode(const NodeIndex &index)
+        {return m_data.getNode(index);}
+
     //! Convertie un index en itérateur.
     IterNode indexToIterator(const NodeIndex & index) const
         {return index.m_iter;}
 
+    //! Insert count noeuds de nature type avant la position pos de parent.
+    virtual std::list<IterNode> insert(const NodeIndex &parent, numt pos, numt count, int type = DefaultType);
+
     //! Fabrique des noeuds.
     virtual Node nodeFactory(const NodeIndex & /*parent*/, numt /*pos*/, int /*type*/) {return std::make_unique<ItemNode>();}
+
+    //! Supprimer count noeud de la fratrie en commençant par le noeud node.
+    virtual bool remove(const NodeIndex &index, numt count = 1);
+
+    //! Mutateur des données du model.
+    virtual bool set(const NodeIndex & index, const QVariant & value, int role);
 };
 
-////////////////////////////////////////////////// TreeNodeModelWithBdd /////////////////////////////////////////////////////
 /*! \ingroup groupeModel
- * \brief Classe mère des models à noeuds.
+ * \brief Classe des noeuds pour une gestion avec la base de donnée.
+ */
+class ItemBddNode : public ItemNode{
+public:
+    //! Constructeur.
+    using ItemNode::ItemNode;
+
+    NODE_COPIE(ItemBddNode)
+
+    //! Enregistre les données du noeud.
+    virtual void save(bddMPS::Bdd &) {}
+
+    //! Insert un nouveau noeud dans la base de donnée.
+    virtual void insert(bddMPS::Bdd &) {}
+};
+
+/*! \ingroup groupeModel
+ * \brief Classe mère des models à noeuds avec une gestion en base de donnée.
  */
 class ItemNodeBddModel : public ItemNodeModel {
     Q_OBJECT
@@ -524,16 +595,18 @@ public slots:
 };
 
 ///////////////////////////////////// Definition de TreeForNodeModel //////////////////////////////////
-template<class Factory> void TreeForNodeModel::insertNodes(const NodeIndex &parent, numt pos, numt count, Factory factory) {
+template<class Factory> std::list<IterNode> TreeForNodeModel::insertNodes(const NodeIndex &parent, numt pos, numt count, Factory factory) {
+    std::list<IterNode> list;
     auto iter = parent.m_iter;
     if(pos == parent.childCount())
         for(numt i = 0; i != count; ++i)
-            updateIter(m_tree.push_back(iter,factory(parent, pos + i)));
+            list.push_back(updateIter(m_tree.push_back(iter,factory(parent, pos + i))));
     else {
         iter.toChildU(pos);
         for(numt i = count; i != 0; --i)
-            updateIter(m_tree.insert(iter,factory(parent, pos + i)));
+            list.push_back(updateIter(m_tree.insert(iter,factory(parent, pos + i))));
     }
+    return list;
 }
 
 template<class U, class F>  void TreeForNodeModel::setTree(const conteneurMPS::tree<U> & t, F usine) {
