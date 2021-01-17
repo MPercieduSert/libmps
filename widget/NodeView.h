@@ -50,8 +50,13 @@ public:
     //! Mutateur de flags.
     void setFlags(flag fl) {
         m_flags = fl;
-        setVisible(fl.test(modelMPS::VisibleFlagNode));
-        setEnabled(fl.test(modelMPS::EnableFlagNode));
+        updateFlags();
+    }
+
+    //! Met à jour le widget après un changement de drapeaux.
+    virtual void updateFlags() {
+        setVisible(m_flags.test(modelMPS::VisibleFlagNode));
+        setEnabled(m_flags.test(modelMPS::EnableFlagNode));
     }
  };
 

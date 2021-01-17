@@ -77,6 +77,7 @@ void LabelSubNodeWidget::updateDataSubNode(flag role) {
 DateSubNodeWidget::DateSubNodeWidget(const NodeIndex & index, QWidget * parent)
     : LabelSubNodeWidget(index,parent) {
     m_dateEdit = new QDateEdit;
+    m_dateEdit->setCalendarPopup(true);
     m_mainLayout->addWidget(m_dateEdit);
     connect(m_dateEdit,&QDateEdit::dateChanged,this,[this]() {
         if(connexionEnable())

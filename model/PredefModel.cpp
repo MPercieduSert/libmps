@@ -50,19 +50,8 @@ void PermissionModel::setCible(entidt num, bool visible){
 
 //////////////////////////////////////////////////////// TypePermissionNode ///////////////////////////////
 QVariant TypePermissionNode::data(int cible, int role, numt num) const {
-    if(cible == PermissionModel::RefCible) {
-        if(role == LabelRole)
-            return "Référence :";
-        if(role == StringRole)
+    if(cible == PermissionModel::RefCible && role == StringRole)
             return m_ent.ref();
-    }
-    else if(cible == SubNodeCible && role == SubNodeRole && num == PermissionModel::RefPosition) {
-        QList<QVariant> init;
-        init.append(PermissionModel::RefCible);
-        init.append(0);
-        init.append(LineEditSubNode);
-        return init;
-    }
     return PermNode::data(cible,role,num);
 }
 

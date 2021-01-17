@@ -24,6 +24,11 @@ protected:
 public:
     //! Constructeur.
     CheckSubNodeWidget(const NodeIndex & index, QWidget * parent);
+
+    //! Met à jour le widget après un changement de drapeaux.
+    void updateFlags() override {
+        m_checkBox->setEnabled(m_flags.test(modelMPS::EnableFlagNode));
+    }
 protected:
     //! Met à jour les données du label à partir des données du model.
     void updateDataSubNode(flag role) override;
@@ -39,6 +44,11 @@ protected:
 public:
     //! Constructeur.
     LabelSubNodeWidget(const NodeIndex & index, QWidget * parent);
+
+    //! Met à jour le widget après un changement de drapeaux.
+    void updateFlags() override
+        {setVisible(m_flags.test(modelMPS::VisibleFlagNode));}
+
 protected:
     //! Met à jour les données du label à partir des données du model.
     void updateDataSubNode(flag role) override;
@@ -53,6 +63,12 @@ protected:
 public:
     //! Constructeur.
     CodeSubNodeWidget(const CodeWidget::Cases & cases, const NodeIndex & index, QWidget * parent);
+
+    //! Met à jour le widget après un changement de drapeaux.
+    void updateFlags() override {
+        LabelSubNodeWidget::updateFlags();
+        m_codeWidget->setReadOnly(!m_flags.test(modelMPS::EnableFlagNode));
+    }
 protected:
     //! Met à jour les données du label à partir des données du model.
     void updateDataSubNode(flag role) override;
@@ -69,6 +85,12 @@ protected:
 public:
     //! Constructeur.
     ComboBoxSubNodeWidget(const NodeIndex & index, QWidget * parent);
+
+    //! Met à jour le widget après un changement de drapeaux.
+    void updateFlags() override {
+        LabelSubNodeWidget::updateFlags();
+        m_comboBox->setEnabled(m_flags.test(modelMPS::EnableFlagNode));
+    }
 protected:
     //! Met à jour les données du label à partir des données du model.
     void updateDataSubNode(flag role) override;
@@ -84,6 +106,12 @@ protected:
 public:
     //! Constructeur.
     DateSubNodeWidget(const NodeIndex & index, QWidget * parent);
+
+    //! Met à jour le widget après un changement de drapeaux.
+    void updateFlags() override {
+        LabelSubNodeWidget::updateFlags();
+        m_dateEdit->setReadOnly(!m_flags.test(modelMPS::EnableFlagNode));
+    }
 protected:
     //! Met à jour les données du label à partir des données du model.
     void updateDataSubNode(flag role) override;
@@ -99,6 +127,12 @@ protected:
 public:
     //! Constructeur.
     LineEditSubNodeWidget(const NodeIndex & index, QWidget * parent);
+
+    //! Met à jour le widget après un changement de drapeaux.
+    void updateFlags() override {
+        LabelSubNodeWidget::updateFlags();
+        m_lineEdit->setReadOnly(!m_flags.test(modelMPS::EnableFlagNode));
+    }
 protected:
     //! Met à jour les données du label à partir des données du model.
     void updateDataSubNode(flag role) override;

@@ -101,8 +101,6 @@ public:
     //! Constructeur.
     FindModel(AbstractColonnesModel * model = nullptr, QObject * parent = nullptr);
 
-
-
     //! Accesseur du model filtré.
     AbstractColonnesModel * model() const
         {return m_model;}

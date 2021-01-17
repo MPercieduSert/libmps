@@ -25,6 +25,8 @@ public:
         QBrush backgroundTrue;
         QBrush foregroundFalse;
         QBrush foregroundTrue;
+        QBrush foregroundReadFalse;
+        QBrush foregroundReadTrue;
         QFont fontFalse;
         QFont fontTrue;
         QString textFalse;
@@ -39,6 +41,7 @@ protected:
     int m_cote;                     //!< Taille des coté des carrés.
     const Cases & m_cases;          //!< Référence au mode de représantation d'un code.
     flag m_code;                    //!< Le code représenté.
+    bool m_readOnly = false;        //!< Le widget est-il en lecture seule.
 
 public:
     //! Taille.
@@ -53,6 +56,10 @@ public:
     flag code() const noexcept
         {return m_code;}
 
+    //! Accesseur de readOnly.
+    bool readOnly() const noexcept
+        {return  m_readOnly;}
+
     //! Mutateur du code.
     void setCode(flag code);
 
@@ -60,6 +67,12 @@ public:
     void setCote(int cote) {
         m_cote = cote;
         adjustSize();
+    }
+
+    //! Accesseur de readOnly.
+    void setReadOnly(bool bb) noexcept {
+        m_readOnly = bb;
+        repaint();
     }
 
     //! Taille du widget

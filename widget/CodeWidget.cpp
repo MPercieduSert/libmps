@@ -9,6 +9,8 @@ CodeWidget::CaseOption CodeWidget::caseStyle(styleCase sc, flag code) {
     caseOption.backgroundFalse = QColor(Qt::red);
     caseOption.foregroundTrue = QColor(Qt::black);
     caseOption.foregroundFalse = QColor(Qt::white);
+    caseOption.foregroundReadTrue = QColor(Qt::darkGray);
+    caseOption.foregroundReadFalse = QColor(Qt::lightGray);
     caseOption.fontTrue.setFamily("FontAwesome");
     caseOption.fontFalse.setFamily("FontAwesome");
     caseOption.fontTrue.setPointSize(FontSize);
@@ -32,7 +34,7 @@ CodeWidget::CodeWidget(const Cases & cases, int cote, QWidget * parent)
 }
 
 void CodeWidget::mousePressEvent(QMouseEvent *event) {
-    if(event->button() == Qt::LeftButton)
+    if(!m_readOnly && event->button() == Qt::LeftButton)
         setCode(m_code ^ m_cases.at(static_cast<szt>(event->x()/m_cote)).code);
 }
 
@@ -48,7 +50,7 @@ void CodeWidget::paintEvent(QPaintEvent * /*event*/) {
         if(m_code.test(iter->code)) {
             painter.setBrush(iter->backgroundTrue);
             painter.drawRoundedRect(rect,25.0,25.0,Qt::RelativeSize);
-            penText.setBrush(iter->foregroundTrue);
+            penText.setBrush(m_readOnly ? iter->foregroundReadTrue : iter->foregroundTrue);
             painter.setPen(penText);
             painter.setFont(iter->fontTrue);
             painter.drawText(rect,Qt::AlignCenter,iter->textTrue);
@@ -56,7 +58,7 @@ void CodeWidget::paintEvent(QPaintEvent * /*event*/) {
         else {
             painter.setBrush(iter->backgroundFalse);
             painter.drawRoundedRect(rect,25.0,25.0,Qt::RelativeSize);
-            penText.setBrush(iter->foregroundFalse);
+            penText.setBrush(m_readOnly ? iter->foregroundReadFalse : iter->foregroundFalse);
             painter.setPen(penText);
             painter.setFont(iter->fontFalse);
             painter.drawText(rect,Qt::AlignCenter,iter->textFalse);

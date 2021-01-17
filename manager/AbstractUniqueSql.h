@@ -175,7 +175,7 @@ protected:
         exec();
         if(next()) {
             resultat.second = id();
-            if(entity.isNew() || entity.id() == id())
+            if(entity.isNew() || entity.id() == resultat.second)
                 resultat.first = bmps::existeUni::Tous;
             else
                 resultat.first = bmps::existeUni::Autre;
@@ -200,7 +200,6 @@ template<class Ent> bmps::existeUni SimpleUniqueSql<Ent>::existsUnique(Ent & ent
 }
 
 template<class Ent> std::pair<bmps::existeUni,idt> SimpleUniqueSql<Ent>::existsUniqueId(const Ent & entity) {
-
     prepare(m_unique);
     bindValuesUnique(entity);
     return execUniqueId(entity);
