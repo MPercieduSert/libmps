@@ -94,8 +94,7 @@ namespace emps = entityMPS;
 /*! \ingroup groupeManager
  * \brief Classe des informations d'une entité sur sa table dans la base de données.
  */
-class InfoBdd
-{
+class InfoBdd {
 public:
 using Caract = std::pair<typeAttributBdd, bool>;
 
