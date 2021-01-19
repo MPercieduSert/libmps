@@ -48,6 +48,7 @@ namespace bddMPS {
  */
 class BddPredef : public Bdd {
 public:
+    enum {InvalideEnum = 0x10000};
     //! Constructeur. Donner en argument le type ainsi que le chemin de la base de donnée.
     BddPredef(const QString & dbtype, const std::vector<int> & version, std::unique_ptr<managerMPS::ManagersPredef> && manager)
         : Bdd(dbtype,version,std::move(manager)) {}
@@ -68,7 +69,7 @@ public:
     template<class Ent> int cible() const
         {return managers().cible<Ent>();}
 
-    //! renvoie le numéro de permission associée à la chaine de caractères, ou NbrPermission la chaine ne correspond à aucun numéro.
+    //! Renvoie le drapeau associé à str pour une entitée de type idEntity.
     virtual flag code(idt idEntity, const QString & str) const;
 
     //! Suppresseur d'une entité enregistrée comme donnée.
@@ -96,6 +97,8 @@ public:
     //! Mutateur d'une entité enregistrée comme donnée.
     template<class Ent> void setEntityInDonnee(const Ent & entity, idt idCible, int cible, int num = 0);
 
+    //! Renvoie l'enumeration associé à str pour une entitée de type idEntity.
+    virtual int strToEnum(idt idEntity, const QString & str) const;
 protected:
     //! Supprime l'entité d'identifiant id de type d'identifiant idEntity de la base de données.
     bool delP(idt id, entidt idEntity) override;

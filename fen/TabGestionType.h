@@ -20,7 +20,6 @@ namespace fenMPS {
 class TabGestionType : public AbstractTabModuleWithBdd
 {
 protected:
-    //std::vector<QString> m_namesAttributs;    //!< Noms des attributs.
     modelMPS::TypePermissionModel * m_model;    //!< Model.
     widgetMPS::NodeView * m_view;               //!< Vue.
     QListWidget * m_cibleListWidget;            //!< Sélection des cibles.

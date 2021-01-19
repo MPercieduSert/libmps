@@ -308,6 +308,38 @@ std::pair<int, int> BddPredef::intervalEntityInDonnee(idt idCible, int cible, in
     return interval;
 }
 
+int BddPredef::strToEnum(idt idEntity, const QString & str) const {
+    switch (idEntity) {
+    case Donnee::ID:
+        if(str == "NoDonne")
+            return donnee::NoDonnee;
+        if(str == "Int")
+            return donnee::Int;
+        if(str == "String")
+            return donnee::String;
+        if(str == "Bool")
+            return donnee::Bool;
+        if(str == "Float")
+            return donnee::Float;
+        if(str == "Double")
+            return donnee::Double;
+        if(str == "Date")
+            return donnee::Date;
+        if(str == "DateTime")
+            return donnee::DateTime;
+        if(str == "Exact")
+            return donnee::Exact;
+        if(str == "Au plus")
+            return donnee::AuPlus;
+        if(str == "Au moins")
+            return donnee::AuMoins;
+        break;
+    default:
+        return code::Invalide;
+    }
+    return InvalideEnum;
+}
+
 void BddPredef::listeMiseAJourBdd(int version, idt type) {
     if(type == bddVersion::LibraryType) {
         switch (version) {
@@ -331,27 +363,6 @@ void BddPredef::listeMiseAJourBdd(int version, idt type) {
                 creerTable<DonneeCible>();
                 creerTable<DonneeCard>();
                 if(managers().ensembleEnable(TypeEnable)) {
-                    Type configType;
-                    configType.setNom("Configuration");
-                    configType.setNc("config");
-                    configType.setRef("config_root_tp");
-                    save(configType,Suppr);
-                    TypePermission configPerm;
-                    configPerm.setIdType(configType.id());
-                    configPerm.setCible(cible<Donnee>());
-                    configPerm.setCode(code::Visible);
-                    save(configPerm);
-                    Type defValType;
-                    defValType.setNom("Valeur par defaut");
-                    defValType.setNc("defaut");
-                    defValType.setRef("valeur_defaut_tp");
-                    defValType.setParent(configType.id());
-                    save(defValType,Suppr);
-                    TypePermission defValPerm;
-                    defValPerm.setIdType(defValType.id());
-                    defValPerm.setCible(cible<Donnee>());
-                    defValPerm.setCode(code::Visible | code::Attribuable);
-                    save(defValPerm);
                     conteneurMPS::tree<Donnee> tree;
                     auto iter = tree.begin();
                     iter->setNom("Configuration");

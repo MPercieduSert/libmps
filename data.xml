@@ -1,0 +1,60 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<entities>
+
+<!--  Type -->
+ <Type modification="non" suppression="non">
+<Nom>Configuratio"</Nom>
+<Nc>config</Nc>
+<Ref>config_root_tp</Ref> 
+ </Type>
+<Type modification="non" suppression="non">
+<Parent>
+  <Ref>config_root_tp</Ref>
+</Parent>
+<Nom>Valeur par defaut</Nom>
+<Nc>defaut</Nc>
+<Ref>valeur_defaut_tp</Ref>
+</Type> 
+ 
+ <!-- TypePermission -->
+ <TypePermission modification="non" suppression="non">
+<IdType>
+  <Ref>config_root_tp</Ref>
+</IdType> 
+<Cible>Donnee</Cible>
+<Code>Visible</Code>
+ </TypePermission>
+ <TypePermission modification="non" suppression="non">
+<IdType>
+  <Ref>valeur_defaut_tp</Ref>
+</IdType> 
+<Cible>Donnee</Cible>
+<Code>Visible,Attribuable</Code>
+ </TypePermission>
+ 
+ <!-- Donnee -->
+ <Donnee modification="non" suppression="non">
+ <Nom>Configuration</Nom>
+ <Ref>config_dn</Ref>
+ <Type>
+  <Ref>config_root_tp</Ref> 
+ </Type>
+ <TpVal>NoDonnee</TpVal>
+ </Donnee>
+ <Donnee modification="non" suppression="non">
+ <Nom>Valeur par defaut</Nom>
+ <Ref>valeur_defaut_dn</Ref>
+ <Type>
+  <Ref>config_root_tp</Ref> 
+ </Type>
+ <TpVal>NoDonnee</TpVal>
+ </Donnee>
+   <Donnee modification="non" suppression="non">
+ <Nom>Date par defaut</Nom>
+ <Ref>date_defaut_dn</Ref>
+ <Type>
+  <Ref>valeur_defaut_tp</Ref> 
+ </Type>
+ <TpVal>Date</TpVal>
+ </Donnee>
+</entities>

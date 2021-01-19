@@ -36,7 +36,7 @@ namespace donnee {
 
     //! Exact
     enum cardinalCode {Exact,
-                       Auplus,
+                       AuPlus,
                        AuMoins,
     };
 
