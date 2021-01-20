@@ -85,9 +85,13 @@ public:
             return 0;
     }
 
-    //! Return l'indice maximum dans la fratrie du noeud.
-    int sizeBrother(const Arbre & node)
-     {return fonctionAgrega(bmps::agrega::Nombre,Arbre::Parent,Arbre::Parent,node.parent()).toInt();}
+//    //! Renvoie le nombre de frères dans la fratrie.
+//    int sizeBrother(const Arbre & node)
+//     {return fonctionAgrega(bmps::agrega::Nombre,Arbre::Parent,Arbre::Parent,node.parent()).toInt();}
+
+    //! Renvoie le nombre de descendants directs.
+    int size(idt idParent)
+        {return fonctionAgrega(bmps::agrega::Nombre,Arbre::Parent,Arbre::Parent,idParent).toInt();}
 
     //! Teste s'il y a dans la base de donnée un noeud ayant exactement les mêmes attributs id, num et parent.
     bool sameInBdd(const Arbre & node) override {

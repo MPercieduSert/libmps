@@ -129,6 +129,10 @@ public:
     void save(const Ent & entity) override
         {saveConst(entity);}
 
+    //! Renvoie le nombre de fils du noeud.
+    int sizeChild(const Entity & entity) override
+        {return m_managerArbre.size(entity.id());}
+
     //! Retourne le type du manager.
     virtual flag typeManager() const override
         {return bmps::ArbreTypeManager;}

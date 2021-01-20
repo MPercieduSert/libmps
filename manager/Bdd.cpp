@@ -2,6 +2,46 @@
 
 using namespace bddMPS;
 
+entityBaseMPS::Arbre Bdd::arbreXml(fichierMPS::XmlDoc::const_brother_iterator iter, QString & controle){
+    auto iterArbre = iter.cbeginChild();
+    entityBaseMPS::Arbre arb;
+    if(iterArbre->name() == "Arbre") {
+        for (auto iterValue = iterArbre.cbeginChild(); controle.isEmpty() && iterValue; ++iterValue) {
+            if(iterValue->name() == "Parent") {
+                auto parent = makeEntity(iter->name());
+                hydrateEntityXml(*parent,iterValue,controle);
+                if(controle.isEmpty()) {
+                    if (existsUnique(*parent))
+                        arb.setParent(parent->id());
+                    else
+                        controle.append(iter->name()).append("\nParent unique introuvable :\n")
+                                .append(parent->affiche());
+                }
+            }
+            else if (iterValue->name() == "Num") {
+                if(iterValue->text() == "premier")
+                    arb.setNum(0);
+                else if(iterValue->text() == "dernier"){
+                    arb.setNum(sizeChild(arb));
+                }
+                else {
+                    bool ok;
+                    auto num = iterValue->text().toInt(&ok);
+                    if (ok)
+                        arb.setNum(num);
+                    else
+                        controle.append(iter->name()).append("\nNum dans arbre invalide :\n")
+                                .append(iterValue->text());
+                }
+            }
+            else
+                controle.append(iterValue->name()).append("\nAttribut invalide de valeur : ").append(iter->text())
+                        .append(".\nLe noeud d'arbre :\n").append(arb.affiche());
+        }
+    }
+    return arb;
+}
+
 bool Bdd::copy(const QString & name) {
     Bdd bdd(m_bdd.driverName(), name,{});
     if(bdd.exists() && bdd.isValid()) {
@@ -50,44 +90,50 @@ flag Bdd::getRestriction(const Entity & entity)
 bool Bdd::getUnique(Entity & entity)
     {return m_manager->get(entity.idEntity()).getUnique(entity);}
 
-QString Bdd::hydrateAttributXml(entityMPS::Entity & entity, post pos, fichierMPS::XmlDoc::const_brother_iterator iter) {
+void Bdd::hydrateAttributXml(entityMPS::Entity & entity, post pos,
+                             fichierMPS::XmlDoc::const_brother_iterator iter, QString & controle) {
     auto fkey_iter = info(entity).foreignKeyName().find(pos);
-    if(fkey_iter == info(entity).foreignKeyName().end()) {
+    if(fkey_iter == info(entity).foreignKeyName().end())
         entity.setData(pos, iter->text());
-        return QString();
-    }
     else {
         auto fkey_entity = makeEntity(fkey_iter->second);
-        auto controle = hydrateEntityXml(*fkey_entity, iter);
+        hydrateEntityXml(*fkey_entity, iter, controle);
         if(controle.isEmpty()) {
-            if(getUnique(*fkey_entity))
+            if(existsUnique(*fkey_entity))
                 entity.setData(pos, fkey_entity->id());
             else
-                controle = QString("Entité unique introuvable:\n").append(fkey_entity->affiche());
+                controle.append("Entité unique introuvable:\n").append(fkey_entity->affiche());
         }
         if(!controle.isEmpty())
             controle.prepend("->").prepend(fkey_iter->second);
-        return controle;
     }
 }
 
-QString Bdd::hydrateEntityXml(entityMPS::Entity & entity, fichierMPS::XmlDoc::const_brother_iterator iter) {
-    QString controle;
+void Bdd::hydrateEntityXml(entityMPS::Entity & entity, fichierMPS::XmlDoc::const_brother_iterator iter, QString &controle) {
     for (auto att_iter = iter.cbeginChild(); controle.isEmpty() && att_iter; ++att_iter) {
         auto pos = entity.position(att_iter->name());
         if(pos == entity.nbrAtt())
-            return QString(att_iter->name()).append("\nAttribut invalide de Valeur : ").append(att_iter->text())
+            controle.append(att_iter->name()).append("\nAttribut invalide de valeur : ").append(att_iter->text())
                     .append(".\nPour l'entité :\n").append(entity.affiche());
         else
-            controle = hydrateAttributXml(entity, pos, att_iter);
+            hydrateAttributXml(entity, pos, att_iter,controle);
     }
-    return controle;
+}
+
+flag Bdd::restrictionXml(fichierMPS::XmlDoc::const_brother_iterator iter) {
+    flag restrict;
+    const auto restriction = RestrictionToStr();
+    for (auto iter_restrict = restriction.cbegin(); iter_restrict != restriction.cend(); ++iter_restrict) {
+        auto iter_att = iter->attributes().find(iter_restrict->second);
+        if(iter_att != iter->attributes().end())
+            restrict |= iter_restrict->first;
+    }
+    return restrict;
 }
 
 QString Bdd::importXml(const fichierMPS::XmlDoc & doc){
     auto iter = doc.cbegin().cbeginChild();
     QString controle;
-    const auto restriction = RestrictionToStr();
     while(controle.isEmpty() && iter) {
         auto entity = makeEntity(iter->name());
         if(!entity)
@@ -95,27 +141,44 @@ QString Bdd::importXml(const fichierMPS::XmlDoc & doc){
         else {
             auto typeManager = m_manager->get(entity->idEntity()).typeManager();
             if(typeManager & bddMPS::ArbreTypeManager) {
-                //auto iterHA = iter.cbeginChild();
-                //entityBaseMPS::Arbre arb;
+                auto arb = arbreXml(iter,controle);
+                if(controle.isEmpty()) {
+                    auto iterValeur = iter.cbeginChild();
+                    if(arb.parent())
+                        ++iterValeur;
+                    if(iterValeur->name() == "Valeur"){
+                        hydrateEntityXml(*entity, iterValeur, controle);
+                        if(controle.isEmpty()) {
+                            if(entity->isValid()) {
+                                if(existsUnique(*entity))
+                                    save(*entity);
+                                else
+                                    insert(*entity,arb.parent(),arb.num());
+                                if(typeManager & bddMPS::ModifControleTypeManager)
+                                    setRestriction(*entity,restrictionXml(iter));
+                            }
+                            else
+                                controle.append("Entité invalide :\n").append(entity->affiche());
+                        }
+                        if(!controle.isEmpty())
+                            controle.prepend("->").prepend(iter->name());
+                    }
+                    else
+                        controle.append("Les attributs d'une entité de type arbre doivent être regroupe dans une balice <Valeur> :\n")
+                                .append(iterValeur->name());
+                }
             }
             else {
-                controle = hydrateEntityXml(*entity, iter);
+                hydrateEntityXml(*entity, iter, controle);
                 if(controle.isEmpty()) {
                     if(entity->isValid()) {
                         existsUnique(*entity);
                         save(*entity);
-                        if(typeManager & bddMPS::ModifControleTypeManager) {
-                            flag restrict = bddMPS::Aucune;
-                            for (auto iter_restrict = restriction.cbegin(); iter_restrict != restriction.cend(); ++iter_restrict) {
-                                auto iter_att = iter->attributes().find(iter_restrict->second);
-                                if(iter_att != iter->attributes().end())
-                                    restrict |=iter_restrict->first;
-                            }
-                            setRestriction(*entity,restrict);
-                        }
+                        if(typeManager & bddMPS::ModifControleTypeManager)
+                            setRestriction(*entity,restrictionXml(iter));
                     }
                     else
-                        controle = QString("Entité invalide :\n").append(entity->affiche());
+                        controle.append("Entité invalide :\n").append(entity->affiche());
                 }
                 if(!controle.isEmpty())
                     controle.prepend("->").prepend(iter->name());

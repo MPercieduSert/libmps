@@ -28,7 +28,7 @@ void ManagerForArbre::add(Arbre &node) {
                 ManagerSqlArbre::modify(parent);
             }
             else {
-                auto max = sizeBrother(node);
+                auto max = size(node.parent());
                 if(node.num() < 0 || node.num() > max) {
                     node.setNum(max+1);
                     ManagerSqlArbre::add(node);
@@ -72,7 +72,7 @@ void ManagerForArbre::add(const Arbre &node) {
                 ManagerSqlArbre::modify(parent);
             }
             else {
-                auto max = sizeBrother(node);
+                auto max = size(node.parent());
                 if(node.num() < 0 || node.num() > max)
                     ManagerSqlArbre::add(Arbre(true,max+1,node.parent()));
                 else {
@@ -110,7 +110,7 @@ void ManagerForArbre::addUnstable(Arbre &node) {
                 ManagerSqlArbre::modify(parent);
             }
             else {
-                auto max = sizeBrother(node);
+                auto max = size(node.parent());
                 if(node.num() < 0 || node.num() > max) {
                     node.setNum(max+1);
                     ManagerSqlArbre::add(node);
@@ -146,7 +146,7 @@ void ManagerForArbre::addUnstable(const Arbre &node) {
                 ManagerSqlArbre::modify(parent);
             }
             else {
-                auto max = sizeBrother(node);
+                auto max = size(node.parent());
                 if(node.num() < 0 || node.num() > max)
                     ManagerSqlArbre::add(Arbre(true,max+1,node.parent()));
                 else {
@@ -223,7 +223,7 @@ void ManagerForArbre::modify(const Arbre & node) {
     auto numBdd = nodeBdd.num();
     if(node.parent()) {
         if(nodeBdd.parent() == node.parent()) {
-            auto max = sizeBrother(node);
+            auto max = size(node.parent());
             auto num = node.num();
             if(num < 0 || num > max)
                 num = max;
@@ -265,7 +265,7 @@ void ManagerForArbre::modify(const Arbre & node) {
                 nodeBdd.setNum(0);
             }
             else {
-                auto max = sizeBrother(node);
+                auto max = size(node.parent());
                 if(node.num() < 0 || node.num() > max)
                     nodeBdd.setNum(max + 1);
                 else {
@@ -308,7 +308,7 @@ void ManagerForArbre::modify(const Arbre & node) {
 void ManagerForArbre::modifyUnstable(const Arbre & node) {
     Arbre nodeBdd(node.id());
     get(nodeBdd);
-    auto max = sizeBrother(node);
+    auto max = size(node.parent());
     if(node.num() < 0 || node.num() > max)
         ManagerSqlArbre::modify(Arbre(nodeBdd.feuille(),max+1,node.parent(),node.id()));
     else {
@@ -336,7 +336,7 @@ void ManagerForArbre::modifyUnstable(const Arbre & node) {
 void ManagerForArbre::modifyStableUnstable(const Arbre & node) {
     Arbre nodeBdd(node.id());
     get(nodeBdd);
-    auto max = sizeBrother(node);
+    auto max = size(node.parent());
     if(node.num() < 0 || node.num() > max)
         ManagerSqlArbre::modify(Arbre(nodeBdd.feuille(),max+1,node.parent(),node.id()));
     else {

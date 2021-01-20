@@ -104,7 +104,8 @@ protected:
     bool delP(idt id, entidt idEntity) override;
 
     //! Hydrate un attribut de l'entité par la valeur contenue dans le XmlDox à l'endroit pointé par iter.
-    QString hydrateAttributXml(entityMPS::Entity & entity, post pos, fichierMPS::XmlDoc::const_brother_iterator iter) override;
+    void hydrateAttributXml(entityMPS::Entity & entity, post pos,
+                            fichierMPS::XmlDoc::const_brother_iterator iter, QString & controle) override;
 
     //! Renvoie le numero de début d'enregistrement d'une entité.
     std::pair<int, int> intervalEntityInDonnee(idt idCible, int cible, int num);

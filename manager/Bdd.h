@@ -84,6 +84,9 @@ public:
     //! Ajoute des restrictions de modification pour une entité donnée.
     void addRestriction(const Entity & entity, flag restrict);
 
+    //! Renvoie un arbre avec les valeurs contenues dans le XmlDox à l'endroit pointé par iter.
+    entityBaseMPS::Arbre arbreXml(fichierMPS::XmlDoc::const_brother_iterator iter, QString & controle);
+
     //! Vérifie si le fichier de chemin name existe et est un fichier de base de donnée valide, si c'est le cas,
     //! le fichier de la base de donnée est remplacé par une copie du fichier de chemin name.
     bool copy(const QString & name) override;
@@ -606,6 +609,10 @@ public:
     //! Modifie les restrictions de modification pour une entité donnée.
     template<class Ent> void setRestriction(const Ent & entity, flag restrict);
 
+    //! Renvoie le nombre de descendants directs.
+    int sizeChild(const Entity & entity)
+        {return m_manager->get(entity.id()).sizeChild(entity);}
+
     //! Convertit la chaine de caractères représentant une restriction.
     static flag strToRestriction(const QString & str) noexcept;
 
@@ -635,16 +642,20 @@ protected:
         {return m_manager->get(idEntity).del(id);}
 
     //! Hydrate un attribut de l'entité par la valeur contenue dans le XmlDox à l'endroit pointé par iter.
-    virtual QString hydrateAttributXml(entityMPS::Entity & entity, post pos, fichierMPS::XmlDoc::const_brother_iterator iter);
+    virtual void hydrateAttributXml(entityMPS::Entity & entity, post pos,
+                                       fichierMPS::XmlDoc::const_brother_iterator iter, QString & controle);
 
     //! Hydrate l'entité avec les valeurs contenues dans le XmlDox à l'endroit pointé par iter.
-    QString hydrateEntityXml(entityMPS::Entity & entity, fichierMPS::XmlDoc::const_brother_iterator iter);
+    void hydrateEntityXml(entityMPS::Entity & entity, fichierMPS::XmlDoc::const_brother_iterator iter, QString & controle);
 
     //! Mise à jour de la base de donnée.
     virtual void listeMiseAJourBdd(int /*version*/, idt /*type*/) {}
 
     //! Ouverture de la base de donnée.
     bool openBdd();
+
+    //! Renvoie les restriction avec les valeurs contenues dans le XmlDox à l'endroit pointé par iter.
+    flag restrictionXml(fichierMPS::XmlDoc::const_brother_iterator iter);
 
     //! Enregistre les entités de vector dans la base de donnée.
     template<class Ent,class Conteneur> void saveConteneur(const Conteneur & vector);

@@ -258,33 +258,36 @@ bool BddPredef::testAutorisationP(idt id, entidt idEntity, flag autoris) {
     return controle;
 }
 
-QString BddPredef::hydrateAttributXml(entityMPS::Entity & entity, post pos, fichierMPS::XmlDoc::const_brother_iterator iter){
+void BddPredef::hydrateAttributXml(entityMPS::Entity & entity, post pos, fichierMPS::XmlDoc::const_brother_iterator iter, QString &controle){
     if(iter->name() == "Cible") {
         auto i = m_manager->find(iter->text());
         if(i == nbrEntity())
-            return QString("Cible invalide : ").append(iter->text());
-        else {
+            controle.append("Cible invalide : ").append(iter->text());
+        else
             entity.setData(pos, cible(i));
-            return QString();
-        }
     }
-    if(iter->name() == "Code") {
+    else if(iter->name() == "Code") {
         auto list = iter->text().split(",");
         flag fl;
-        QString controle;
         for(auto iter_list = list.cbegin(); controle.isEmpty() && iter_list != list.cend(); ++iter_list) {
             auto cd = code(entity.idEntity(),*iter_list);
             if (cd != code::Invalide)
                 fl |= cd;
             else
-                controle = QString("Code Invalide : ").append(*iter_list);
+                controle.append("Code Invalide : ").append(*iter_list);
         }
         if(controle.isEmpty())
             entity.setData(pos, fl.value());
-        return controle;
     }
-
-    return Bdd::hydrateAttributXml(entity, pos,iter);
+    else if(iter->name() == "Card" || iter->name() == "Exact" || iter->name() == "TpVal") {
+        auto i = strToEnum(entity.idEntity(),iter->text());
+        if(i == InvalideEnum)
+            controle.append(iter->name()).append("->Enum invalide : ").append(iter->text());
+        else
+            entity.setData(pos, i);
+    }
+    else
+        Bdd::hydrateAttributXml(entity, pos,iter,controle);
 }
 
 std::pair<int, int> BddPredef::intervalEntityInDonnee(idt idCible, int cible, int num) {
@@ -311,7 +314,7 @@ std::pair<int, int> BddPredef::intervalEntityInDonnee(idt idCible, int cible, in
 int BddPredef::strToEnum(idt idEntity, const QString & str) const {
     switch (idEntity) {
     case Donnee::ID:
-        if(str == "NoDonne")
+        if(str == "NoDonnee")
             return donnee::NoDonnee;
         if(str == "Int")
             return donnee::Int;
@@ -327,6 +330,8 @@ int BddPredef::strToEnum(idt idEntity, const QString & str) const {
             return donnee::Date;
         if(str == "DateTime")
             return donnee::DateTime;
+        break;
+    case DonneeCard::ID:
         if(str == "Exact")
             return donnee::Exact;
         if(str == "Au plus")
@@ -335,7 +340,7 @@ int BddPredef::strToEnum(idt idEntity, const QString & str) const {
             return donnee::AuMoins;
         break;
     default:
-        return code::Invalide;
+        return InvalideEnum;
     }
     return InvalideEnum;
 }
@@ -362,25 +367,6 @@ void BddPredef::listeMiseAJourBdd(int version, idt type) {
                 creerTable<Donnee>();
                 creerTable<DonneeCible>();
                 creerTable<DonneeCard>();
-                if(managers().ensembleEnable(TypeEnable)) {
-                    conteneurMPS::tree<Donnee> tree;
-                    auto iter = tree.begin();
-                    iter->setNom("Configuration");
-                    iter->setType(configType.id());
-                    iter->setTpVal(donnee::NoDonnee);
-                    iter->setRef("config_dn");
-                    iter = tree.push_back(iter);
-                    iter->setNom("Valeurs par defaut");
-                    iter->setType(configType.id());
-                    iter->setTpVal(donnee::NoDonnee);
-                    iter->setRef("valeur_defaut_dn");
-                    iter = tree.push_back(iter);
-                    iter->setNom("Date par defaut");
-                    iter->setType(defValType.id());
-                    iter->setTpVal(donnee::Date);
-                    iter->setRef("date_defaut_dn");
-                    save(tree,WithoutDelete);
-                }
             }
             //Evenement
             if(managers().ensembleEnable(EvenementEnable)) {

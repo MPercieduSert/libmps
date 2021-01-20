@@ -34,27 +34,43 @@
  
  <!-- Donnee -->
  <Donnee modification="non" suppression="non">
+ <Valeur>
  <Nom>Configuration</Nom>
- <Ref>config_dn</Ref>
+ <Ref>config_root_dn</Ref>
  <Type>
   <Ref>config_root_tp</Ref> 
  </Type>
  <TpVal>NoDonnee</TpVal>
+ </Valeur>
  </Donnee>
  <Donnee modification="non" suppression="non">
+ <Arbre>
+ <Parent>
+  <Ref>config_root_dn</Ref> 
+ </Parent>
+ </Arbre>
+ <Valeur>
  <Nom>Valeur par defaut</Nom>
  <Ref>valeur_defaut_dn</Ref>
  <Type>
   <Ref>config_root_tp</Ref> 
  </Type>
  <TpVal>NoDonnee</TpVal>
+ </Valeur>
  </Donnee>
-   <Donnee modification="non" suppression="non">
- <Nom>Date par defaut</Nom>
- <Ref>date_defaut_dn</Ref>
+ <Donnee modification="non" suppression="non">
+   <Arbre>
+   <Parent> 
+   <Ref>valeur_defaut_dn</Ref>
+   </Parent>   
+   </Arbre>
+   <Valeur>
+    <Nom>Date par defaut</Nom>
+  <Ref>date_defaut_dn</Ref>
  <Type>
   <Ref>valeur_defaut_tp</Ref> 
  </Type>
  <TpVal>Date</TpVal>
+   </Valeur>
  </Donnee>
 </entities>

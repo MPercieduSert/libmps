@@ -64,6 +64,8 @@ public:
  * Cette classe joue le rôle d'interface pour les différents manageurs.
  */
 class AbstractManager {
+protected:
+    enum {NoChild = 0};
 public:   
     //! Constructeur.
     AbstractManager() = default;
@@ -183,6 +185,10 @@ public:
                                                 "Les entités du type ").append(name())
                                         .append(" ne peuvent avoir de restriction de modification.\n").toStdString());
     }
+
+    //! Renvoie le nombre de descendants directs.
+    virtual int sizeChild(const Entity & /*entity*/)
+        {return NoChild;}
 
     //! Test la restriction de modification de l'entité d'identifiant id.
     virtual bool testRestriction(idt /*id*/, flag /*restrict*/)
