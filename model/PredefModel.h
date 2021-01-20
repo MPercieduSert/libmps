@@ -101,19 +101,6 @@ public:
     flag flags(int cible, numt num = 0) const override;
 
     //! Enregistre les données du noeud.
-    void insert(bddMPS::Bdd & bdd) override{
-        if(!m_iter.parent().root())
-            m_ent.setParent(static_cast<const PermissionNode &>(**m_iter.parent()).m_ent.id());
-        bdd.save(m_ent);
-        savePermission(bdd);
-//        idt idParent = 0;
-//        if(!m_iter.parent().root())
-//            idParent = static_cast<const PermissionNode &>(**m_iter.parent()).m_ent.id();
-//        bdd.insert(m_ent,idParent,m_iter.position());
-//        savePermission(bdd);
-    }
-
-    //! Enregistre les données du noeud.
     void save(bddMPS::Bdd & bdd) override{
         bdd.save(m_ent);
         savePermission(bdd);
@@ -130,14 +117,96 @@ public:
 };
 
 /*! \ingroup groupeModel
- * \brief Classe des neuds du model de Type-permission.
+ * \brief Classe des neuds du model de permission pour une entité de type arbre.
  */
-class TypePermissionNode : public PermissionNode<entityMPS::Type,entityMPS::TypePermission> {
+template<class Ent, class Permission> class ArbrePermissionNode : public PermissionNode<Ent,Permission> {
 protected:
-    using PermNode = PermissionNode<entityMPS::Type,entityMPS::TypePermission>;
+    using PermNode = PermissionNode<Ent,Permission>;
+    using PermNode::m_iter;
+    using PermNode::m_ent;
+    using PermNode::savePermission;
 public:
     //! Constructeur.
     using PermNode::PermissionNode;
+
+    NODE_COPIE(ArbrePermissionNode)
+
+    //! Enregistre les données du noeud.
+    void insert(bddMPS::Bdd & bdd) override{
+        idt idParent = 0;
+        if(!m_iter.parent().root())
+            idParent = static_cast<const PermNode &>(**m_iter.parent()).m_ent.id();
+        bdd.insert(m_ent,idParent,m_iter.position());
+        savePermission(bdd);
+    }
+};
+
+/*! \ingroup groupeModel
+ * \brief Classe des neuds du model de permission pour une entité de type arbre simple.
+ */
+template<class Ent, class Permission> class ArbreSimplePermissionNode : public PermissionNode<Ent,Permission> {
+protected:
+    using PermNode = PermissionNode<Ent,Permission>;
+    using PermNode::m_iter;
+    using PermNode::m_ent;
+    using PermNode::savePermission;
+public:
+    //! Constructeur.
+    using PermNode::PermissionNode;
+
+    //! Enregistre les données du noeud.
+    void insert(bddMPS::Bdd & bdd) override{
+        if(!m_iter.parent().root())
+            m_ent.setParent(static_cast<const PermNode &>(**m_iter.parent()).m_ent.id());
+        bdd.save(m_ent);
+        savePermission(bdd);
+    }
+};
+
+/*! \ingroup groupeModel
+ * \brief Classe des neuds du model de MotCle-permission.
+ */
+class MotClePermissionNode : public ArbrePermissionNode<entityMPS::MotCle,entityMPS::MotClePermission> {
+protected:
+    using APermNode = ArbrePermissionNode<entityMPS::MotCle,entityMPS::MotClePermission>;
+public:
+    //! Constructeur.
+    using APermNode::ArbrePermissionNode;
+
+    NODE_COPIE(MotClePermissionNode)
+
+    //! Accesseur des données du noeud.
+    QVariant data(int cible, int role, numt num = 0) const override;
+
+    //! Mutateur des données du noeud.
+    flag setData(int cible, const QVariant & value, int role, numt num = 0) override;
+};
+
+/*! \ingroup groupeModel
+ * \brief Model de gestion des type et de leur permission.
+ */
+class MotClePermissionModel : public PermissionModel {
+    Q_OBJECT
+public:
+    using MotClePermissionNode = ArbrePermissionNode<entityMPS::MotCle,entityMPS::MotClePermission>;
+    enum {NcNomOffset = 2};
+    //! Constructeur.
+    MotClePermissionModel(bddMPS::BddPredef &bdd, QObject * parent = nullptr);
+
+    //! Fabrique des noeuds.
+    Node nodeFactory(const NodeIndex & /*parent*/, numt /*pos*/, int /*type*/) override
+        {return std::make_unique<MotClePermissionNode>(this);}
+};
+
+/*! \ingroup groupeModel
+ * \brief Classe des neuds du model de Type-permission.
+ */
+class TypePermissionNode : public ArbreSimplePermissionNode<entityMPS::Type,entityMPS::TypePermission> {
+protected:
+    using APermNode = ArbreSimplePermissionNode<entityMPS::Type,entityMPS::TypePermission>;
+public:
+    //! Constructeur.
+    using APermNode::ArbreSimplePermissionNode;
 
     NODE_COPIE(TypePermissionNode)
 

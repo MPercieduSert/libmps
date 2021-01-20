@@ -48,6 +48,16 @@ void PermissionModel::setCible(entidt num, bool visible){
     }
 }
 
+//////////////////////////////////////////////////////// MotClePermissionModel ///////////////////////////////
+MotClePermissionModel::MotClePermissionModel(bddMPS::BddPredef &bdd, QObject * parent)
+    : PermissionModel(bdd,NcNomOffset,parent) {
+    m_data.setTree(bdd.getArbre<entityMPS::MotCle>(),[this](const entityMPS::MotCle & entity) {
+        auto node = std::make_unique<MotClePermissionNode>(this);
+        node->setEnt(entity);
+        return node;
+    });
+}
+
 //////////////////////////////////////////////////////// TypePermissionNode ///////////////////////////////
 QVariant TypePermissionNode::data(int cible, int role, numt num) const {
     if(cible == PermissionModel::RefCible && role == StringRole)
