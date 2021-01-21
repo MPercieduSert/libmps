@@ -178,7 +178,7 @@ void ManagersPredef::enableMotCle(const QString & motCle, const QString & motCle
     //Mot Clé
     auto infoArbre = infoBddArbre(motCleArbre);
     using UniqueMC = RefUniqueSql<MotCle>;
-    InfoBdd infoMC("MotCle",motCle,MotCle::NbrAtt);
+    InfoBdd infoMC("MotCle",motCle,MotCle::NbrAtt,{UniqueMC::NbrUnique});
     infoMC.setAttribut(MotCle::Nc,"nc",bmps::typeAttributBdd::Text);
     infoMC.setAttribut(MotCle::Nom,"nm",bmps::typeAttributBdd::Text);
     infoMC.setAttribut(MotCle::Ref,"ref",bmps::typeAttributBdd::Text,false);

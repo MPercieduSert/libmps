@@ -3,7 +3,7 @@
 
 <!--  Type -->
  <Type modification="non" suppression="non">
-<Nom>Configuratio"</Nom>
+<Nom>Configuration</Nom>
 <Nc>config</Nc>
 <Ref>config_root_tp</Ref> 
  </Type>
