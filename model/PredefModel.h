@@ -240,32 +240,28 @@ template<class Ent, class Permission> QVariant PermissionNode<Ent,Permission>::d
         break;
     case SubNodeCible:
         if(role == SubNodeRole){
-            if(num >= m_model->offset()) {
-                QList<QVariant> init;
+            QList<QVariant> init;
+            if(num >= m_model->offset())
                 init.append(PermissionModel::PermissionCible);
                 init.append(num - m_model->offset());
                 init.append(CodeSubNode);
                 return init;
-            }
             switch (num) {
-            case PermissionModel::NomPosition: {
-                QList<QVariant> init;
+            case PermissionModel::NomPosition:
                 init.append(PermissionModel::NomCible);
                 init.append(0);
                 init.append(LineEditSubNode);
-                return init;}
-            case PermissionModel::NcPosition: {
-                QList<QVariant> init;
+                return init;
+            case PermissionModel::NcPosition:
                 init.append(PermissionModel::NcCible);
                 init.append(0);
                 init.append(LineEditSubNode);
-                return init;}
-            case PermissionModel::RefPosition: {
-                QList<QVariant> init;
+                return init;
+            case PermissionModel::RefPosition:
                 init.append(PermissionModel::RefCible);
                 init.append(0);
                 init.append(LineEditSubNode);
-                return init;}
+                return init;
             }
         }
     }

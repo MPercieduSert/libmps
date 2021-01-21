@@ -89,7 +89,8 @@ enum subNodeType {
     CodeSubNode,
     ComboBoxSubNode,
     DateSubNode,
-    LineEditSubNode
+    LineEditSubNode,
+    TexteEditSubNode
 };
 
 //! Initialisation d'un sous-noeud.

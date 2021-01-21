@@ -9,6 +9,7 @@
 #include <QDateEdit>
 #include <QLabel>
 #include <QLineEdit>
+#include <QTextEdit>
 #include "CodeWidget.h"
 #include "NodeView.h"
 
@@ -138,6 +139,24 @@ protected:
     void updateDataSubNode(flag role) override;
 };
 
+/*! \ingroup groupeWidget
+ * \brief Classe des sous-noeuds d'un texte à éditer.
+ */
+class TexteEditNodeWidget : public SubNodeWidget {
+    Q_OBJECT
+protected:
+    QTextEdit * m_texteEdit;       //! Éditeur de texte du sous-noeud.
+public:
+    //! Constructeur.
+    TexteEditNodeWidget(const NodeIndex & index, QWidget * parent);
+
+    //! Met à jour le widget après un changement de drapeaux.
+    void updateFlags() override
+        {m_texteEdit->setReadOnly(!m_flags.test(modelMPS::EnableFlagNode));}
+protected:
+    //! Met à jour les données du label à partir des données du model.
+    void updateDataSubNode(flag role) override;
+};
 /*! \ingroup groupeWidget
  * \brief Classe dessinant les nodes widgets à angles arrondis.
  */

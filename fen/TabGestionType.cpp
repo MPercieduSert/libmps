@@ -24,7 +24,7 @@ TabGestionType::TabGestionType(bmps::Bdd & bdd, const std::pair<int, int> &pairI
     m_cibleListWidget->setSizePolicy(QSizePolicy::Minimum,QSizePolicy::Expanding);
     connect(m_cibleListWidget,&QListWidget::itemChanged,this,[this](QListWidgetItem * item)
         {m_model->setCible(item->data(Qt::UserRole).toUInt(), item->checkState() == Qt::Checked);});
-    connect(m_saveButton,&QPushButton::clicked,m_model,&modelMPS::TypePermissionModel::save);
+    connect(m_saveButton,&QPushButton::clicked,this,&TabGestionType::sauver);
 
     // Calque
     m_cibleLayout = new QVBoxLayout;
@@ -34,3 +34,6 @@ TabGestionType::TabGestionType(bmps::Bdd & bdd, const std::pair<int, int> &pairI
     m_mainLayout->addWidget(m_view);
     m_mainLayout->addLayout(m_cibleLayout);
 }
+
+void TabGestionType::becomeCurrent()
+    {emit actionPermise(fenMPS::SauverAction);}

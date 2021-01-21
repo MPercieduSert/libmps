@@ -106,6 +106,22 @@ void LineEditSubNodeWidget::updateDataSubNode(flag role) {
         m_lineEdit->setText(m_index.data(modelMPS::StringRole).toString());
 }
 
+////////////////////////////////////////////////// TexteEditSubNodeWidget //////////////////////////////////////////
+TexteEditNodeWidget::TexteEditNodeWidget(const NodeIndex & index, QWidget * parent)
+    : SubNodeWidget(index,parent) {
+    m_texteEdit = new QTextEdit;
+    m_mainLayout->addWidget(m_texteEdit);
+    connect(m_texteEdit,&QTextEdit::textChanged,[this]() {
+        if(connexionEnable())
+            m_index.model()->setData(m_index,m_texteEdit->toPlainText(),modelMPS::StringRole);});
+}
+
+void TexteEditNodeWidget::updateDataSubNode(flag role) {
+    SubNodeWidget::updateDataSubNode(role);
+    if(role.test(modelMPS::StringRole))
+        m_texteEdit->setPlainText(m_index.data(modelMPS::StringRole).toString());
+}
+
 ////////////////////////////////////////////////// RoundedArcPainter //////////////////////////////////////////
 void RoundedArcPainter::drawArc(ArcNodeViewWidget * arc) const{
     QPainter painter(arc);
@@ -229,12 +245,14 @@ SubNodeWidget * StandardNodeDelegate::createSubNode(const NodeIndex &index, QWid
     switch (info.at(modelMPS::TypeSubNode).toUInt()) {
     case modelMPS::CheckSubNode:
         return new CheckSubNodeWidget(indexSubNode,parent);
+    case modelMPS::ComboBoxSubNode:
+        return new ComboBoxSubNodeWidget(indexSubNode,parent);
     case modelMPS::DateSubNode:
         return  new DateSubNodeWidget(indexSubNode,parent);
     case modelMPS::LineEditSubNode:
         return new LineEditSubNodeWidget(indexSubNode,parent);
-    case modelMPS::ComboBoxSubNode:
-        return new ComboBoxSubNodeWidget(indexSubNode,parent);
+    case modelMPS::TexteEditSubNode:
+        return  new TexteEditNodeWidget(indexSubNode,parent);
     }
     return new SubNodeWidget(indexSubNode,parent);
 }

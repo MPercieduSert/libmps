@@ -38,8 +38,16 @@ public:
     TabGestionType(bmps::Bdd & bdd, const std::pair<int, int> &pairIndex, QWidget * parent = nullptr);
 
     //! Accesseur du titre.
-    QString title() const
+    QString title() const override
         {return QString("Gestion des types");}
+
+public slots:
+    //! Action à effectuer lorsque l'onglet devient actif.
+    void becomeCurrent() override;
+
+    //! Slot coorepondant à l'action sauver.
+    void sauver() override
+        {m_model->save();}
 };
 }
 
