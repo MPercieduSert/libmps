@@ -177,14 +177,18 @@ void ManagersPredef::enableMotCle(const QString & motCle, const QString & motCle
                                   std::unique_ptr<AbstractGestionRestriction<MotProgPermission>> &&  gestionProgPermission) {
     //Mot Clé
     auto infoArbre = infoBddArbre(motCleArbre);
+    using UniqueMC = RefUniqueSql<MotCle>;
     InfoBdd infoMC("MotCle",motCle,MotCle::NbrAtt);
     infoMC.setAttribut(MotCle::Nc,"nc",bmps::typeAttributBdd::Text);
     infoMC.setAttribut(MotCle::Nom,"nm",bmps::typeAttributBdd::Text);
+    infoMC.setAttribut(MotCle::Ref,"ref",bmps::typeAttributBdd::Text,false);
+    infoMC.setUnique(MotCle::Ref,UniqueMC::RefUnique);
     infoMC.setForeignKey(MotCle::Id,infoArbre);
     if(gestionMotCle)
-        setManager<MotCle>(std::make_unique<ManagerArbreModifControle<MotCle>>(infoMC,infoArbre,std::move(gestionMotCle)));
+        setManager<MotCle>(std::make_unique<ManagerArbreModifControle<MotCle>>(infoMC,infoArbre,std::move(gestionMotCle),
+                                                                               std::make_unique<UniqueMC>()));
     else
-        setManager<MotCle>(std::make_unique<ManagerArbre<MotCle>>(infoMC,infoArbre));
+        setManager<MotCle>(std::make_unique<ManagerArbre<MotCle>>(infoMC,infoArbre,std::make_unique<UniqueMC>()));
     setCible<MotCle>(bmps::cibleId::MotCle);
 
     // Cible Mot Clé

@@ -343,7 +343,7 @@ using namespace ensembleHistorique;
  * \brief Ensemble des classes de la fonctionalité mot clé.
  */
 namespace ensembleMotCle {
-using MotCle = ebmps::NcNomEntity<infoEntity::MotCleId>;
+using MotCle = ebmps::NcNomRefEntity<infoEntity::MotCleId>;
 ID1_ENTITY(MotCleCible,Cible,infoEntity::MotCleCibleId,MotCle)
 ID1_ENTITY(MotClePermission,IdCibleCode,infoEntity::MotClePermissionId,MotCle)
 ID1_ENTITY(MotProgCible,CibleRef,infoEntity::MotProgCibleId,MotCle)

@@ -364,7 +364,8 @@
 		\&
 		\entity{MotCle}{
 			nc\\
-			nom
+			nom\\
+			ref
 		}
 		\&
 		\relation{ciblageMotCle}
@@ -423,9 +424,11 @@
 		\&
 		\tableEntity{MotCle}{
 			nc&text&stringNotEmpty&nc&\\
-			nom&text&stringNotEmpty&nm&
+			nom&text&stringNotEmpty&nm&\\
+			ref&text&ref&ref&NULL
 		}{
 			\fkey{id}{ArbreMotCle}\\
+			\unique{ref}
 			ArbreModifControle*
 		}[\bdd]
 		\&

@@ -357,6 +357,44 @@ public:
 template<entidt IDM > NcNomTypeEntity<IDM>::~NcNomTypeEntity() {}
 
 /*! \ingroup groupeBaseEntity
+ * \brief Classe de base des entités ayant des attributs nc, nom et ref.
+ */
+template<entidt IDM > class NcNomRefEntity : public EntityID<IDM,NcNomRefAttribut> {
+public:
+    using EAID = EntityID<IDM,NcNomRefAttribut>;
+    //! Positions des attributs.
+    enum Position:post {Id = PositionEnum<IdAttribut,EAID>::Position,
+                   Nc = PositionEnum<NcAttribut,EAID>::Position,
+                   Nom = PositionEnum<NomAttribut,EAID>::Position,
+                   Ref = PositionEnum<RefAttribut,EAID>::Position,
+                   NbrAtt = EAID::NbrAtt};
+
+    using EntityID<IDM,NcNomRefAttribut>::EntityID;
+    using EAID::setNc;
+    using EAID::setNom;
+    using EAID::setRef;
+    BASE_ENTITY(NcNomRefEntity)
+
+    //! Constructeur à partir d'un jeux de valeurs attributs unique.
+    NcNomRefEntity(const QString & ref)
+        {setRef(ref);}
+
+    //! Constructeur à partir d'un jeux de valeurs attributs unique.
+    NcNomRefEntity(const QString & nom, idt id = 0)
+        : EAID (id)
+        {setNom(nom);}
+
+    //! Constructeur à partir des valeurs attributs.
+    NcNomRefEntity(const QString & nc, const QString & nom, const QString & ref, idt id = 0)
+        : NcNomRefEntity(nom,id) {
+        setNc(nc);
+        setRef(ref);
+    }
+};
+
+template<entidt IDM > NcNomRefEntity<IDM>::~NcNomRefEntity() {}
+
+/*! \ingroup groupeBaseEntity
  * \brief Classe de base des entités ayant des attributs nc, nom, ref et type.
  */
 template<entidt IDM > class NcNomRefTypeEntity : public EntityID<IDM,NcNomRefTypeAttribut> {

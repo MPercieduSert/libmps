@@ -17,8 +17,8 @@ PermissionModel::PermissionModel(bddMPS::BddPredef & bdd, enumt offset, QObject 
 numt PermissionModel::dataCount(const NodeIndex & index) const {
     switch (index.cible()) {
     case PermissionModel::NcCible:
-        return 1;
     case PermissionModel::NomCible:
+    case PermissionModel::RefCible:
         return 1;
     case PermissionModel::PermissionCible:
         return static_cast<numt>(m_cibleVec.size());
@@ -50,27 +50,12 @@ void PermissionModel::setCible(entidt num, bool visible){
 
 //////////////////////////////////////////////////////// MotClePermissionModel ///////////////////////////////
 MotClePermissionModel::MotClePermissionModel(bddMPS::BddPredef &bdd, QObject * parent)
-    : PermissionModel(bdd,NcNomOffset,parent) {
+    : PermissionModel(bdd,NcNomRefOffset,parent) {
     m_data.setTree(bdd.getArbre<entityMPS::MotCle>(),[this](const entityMPS::MotCle & entity) {
         auto node = std::make_unique<MotClePermissionNode>(this);
         node->setEnt(entity);
         return node;
     });
-}
-
-//////////////////////////////////////////////////////// TypePermissionNode ///////////////////////////////
-QVariant TypePermissionNode::data(int cible, int role, numt num) const {
-    if(cible == PermissionModel::RefCible && role == StringRole)
-            return m_ent.ref();
-    return PermNode::data(cible,role,num);
-}
-
-flag TypePermissionNode::setData(int cible, const QVariant & value, int role, numt num) {
-    if(cible == PermissionModel::RefCible && role == StringRole) {
-        m_ent.setRef(value.toString());
-        return StringRole;
-    }
-    return PermNode::setData(cible,value,role,num);
 }
 
 //////////////////////////////////////////////////////// TypePermissionModel ///////////////////////////////
@@ -81,10 +66,4 @@ TypePermissionModel::TypePermissionModel(bddMPS::BddPredef &bdd, QObject * paren
         node->setEnt(entity);
         return node;
     });
-}
-
-numt TypePermissionModel::dataCount(const NodeIndex & index) const {
-    if(index.cible() == PermissionModel::RefCible)
-        return 1;
-    return PermissionModel::dataCount(index);
 }
