@@ -4,7 +4,7 @@ using namespace dialogMPS;
 //////////////////////////////////////////////// EvenementNewModifForm ////////////////////////////////////////
 EvenementNewModifForm::EvenementNewModifForm(bddMPS::Bdd &bdd, bool newEnt, QWidget * parent)
     : AbstractTypeNcNomNewModifForm(static_cast<bddMPS::BddPredef &>(bdd),"evenement_root_tp",Evenement::ID,
-                                    "Type de l'événement :","Nom court de l'événement :","Nom de l'événement :",
+                                    "Type de l'événement :","Nom abrégé de l'événement :","Nom de l'événement :",
                                     newEnt,parent){
     // Nom
     if(!m_new)
@@ -293,4 +293,21 @@ void EvenementStyleNewModifForm::updateData() {
     m_texteLabel->setFont(font);
     font.fromString(style.policeTitre());
     m_titreLabel->setFont(font);
+}
+
+////////////////////////////////////////////////// SourceNewModifForm ///////////////////////////////////////////
+void SourceNewModifForm::save() {
+    Source src;
+    if(!m_new)
+        src.setId(id());
+    src.setNc(nc());
+    src.setNom(nom());
+    src.setType(idType());
+    m_bdd.save(src);
+}
+void SourceNewModifForm::updateData() {
+    if(!m_new) {
+        Source src;
+        updateTemp<Source>(src);
+    }
 }

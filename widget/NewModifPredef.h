@@ -154,6 +154,40 @@ protected:
     //! Mutateur de la couleur.
     void setColor(objet ob, const QColor & color);
 };
+
+/*! \ingroup groupeDialog
+ * \brief Formulaire de création et modification des sources.
+ */
+class SourceNewModifForm : public dialogMPS::AbstractTypeNcNomNewModifForm {
+    Q_OBJECT
+protected:
+    using Source = entityMPS::Source;
+public:
+    //! Constructeur.
+    SourceNewModifForm(bddMPS::Bdd & bdd, bool newEnt, QWidget * parent = nullptr)
+        : AbstractTypeNcNomNewModifForm(static_cast<bddMPS::BddPredef &>(bdd),"source_root_tp",Source::ID,
+                                        "Type de la source :","Nom abrégé de la source :","Nom de la source :",
+                                                                     newEnt,parent) {}
+
+    //!Destructeur.
+    ~SourceNewModifForm() override = default;
+
+    //! Titre de la fenêtre de dialogue.
+    QString title() const override
+        {return m_new ? tr("Création d'une nouvelle source") :
+                        tr("Modification d'une source existante");}
+
+public slots:
+    //! Supprime le type d'établissement dans la bases de donnée.
+    bool del() override
+        {return !m_new && m_bdd.del(Source(id()));}
+
+    //! Sauve le type d'établissement et les réponces du formulairs dans la bases de donnée.
+    void save() override;
+
+    //! Met à jour le formulaire.
+    void updateData() override;
+};
 }
 
 #endif // NEWMODIFPREDEF_H

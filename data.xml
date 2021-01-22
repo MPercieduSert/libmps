@@ -18,6 +18,34 @@
 <Restriction code="modification|suppression"/>
 <Permission in="TypePermission" id_ent="IdType"  cible="Donnee" code="Visible|Attribuable" restriction="modification|suppression"/>
 </Type> 
+ <Type modification="non" suppression="non">
+<Nom>Source</Nom>
+<Nc>source</Nc>
+<Ref>source_root_tp</Ref> 
+ </Type>
+ 
+ <!-- TypePermission -->
+ <TypePermission modification="non" suppression="non">
+<IdType>
+  <Ref>config_root_tp</Ref>
+</IdType> 
+<Cible>Donnee</Cible>
+<Code>Visible</Code>
+ </TypePermission>
+ <TypePermission modification="non" suppression="non">
+<IdType>
+  <Ref>valeur_defaut_tp</Ref>
+</IdType> 
+<Cible>Donnee</Cible>
+<Code>Visible,Attribuable</Code>
+ </TypePermission>
+ <TypePermission modification="non" suppression="non">
+<IdType>
+  <Ref>source_root_tp</Ref>
+</IdType> 
+<Cible>Source</Cible>
+<Code>Visible</Code>
+ </TypePermission>
  
  <!-- Donnee -->
  <Donnee>
