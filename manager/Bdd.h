@@ -466,13 +466,29 @@ public:
     void insert(Entity & entity, idt idParent, int num = 0);
 
     //! Enregistre l'entité entity en base avec le parent et la position spécifiés.
+    void insert(Entity & entity, idt idParent, numt num = 0)
+        {insert(entity,idParent,static_cast<int>(num));}
+
+    //! Enregistre l'entité entity en base avec le parent et la position spécifiés.
     template<class Ent> void insert(Ent & entity, idt idParent, int num = 0);
+
+    //! Enregistre l'entité entity en base avec le parent et la position spécifiés.
+    template<class Ent> void insert(Ent & entity, idt idParent, numt num = 0)
+        {insert(entity,idParent,static_cast<int>(num));}
 
     //! Enregistre l'entité entity en base avec le parent et la position spécifiés.
     void insert(const Entity & entity, idt idParent, int num = 0);
 
     //! Enregistre l'entité entity en base avec le parent et la position spécifiés.
+    void insert(const Entity & entity, idt idParent, numt num = 0)
+        {insert(entity,idParent,static_cast<int>(num));}
+
+    //! Enregistre l'entité entity en base avec le parent et la position spécifiés.
     template<class Ent> void insert(const Ent & entity, idt idParent, int num = 0);
+
+    //! Enregistre l'entité entity en base avec le parent et la position spécifiés.
+    template<class Ent> void insert(const Ent & entity, idt idParent, numt num = 0)
+        {insert(entity,idParent,static_cast<int>(num));}
 
     //! Teste si la base de donnée est valide.
     bool isValid() noexcept override
