@@ -378,7 +378,7 @@ public:
 
     public:
         //! Constructeur.
-        const_abstract_iterator(void * node) noexcept
+        const_abstract_iterator(void * node = nullptr) noexcept
             : m_ptr(static_cast<Item *>(node)) {}
 
         ///////////////// begin ////////////
@@ -471,7 +471,7 @@ public:
 
     protected:
         //! Constructeur.
-        const_abstract_iterator(Item * node = nullptr) noexcept
+        const_abstract_iterator(Item * node) noexcept
             : m_ptr(node) {}
 
         //! Renvoie un référence sur le noeud courant.

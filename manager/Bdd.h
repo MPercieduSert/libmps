@@ -55,6 +55,7 @@ using Entity = entityMPS::Entity;
 class Bdd : public fichierMPS::FileInterface
 {
 protected:
+    using xml_iterator = fichierMPS::XmlDoc::const_brother_iterator;
     QSqlDatabase m_bdd;                 //!< Connexion à la base de donnée.
     std::unique_ptr<managerMPS::Managers> m_manager;         //!< Manager des entités.
     const std::vector<int> m_version;                //!< Version de la base de donnée requis par le programme
@@ -83,9 +84,6 @@ public:
 
     //! Ajoute des restrictions de modification pour une entité donnée.
     void addRestriction(const Entity & entity, flag restrict);
-
-    //! Renvoie un arbre avec les valeurs contenues dans le XmlDox à l'endroit pointé par iter.
-    entityBaseMPS::Arbre arbreXml(fichierMPS::XmlDoc::const_brother_iterator iter, QString & controle);
 
     //! Vérifie si le fichier de chemin name existe et est un fichier de base de donnée valide, si c'est le cas,
     //! le fichier de la base de donnée est remplacé par une copie du fichier de chemin name.
@@ -621,6 +619,12 @@ public:
         {return testAutorisationP(entity.id(),entity.idEntity(),autoris);}
 
 protected:
+    //! Renvoie un arbre avec les valeurs contenues dans le XmlDox à l'endroit pointé par iter.
+    entityBaseMPS::Arbre arbreXml(xml_iterator iter, QString & controle);
+
+    //! Enregistre les données xml associées à une entité dans la base de donnée.
+    virtual void associatedXml(Entity & entity, xml_iterator iter, QString & controle);
+
     //! Création de la table de l'entité en base de donnée.
     template<class Ent> void creerTable()
         {m_manager->get<Ent>().creer();}
@@ -642,11 +646,11 @@ protected:
         {return m_manager->get(idEntity).del(id);}
 
     //! Hydrate un attribut de l'entité par la valeur contenue dans le XmlDox à l'endroit pointé par iter.
-    virtual void hydrateAttributXml(entityMPS::Entity & entity, post pos,
-                                       fichierMPS::XmlDoc::const_brother_iterator iter, QString & controle);
+    virtual void hydrateAttributXml(Entity & entity, post pos, xml_iterator iter, QString & controle);
 
-    //! Hydrate l'entité avec les valeurs contenues dans le XmlDox à l'endroit pointé par iter.
-    void hydrateEntityXml(entityMPS::Entity & entity, fichierMPS::XmlDoc::const_brother_iterator iter, QString & controle);
+    //! Hydrate l'entité avec les valeurs contenues dans le XmlDox à l'endroit pointé par iter
+    //! renvoie la liste des itérateurs sur les données associées.
+    std::list<xml_iterator> hydrateEntityXml(Entity & entity, xml_iterator iter, QString & controle);
 
     //! Mise à jour de la base de donnée.
     virtual void listeMiseAJourBdd(int /*version*/, idt /*type*/) {}
@@ -654,8 +658,8 @@ protected:
     //! Ouverture de la base de donnée.
     bool openBdd();
 
-    //! Renvoie les restriction avec les valeurs contenues dans le XmlDox à l'endroit pointé par iter.
-    flag restrictionXml(fichierMPS::XmlDoc::const_brother_iterator iter);
+    //! Renvoie les restriction à partir d'une chaine de caractère (séparateur "|").
+    flag restrictionFromQString(const QString & str, QString &controle);
 
     //! Enregistre les entités de vector dans la base de donnée.
     template<class Ent,class Conteneur> void saveConteneur(const Conteneur & vector);

@@ -2,75 +2,53 @@
 <entities>
 
 <!--  Type -->
- <Type modification="non" suppression="non">
+ <Type>
 <Nom>Configuration</Nom>
 <Nc>config</Nc>
 <Ref>config_root_tp</Ref> 
+<Restriction code="modification,suppression"/>
+<Permission in="TypePermission" cible="Donnee" code="Visible" restriction="modification,suppression"/>
  </Type>
-<Type modification="non" suppression="non">
+<Type>
 <Parent>
   <Ref>config_root_tp</Ref>
 </Parent>
 <Nom>Valeur par defaut</Nom>
 <Nc>defaut</Nc>
 <Ref>valeur_defaut_tp</Ref>
+<Restriction code="modification,suppression"/>
+<Permission in="TypePermission" cible="Donnee" code="Visible,Attribuable" restriction="modification,suppression"/>
 </Type> 
  
- <!-- TypePermission -->
- <TypePermission modification="non" suppression="non">
-<IdType>
-  <Ref>config_root_tp</Ref>
-</IdType> 
-<Cible>Donnee</Cible>
-<Code>Visible</Code>
- </TypePermission>
- <TypePermission modification="non" suppression="non">
-<IdType>
-  <Ref>valeur_defaut_tp</Ref>
-</IdType> 
-<Cible>Donnee</Cible>
-<Code>Visible,Attribuable</Code>
- </TypePermission>
  
  <!-- Donnee -->
- <Donnee modification="non" suppression="non">
- <Valeur>
+ <Donnee>
  <Nom>Configuration</Nom>
  <Ref>config_root_dn</Ref>
  <Type>
   <Ref>config_root_tp</Ref> 
  </Type>
  <TpVal>NoDonnee</TpVal>
- </Valeur>
+ <Restriction code="modification,suppression"/>
  </Donnee>
- <Donnee modification="non" suppression="non">
- <Arbre>
- <Parent>
-  <Ref>config_root_dn</Ref> 
- </Parent>
- </Arbre>
- <Valeur>
+ <Donnee>
+ <Arbre refParent="config_root_dn"/>
  <Nom>Valeur par defaut</Nom>
  <Ref>valeur_defaut_dn</Ref>
  <Type>
   <Ref>config_root_tp</Ref> 
  </Type>
  <TpVal>NoDonnee</TpVal>
- </Valeur>
+ <Restriction code="modification,suppression"/>
  </Donnee>
- <Donnee modification="non" suppression="non">
-   <Arbre>
-   <Parent> 
-   <Ref>valeur_defaut_dn</Ref>
-   </Parent>   
-   </Arbre>
-   <Valeur>
-    <Nom>Date par defaut</Nom>
+ <Donnee>
+   <Arbre refParent="valeur_defaut_dn"/>
+  <Nom>Date par defaut</Nom>
   <Ref>date_defaut_dn</Ref>
  <Type>
   <Ref>valeur_defaut_tp</Ref> 
  </Type>
  <TpVal>Date</TpVal>
-   </Valeur>
+   <Restriction code="modification,suppression"/>
  </Donnee>
 </entities>
