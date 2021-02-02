@@ -622,6 +622,17 @@ protected:
     //! Renvoie un arbre avec les valeurs contenues dans le XmlDox à l'endroit pointé par iter.
     entityBaseMPS::Arbre arbreXml(xml_iterator iter, QString & controle);
 
+    //! Cherche un attribut dans un noeud xml puis renvoie sa valeur.
+    QString attributXml(xml_iterator iter, const QString & attribut, QString & controle) const {
+        auto iter_att = iter->attributes().find(attribut);
+        if(iter_att == iter->attributes().cend()) {
+            controle.append("Le noeud ne possède pas d'attribut : ").append(attribut);
+            return QString();
+        }
+        else
+            return iter_att->second;
+    }
+
     //! Enregistre les données xml associées à une entité dans la base de donnée.
     virtual void associatedXml(Entity & entity, xml_iterator iter, QString & controle);
 
@@ -657,6 +668,16 @@ protected:
 
     //! Ouverture de la base de donnée.
     bool openBdd();
+
+    //! Position d'un attribut dans l'entité.
+    post positionXml(const Entity & entity, const QString & attribut, QString & controle) const {
+        auto pos = entity.position(attribut);
+        if(pos == entity.nbrAtt())
+            controle.append("L'entité de type : ").append(m_manager->info(entity.idEntity()).name())
+                    .append("\nne possède pas d'attribut : ").append(attribut)
+                    .append("\nL'entité : ").append(entity.affiche());
+        return pos;
+    }
 
     //! Renvoie les restriction à partir d'une chaine de caractère (séparateur "|").
     flag restrictionFromQString(const QString & str, QString &controle);

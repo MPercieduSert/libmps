@@ -6,8 +6,8 @@
 <Nom>Configuration</Nom>
 <Nc>config</Nc>
 <Ref>config_root_tp</Ref> 
-<Restriction code="modification,suppression"/>
-<Permission in="TypePermission" cible="Donnee" code="Visible" restriction="modification,suppression"/>
+<Restriction code="modification|suppression"/>
+<Permission in="TypePermission" id_ent="IdType" cible="Donnee" code="Visible" restriction="modification|suppression"/>
  </Type>
 <Type>
 <Parent>
@@ -16,10 +16,9 @@
 <Nom>Valeur par defaut</Nom>
 <Nc>defaut</Nc>
 <Ref>valeur_defaut_tp</Ref>
-<Restriction code="modification,suppression"/>
-<Permission in="TypePermission" cible="Donnee" code="Visible,Attribuable" restriction="modification,suppression"/>
+<Restriction code="modification|suppression"/>
+<Permission in="TypePermission" id_ent="IdType"  cible="Donnee" code="Visible|Attribuable" restriction="modification|suppression"/>
 </Type> 
- 
  
  <!-- Donnee -->
  <Donnee>
@@ -29,7 +28,7 @@
   <Ref>config_root_tp</Ref> 
  </Type>
  <TpVal>NoDonnee</TpVal>
- <Restriction code="modification,suppression"/>
+ <Restriction code="modification|suppression"/>
  </Donnee>
  <Donnee>
  <Arbre refParent="config_root_dn"/>
@@ -39,7 +38,7 @@
   <Ref>config_root_tp</Ref> 
  </Type>
  <TpVal>NoDonnee</TpVal>
- <Restriction code="modification,suppression"/>
+ <Restriction code="modification|suppression"/>
  </Donnee>
  <Donnee>
    <Arbre refParent="valeur_defaut_dn"/>
@@ -49,6 +48,6 @@
   <Ref>valeur_defaut_tp</Ref> 
  </Type>
  <TpVal>Date</TpVal>
-   <Restriction code="modification,suppression"/>
+   <Restriction code="modification|suppression"/>
  </Donnee>
 </entities>

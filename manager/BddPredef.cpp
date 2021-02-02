@@ -3,6 +3,13 @@
 using namespace bddMPS;
 using namespace entityMPS;
 
+void BddPredef::associatedXml(Entity & entity, xml_iterator iter, QString & controle) {
+    if(iter->name() == "Permission")
+        permissionXml(entity,iter,controle);
+    else
+        Bdd::associatedXml(entity,iter,controle);
+}
+
 flag BddPredef::code(idt idEntity, const QString & str) const {
     switch (idEntity) {
     case TypePermission::ID:
@@ -154,6 +161,66 @@ void BddPredef::delEntityInDonnee(idt idCible, int cible, int num) {
     }
 }
 
+void BddPredef::permissionXml(Entity &entity, xml_iterator iter, QString & controle) {
+    // In -> entité de permission
+    auto in_att = attributXml(iter,"in",controle);
+    if(controle.isEmpty()) {
+        auto perm = makeEntity(in_att);
+        if(!perm)
+            controle.append("L'entité ").append(in_att)
+                    .append(" de l'atribut 'in' dans le noeud Permission est inconnue.");
+        else {
+            // Id1 -> identifiant de l'entité
+            auto att = attributXml(iter,"id_ent",controle);
+            if(controle.isEmpty()) {
+                auto pos = positionXml(*perm,att,controle);
+                if(controle.isEmpty()) {
+                    perm->setData(pos,entity.id());
+                    // cible -> Cible
+                    att = attributXml(iter,"cible",controle);
+                    if(controle.isEmpty()) {
+                        pos = positionXml(*perm,"Cible",controle);
+                        if(controle.isEmpty()) {
+                            auto i = m_manager->find(att);
+                            if(i == nbrEntity())
+                                controle.append("La valeur de l'attribut cible est inconnue : ").append(att);
+                            else
+                                entity.setData(pos, cible(i));
+                            // code -> permission
+                            att = attributXml(iter,"code",controle);
+                            if(controle.isEmpty()) {
+                                auto code_list = att.split("|");
+                                flag code_flag;
+                                for (auto code_iter = code_list.cbegin();
+                                     code_iter != code_list.cend() && controle.isEmpty(); ++code_iter) {
+                                    auto code_value = code(perm->idEntity(),*code_iter);
+                                    if (code_value == code::Invalide)
+                                        controle.append("Valeur de l'attribut code invalide : ").append(*code_iter);
+                                    else
+                                        code_flag |= code_value;
+                                }
+                                if(controle.isEmpty()) {
+                                    pos = positionXml(*perm,"Code",controle);
+                                    if(controle.isEmpty()) {
+                                        perm->setData(pos,code_flag.value());
+                                        existsUnique(*perm);
+                                        save(*perm);
+                                        auto iter_restrict = iter->attributes().find("restriction");
+                                        if(iter_restrict != iter->attributes().cend())
+                                            setRestriction(*perm,restrictionFromQString(iter_restrict->second,controle));
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    if(!controle.isEmpty())
+        controle.append("\nPermission associé à l'entité :\n").append(entity.affiche());
+}
+
 bool BddPredef::testAutorisationP(idt id, entidt idEntity, flag autoris) {
     auto controle = Bdd::testAutorisationP(id,idEntity,autoris);
     if(autoris & Suppr) {
@@ -258,7 +325,7 @@ bool BddPredef::testAutorisationP(idt id, entidt idEntity, flag autoris) {
     return controle;
 }
 
-void BddPredef::hydrateAttributXml(entityMPS::Entity & entity, post pos, fichierMPS::XmlDoc::const_brother_iterator iter, QString &controle){
+void BddPredef::hydrateAttributXml(entityMPS::Entity & entity, post pos, xml_iterator iter, QString &controle){
     if(iter->name() == "Cible") {
         auto i = m_manager->find(iter->text());
         if(i == nbrEntity())

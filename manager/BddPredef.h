@@ -100,18 +100,23 @@ public:
     //! Renvoie l'enumeration associé à str pour une entitée de type idEntity.
     virtual int strToEnum(idt idEntity, const QString & str) const;
 protected:
+    //! Enregistre les données xml associées à une entité dans la base de donnée.
+    void associatedXml(Entity & entity, xml_iterator iter, QString & controle) override;
+
     //! Supprime l'entité d'identifiant id de type d'identifiant idEntity de la base de données.
     bool delP(idt id, entidt idEntity) override;
 
     //! Hydrate un attribut de l'entité par la valeur contenue dans le XmlDox à l'endroit pointé par iter.
-    void hydrateAttributXml(entityMPS::Entity & entity, post pos,
-                            fichierMPS::XmlDoc::const_brother_iterator iter, QString & controle) override;
+    void hydrateAttributXml(entityMPS::Entity & entity, post pos, xml_iterator iter, QString & controle) override;
 
     //! Renvoie le numero de début d'enregistrement d'une entité.
     std::pair<int, int> intervalEntityInDonnee(idt idCible, int cible, int num);
 
     //! Mise à jour de la base de donnée.
     void listeMiseAJourBdd(int version, idt type) override;
+
+    //! Enregistre une permission dans la base de donnée.
+    void permissionXml(Entity & entity, xml_iterator iter, QString & controle);
 
     //! Renvoie l'autorisation de modification de l'entité donnée en argument.
     bool testAutorisationP(idt id, entidt idEntity, flag autoris) override;
