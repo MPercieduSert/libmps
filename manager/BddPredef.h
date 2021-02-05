@@ -115,6 +115,9 @@ protected:
     //! Mise à jour de la base de donnée.
     void listeMiseAJourBdd(int version, idt type) override;
 
+    //! Enregistre un mot clé dans la base de donnée.
+    void motCleXml(Entity & entity, xml_iterator iter, QString & controle);
+
     //! Enregistre une permission dans la base de donnée.
     void permissionXml(Entity & entity, xml_iterator iter, QString & controle);
 

@@ -1,21 +1,20 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <entities>
-
 <!--  Type -->
  <Type>
 <Nom>Configuration</Nom>
 <Nc>config</Nc>
-<Ref>config_root_tp</Ref> 
+<Ref>config_root</Ref> 
 <Restriction code="modification|suppression"/>
 <Permission in="TypePermission" id_ent="IdType" cible="Donnee" code="Visible" restriction="modification|suppression"/>
  </Type>
 <Type>
 <Parent>
-  <Ref>config_root_tp</Ref>
+  <Ref>config_root</Ref>
 </Parent>
 <Nom>Valeur par defaut</Nom>
 <Nc>defaut</Nc>
-<Ref>valeur_defaut_tp</Ref>
+<Ref>valeur_defaut</Ref>
 <Restriction code="modification|suppression"/>
 <Permission in="TypePermission" id_ent="IdType"  cible="Donnee" code="Visible|Attribuable" restriction="modification|suppression"/>
 </Type> 
@@ -23,29 +22,29 @@
  <!-- Donnee -->
  <Donnee>
  <Nom>Configuration</Nom>
- <Ref>config_root_dn</Ref>
+ <Ref>config_root</Ref>
  <Type>
-  <Ref>config_root_tp</Ref> 
+  <Ref>config_root</Ref> 
  </Type>
  <TpVal>NoDonnee</TpVal>
  <Restriction code="modification|suppression"/>
  </Donnee>
  <Donnee>
- <Arbre refParent="config_root_dn"/>
+ <Arbre ref_parent="config_root"/>
  <Nom>Valeur par defaut</Nom>
- <Ref>valeur_defaut_dn</Ref>
+ <Ref>valeur_defaut</Ref>
  <Type>
-  <Ref>config_root_tp</Ref> 
+  <Ref>config_root</Ref> 
  </Type>
  <TpVal>NoDonnee</TpVal>
  <Restriction code="modification|suppression"/>
  </Donnee>
  <Donnee>
-   <Arbre refParent="valeur_defaut_dn"/>
+   <Arbre ref_parent="valeur_defaut"/>
   <Nom>Date par defaut</Nom>
-  <Ref>date_defaut_dn</Ref>
+  <Ref>date_defaut</Ref>
  <Type>
-  <Ref>valeur_defaut_tp</Ref> 
+  <Ref>valeur_defaut</Ref> 
  </Type>
  <TpVal>Date</TpVal>
    <Restriction code="modification|suppression"/>

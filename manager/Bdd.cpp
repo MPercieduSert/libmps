@@ -5,7 +5,7 @@ using namespace bddMPS;
 entityBaseMPS::Arbre Bdd::arbreXml(xml_iterator iter, QString & controle){
     entityBaseMPS::Arbre arbre;
     for (auto att_iter = iter->attributes().cbegin(); att_iter != iter->attributes().cend() && controle.isEmpty(); ++att_iter) {
-        if(att_iter->first == "refParent") {
+        if(att_iter->first == "ref_parent") {
             auto parent = makeEntity(iter.parent()->name());
             parent->setData(parent->position("Ref"),att_iter->second);
             if (existsUnique(*parent))

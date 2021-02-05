@@ -6,6 +6,8 @@ using namespace entityMPS;
 void BddPredef::associatedXml(Entity & entity, xml_iterator iter, QString & controle) {
     if(iter->name() == "Permission")
         permissionXml(entity,iter,controle);
+    if(iter->name() == "MotCle")
+        motCleXml(entity,iter,controle);
     else
         Bdd::associatedXml(entity,iter,controle);
 }
@@ -161,6 +163,26 @@ void BddPredef::delEntityInDonnee(idt idCible, int cible, int num) {
     }
 }
 
+void BddPredef::motCleXml(Entity & entity, xml_iterator iter, QString & controle){
+    auto att = attributXml(iter,"ref_mot_cle",controle);
+    if(controle.isEmpty()){
+        entityMPS::MotCle mc;
+        mc.setRef(att);
+        if(!existsUnique(mc))
+            controle.append("La référence de mot clé est inconnu : ").append(att);
+        else {
+            entityMPS::MotCleCible mcCible;
+            mcCible.setIdMotCle(mc.id());
+            mcCible.setCible(cible(entity.idEntity()));
+            mcCible.setIdCible(entity.id());
+            existsUnique(mcCible);
+            save(mcCible);
+        }
+    }
+    if(!controle.isEmpty())
+        controle.append("\nMot clé associé à l'entité :\n").append(entity.affiche());
+}
+
 void BddPredef::permissionXml(Entity &entity, xml_iterator iter, QString & controle) {
     // In -> entité de permission
     auto in_att = attributXml(iter,"in",controle);
@@ -176,38 +198,46 @@ void BddPredef::permissionXml(Entity &entity, xml_iterator iter, QString & contr
                 auto pos = positionXml(*perm,att,controle);
                 if(controle.isEmpty()) {
                     perm->setData(pos,entity.id());
-                    // cible -> Cible
-                    att = attributXml(iter,"cible",controle);
+                    // code -> permission
+                    att = attributXml(iter,"code",controle);
                     if(controle.isEmpty()) {
-                        pos = positionXml(*perm,"Cible",controle);
-                        if(controle.isEmpty()) {
-                            auto i = m_manager->find(att);
-                            if(i == nbrEntity())
-                                controle.append("La valeur de l'attribut cible est inconnue : ").append(att);
+                        auto code_list = att.split("|");
+                        flag code_flag;
+                        for (auto code_iter = code_list.cbegin();
+                             code_iter != code_list.cend() && controle.isEmpty(); ++code_iter) {
+                            auto code_value = code(perm->idEntity(),*code_iter);
+                            if (code_value == code::Invalide)
+                                controle.append("Valeur de l'attribut code invalide : ").append(*code_iter);
                             else
-                                entity.setData(pos, cible(i));
-                            // code -> permission
-                            att = attributXml(iter,"code",controle);
+                                code_flag |= code_value;
+                        }
+                        if(controle.isEmpty()) {
+                            pos = positionXml(*perm,"Code",controle);
                             if(controle.isEmpty()) {
-                                auto code_list = att.split("|");
-                                flag code_flag;
-                                for (auto code_iter = code_list.cbegin();
-                                     code_iter != code_list.cend() && controle.isEmpty(); ++code_iter) {
-                                    auto code_value = code(perm->idEntity(),*code_iter);
-                                    if (code_value == code::Invalide)
-                                        controle.append("Valeur de l'attribut code invalide : ").append(*code_iter);
-                                    else
-                                        code_flag |= code_value;
-                                }
+                                perm->setData(pos,code_flag.value());
+                                // cible -> Cible
+                                att = attributXml(iter,"cible",controle);
                                 if(controle.isEmpty()) {
-                                    pos = positionXml(*perm,"Code",controle);
+                                    pos = positionXml(*perm,"Cible",controle);
                                     if(controle.isEmpty()) {
-                                        perm->setData(pos,code_flag.value());
-                                        existsUnique(*perm);
-                                        save(*perm);
-                                        auto iter_restrict = iter->attributes().find("restriction");
-                                        if(iter_restrict != iter->attributes().cend())
-                                            setRestriction(*perm,restrictionFromQString(iter_restrict->second,controle));
+                                        auto cible_list = att.split("|");
+                                        for(auto cible_iter = cible_list.cbegin();
+                                            cible_iter != cible_list.cend() && controle.isEmpty(); ++cible_iter) {
+                                            auto i = m_manager->find(*cible_iter);
+                                            if(i == nbrEntity())
+                                                controle.append("La valeur de l'attribut cible est inconnue : ")
+                                                        .append(*cible_iter);
+                                            else
+                                                entity.setData(pos, cible(i));
+                                            if(controle.isEmpty()) {
+                                                entity.setId(0);
+                                                existsUnique(*perm);
+                                                save(*perm);
+                                                auto iter_restrict = iter->attributes().find("restriction");
+                                                if(iter_restrict != iter->attributes().cend())
+                                                    setRestriction(*perm,restrictionFromQString(iter_restrict->second,controle));
+                                            }
+                                        }
                                     }
                                 }
                             }
