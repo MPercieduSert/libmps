@@ -683,6 +683,10 @@ protected:
     //! renvoie la liste des itérateurs sur les données associées.
     std::list<xml_iterator> hydrateEntityXml(Entity & entity, xml_iterator iter, QString & controle);
 
+    //! Teste si un attribut d'une entité associée est multiple.
+    virtual bool isMultipleAssociatedXml(const QString & /*att*/) const
+        {return false;}
+
     //! Mise à jour de la base de donnée.
     virtual void listeMiseAJourBdd(int /*version*/, idt /*type*/) {}
 

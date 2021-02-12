@@ -116,6 +116,9 @@ protected:
     //! Renvoie le numero de début d'enregistrement d'une entité.
     std::pair<int, int> intervalEntityInDonnee(idt idCible, int cible, int num);
 
+    //! Teste si un attribut d'une entité associée est multiple.
+    bool isMultipleAssociatedXml(const QString & att) const override;
+
     //! Mise à jour de la base de donnée.
     void listeMiseAJourBdd(int version, idt type) override;
 

@@ -163,6 +163,7 @@ void BddPredef::delEntityInDonnee(idt idCible, int cible, int num) {
     }
 }
 
+<<<<<<< HEAD
 void BddPredef::hydrateAttributXml(entityMPS::Entity & entity, post pos, xml_iterator iter, QString &controle){
     if(iter->name() == "Cible") {
         auto i = m_manager->find(iter->text());
@@ -257,6 +258,12 @@ void BddPredef::motCleXml(Entity & entity, xml_iterator iter, QString & controle
     }
     if(!controle.isEmpty())
         controle.append("\nMot clé associé à l'entité :\n").append(entity.affiche());
+=======
+bool BddPredef::isMultipleAssociatedXml(const QString & att) const {
+    if(att == "cible")
+        return true;
+    return Bdd::isMultipleAssociatedXml(att);
+>>>>>>> Début multipleAssociatedXml
 }
 
 void BddPredef::permissionXml(Entity &entity, xml_iterator iter, QString & controle) {
