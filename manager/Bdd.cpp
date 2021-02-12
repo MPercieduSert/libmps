@@ -42,9 +42,16 @@ void Bdd::associatedXml(Entity & entity, xml_iterator iter, QString & controle) 
         auto iter_code = iter->attributes().find("code");
         setRestriction(entity,restrictionFromQString(iter_code->second,controle));
     }
-    else if (iter->name() != "Arbre")
-        controle.append("Donnée associée invalide : ").append(iter->name())
-                .append("\n Pour l'entitée : \n").append(entity.affiche());
+    else if (iter->name() != "Arbre"){
+        auto ent_ass = makeEntity(iter->name());
+        if(!ent_ass)
+            controle.append("Donnée associée invalide : ").append(iter->name())
+                    .append("\n Pour l'entitée : \n").append(entity.affiche());
+        else
+            for (auto iter_att = iter->attributes().cbegin();
+                 iter_att != iter->attributes().cend() && controle.isEmpty(); ++iter_att)
+                hydrateAttributAssociatedXml(*ent_ass,*iter_att,entity,controle);
+    }
 }
 
 bool Bdd::copy(const QString & name) {
@@ -112,6 +119,20 @@ void Bdd::hydrateAttributXml(entityMPS::Entity & entity, post pos,
         if(!controle.isEmpty())
             controle.prepend("->").prepend(fkey_iter->second);
     }
+}
+
+void Bdd::hydrateAttributAssociatedXml(Entity &entity_ass, const std::pair<const QString,QString> &pair,
+                                       const Entity &entity, QString &controle) {
+    if(pair.first == "id_ent"){
+        auto pos = positionXml(entity_ass,pair.second,controle);
+        if(controle.isEmpty())
+            entity_ass.setData(pos,entity.id());
+    }
+    else
+        controle.append("L'attribut est inconnue : ").append(pair.first);
+    if(!controle.isEmpty())
+        controle.append("\nDans l'entité associée : \n").append(entity_ass.affiche())
+                .append("\nDans l'entité : \n").append(entity.affiche());
 }
 
 std::list<Bdd::xml_iterator> Bdd::hydrateEntityXml(entityMPS::Entity & entity, xml_iterator iter, QString &controle) {

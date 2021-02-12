@@ -109,6 +109,10 @@ protected:
     //! Hydrate un attribut de l'entité par la valeur contenue dans le XmlDox à l'endroit pointé par iter.
     void hydrateAttributXml(entityMPS::Entity & entity, post pos, xml_iterator iter, QString & controle) override;
 
+    //! Hydrate un attribut de l'entité entity_ass associée à entity avec le couple pair<clé,valeur>.
+    void hydrateAttributAssociatedXml(Entity & entity_ass, const std::pair<const QString,QString> & pair,
+                                      const Entity & entity, QString & controle) override;
+
     //! Renvoie le numero de début d'enregistrement d'une entité.
     std::pair<int, int> intervalEntityInDonnee(idt idCible, int cible, int num);
 

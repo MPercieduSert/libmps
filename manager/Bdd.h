@@ -659,6 +659,10 @@ protected:
     //! Hydrate un attribut de l'entité par la valeur contenue dans le XmlDox à l'endroit pointé par iter.
     virtual void hydrateAttributXml(Entity & entity, post pos, xml_iterator iter, QString & controle);
 
+    //! Hydrate un attribut de l'entité entity_ass associée à entity avec le couple pair<clé,valeur>.
+    virtual void hydrateAttributAssociatedXml(Entity &entity_ass, const std::pair<const QString,QString> &pair,
+                                               const Entity &entity, QString &controle);
+
     //! Hydrate l'entité avec les valeurs contenues dans le XmlDox à l'endroit pointé par iter
     //! renvoie la liste des itérateurs sur les données associées.
     std::list<xml_iterator> hydrateEntityXml(Entity & entity, xml_iterator iter, QString & controle);
