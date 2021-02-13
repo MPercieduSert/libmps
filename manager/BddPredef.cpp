@@ -3,31 +3,6 @@
 using namespace bddMPS;
 using namespace entityMPS;
 
-void BddPredef::associatedXml(Entity & entity, xml_iterator iter, QString & controle) {
-    if(iter->name() == "Permission")
-        permissionXml(entity,iter,controle);
-    if(iter->name() == "MotCle")
-        motCleXml(entity,iter,controle);
-    else
-        Bdd::associatedXml(entity,iter,controle);
-}
-
-flag BddPredef::code(idt idEntity, const QString & str) const {
-    switch (idEntity) {
-    case TypePermission::ID:
-        if(str == "Interdit")
-            return code::Interdit;
-        if(str == "Visible")
-            return code::Visible;
-        if(str== "Attribuable")
-            return code::Attribuable;
-        break;
-    default:
-        return code::Invalide;
-    }
-    return code::Invalide;
-}
-
 bool BddPredef::delP(idt id, entidt idEntity) {
     auto controle = true;
     // Spécifique
@@ -163,56 +138,28 @@ void BddPredef::delEntityInDonnee(idt idCible, int cible, int num) {
     }
 }
 
-<<<<<<< HEAD
-void BddPredef::hydrateAttributXml(entityMPS::Entity & entity, post pos, xml_iterator iter, QString &controle){
-    if(iter->name() == "Cible") {
+void BddPredef::hydrateAttributXml(entityMPS::Entity & entity, post pos, xml_iterator iter, const QString &type, QString &controle){
+    if(type.isEmpty())
+        Bdd::hydrateAttributXml(entity, pos,iter,type,controle);
+    else if(type == "cible") {
         auto i = m_manager->find(iter->text());
         if(i == nbrEntity())
             controle.append("Cible invalide : ").append(iter->text());
         else
             entity.setData(pos, cible(i));
     }
-    else if(iter->name() == "Code") {
-        auto list = iter->text().split(",");
-        flag fl;
-        for(auto iter_list = list.cbegin(); controle.isEmpty() && iter_list != list.cend(); ++iter_list) {
-            auto cd = code(entity.idEntity(),*iter_list);
-            if (cd != code::Invalide)
-                fl |= cd;
-            else
-                controle.append("Code Invalide : ").append(*iter_list);
-        }
-        if(controle.isEmpty())
-            entity.setData(pos, fl.value());
-    }
-    else if(iter->name() == "Card" || iter->name() == "Exact" || iter->name() == "TpVal") {
-        auto i = strToEnum(entity.idEntity(),iter->text());
-        if(i == InvalideEnum)
-            controle.append(iter->name()).append("->Enum invalide : ").append(iter->text());
-        else
-            entity.setData(pos, i);
-    }
-    else
-        Bdd::hydrateAttributXml(entity, pos,iter,controle);
 }
 
 void BddPredef::hydrateAttributAssociatedXml(Entity &entity_ass, const std::pair<const QString,QString> &pair,
                                              const Entity &entity, QString &controle) {
-    if(pair.first == "code") {
-        auto code_list = pair.second.split("|");
-        flag code_flag;
-        for (auto code_iter = code_list.cbegin();
-             code_iter != code_list.cend() && controle.isEmpty(); ++code_iter) {
-            auto code_value = code(entity_ass.idEntity(),*code_iter);
-            if (code_value == code::Invalide)
-                controle.append("Valeur de l'attribut code invalide : ").append(*code_iter);
-            else
-                code_flag |= code_value;
-        }
-        if(controle.isEmpty()) {
-            auto pos = positionXml(entity_ass,"Code",controle);
+    if(pair.first == "cible"){
+        auto i = m_manager->find(pair.second);
+        if(i == nbrEntity())
+            controle.append("La valeur de l'attribut cible est inconnue : ").append(pair.second);
+        else{
+            auto pos = positionXml(entity_ass,"Cible",controle);
             if(controle.isEmpty())
-                entity_ass.setData(pos,code_flag.value());
+                entity_ass.setData(pos, cible(i));
         }
     }
     else
@@ -240,98 +187,21 @@ std::pair<int, int> BddPredef::intervalEntityInDonnee(idt idCible, int cible, in
     return interval;
 }
 
-void BddPredef::motCleXml(Entity & entity, xml_iterator iter, QString & controle){
-    auto att = attributXml(iter,"ref_mot_cle",controle);
-    if(controle.isEmpty()){
-        entityMPS::MotCle mc;
-        mc.setRef(att);
-        if(!existsUnique(mc))
-            controle.append("La référence de mot clé est inconnu : ").append(att);
-        else {
-            entityMPS::MotCleCible mcCible;
-            mcCible.setIdMotCle(mc.id());
-            mcCible.setCible(cible(entity.idEntity()));
-            mcCible.setIdCible(entity.id());
-            existsUnique(mcCible);
-            save(mcCible);
-        }
-    }
-    if(!controle.isEmpty())
-        controle.append("\nMot clé associé à l'entité :\n").append(entity.affiche());
-=======
-bool BddPredef::isMultipleAssociatedXml(const QString & att) const {
-    if(att == "cible")
-        return true;
-    return Bdd::isMultipleAssociatedXml(att);
->>>>>>> Début multipleAssociatedXml
+bool BddPredef::isMultipleAssociatedXml(const std::pair<const QString, QString> &pair) const {
+    if(pair.first == "cible")
+        return pair.second.contains("|");
+    return Bdd::isMultipleAssociatedXml(pair);
 }
 
-void BddPredef::permissionXml(Entity &entity, xml_iterator iter, QString & controle) {
-    // In -> entité de permission
-    auto in_att = attributXml(iter,"in",controle);
-    if(controle.isEmpty()) {
-        auto perm = makeEntity(in_att);
-        if(!perm)
-            controle.append("L'entité ").append(in_att)
-                    .append(" de l'atribut 'in' dans le noeud Permission est inconnue.");
-        else {
-//            // Id1 -> identifiant de l'entité
-//            auto att = attributXml(iter,"id_ent",controle);
-//            if(controle.isEmpty()) {
-//                auto pos = positionXml(*perm,att,controle);
-//                if(controle.isEmpty()) {
-//                    perm->setData(pos,entity.id());
-                    // code -> permission
-//                    att = attributXml(iter,"code",controle);
-//                    if(controle.isEmpty()) {
-//                        auto code_list = att.split("|");
-//                        flag code_flag;
-//                        for (auto code_iter = code_list.cbegin();
-//                             code_iter != code_list.cend() && controle.isEmpty(); ++code_iter) {
-//                            auto code_value = code(perm->idEntity(),*code_iter);
-//                            if (code_value == code::Invalide)
-//                                controle.append("Valeur de l'attribut code invalide : ").append(*code_iter);
-//                            else
-//                                code_flag |= code_value;
-//                        }
-//                        if(controle.isEmpty()) {
-//                            pos = positionXml(*perm,"Code",controle);
-//                            if(controle.isEmpty()) {
-//                                perm->setData(pos,code_flag.value());
-                                // cible -> Cible
-                                att = attributXml(iter,"cible",controle);
-                                if(controle.isEmpty()) {
-                                    pos = positionXml(*perm,"Cible",controle);
-                                    if(controle.isEmpty()) {
-                                        auto cible_list = att.split("|");
-                                        for(auto cible_iter = cible_list.cbegin();
-                                            cible_iter != cible_list.cend() && controle.isEmpty(); ++cible_iter) {
-                                            auto i = m_manager->find(*cible_iter);
-                                            if(i == nbrEntity())
-                                                controle.append("La valeur de l'attribut cible est inconnue : ")
-                                                        .append(*cible_iter);
-                                            else
-                                                entity.setData(pos, cible(i));
-                                            if(controle.isEmpty()) {
-                                                entity.setId(0);
-                                                existsUnique(*perm);
-                                                save(*perm);
-                                                auto iter_restrict = iter->attributes().find("restriction");
-                                                if(iter_restrict != iter->attributes().cend())
-                                                    setRestriction(*perm,restrictionFromQString(iter_restrict->second,controle));
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
+Bdd::xml_list_atts BddPredef::listMultipleAssociatedXml(const std::pair<const QString,QString> &pair, QString &controle) {
+    if(pair.first == "cible"){
+        xml_list_atts list;
+        auto cibles = pair.second.split("|");
+        for (auto iter = cibles.cbegin(); iter != cibles.cend(); ++iter)
+            list.push_back({pair.first,*iter});
+        return list;
     }
-    if(!controle.isEmpty())
-        controle.append("\nPermission associé à l'entité :\n").append(entity.affiche());
+    return Bdd::listMultipleAssociatedXml(pair,controle);
 }
 
 bool BddPredef::testAutorisationP(idt id, entidt idEntity, flag autoris) {
@@ -438,7 +308,7 @@ bool BddPredef::testAutorisationP(idt id, entidt idEntity, flag autoris) {
     return controle;
 }
 
-int BddPredef::strToEnum(idt idEntity, const QString & str) const {
+enumt BddPredef::strIdToEnum(const QString & str, idt idEntity, QString &controle) const noexcept {
     switch (idEntity) {
     case Donnee::ID:
         if(str == "NoDonnee")
@@ -466,10 +336,21 @@ int BddPredef::strToEnum(idt idEntity, const QString & str) const {
         if(str == "Au moins")
             return donnee::AuMoins;
         break;
-    default:
-        return InvalideEnum;
+    case EvenementStyle::ID:
+        if(str == "Rectangle")
+            return EvenementStyle::Rectangle;
+        return strCategorieToEnum(str,LineStyle|BrushStyle,controle);
+        break;
+    case TypePermission::ID:
+        if(str == "Interdit")
+            return code::Interdit;
+        if(str == "Visible")
+            return code::Visible;
+        if(str== "Attribuable")
+            return code::Attribuable;
+        break;
     }
-    return InvalideEnum;
+    return Bdd::strIdToEnum(str,idEntity,controle);
 }
 
 void BddPredef::listeMiseAJourBdd(int version, idt type) {
@@ -498,31 +379,7 @@ void BddPredef::listeMiseAJourBdd(int version, idt type) {
             //Evenement
             if(managers().ensembleEnable(EvenementEnable)) {
                 creerTable<EvenementStyle>();
-                EvenementStyle style;
-                style.setBordure(Qt::SolidLine);
-                style.setCouleurBordure(QColor(Qt::black).name());
-                style.setCouleurFond(QColor(Qt::gray).name());
-                style.setCouleurTexte(QColor(Qt::black).name());
-                style.setCouleurTitre(QColor(Qt::black).name());
-                style.setForme(EvenementStyle::Rectangle);
-                style.setNom("Style par défaut");
-                style.setPoliceTexte(QFont("Times", 10).toString());
-                style.setPoliceTitre(QFont("Times", 14, QFont::Bold).toString());
-                style.setTexture(Qt::SolidPattern);
-                save(style);
                 creerTable<Evenement>();
-                if(managers().ensembleEnable(TypeEnable)){
-                    Type tpEve;
-                    tpEve.setRef("evenement_root_tp");
-                    tpEve.setNc("Événement");
-                    tpEve.setNom("Événement");
-                    save(tpEve);
-                    TypePermission permEve;
-                    permEve.setIdType(tpEve.id());
-                    permEve.setCible(cible<Evenement>());
-                    permEve.setCode(code::Visible);
-                    save(permEve);
-                }
                 creerTable<EvenementCible>();
             }
             //Historique

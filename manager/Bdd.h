@@ -6,6 +6,7 @@
 
 #include <functional>
 #include <memory>
+#include <QFont>
 #include <QString>
 #include <QSqlDatabase>
 #include <QSqlQuery>
@@ -56,11 +57,20 @@ class Bdd : public fichierMPS::FileInterface
 {
 protected:
     using xml_iterator = fichierMPS::XmlDoc::const_brother_iterator;
+    using xml_list_atts = std::list<std::pair<QString,QString>>;
     QSqlDatabase m_bdd;                 //!< Connexion à la base de donnée.
     std::unique_ptr<managerMPS::Managers> m_manager;         //!< Manager des entités.
     const std::vector<int> m_version;                //!< Version de la base de donnée requis par le programme
-
 public:
+    enum {InvalideEnum = 0x1000000,
+          NoEntity
+         };
+    enum categorie : flag::flag_type {RestrictionCode = 0x1,
+                                      LineStyle = 0x2,
+                                      BrushStyle = 0x4,
+                                      FontWeight = 0x8
+
+                   };
     //! Constructeur. Donner en argument le type ainsi que le chemin de la base de donnée.
     Bdd(const QString & dbtype, const std::vector<int> & version, std::unique_ptr<managerMPS::Managers> && manager = nullptr)
         : FileInterface(QString(),"Data Base files (*.db)"),
@@ -83,7 +93,11 @@ public:
         {m_bdd.close();}
 
     //! Ajoute des restrictions de modification pour une entité donnée.
-    void addRestriction(const Entity & entity, flag restrict);
+    void addRestriction(const Entity & entity, flag restrict)
+        {m_manager->get(entity.idEntity()).addRestriction(entity.id(), restrict);}
+
+    //! Renvoie le code associé à une chaine de caractère (séparateur "|") pour l'entité identity.
+    flag codeFromQString(const QString & str, uint idCat, bool forEntity,  QString &controle) const;
 
     //! Vérifie si le fichier de chemin name existe et est un fichier de base de donnée valide, si c'est le cas,
     //! le fichier de la base de donnée est remplacé par une copie du fichier de chemin name.
@@ -627,11 +641,18 @@ public:
     int sizeChild(const Entity & entity)
         {return m_manager->get(entity.id()).sizeChild(entity);}
 
-    //! Convertit la chaine de caractères représentant une restriction.
-    static flag strToRestriction(const QString & str) noexcept;
+    //! Renvoie l'enumeration associé à str pour un groupe de catégorie.
+    virtual enumt strCategorieToEnum(const QString &str, flag categorie, QString & controle) const noexcept;
+
+    //! Renvoie l'enumeration associé à str pour une entitée d'identifiant idEntity.
+    virtual enumt strIdToEnum(const QString &str, idt idEntity, QString & controle) const noexcept {
+        controle.append("Enum invalide pour l'entité d'identifiant ").append(QString::number(static_cast<uint>(idEntity)))
+                .append(": ").append(str);
+        return InvalideEnum;
+    }
 
     //! Teste l'autorisation de modification de l'entité donnée en argument.
-    bool testAutorisation(const Entity & entity, flag autoris)
+    bool testAutorisation(const Entity &entity, flag autoris)
         {return testAutorisationP(entity.id(),entity.idEntity(),autoris);}
 
 protected:
@@ -673,7 +694,7 @@ protected:
         {return m_manager->get(idEntity).del(id);}
 
     //! Hydrate un attribut de l'entité par la valeur contenue dans le XmlDox à l'endroit pointé par iter.
-    virtual void hydrateAttributXml(Entity & entity, post pos, xml_iterator iter, QString & controle);
+    virtual void hydrateAttributXml(Entity & entity, post pos, xml_iterator iter, const QString & type, QString & controle);
 
     //! Hydrate un attribut de l'entité entity_ass associée à entity avec le couple pair<clé,valeur>.
     virtual void hydrateAttributAssociatedXml(Entity &entity_ass, const std::pair<const QString,QString> &pair,
@@ -683,12 +704,19 @@ protected:
     //! renvoie la liste des itérateurs sur les données associées.
     std::list<xml_iterator> hydrateEntityXml(Entity & entity, xml_iterator iter, QString & controle);
 
+    //! Teste si un attribut d'une entité associée doit être pris en compte après l'enregistrement.
+    virtual bool isAfterAssociatedXml(const std::pair<const QString,QString> &pair) const
+        {return pair.first == "restriction";}
+
     //! Teste si un attribut d'une entité associée est multiple.
-    virtual bool isMultipleAssociatedXml(const QString & /*att*/) const
+    virtual bool isMultipleAssociatedXml(const std::pair<const QString,QString> &/*pair*/) const
         {return false;}
 
     //! Mise à jour de la base de donnée.
     virtual void listeMiseAJourBdd(int /*version*/, idt /*type*/) {}
+
+    //! Renvoie la liste des attributs associés un attribut multiple.
+    virtual xml_list_atts listMultipleAssociatedXml(const std::pair<const QString,QString> &pair, QString & controle);
 
     //! Ouverture de la base de donnée.
     bool openBdd();
@@ -702,9 +730,6 @@ protected:
                     .append("\nL'entité : ").append(entity.affiche());
         return pos;
     }
-
-    //! Renvoie les restriction à partir d'une chaine de caractère (séparateur "|").
-    flag restrictionFromQString(const QString & str, QString &controle);
 
     //! Enregistre les entités de vector dans la base de donnée.
     template<class Ent,class Conteneur> void saveConteneur(const Conteneur & vector);

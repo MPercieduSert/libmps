@@ -15,7 +15,6 @@ namespace bddMPS {
                         NbrVersionPredef};}
 
     namespace code {
-        enum invalide : flag::flag_type {Invalide = 0x1000000};
         enum permission : flag::flag_type {Interdit = 0,
                               Visible = 0x1,
                               Attribuable = 0x2};
@@ -48,7 +47,6 @@ namespace bddMPS {
  */
 class BddPredef : public Bdd {
 public:
-    enum {InvalideEnum = 0x10000};
     //! Constructeur. Donner en argument le type ainsi que le chemin de la base de donnée.
     BddPredef(const QString & dbtype, const std::vector<int> & version, std::unique_ptr<managerMPS::ManagersPredef> && manager)
         : Bdd(dbtype,version,std::move(manager)) {}
@@ -68,9 +66,6 @@ public:
     //! Retourne le numéro de cible associé à un type d'entité.
     template<class Ent> int cible() const
         {return managers().cible<Ent>();}
-
-    //! Renvoie le drapeau associé à str pour une entitée de type idEntity.
-    virtual flag code(idt idEntity, const QString & str) const;
 
     //! Suppresseur d'une entité enregistrée comme donnée.
     void delEntityInDonnee(idt idCible, int cible, int num = 0);
@@ -98,16 +93,15 @@ public:
     template<class Ent> void setEntityInDonnee(const Ent & entity, idt idCible, int cible, int num = 0);
 
     //! Renvoie l'enumeration associé à str pour une entitée de type idEntity.
-    virtual int strToEnum(idt idEntity, const QString & str) const;
-protected:
-    //! Enregistre les données xml associées à une entité dans la base de donnée.
-    void associatedXml(Entity & entity, xml_iterator iter, QString & controle) override;
+    enumt strIdToEnum(const QString & str, idt idEntity, QString &controle) const noexcept override;
 
+protected:
     //! Supprime l'entité d'identifiant id de type d'identifiant idEntity de la base de données.
     bool delP(idt id, entidt idEntity) override;
 
     //! Hydrate un attribut de l'entité par la valeur contenue dans le XmlDox à l'endroit pointé par iter.
-    void hydrateAttributXml(entityMPS::Entity & entity, post pos, xml_iterator iter, QString & controle) override;
+    void hydrateAttributXml(entityMPS::Entity & entity, post pos, xml_iterator iter,
+                            const QString &type, QString & controle) override;
 
     //! Hydrate un attribut de l'entité entity_ass associée à entity avec le couple pair<clé,valeur>.
     void hydrateAttributAssociatedXml(Entity & entity_ass, const std::pair<const QString,QString> & pair,
@@ -117,16 +111,13 @@ protected:
     std::pair<int, int> intervalEntityInDonnee(idt idCible, int cible, int num);
 
     //! Teste si un attribut d'une entité associée est multiple.
-    bool isMultipleAssociatedXml(const QString & att) const override;
+    bool isMultipleAssociatedXml(const std::pair<const QString,QString> &pair) const override;
 
     //! Mise à jour de la base de donnée.
     void listeMiseAJourBdd(int version, idt type) override;
 
-    //! Enregistre un mot clé dans la base de donnée.
-    void motCleXml(Entity & entity, xml_iterator iter, QString & controle);
-
-    //! Enregistre une permission dans la base de donnée.
-    void permissionXml(Entity & entity, xml_iterator iter, QString & controle);
+    //! Renvoie la liste des attributs associés un attribut multiple.
+    xml_list_atts listMultipleAssociatedXml(const std::pair<const QString,QString> &pair, QString & controle) override;
 
     //! Renvoie l'autorisation de modification de l'entité donnée en argument.
     bool testAutorisationP(idt id, entidt idEntity, flag autoris) override;

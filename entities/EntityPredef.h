@@ -25,14 +25,14 @@ namespace donnee {
                 Contenu};
 
     //! Différents types des valeurs des données
-    enum typeVal {NoDonnee = -1,
-                  Int = 0,
-                  String = 1,
-                  Bool = 2,
-                  Float = 3,
-                  Double = 4,
-                  Date = 5,
-                  DateTime = 6};
+    enum typeVal {NoDonnee = 0,
+                  Int = 1,
+                  String = 2,
+                  Bool = 3,
+                  Float = 4,
+                  Double = 5,
+                  Date = 6,
+                  DateTime = 7};
 
     //! Exact
     enum cardinalCode {Exact,

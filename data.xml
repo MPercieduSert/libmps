@@ -6,7 +6,7 @@
 <Nc>config</Nc>
 <Ref>config_root</Ref> 
 <Restriction code="modification|suppression"/>
-<Permission in="TypePermission" id_ent="IdType" cible="Donnee" code="Visible" restriction="modification|suppression"/>
+<TypePermission id_ent="IdType" cible="Donnee" code="Visible" restriction="modification|suppression"/>
  </Type>
 <Type>
 <Parent>
@@ -16,36 +16,21 @@
 <Nc>defaut</Nc>
 <Ref>valeur_defaut</Ref>
 <Restriction code="modification|suppression"/>
-<Permission in="TypePermission" id_ent="IdType"  cible="Donnee" code="Visible|Attribuable" restriction="modification|suppression"/>
+<TypePermission id_ent="IdType"  cible="Donnee" code="Visible|Attribuable" restriction="modification|suppression"/>
 </Type> 
- <Type modification="non" suppression="non">
+ <Type>
 <Nom>Source</Nom>
 <Nc>source</Nc>
-<Ref>source_root_tp</Ref> 
+<Ref>source_root</Ref> 
+<Restriction code="modification|suppression"/>
  </Type>
- 
- <!-- TypePermission -->
- <TypePermission modification="non" suppression="non">
-<IdType>
-  <Ref>config_root_tp</Ref>
-</IdType> 
-<Cible>Donnee</Cible>
-<Code>Visible</Code>
- </TypePermission>
- <TypePermission modification="non" suppression="non">
-<IdType>
-  <Ref>valeur_defaut_tp</Ref>
-</IdType> 
-<Cible>Donnee</Cible>
-<Code>Visible,Attribuable</Code>
- </TypePermission>
- <TypePermission modification="non" suppression="non">
-<IdType>
-  <Ref>source_root_tp</Ref>
-</IdType> 
-<Cible>Source</Cible>
-<Code>Visible</Code>
- </TypePermission>
+ <Type>
+ <Nom>Événement</Nom>
+ <Nc>Événement</Nc>
+ <Ref>even_root</Ref>
+ <Restriction code="modification|suppression"/>
+ <TypePermission id_ent="IdType"  cible="Evenement" code="Visible" restriction="modification|suppression"/>
+ </Type>
  
  <!-- Donnee -->
  <Donnee>
@@ -77,4 +62,25 @@
  <TpVal>Date</TpVal>
    <Restriction code="modification|suppression"/>
  </Donnee>
+ 
+ <!-- Evenement -->
+ <EvenementStyle>
+ <Nom>Style par défaut</Nom>
+ <Bordure type="enum">SolideLine</Bordure>
+ <CouleurBordure type="couleur">black</CouleurBordure>
+ <CouleurFond type="couleur">gray</CouleurFond>
+ <CouleurTexte type="couleur">black</CouleurTexte>
+ <CouleurTitre type="couleur">Black</CouleurTitre>
+ <Forme type="enum">Rectangle</Forme>
+ <PoliceTexte type="police">
+ <Famille>Times</Famille>
+ <Taille>10</Taille>
+ </PoliceTexte>
+ <PoliceTitre type="police">
+<Famille>Times</Famille>
+<Taille>14</Taille>
+<Poids>Bold</Poids> 
+ </PoliceTitre>
+ <Texture>SolidPattern</Texture>
+ </EvenementStyle>
 </entities>
