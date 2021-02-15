@@ -62,7 +62,7 @@ void Bdd::associatedXml(Entity & entity, xml_iterator iter, QString & controle) 
                 else if(isAfterAssociatedXml(*iter_att))
                     after_atts.push_back(iter_att);
                 else
-                    hydrateAttributAssociatedXml(*ent_ass,*iter_att,entity,controle);
+                    hydrateAttributAssociatedControledXml(*ent_ass,*iter_att,entity,controle);
             }
             if(controle.isEmpty()) {
                 if(multi_atts.empty()){
@@ -72,7 +72,7 @@ void Bdd::associatedXml(Entity & entity, xml_iterator iter, QString & controle) 
                     else
                         save(*ent_ass);
                     for (auto iter = after_atts.cbegin(); iter != after_atts.cend() && controle.isEmpty(); ++iter)
-                        hydrateAttributAssociatedXml(*ent_ass,**iter,entity,controle);
+                        hydrateAttributAssociatedControledXml(*ent_ass,**iter,entity,controle);
                 }
                 else {
                     std::list<xml_list_atts> multi;
@@ -81,9 +81,9 @@ void Bdd::associatedXml(Entity & entity, xml_iterator iter, QString & controle) 
                     std::list<xml_list_atts::const_iterator> multi_iter;
                     for (auto iter = multi.cbegin(); iter != multi.cend() && controle.isEmpty(); ++iter) {
                         multi_iter.push_back(iter->cbegin());
-                        hydrateAttributAssociatedXml(*ent_ass,*(iter->cbegin()),entity,controle);
+                        hydrateAttributAssociatedControledXml(*ent_ass,*(iter->cbegin()),entity,controle);
                     }
-                    if(!controle.isEmpty()) {
+                    if(controle.isEmpty()) {
                         auto controle_while = true;
                         while(controle_while && controle.isEmpty()){
                             ent_ass->setId(0);
@@ -93,7 +93,7 @@ void Bdd::associatedXml(Entity & entity, xml_iterator iter, QString & controle) 
                             else
                                 save(*ent_ass);
                             for (auto iter = after_atts.cbegin(); iter != after_atts.cend() && controle.isEmpty(); ++iter)
-                                hydrateAttributAssociatedXml(*ent_ass,**iter,entity,controle);
+                                hydrateAttributAssociatedControledXml(*ent_ass,**iter,entity,controle);
                             if(controle.isEmpty()) {
                                 auto iter_iter = multi_iter.begin();
                                 auto iter_multi = multi.cbegin();
@@ -104,7 +104,7 @@ void Bdd::associatedXml(Entity & entity, xml_iterator iter, QString & controle) 
                                         *iter_iter = iter_multi->cbegin();
                                         controle_do = true;
                                     }
-                                    hydrateAttributAssociatedXml(*ent_ass,**iter_iter,entity,controle);
+                                    hydrateAttributAssociatedControledXml(*ent_ass,**iter_iter,entity,controle);
                                     if(controle_do) {
                                         ++iter_iter;
                                         ++iter_multi;
@@ -116,8 +116,6 @@ void Bdd::associatedXml(Entity & entity, xml_iterator iter, QString & controle) 
                     }
                 }
             }
-            if(!controle.isEmpty())
-                controle.prepend(QString("-> Dans l'entité associée : \n").append(ent_ass->affiche()).append("\n"));
         }
     }
 }
@@ -283,16 +281,15 @@ std::list<Bdd::xml_iterator> Bdd::hydrateEntityXml(entityMPS::Entity & entity, x
         else {
             auto pos = entity.position(sub_iter->name());
             if(pos == entity.nbrAtt())
-                controle.append("-> Attribut inconnue dans l'entité : ").append(info(entity).name());
+                controle.append("-> Attribut ").append(sub_iter->name()).append(" de valeur : ").append(sub_iter->text())
+                        .append("\ninconnue dans l'entité : \n").append(info(entity).name()).append("\n")
+                        .append(entity.affiche());
             else
-                hydrateAttributXml(entity, pos, sub_iter,
+                hydrateAttributControledXml(entity, pos, sub_iter,
                                    sub_iter->hasAttributes() ? sub_iter->attributes().cbegin()->second : QString(),
                                    controle);
 
         }
-        if(!controle.isEmpty())
-            controle.prepend(QString("-> Dans l'attribut : ").append(sub_iter->name())
-                             .append(" de valeur : ").append(sub_iter->text()).append("\n"));
     }
     return assotiated;
 }
@@ -334,7 +331,7 @@ QString Bdd::importXml(const fichierMPS::XmlDoc & doc){
                 }
                 if(controle.isEmpty())
                     for (auto iter_list = associated.cbegin(); iter_list != associated.cend() && controle.isEmpty(); ++iter_list)
-                        associatedXml(*entity,*iter_list,controle);
+                        associatedControledXml(*entity,*iter_list,controle);
             }
             if(!controle.isEmpty())
                 controle.prepend(QString("-> Dans l'entité :\n").append(entity->affiche()).append("\n"));

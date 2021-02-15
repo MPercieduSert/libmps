@@ -671,6 +671,15 @@ protected:
     //! Enregistre les données xml associées à une entité dans la base de donnée.
     virtual void associatedXml(Entity & entity, xml_iterator iter, QString & controle);
 
+    //! Enregistre les données xml associées à une entité dans la base de donnée
+    //! et complète le message d'erreur si besoin.
+    void associatedControledXml(Entity & entity, xml_iterator iter, QString & controle) {
+        associatedXml(entity,iter,controle);
+        if(!controle.isEmpty())
+            controle.prepend(QString("-> Dans l'entité associée : ").append(iter->name()).append("\n"));
+    }
+
+
     //! Création de la table de l'entité en base de donnée.
     template<class Ent> void creerTable()
         {m_manager->get<Ent>().creer();}
@@ -694,9 +703,28 @@ protected:
     //! Hydrate un attribut de l'entité par la valeur contenue dans le XmlDox à l'endroit pointé par iter.
     virtual void hydrateAttributXml(Entity & entity, post pos, xml_iterator iter, const QString & type, QString & controle);
 
+    //! Hydrate un attribut de l'entité par la valeur contenue dans le XmlDox à l'endroit pointé par iter
+    //! et complète le message d'erreur si besoin.
+    void hydrateAttributControledXml(Entity & entity, post pos, xml_iterator iter, const QString & type, QString & controle) {
+        hydrateAttributXml(entity,pos,iter,type,controle);
+        if(!controle.isEmpty())
+            controle.prepend(QString("-> Dans le noeud d'attribut : ")
+                             .append(iter->name()).append(" -> ").append(iter->text()).append("\n"));
+    }
+
+
     //! Hydrate un attribut de l'entité entity_ass associée à entity avec le couple pair<clé,valeur>.
     virtual void hydrateAttributAssociatedXml(Entity &entity_ass, const std::pair<const QString,QString> &pair,
                                                const Entity &entity, QString &controle);
+
+    //! Hydrate un attribut de l'entité entity_ass associée à entity avec le couple pair<clé,valeur>
+    //! et complète le message d'erreur si besoin.
+    void hydrateAttributAssociatedControledXml(Entity &entity_ass, const std::pair<const QString,QString> &pair,
+                                              const Entity &entity, QString &controle){
+        hydrateAttributAssociatedXml(entity_ass,pair,entity,controle);
+        if(!controle.isEmpty())
+            controle.prepend(QString("-> Dans l'attribut : ").append(pair.first).append(" = ").append(pair.second).append("\n"));
+    }
 
     //! Hydrate l'entité avec les valeurs contenues dans le XmlDox à l'endroit pointé par iter
     //! renvoie la liste des itérateurs sur les données associées.
@@ -715,6 +743,15 @@ protected:
 
     //! Renvoie la liste des attributs associés un attribut multiple.
     virtual xml_list_atts listMultipleAssociatedXml(const std::pair<const QString,QString> &pair, QString & controle);
+
+    //! Renvoie la liste des attributs associés un attribut multiple.
+    virtual xml_list_atts listMultipleAssociatedControledXml(const std::pair<const QString,QString> &pair, QString & controle){
+        auto list = listMultipleAssociatedXml(pair,controle);
+        if(!controle.isEmpty())
+            controle.prepend(QString("-> Dans la liste d'attribut multiple : ")
+                             .append(pair.first).append(" = ").append(pair.second));
+        return list;
+    }
 
     //! Ouverture de la base de donnée.
     bool openBdd();

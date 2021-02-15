@@ -157,11 +157,45 @@ void BddPredef::hydrateAttributAssociatedXml(Entity &entity_ass, const std::pair
     if(pair.first == "cible"){
         auto i = m_manager->find(pair.second);
         if(i == nbrEntity())
-            controle.append("La valeur de l'attribut cible est inconnue : ").append(pair.second);
+            controle.append("-> La valeur de l'attribut cible est inconnue : ").append(pair.second);
         else{
             auto pos = positionXml(entity_ass,"Cible",controle);
             if(controle.isEmpty())
                 entity_ass.setData(pos, cible(i));
+        }
+    }
+    else if (pair.first == "id1_cible") {
+        if(info(entity_ass).foreignKeyName().size() != 1)
+            controle.append("-> Pour utilisé l'attribut id1_cible, l'entité associé doit avoir exactement une clé étrangère.");
+        else {
+            entity_ass.setData(info(entity_ass).foreignKeyName().cbegin()->first,entity.id());
+            hydrateAttributAssociatedXml(entity_ass,{"cible",pair.second},entity,controle);
+        }
+    }
+    else if (pair.first == "idcible_id1") {
+        auto pos = positionXml(entity_ass,"IdCible",controle);
+        if(controle.isEmpty()) {
+            entity_ass.setData(pos,entity.id());
+            pos = positionXml(entity_ass,"Cible",controle);
+            if(controle.isEmpty()){
+                entity_ass.setData(pos,cible(entity.idEntity()));
+                if(info(entity_ass).foreignKeyName().size() != 1)
+                    controle.append("-> Pour utilisé l'attribut idcible_id1,")
+                            .append("l'entité associé doit avoir exactement une clé étrangère : ")
+                            .append(entity_ass.affiche());
+                else {
+                    auto fkey_iter = info(entity_ass).foreignKeyName().cbegin();
+                    auto fkey_entity = makeEntity(fkey_iter->second);
+                    pos = positionXml(*fkey_entity,"Ref",controle);
+                    if(controle.isEmpty()) {
+                        fkey_entity->setData(pos,pair.second);
+                        if(existsUnique(*fkey_entity))
+                            entity_ass.setData(fkey_iter->first,fkey_entity->id());
+                        else
+                            controle.append("-> Entité unique intouvable: \n").append(fkey_entity->affiche());
+                    }
+                }
+            }
         }
     }
     else
@@ -190,13 +224,13 @@ std::pair<int, int> BddPredef::intervalEntityInDonnee(idt idCible, int cible, in
 }
 
 bool BddPredef::isMultipleAssociatedXml(const std::pair<const QString, QString> &pair) const {
-    if(pair.first == "cible")
+    if(pair.first == "cible" || pair.first == "id1_cible")
         return pair.second.contains("|");
     return Bdd::isMultipleAssociatedXml(pair);
 }
 
 Bdd::xml_list_atts BddPredef::listMultipleAssociatedXml(const std::pair<const QString,QString> &pair, QString &controle) {
-    if(pair.first == "cible"){
+    if(pair.first == "cible" || pair.first == "id1_cible"){
         xml_list_atts list;
         auto cibles = pair.second.split("|");
         for (auto iter = cibles.cbegin(); iter != cibles.cend(); ++iter)

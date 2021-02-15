@@ -6,7 +6,7 @@
 <Nc>config</Nc>
 <Ref>config_root</Ref> 
 <Restriction code="modification|suppression"/>
-<TypePermission id_ent="IdType" cible="Donnee" code="Visible" restriction="modification|suppression"/>
+<TypePermission id1_cible="Donnee" code="Visible" restriction="modification|suppression"/>
  </Type>
 <Type>
 <Parent>
@@ -16,7 +16,7 @@
 <Nc>defaut</Nc>
 <Ref>valeur_defaut</Ref>
 <Restriction code="modification|suppression"/>
-<TypePermission id_ent="IdType"  cible="Donnee" code="Visible|Attribuable" restriction="modification|suppression"/>
+<TypePermission id1_cible="Donnee" code="Visible|Attribuable" restriction="modification|suppression"/>
 </Type> 
  <Type>
 <Nom>Source</Nom>
@@ -29,7 +29,7 @@
  <Nc>Événement</Nc>
  <Ref>even_root</Ref>
  <Restriction code="modification|suppression"/>
- <TypePermission id_ent="IdType"  cible="Evenement" code="Visible" restriction="modification|suppression"/>
+ <TypePermission id1_cible="Evenement" code="Visible" restriction="modification|suppression"/>
  </Type>
  
  <!-- Donnee -->
