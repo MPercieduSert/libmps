@@ -66,7 +66,7 @@
  <!-- Evenement -->
  <EvenementStyle>
  <Nom>Style par défaut</Nom>
- <Bordure type="enum">SolideLine</Bordure>
+ <Bordure type="enum">SolidLine</Bordure>
  <CouleurBordure type="couleur">black</CouleurBordure>
  <CouleurFond type="couleur">gray</CouleurFond>
  <CouleurTexte type="couleur">black</CouleurTexte>

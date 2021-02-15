@@ -148,6 +148,8 @@ void BddPredef::hydrateAttributXml(entityMPS::Entity & entity, post pos, xml_ite
         else
             entity.setData(pos, cible(i));
     }
+    else
+        Bdd::hydrateAttributXml(entity, pos,iter,type,controle);
 }
 
 void BddPredef::hydrateAttributAssociatedXml(Entity &entity_ass, const std::pair<const QString,QString> &pair,
@@ -308,6 +310,18 @@ bool BddPredef::testAutorisationP(idt id, entidt idEntity, flag autoris) {
     return controle;
 }
 
+enumt BddPredef::strCategorieToEnum(const QString &str, flag categorie, QString & controle) const noexcept {
+    if(categorie & PermissionCode){
+        if(str == "Interdit")
+            return code::Interdit;
+        if(str == "Visible")
+            return code::Visible;
+        if(str== "Attribuable")
+            return code::Attribuable;
+    }
+    return Bdd::strCategorieToEnum(str,categorie,controle);
+}
+
 enumt BddPredef::strIdToEnum(const QString & str, idt idEntity, QString &controle) const noexcept {
     switch (idEntity) {
     case Donnee::ID:
@@ -340,15 +354,9 @@ enumt BddPredef::strIdToEnum(const QString & str, idt idEntity, QString &control
         if(str == "Rectangle")
             return EvenementStyle::Rectangle;
         return strCategorieToEnum(str,LineStyle|BrushStyle,controle);
-        break;
+    case MotClePermission::ID:
     case TypePermission::ID:
-        if(str == "Interdit")
-            return code::Interdit;
-        if(str == "Visible")
-            return code::Visible;
-        if(str== "Attribuable")
-            return code::Attribuable;
-        break;
+        return strCategorieToEnum(str,PermissionCode,controle);
     }
     return Bdd::strIdToEnum(str,idEntity,controle);
 }

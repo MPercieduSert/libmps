@@ -92,6 +92,9 @@ public:
     //! Mutateur d'une entité enregistrée comme donnée.
     template<class Ent> void setEntityInDonnee(const Ent & entity, idt idCible, int cible, int num = 0);
 
+    //! Renvoie l'enumeration associé à str pour un groupe de catégorie.
+    enumt strCategorieToEnum(const QString &str, flag categorie, QString & controle) const noexcept override;
+
     //! Renvoie l'enumeration associé à str pour une entitée de type idEntity.
     enumt strIdToEnum(const QString & str, idt idEntity, QString &controle) const noexcept override;
 

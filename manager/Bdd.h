@@ -66,9 +66,10 @@ public:
           NoEntity
          };
     enum categorie : flag::flag_type {RestrictionCode = 0x1,
-                                      LineStyle = 0x2,
-                                      BrushStyle = 0x4,
-                                      FontWeight = 0x8
+                                      PermissionCode = 0x2,
+                                      LineStyle = 0x4,
+                                      BrushStyle = 0x8,
+                                      FontWeight = 0x10
 
                    };
     //! Constructeur. Donner en argument le type ainsi que le chemin de la base de donnée.
@@ -533,9 +534,6 @@ public:
          return existsUnique(entity) ? entity.id() : 0;
     }
 
-    //! Renvoie un vector faisant la correspondance emun <-> QString pour les restrictions.
-    static std::map<flag::flag_type, QString> RestrictionToStr();
-
     //! Teste s'il y a dans la base de donnée une entité ayant exactement les mêmes attributs (identifiant compris).
     bool sameInBdd(const Entity & entity);
 
@@ -646,7 +644,7 @@ public:
 
     //! Renvoie l'enumeration associé à str pour une entitée d'identifiant idEntity.
     virtual enumt strIdToEnum(const QString &str, idt idEntity, QString & controle) const noexcept {
-        controle.append("Enum invalide pour l'entité d'identifiant ").append(QString::number(static_cast<uint>(idEntity)))
+        controle.append("-> Enum invalide pour l'entité d'identifiant ").append(QString::number(static_cast<uint>(idEntity)))
                 .append(": ").append(str);
         return InvalideEnum;
     }
