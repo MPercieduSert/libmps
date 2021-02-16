@@ -138,10 +138,9 @@ void BddPredef::delEntityInDonnee(idt idCible, int cible, int num) {
     }
 }
 
-void BddPredef::hydrateAttributXml(entityMPS::Entity & entity, post pos, xml_iterator iter, const QString &type, QString &controle){
-    if(type.isEmpty())
-        Bdd::hydrateAttributXml(entity, pos,iter,type,controle);
-    else if(type == "cible") {
+void BddPredef::hydrateAttributXml(entityMPS::Entity & entity, post pos, xml_iterator iter, QString &controle){
+    if(iter->hasAttributes() && iter->attributes().cbegin()->first == "type"
+                             && iter->attributes().cbegin()->second == "cible") {
         auto i = m_manager->find(iter->text());
         if(i == nbrEntity())
             controle.append("Cible invalide : ").append(iter->text());
@@ -149,7 +148,7 @@ void BddPredef::hydrateAttributXml(entityMPS::Entity & entity, post pos, xml_ite
             entity.setData(pos, cible(i));
     }
     else
-        Bdd::hydrateAttributXml(entity, pos,iter,type,controle);
+        Bdd::hydrateAttributXml(entity, pos,iter,controle);
 }
 
 void BddPredef::hydrateAttributAssociatedXml(Entity &entity_ass, const std::pair<const QString,QString> &pair,

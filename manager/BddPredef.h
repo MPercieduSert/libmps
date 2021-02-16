@@ -103,8 +103,7 @@ protected:
     bool delP(idt id, entidt idEntity) override;
 
     //! Hydrate un attribut de l'entité par la valeur contenue dans le XmlDox à l'endroit pointé par iter.
-    void hydrateAttributXml(entityMPS::Entity & entity, post pos, xml_iterator iter,
-                            const QString &type, QString & controle) override;
+    void hydrateAttributXml(entityMPS::Entity & entity, post pos, xml_iterator iter, QString & controle) override;
 
     //! Hydrate un attribut de l'entité entity_ass associée à entity avec le couple pair<clé,valeur>.
     void hydrateAttributAssociatedXml(Entity & entity_ass, const std::pair<const QString,QString> & pair,

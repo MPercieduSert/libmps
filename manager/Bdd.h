@@ -158,12 +158,14 @@ public:
 
     //! Teste s'il existe une entité ayant les mêmes valeurs qu'un des ensemble d'attributs uniques d'entity en base de donnée.
     //! De plus, si l'identifiant de entity est nul et qu'il existe en base de donnée exactement une entité possédant des ensembles
-    //! d'attributs uniques avec les mêmes valeurs qu'entity, alors l'identifiant d'entity est remplacé par l'identifiant de cette entité.
+    //! d'attributs uniques avec les mêmes valeurs qu'entity,
+    //! alors l'identifiant d'entity est remplacé par l'identifiant de cette entité.
     bool existsUnique(Entity & entity);
 
     //! Teste s'il existe une entité ayant les mêmes valeurs qu'un des ensemble d'attributs uniques d'entity en base de donnée.
     //! De plus, si l'identifiant de entity est nul et qu'il existe en base de donnée exactement une entité possédant des ensembles
-    //! d'attributs uniques avec les mêmes valeurs qu'entity, alors l'identifiant d'entity est remplacé par l'identifiant de cette entité.
+    //! d'attributs uniques avec les mêmes valeurs qu'entity,
+    //! alors l'identifiant d'entity est remplacé par l'identifiant de cette entité.
     template<class Ent> bool existsUnique(Ent & entity);
 
     //! Teste s'il existe une entité ayant les mêmes valeurs qu'un ensemble d'attributs uniques que entity en base de donnée.
@@ -247,8 +249,9 @@ public:
 
     //! Renvoie la liste des entités de la table des entités Ent vérifiant la condition,
     //! valeur de la colonne d'identifiant cle = value, ordonnée suivant la colonne d'identifiant ordre.
-    template<class Ent> VectorPtr<Ent> getList(typename Ent::Position cle, const QVariant & value, typename Ent::Position ordre = Ent::Id,
-                                             condition cond = condition::Egal, bool crois = true);
+    template<class Ent> VectorPtr<Ent> getList(typename Ent::Position cle, const QVariant & value,
+                                               typename Ent::Position ordre = Ent::Id,
+                                               condition cond = condition::Egal, bool crois = true);
 
     //! Renvoie la liste des entités de la table des entités Ent vérifiant la condition,
     //! valeur de la colonne d'identifiant cle = value, ordonnée suivant les colonnes d'identifiant ordre1 puis ordre2.
@@ -259,9 +262,9 @@ public:
     //! Renvoie la liste des entités de la table des entités Ent vérifiant la condition,
     //! valeur de la colonne d'identifiant cle = value, ordonnée suivant les colonnes d'identifiant ordre1, ordre2 puis ordre3.
     template<class Ent> VectorPtr<Ent> getList(typename Ent::Position cle, const QVariant & value,
-                                             typename Ent::Position ordre1, typename Ent::Position ordre2, typename Ent::Position ordre3,
-                                             condition cond = condition::Egal,
-                                             bool crois1 = true, bool crois2 = true, bool crois3 = true);
+                                               typename Ent::Position ordre1, typename Ent::Position ordre2,
+                                               typename Ent::Position ordre3, condition cond = condition::Egal,
+                                               bool crois1 = true, bool crois2 = true, bool crois3 = true);
 
     //! Renvoie la liste des entités de la table des entités Ent vérifiant les deux conditions,
     //! valeur de la colonne d'identifiant cle1 = value1 et valeur de la colonne d'identifiant cle2 = value2,
@@ -286,7 +289,8 @@ public:
 
     //! Renvoie la liste des entités de la table vérifiant les conditions, pour tout i,
     //! valeur de la colonne d'identifiant cle[i] condition[i] value[i],
-    //! ordonnée suivant les colonnes d'identifiant contenue dans ordre, croissante (crois[i]=true) ou décroissante (croiss[i]=false).
+    //! ordonnée suivant les colonnes d'identifiant contenue dans ordre,
+    //! croissante (crois[i]=true) ou décroissante (croiss[i]=false).
     template<class Ent> VectorPtr<Ent> getList(const std::vector<typename Ent::Position> & cle, const std::vector<QVariant> & value,
                          const std::vector<typename Ent::Position> & ordre = std::vector<typename Ent::Position>(),
                          const std::vector<condition> & cond = std::vector<condition>(),
@@ -701,12 +705,12 @@ protected:
         {return m_manager->get(idEntity).del(id);}
 
     //! Hydrate un attribut de l'entité par la valeur contenue dans le XmlDox à l'endroit pointé par iter.
-    virtual void hydrateAttributXml(Entity & entity, post pos, xml_iterator iter, const QString & type, QString & controle);
+    virtual void hydrateAttributXml(Entity & entity, post pos, xml_iterator iter, QString & controle);
 
     //! Hydrate un attribut de l'entité par la valeur contenue dans le XmlDox à l'endroit pointé par iter
     //! et complète le message d'erreur si besoin.
-    void hydrateAttributControledXml(Entity & entity, post pos, xml_iterator iter, const QString & type, QString & controle) {
-        hydrateAttributXml(entity,pos,iter,type,controle);
+    void hydrateAttributControledXml(Entity & entity, post pos, xml_iterator iter, QString & controle) {
+        hydrateAttributXml(entity,pos,iter,controle);
         if(!controle.isEmpty())
             controle.prepend(QString("-> Dans le noeud d'attribut : ")
                              .append(iter->name()).append(" -> ").append(iter->text()).append("\n"));
@@ -728,11 +732,14 @@ protected:
 
     //! Hydrate l'entité avec les valeurs contenues dans le XmlDox à l'endroit pointé par iter
     //! renvoie la liste des itérateurs sur les données associées.
-    std::list<xml_iterator> hydrateEntityXml(Entity & entity, xml_iterator iter, QString & controle);
+    std::list<xml_iterator> hydrateEntityXml(Entity &entity, xml_iterator iter, QString &controle);
 
     //! Teste si un attribut d'une entité associée doit être pris en compte après l'enregistrement.
     virtual bool isAfterAssociatedXml(const std::pair<const QString,QString> &pair) const
         {return pair.first == "restriction";}
+
+    //! Teste si un attribut est une entité associée.
+    virtual bool isAssociatedXml(xml_iterator iter, Entity &entity) const;
 
     //! Teste si un attribut d'une entité associée est multiple.
     virtual bool isMultipleAssociatedXml(const std::pair<const QString,QString> &/*pair*/) const
@@ -760,7 +767,7 @@ protected:
     post positionXml(const Entity & entity, const QString & attribut, QString & controle) const {
         auto pos = entity.position(attribut);
         if(pos == entity.nbrAtt())
-            controle.append("L'entité de type : ").append(m_manager->info(entity.idEntity()).name())
+            controle.append("-> L'entité de type : ").append(m_manager->info(entity.idEntity()).name())
                     .append("\nne possède pas d'attribut : ").append(attribut)
                     .append("\nL'entité : ").append(entity.affiche());
         return pos;

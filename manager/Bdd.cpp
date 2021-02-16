@@ -181,14 +181,32 @@ bool Bdd::getUnique(Entity & entity)
     {return m_manager->get(entity.idEntity()).getUnique(entity);}
 
 void Bdd::hydrateAttributXml(entityMPS::Entity & entity, post pos,
-                             xml_iterator iter, const QString &type, QString & controle) {
-    if(type.isEmpty()) {
+                             xml_iterator iter, QString & controle) {
+    if(!iter->hasAttributes() || iter->attributes().cbegin()->first != "type") {
         auto fkey_iter = info(entity).foreignKeyName().find(pos);
-        if(fkey_iter == info(entity).foreignKeyName().end())
-            entity.setData(pos, iter->text());
-        else {
+        if(fkey_iter == info(entity).foreignKeyName().end()){
+            if(iter->hasAttributes())
+                controle.append("-> Seul les noeuds hydratant une clé étrangère\n")
+                        .append("peuvent avoir un attribut différent de 'type'.")
+                        .append("Attribut xml : ").append(iter->attributes().cbegin()->first).append(" = ")
+                        .append(iter->attributes().cbegin()->second);
+            else
+                entity.setData(pos, iter->text());
+        }
+        else {// Clé étrangère
             auto fkey_entity = makeEntity(fkey_iter->second);
-            hydrateEntityXml(*fkey_entity, iter, controle);
+            if(iter.leaf()) {// Définie par un attribut
+                if(iter->attributes().size() != 1)
+                    controle.append("-> Une clé étrangère doit être hydratée par un attribut unique\nou par un ensemble de noeuds.");
+                else {
+                    auto pair_iter = iter->attributes().cbegin();
+                    auto pos_fkey = positionXml(*fkey_entity,pair_iter->first,controle);
+                    if(controle.isEmpty())
+                        fkey_entity->setData(pos_fkey,pair_iter->second);
+                }
+            }
+            else // Définie par un ensemble de noeuds
+                hydrateEntityXml(*fkey_entity,iter,controle);
             if(controle.isEmpty()) {
                 if(existsUnique(*fkey_entity))
                     entity.setData(pos, fkey_entity->id());
@@ -196,55 +214,58 @@ void Bdd::hydrateAttributXml(entityMPS::Entity & entity, post pos,
                     controle.append("-> Entité unique introuvable:\n").append(fkey_entity->affiche());
             }
             if(!controle.isEmpty())
-                controle.prepend("-> Dans la clé étrangère : ").prepend(fkey_iter->second).append("\n");
+                controle.prepend(QString("-> Dans la clé étrangère sur : ").append(fkey_iter->second).append("\n"));
         }
     }
-    else if(type == "code") {
-        auto code = codeFromQString(iter->text(),entity.idEntity(),true,controle);
-        if(controle.isEmpty())
-            entity.setData(pos, code.value());
-    }
-    else if(type == "couleur") {
-        QColor color(iter->text());
-        if(color.isValid())
-            entity.setData(pos,color.name());
-        else
-            controle.append("-> Couleur invalide ").append(iter->name()).append(" = ").append(iter->text());
-    }
-    else if (type == "enum") {
-        auto i = strIdToEnum(iter->text(),entity.idEntity(),controle);
-        if(controle.isEmpty())
-            entity.setData(pos,i);
-    }
-    else if (type == "police") {
-        QFont police;
-        for (auto iter_police = iter.cbeginChild(); iter_police && controle.isEmpty(); ++iter_police) {
-            if(iter_police->name() == "Famille")
-                police.setFamily(iter_police->text());
-            else if(iter_police->name() == "Poids") {
-                auto p = strCategorieToEnum(iter_police->text(),FontWeight,controle);
-                if(controle.isEmpty())
-                    police.setWeight(static_cast<int>(p));
-                else
-                    controle.prepend(QString("-> Dans le poids de la police de : ")
-                                     .append(iter->name()).append(" = ").append(iter_police->text()).append("\n"));
-            }
-            else if (iter_police->name() == "Taille") {
-                bool ok;
-                police.setPointSize(iter_police->text().toInt(&ok));
-                if(!ok)
-                    controle.append("-> Taille de police invalide : ").append(iter_police->text());
-            }
+    else {
+        auto type = iter->attributes().cbegin()->second;
+        if(type == "code") {
+            auto code = codeFromQString(iter->text(),entity.idEntity(),true,controle);
+            if(controle.isEmpty())
+                entity.setData(pos, code.value());
+        }
+        else if(type == "couleur") {
+            QColor color(iter->text());
+            if(color.isValid())
+                entity.setData(pos,color.name());
             else
-                controle.append("-> Noeud de police inconnue : ").append(iter_police->name());
+                controle.append("-> Couleur invalide ").append(iter->name()).append(" = ").append(iter->text());
         }
-        if(controle.isEmpty())
-            entity.setData(pos,police.toString());
+        else if (type == "enum") {
+            auto i = strIdToEnum(iter->text(),entity.idEntity(),controle);
+            if(controle.isEmpty())
+                entity.setData(pos,i);
+        }
+        else if (type == "police") {
+            QFont police;
+            for (auto iter_police = iter.cbeginChild(); iter_police && controle.isEmpty(); ++iter_police) {
+                if(iter_police->name() == "Famille")
+                    police.setFamily(iter_police->text());
+                else if(iter_police->name() == "Poids") {
+                    auto p = strCategorieToEnum(iter_police->text(),FontWeight,controle);
+                    if(controle.isEmpty())
+                        police.setWeight(static_cast<int>(p));
+                    else
+                        controle.prepend(QString("-> Dans le poids de la police de : ")
+                                         .append(iter->name()).append(" = ").append(iter_police->text()).append("\n"));
+                }
+                else if (iter_police->name() == "Taille") {
+                    bool ok;
+                    police.setPointSize(iter_police->text().toInt(&ok));
+                    if(!ok)
+                        controle.append("-> Taille de police invalide : ").append(iter_police->text());
+                }
+                else
+                    controle.append("-> Noeud de police inconnue : ").append(iter_police->name());
+            }
+            if(controle.isEmpty())
+                entity.setData(pos,police.toString());
+            else
+                controle.prepend(QString("-> Dans la police de : ").append(iter->name()).append("\n"));
+        }
         else
-            controle.prepend(QString("-> Dans la police de : ").append(iter->name()).append("\n"));
+            controle.append("-> Type de noeud xml inconnue : ").append(type);
     }
-    else
-        controle.append("-> Type de noeud xml inconnue : ").append(type);
 }
 
 void Bdd::hydrateAttributAssociatedXml(Entity &entity_ass, const std::pair<const QString,QString> &pair,
@@ -273,30 +294,18 @@ void Bdd::hydrateAttributAssociatedXml(Entity &entity_ass, const std::pair<const
         controle.append("-> Attribut inconnu : ").append(pair.first);
 }
 
-std::list<Bdd::xml_iterator> Bdd::hydrateEntityXml(entityMPS::Entity & entity, xml_iterator iter, QString &controle) {
+std::list<Bdd::xml_iterator> Bdd::hydrateEntityXml(Entity &entity, xml_iterator iter, QString &controle) {
     std::list<xml_iterator> assotiated;
     for (auto sub_iter = iter.cbeginChild(); sub_iter && controle.isEmpty(); ++sub_iter) {
-        if(sub_iter->hasAttributes() && (sub_iter->attributes().size() > 1 || sub_iter->attributes().cbegin()->first != "type"))
+        if(isAssociatedXml(sub_iter,entity))
                 assotiated.push_back(sub_iter);
         else {
-            auto pos = entity.position(sub_iter->name());
-            if(pos == entity.nbrAtt())
-                controle.append("-> Attribut ").append(sub_iter->name()).append(" de valeur : ").append(sub_iter->text())
-                        .append("\ninconnue dans l'entité : \n").append(info(entity).name()).append("\n")
-                        .append(entity.affiche());
-            else
-                hydrateAttributControledXml(entity, pos, sub_iter,
-                                   sub_iter->hasAttributes() ? sub_iter->attributes().cbegin()->second : QString(),
-                                   controle);
-
+            auto pos = positionXml(entity,sub_iter->name(),controle);
+            if(controle.isEmpty())
+                hydrateAttributControledXml(entity, pos, sub_iter,controle);
         }
     }
     return assotiated;
-}
-
-Bdd::xml_list_atts Bdd::listMultipleAssociatedXml(const std::pair<const QString,QString> &pair, QString &controle) {
-    controle.append("L'attribut est inconnu : ").append(pair.first);
-    return xml_list_atts();
 }
 
 QString Bdd::importXml(const fichierMPS::XmlDoc & doc){
@@ -334,7 +343,8 @@ QString Bdd::importXml(const fichierMPS::XmlDoc & doc){
                         associatedControledXml(*entity,*iter_list,controle);
             }
             if(!controle.isEmpty())
-                controle.prepend(QString("-> Dans l'entité :\n").append(entity->affiche()).append("\n"));
+                controle.prepend(QString("-> Dans l'entité : ").append(info(*entity).name())
+                                 .append("\n").append(entity->affiche()).append("\n"));
         }
         ++iter;
     }
@@ -349,6 +359,27 @@ void Bdd::insert(Entity & entity, idt idParent, int num)
 
 void Bdd::insert(const Entity & entity, idt idParent, int num)
     {m_manager->get(entity.idEntity()).insert(entity,idParent,num);}
+
+bool Bdd::isAssociatedXml(xml_iterator iter, Entity &entity) const {
+        if(!iter->hasAttributes() || iter->hasText())
+            return false;
+        if(iter->attributes().size() > 1)
+            return true;
+        auto att = iter->attributes().cbegin()->first;
+        if(att == "type")
+            return false;
+        if(att == "restriction")
+            return true;
+        auto pos = entity.position(iter->name());
+        if(pos == entity.nbrAtt())
+            return true;
+        return info(entity).foreignKeyName().find(pos) == info(entity).foreignKeyName().cend();
+    }
+
+Bdd::xml_list_atts Bdd::listMultipleAssociatedXml(const std::pair<const QString,QString> &pair, QString &controle) {
+    controle.append("L'attribut est inconnu : ").append(pair.first);
+    return xml_list_atts();
+}
 
 void Bdd::miseAJourBdd() {
     for (idt type = 0; type != m_version.size(); ++type) {

@@ -9,9 +9,7 @@
 <TypePermission id1_cible="Donnee" code="Visible" restriction="modification|suppression"/>
  </Type>
 <Type>
-<Parent>
-  <Ref>config_root</Ref>
-</Parent>
+<Parent Ref="config_root"/>
 <Nom>Valeur par defaut</Nom>
 <Nc>defaut</Nc>
 <Ref>valeur_defaut</Ref>
@@ -36,9 +34,7 @@
  <Donnee>
  <Nom>Configuration</Nom>
  <Ref>config_root</Ref>
- <Type>
-  <Ref>config_root</Ref> 
- </Type>
+ <Type Ref="config_root"/> 
  <TpVal>NoDonnee</TpVal>
  <Restriction code="modification|suppression"/>
  </Donnee>
@@ -46,9 +42,7 @@
  <Arbre ref_parent="config_root"/>
  <Nom>Valeur par defaut</Nom>
  <Ref>valeur_defaut</Ref>
- <Type>
-  <Ref>config_root</Ref> 
- </Type>
+ <Type Ref="config_root"/> 
  <TpVal>NoDonnee</TpVal>
  <Restriction code="modification|suppression"/>
  </Donnee>
@@ -56,11 +50,9 @@
    <Arbre ref_parent="valeur_defaut"/>
   <Nom>Date par defaut</Nom>
   <Ref>date_defaut</Ref>
- <Type>
-  <Ref>valeur_defaut</Ref> 
- </Type>
+ <Type Ref="valeur_defaut"/>
  <TpVal>Date</TpVal>
-   <Restriction code="modification|suppression"/>
+  <Restriction code="modification|suppression"/>
  </Donnee>
  
  <!-- Evenement -->
