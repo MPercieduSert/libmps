@@ -168,11 +168,41 @@ existeUni Bdd::existsUniqueEnsemble(const Entity & entity)
 std::pair<existeUni,idt> Bdd::existsUniqueId(const Entity & entity)
     {return m_manager->get(entity.idEntity()).existsUniqueId(entity);}
 
+fichierMPS::XmlDoc Bdd::exportXml(VectorPtr<Entity> && vec, flag option) {
+    fichierMPS::XmlDoc doc;
+    doc.begin()->setName("entities");
+    for (auto entity_iter = vec.begin(); entity_iter != vec.end(); ++entity_iter) {
+        auto ent_xml_iter = doc.push_back(doc.begin(),info(*entity_iter).name());
+        for (post pos = entityMPS::Entity::NbrAtt; pos != entity_iter->nbrAtt(); ++pos) {
+            auto att_xml_iter = doc.push_back(ent_xml_iter,entity_iter->nameAttribut(pos));
+            att_xml_iter->setText(entity_iter->data(pos).toString());
+        }
+        if(option & RestrictionExportationXml) {
+            auto restriction_xml_iter = doc.push_back(ent_xml_iter,"Restriction");
+            auto restriction = getRestriction(*entity_iter);
+            restriction_xml_iter->setAttribut("code",QString::number(restriction.value()));
+        }
+        if(m_manager->get(entity_iter->idEntity()).typeManager() & bddMPS::ArbreTypeManager){
+            auto arb_xml_iter = doc.push_back(ent_xml_iter,"Arbre");
+            auto pos = entity_iter->position("Ref");
+            if(pos != entity_iter->nbrAtt()) {
+                entity_iter->setId(getIdParent(*entity_iter));
+                if(entity_iter->id() && get(*entity_iter))
+                    arb_xml_iter->setAttribut("ref_parent",entity_iter->data(pos).toString());
+            }
+        }
+    }
+    return doc;
+}
+
 bool Bdd::get(Entity & entity)
     {return m_manager->get(entity.idEntity()).get(entity);}
 
-bool Bdd::testAutorisationP(idt id, entidt idEntity, flag autoris)
-    {return !(m_manager->get(idEntity).getRestriction(id) & autoris);}
+idt Bdd::getIdParent(const Entity & entity)
+    {return m_manager->get(entity.idEntity()).getIdParent(entity.id());}
+
+VectorPtr<Entity> Bdd::getList(entidt id_ent)
+    {return m_manager->get(id_ent).getVectorEntity();}
 
 flag Bdd::getRestriction(const Entity & entity)
     {return m_manager->get(entity.idEntity()).getRestriction(entity.id());}
@@ -643,3 +673,21 @@ enumt Bdd::strCategorieToEnum(const QString & str, flag categorie, QString &cont
     controle.append("-> Enum invalide de categorie ").append(QString::number(static_cast<uint>(categorie))).append(": ").append(str);
     return InvalideEnum;
 }
+
+Bdd::vector_id_name Bdd::table_entity_names(bool arbre) const {
+    std::vector<std::pair<int,QString>> vec;
+    vec.reserve(nbrEntity());
+    for(entidt i = 0; i < nbrEntity(); ++i) {
+        if(managers().valide(i)) {
+            vec.emplace_back(i,managers().info(i).name());
+            if(arbre && !managers().get(i).infoArbre().name().isEmpty())
+                vec.emplace_back(-i,managers().get(i).infoArbre().name());
+        }
+    }
+    std::sort(vec.begin(),vec.end(),
+              [](const std::pair<int,QString> &p1, const std::pair<int,QString> &p2)->bool {return p1.second < p2.second;});
+    return vec;
+}
+
+bool Bdd::testAutorisationP(idt id, entidt idEntity, flag autoris)
+    {return !(m_manager->get(idEntity).getRestriction(id) & autoris);}

@@ -50,7 +50,8 @@ SOURCES += \
     NodeView.cpp \
     FindWidget.cpp \
     StandardNodeWidget.cpp \
-    CodeWidget.cpp
+    CodeWidget.cpp \
+    dialog_predef.cpp
 
 HEADERS += \
     AbstractEntitySelectWidget.h \
@@ -81,7 +82,8 @@ HEADERS += \
     NodeView.h \
     FindWidget.h \
     StandardNodeWidget.h \
-    CodeWidget.h
+    CodeWidget.h \
+    dialog_predef.h
 
 unix {
     target.path = /usr/lib

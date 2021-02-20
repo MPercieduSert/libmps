@@ -4,6 +4,7 @@
 #ifndef PREDEFFENPRINCIPALE_H
 #define PREDEFFENPRINCIPALE_H
 
+#include "dialog_predef.h"
 #include <QFileDialog>
 #include "PredefZoneCentrale.h"
 #include "FenPrincipale.h"
@@ -20,9 +21,9 @@ class PredefFenPrincipale : public FenPrincipale {
     Q_OBJECT
 protected:
     // Menu
-    QMenu *m_bddMenu;       //!< Menu de gestion de la base de données.
-    QMenu *m_bddTableMenu;  //!< Menu des tables.
-    QMenu *m_bddXmlMenu;    //!< Menu d'importation d'entité de la base de donnée au format xml.
+    QMenu *m_bdd_menu;       //!< Menu de gestion de la base de données.
+    QMenu *m_bdd_table_menu;  //!< Menu des tables.
+    QMenu *m_bdd_xml_menu;    //!< Menu d'importation d'entité de la base de donnée au format xml.
 
 public:
     //! Constructeur.
@@ -46,8 +47,11 @@ protected:
     void connectActionToOpenTab(QAction * action, const std::pair<int,int>& pairIndex,
                                 const std::vector<QVariant> & vec = std::vector<QVariant>());
 public slots:
+    //! Exporte des entités de la base de données dans un fichier xml.
+    void export_xml();
+
     //! Importe des entités dans la base de à partir d'un fichier xml fourni par l'utilisateur.
-    void importXml();
+    void import_xml();
 
     //! Écrit le schema xml de validation des fichier d'importation de données.
     void schemaXml();

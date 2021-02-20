@@ -56,22 +56,29 @@ using Entity = entityMPS::Entity;
 class Bdd : public fichierMPS::FileInterface
 {
 protected:
+    QSqlDatabase m_bdd;                                 //!< Connexion à la base de donnée.
+    std::unique_ptr<managerMPS::Managers> m_manager;    //!< Manager des entités.
+    const std::vector<int> m_version;                   //!< Version de la base de donnée requis par le programme
+public:
+    // Alias de type
+    using vector_id_name = std::vector<std::pair<int,QString>>;
     using xml_iterator = fichierMPS::XmlDoc::const_brother_iterator;
     using xml_list_atts = std::list<std::pair<QString,QString>>;
-    QSqlDatabase m_bdd;                 //!< Connexion à la base de donnée.
-    std::unique_ptr<managerMPS::Managers> m_manager;         //!< Manager des entités.
-    const std::vector<int> m_version;                //!< Version de la base de donnée requis par le programme
-public:
+
+    // Enumération
     enum {InvalideEnum = 0x1000000,
           NoEntity
          };
+    //! Catégorie des énumérations
     enum categorie : flag::flag_type {RestrictionCode = 0x1,
                                       PermissionCode = 0x2,
                                       LineStyle = 0x4,
                                       BrushStyle = 0x8,
                                       FontWeight = 0x10
+                                     };
+    //! Options d'exportation xml
+    enum export_option : flag::flag_type {RestrictionExportationXml = 0x1};
 
-                   };
     //! Constructeur. Donner en argument le type ainsi que le chemin de la base de donnée.
     Bdd(const QString & dbtype, const std::vector<int> & version, std::unique_ptr<managerMPS::Managers> && manager = nullptr)
         : FileInterface(QString(),"Data Base files (*.db)"),
@@ -194,6 +201,9 @@ public:
     //! et renvoie l'identifiant du premier trouver.
     template<class Ent> std::pair<existeUni,idt> existsUniqueId(const Ent & entity);
 
+    //! Créer un arbre XmlDoc à partir d'une liste d'entités.
+    fichierMPS::XmlDoc exportXml(VectorPtr<Entity> && vec, flag option);
+
     //! Fonction d'agrega sur l'attribut att appliquée à toutes les entités de la table.
     template<class Ent> QVariant fonctionAgrega(agrega fonc, typename Ent::Position att);
 
@@ -233,6 +243,12 @@ public:
 
     //! Renvoie l'arbre de racine d'entité entity pour une entité de type arbre.
     template<class Ent> tree<Ent> getArbre(const Ent & entity);
+
+    //! Renvoie l'identifiant du parent (si le manager est de type arbre).
+    idt getIdParent(const Entity & entity);
+
+    //! Renvoie la liste des entités de la table des entités d'identifiant ent_id ordonnée suivant la colonne d'identifiant ordre.
+    VectorPtr<Entity> getList(entidt ent_id);
 
     //! Renvoie la liste des entités de la table des entités Ent ordonnée suivant la colonne d'identifiant ordre.
     template<class Ent> VectorPtr<Ent> getList(typename Ent::Position ordre = Ent::Id, bool croissant = true);
@@ -475,7 +491,7 @@ public:
          return existsUnique(entity) ? entity.id() : 0;
     }
 
-    //! Importation de donnée à partir d'un xmlDoc
+    //! Importation de donnée à partir d'un xmlDoc.
     QString importXml(const fichierMPS::XmlDoc & doc);
 
     //! Renvoie les informations de la base de donnée sur les Entity du même type que entity.
@@ -652,6 +668,10 @@ public:
                 .append(": ").append(str);
         return InvalideEnum;
     }
+
+    //! Renvoie un vecteur des noms des entités correspondant à une table de la base de données
+    //! (trié par ordre alphabétique).
+    vector_id_name table_entity_names(bool arbre = false) const;
 
     //! Teste l'autorisation de modification de l'entité donnée en argument.
     bool testAutorisation(const Entity &entity, flag autoris)

@@ -27,7 +27,7 @@ template<class T> class VectorPtr;
  * \brief Classe patron des listes de pointeurs.
  */
 template<class T> class ListPtr : protected std::forward_list<T*> {
-    friend VectorPtr<T>;
+    template<class U> friend class VectorPtr;
 protected:
     using Lptr = std::forward_list<T*>;
     using std::forward_list<T*>::cbegin;
@@ -177,6 +177,9 @@ public:
     //! Constructeur à partir d'une liste de pointeurs temporaire.
     template<class U> VectorPtr(VectorPtr<U> && vect) noexcept;
 
+    //! Constructeur à partir d'une liste de pointeurs temporaire.
+    template<class U> VectorPtr(ListPtr<U> && vect) noexcept;
+
     //! Constructeur
     VectorPtr(size_type n, const T & value = T())
         : Vptr(n) {
@@ -275,6 +278,12 @@ public:
     //! Ajoute les éléments de liste (temporaire) à la suite du vecteur.
     VectorPtr<T> &operator <<(ListPtr<T> && liste);
 
+    //! Ajoute les éléments de liste à la suite du vecteur.
+    VectorPtr<T> &operator <<(const VectorPtr<T> & liste);
+
+    //! Ajoute les éléments de liste (temporaire) à la suite du vecteur.
+    VectorPtr<T> &operator <<(VectorPtr<T> && liste);
+
     //! Renvoie une référence sur le n-ième élément (sans vérification).
     T & operator[](size_type n)
         {return *(Vptr::operator[](n));}
@@ -313,6 +322,10 @@ public:
     }
 
 protected:
+    //! Efface la liste de pointeurs, ceux-ci doivent être préalablement déplacés ou les objet pointés détruit.
+    void clearPtr() noexcept
+        {Vptr::clear();}
+
     //! Redimension en ajoutant des pointeur nul.
     void resizeNull(size_type count) {
         if(count < size())
@@ -349,7 +362,17 @@ template<class T> template<class U> VectorPtr<T>::VectorPtr(VectorPtr<U> && vect
         auto i = Vptr::begin();
         for(auto j = vect.std::template vector<U*>::cbegin(); j != vect.std::template vector<U*>::cend(); ++i, ++j)
             *i = *j;
-        vect.std::template vector<U*>::clear();
+        vect.clearPtr();
+    }
+}
+
+template<class T> template<class U> VectorPtr<T>::VectorPtr(ListPtr<U> && list) noexcept
+    : Vptr(list.size()) {
+    if(!list.empty()) {
+        auto i = Vptr::begin();
+        for(auto j = list.std::template forward_list<U*>::cbegin(); j != list.std::template forward_list<U*>::cend(); ++i, ++j)
+            *i = *j;
+        list.clearPtr();
     }
 }
 
@@ -403,7 +426,7 @@ template<class T> VectorPtr<T> & VectorPtr<T>::operator =(VectorPtr<T> && vector
         auto i = Vptr::begin();
         for(auto j = vector.Vptr::cbegin(); j != vector.Vptr::cend(); ++j, ++i)
             *i = *j;
-        vector.Vptr::clear();
+        vector.clearPtr();
     }
     else
         clear();
@@ -426,9 +449,32 @@ template<class T> VectorPtr<T> &VectorPtr<T>::operator <<(ListPtr<T> && liste) {
         int n = size();
         resizeNull(n + liste.size());
         auto i = Vptr::rbegin() + n;
-        for(auto j = liste.cbegin(); j != liste.cend(); ++i, ++j)
+        for(auto j = liste.std::template forward_list<T*>::cbegin(); j != liste.std::template forward_list<T*>::cend(); ++i, ++j)
             *i = *j;
         liste.clearPtr();
+    }
+    return *this;
+}
+
+template<class T> VectorPtr<T> & VectorPtr<T>::operator << (const VectorPtr<T> & vec) {
+    if(!vec.empty()) {
+        int n = size();
+        resizeNull(n + vec.size());
+        auto i = Vptr::rbegin() + n;
+        for(auto j = vec.cbegin(); j != vec.cend(); ++i, ++j)
+            *i = new T(**j);
+    }
+    return *this;
+}
+
+template<class T> VectorPtr<T> &VectorPtr<T>::operator <<(VectorPtr<T> && vec) {
+    if(!vec.empty()) {
+        int n = size();
+        resizeNull(n + vec.size());
+        auto i = Vptr::rbegin() + n;
+        for(auto j = vec.Vptr::cbegin(); j != vec.Vptr::cend(); ++i, ++j)
+            *i = *j;
+        vec.clearPtr();
     }
     return *this;
 }

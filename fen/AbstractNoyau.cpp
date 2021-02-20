@@ -18,6 +18,15 @@ void AbstractNoyau::importXml(const QString &path) {
                                  .append(controle));
 }
 
+void AbstractNoyau::exportXml(const QString &path, conteneurMPS::VectorPtr<entityMPS::Entity> && vec, flag option) {
+    QFile file(path);
+    if(!file.open(QFile::WriteOnly | QFile::Text))
+        throw std::runtime_error("Imposible d'ouvrir pour lecture le fichier :"+file.fileName().toStdString());
+    fichierMPS::XmlWriter xml(&file);
+    xml.write(bdd().exportXml(std::move(vec),option));
+    file.close();
+}
+
 void AbstractNoyau::schemaXmlForimport(const QString & path) {
     QFile file(path);
     if(!file.open(QFile::WriteOnly | QFile::Text))

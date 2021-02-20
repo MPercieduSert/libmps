@@ -111,6 +111,12 @@ public:
     //! Retourne True si l'opération s'est correctement déroulée.
     virtual bool get(Entity & entity) = 0;
 
+    //! Renvoie l'identifiant du parent (si le manager est de type arbre).
+    virtual idt getIdParent(idt id) = 0;
+
+    //! Renvoie la référence du parent (si le manager est de type arbre).
+    virtual QString getRefParent(idt id) = 0;
+
     //! Renvoie la liste des restrictions de modification de l'entité d'identifiant id.
     virtual flag getRestriction(idt /*id*/)
          {return bddMPS::Aucune;}
@@ -119,6 +125,9 @@ public:
     //! ayant les mêmes valeurs pour les attributs uniques.
     //! Retourne True si l'opération s'est correctement déroulée.
     virtual bool getUnique(Entity & entity) = 0;
+
+    //! Renvoie la liste des entités de la table ordonnée suivant les identifiants croissants.
+    virtual VectorPtr<Entity> getVectorEntity() = 0;
 
     //! Renvoie les informations de la table associée au manager.
     virtual const InfoBdd & info() const = 0;
@@ -296,6 +305,9 @@ public:
 
     //! Renvoie l'arbre de racine d'identifiant id pour une entité de type arbre.
     virtual tree<Ent> getArbre(idt id);
+
+    //! Renvoie l'identifiant du parent (si le manager est de type arbre).
+    idt getIdParent(idt id) override;
 
     // Obtention d'une liste.
     //! Renvoie la liste des entités de la table des entités Ent ordonnée suivant la colonne d'identifiant ordre.
@@ -527,9 +539,8 @@ public:
                                    typename Ent::Position cleMap = Ent::Id,
                                    bmps::condition cond = bmps::condition::Egal) = 0;
 
-    //! Renvoie le vecteur des descendant direct d'entity.
-    virtual VectorPtr<Ent> getVectorChilds(const Ent & /*entity*/)
-        {return VectorPtr<Ent>();}
+    //! Renvoie la référence du parent (si le manager est de type arbre).
+    QString getRefParent(idt id) override;
 
     //! Hydrate l'entité entity avec les valeurs des attributs de l'entité enregistrées en base de donnée
     //! ayant les mêmes valeurs pour au moins un ensemble des attributs uniques.
@@ -541,6 +552,14 @@ public:
     //! Retourne True si l'opération s'est correctement déroulée.
     bool getUnique(Entity & entity) override
         {return getUnique(Ent::Convert(entity));}
+
+    //! Renvoie le vecteur des descendant direct d'entity.
+    virtual VectorPtr<Ent> getVectorChilds(const Ent & /*entity*/)
+        {return VectorPtr<Ent>();}
+
+    //! Renvoie la liste des entités de la table ordonnée suivant les identifiants croissants.
+    VectorPtr<Entity> getVectorEntity() override
+        {return getList();}
 
     //! Enregistre l'entité entity en base avec le parent et la position spécifiés.
     virtual void insert(Ent & entity, idt idParent, int num = 0);
@@ -666,6 +685,14 @@ template<class Ent> tree<Ent> AbstractManagerTemp<Ent>::getArbre(const Ent & /*e
 
 template<class Ent> tree<Ent> AbstractManagerTemp<Ent>::getArbre(idt /*id*/)
     {throw std::invalid_argument(QString("La méthode 'getArbre' n'est pas définie pour le manager des : ")
+                                 .append(Ent::Name()).append(".").toStdString());}
+
+template<class Ent> idt AbstractManagerTemp<Ent>::getIdParent(idt /*id*/)
+    {throw std::invalid_argument(QString("La méthode 'getIdParent' n'est pas définie pour le manager des : ")
+                                 .append(Ent::Name()).append(".").toStdString());}
+
+template<class Ent> QString AbstractManagerTemp<Ent>::getRefParent(idt /*id*/)
+    {throw std::invalid_argument(QString("La méthode 'getRefParent' n'est pas définie pour le manager des : ")
                                  .append(Ent::Name()).append(".").toStdString());}
 
 /*template<class Ent> VectorPtr<Ent> AbstractManagerTemp<Ent>::getVectorChilds(const Ent & entity)

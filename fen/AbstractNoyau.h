@@ -51,6 +51,9 @@ public:
     //! Importe des entités dans la base de données à partir du fichier xml de chemin path.
     void importXml(const QString & path);
 
+    //! Exporte des entités dans un fichier xml.
+    void exportXml(const QString & path, conteneurMPS::VectorPtr<entityMPS::Entity> && vec, flag option);
+
     //! Écrit le schema xml des fichiers d'importation de données, dans le fichier de chemin path.
     void schemaXmlForimport(const QString & path);
 

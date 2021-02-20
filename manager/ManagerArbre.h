@@ -13,7 +13,7 @@ namespace managerMPS {
  */
 template<class Ent> class ManagerArbre : public AbstractManagerArbre<Ent> {
 protected:
-    ManagerForArbre m_managerArbre;        //!< Manager de la structure d'arbre.
+    ManagerForArbre m_managerArbre;         //!< Manager de la structure d'arbre.
 
     using Arbre = ebmps::Arbre;
     using ManagerSqlEnt = ManagerSql<Ent>;
@@ -74,6 +74,10 @@ public:
     //! Applique la fonction fonction bool fct(idt id) à chaque noeud descendant celui d'identifiant id.
     template<class Fct> bool foreachNode(idt id, const Fct & fct, bool ordre = true)
         {return m_managerArbre.foreachNode(id,fct,ordre);}
+
+    //! Renvoie l'identifiant du parent (si le manager est de type arbre).
+    idt getIdParent(idt id) override
+        {return m_managerArbre.getParent(id);}
 
     //! Renvoie le liste des descendant direct d'entity.
     VectorPtr<Ent> getListChilds(const Ent & entity) override {
