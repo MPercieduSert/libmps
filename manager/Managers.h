@@ -8,7 +8,7 @@
 #include <memory>
 #include "ManagerSql.h"
 #include "UniqueSqlBase.h"
-#include "EntityDivers.h"
+#include "entityDivers.h"
 
 namespace bddMPS {
     //! Version de création de la base de données.
@@ -30,7 +30,7 @@ namespace bddMPS {
     struct Table {
         QString name;                           //!< Nom de la table (entitée).
         QString nameBdd;                        //!< Nom de la table dans la base de donnée.
-        std::vector<QString> namesAttributs;    //!< Liste des noms des attributs.
+        std::vector<QString> names_attributs;    //!< Liste des noms des attributs.
         std::map<post,QString> foreignKeys;      //!< Map des clés étrangères.
         std::vector<Table> tablesAnnexe;        //! Vecteur des tables annexes
     };
@@ -38,22 +38,22 @@ namespace bddMPS {
 
 namespace managerMPS {
 /*! \ingroup groupeFile
- *  \brief Classe mère de la classe contenant les managers des entités pour la base de donnée.
+ * \brief Classe mère de la classe contenant les managers des entités pour la base de donnée.
  */
 class Managers {
 protected:
-    using VersionBdd = entityMPS::VersionBdd;
+    using version_bdd = entities::version_bdd;
 
-    const entidt m_nbrEntity;                          //!< Nombre d'entité associées à un managers de la base de donnée.
+    const entidt m_nbrentity;                          //!< Nombre d'entité associées à un managers de la base de donnée.
     QSqlQuery m_requete;                            //!< Requéte commune aux manageurs.
     std::vector<std::unique_ptr<AbstractManager>> m_managers;           //!< Tableau des manageurs.
-    std::unique_ptr<ManagerSql<VersionBdd>> m_managerVersion;           //!< Manager de l'entité version de la base de donnée.
+    std::unique_ptr<ManagerSql<version_bdd>> m_managerVersion;           //!< Manager de l'entité version de la base de donnée.
 
 public:
     //! Constructeur.
-    Managers(entidt nbrEntity, const QString & versionTable,
-                     std::map<entidt,std::unique_ptr<AbstractManager>> && managers = std::map<entidt,std::unique_ptr<AbstractManager>>(),
-                     const QSqlQuery & req = QSqlQuery());
+    Managers(entidt nbrentity, const QString &versionTable,
+                     std::map<entidt,std::unique_ptr<AbstractManager>> &&managers = std::map<entidt,std::unique_ptr<AbstractManager>>(),
+                     const QSqlQuery &req = QSqlQuery());
 
     //! Destructeur.
 //    ~Managers()
@@ -66,49 +66,49 @@ public:
 //            delete m_managerVersion;
 //    }
 
-    //! Creé la table de l'entité VersionBdd
+    //! Creé la table de l'entité version_bdd
     void creerVersion();
 
     //! Retourne la version courante de la base de donnée pour un type donnée.
-    VersionBdd getVersion(idt type);
+    version_bdd getVersion(idt type);
 
-    //! Renvoie l'indice du manager associé à l'entité de nom name ou nbrEntity s'il n'existe pas.
-    entidt find(const QString & name) const{
+    //! Renvoie l'indice du manager associé à l'entité de nom name ou nbrentity s'il n'existe pas.
+    entidt find(const QString &name) const{
         entidt i = 0;
-        while(i < m_nbrEntity && (!valide(i) || info(i).name() != name))
+        while(i < m_nbrentity &&(!valide(i) || info(i).name() != name))
             ++i;
         return i;
     }
 
     //! Retourne un référence sur le manager des entités de ID, id.
-    AbstractManager & get(entidt id)
+    AbstractManager &get(entidt id)
         {return getP(id);}
 
     //! Retourne un référence sur le manager des entités de ID, id.
-    const AbstractManager & get(entidt id) const
+    const AbstractManager &get(entidt id) const
         {return getP(id);}
 
 
     //! Méthode template permettant d'obtenir le manager correspondant à l'entité.
-    template<class Ent> const AbstractManagerTemp<Ent> & get() const
-        {return static_cast<const AbstractManagerTemp<Ent> &>(*m_managers[Ent::ID]);}
+    template<class Ent> const AbstractManager_temp<Ent> &get() const
+        {return static_cast<const AbstractManager_temp<Ent> &>(*m_managers[Ent::ID]);}
 
     //! Méthode template permettant d'obtenir le manager correspondant à l'entité.
-    template<class Ent> AbstractManagerTemp<Ent> & get()
-        {return static_cast<AbstractManagerTemp<Ent> &>(*m_managers[Ent::ID]);}
+    template<class Ent> AbstractManager_temp<Ent> &get()
+        {return static_cast<AbstractManager_temp<Ent> &>(*m_managers[Ent::ID]);}
 
     //! Teste s'il existe une version d'un type donnée.
     bool existsVersion(numt type);
 
     //! Renvoie les informations sur la table associée à l'entité d'identifiant id.
-    const InfoBdd & info(entidt id) const;
+    const InfoBdd &info(entidt id) const;
 
     //! Fabrique d'entité de classe nomée entity.
-    std::unique_ptr<Entity> makeEntity(const QString & entity) const;
+    std::unique_ptr<entity> makeentity(const QString &ent) const;
 
     //! Retourne le nombre d'entités associées à un manager dans la base de donnée.
-    entidt nbrEntity() const noexcept
-        {return m_nbrEntity;}
+    entidt nbrentity() const noexcept
+        {return m_nbrentity;}
 
     //! Retourne le numero de version de la base de donnée.
     int numVersion(numt type);
@@ -117,21 +117,21 @@ public:
     void saveVersion(int num, numt type);
 
     //! Modifie le pointeur vers l'objet requête.
-    void setRequete(const QSqlQuery & req);
+    void setRequete(const QSqlQuery &req);
 
     //! Teste si le manager d'identifiant id est valide.
     bool valide(entidt id) const noexcept
-        {return id < m_nbrEntity && m_managers[id];}
+        {return id < m_nbrentity &&m_managers[id];}
 protected:
     //! Construit les informations d'un arbre pour la création des managers de type arbre.
-    InfoBdd infoBddArbre(const QString & table) const;
+    InfoBdd infoBddarbre(const QString &table) const;
 
     //! Mutateur de manager.
-    template<class Ent> void setManager(std::unique_ptr<AbstractManagerTemp<Ent>> && manager)
+    template<class Ent> void setManager(std::unique_ptr<AbstractManager_temp<Ent>> &&manager)
         {m_managers[Ent::ID] = std::move(manager);}
 
-    AbstractManager & getP(entidt id) const {
-        if(id < m_nbrEntity) {
+    AbstractManager &getP(entidt id) const {
+        if(id < m_nbrentity) {
             if(m_managers[id])
                 return *m_managers[id];
             else

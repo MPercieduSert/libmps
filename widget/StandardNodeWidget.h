@@ -16,15 +16,15 @@
 namespace widgetMPS {
 
 /*! \ingroup groupeWidget
- * \brief Classe des sous-noeuds composés d'une case à cocher.
+ *\brief Classe des sous-noeuds composés d'une case à cocher.
  */
 class CheckSubNodeWidget : public SubNodeWidget {
     Q_OBJECT
 protected:
-    QCheckBox * m_checkBox;       //! CheckBox du sous-noeud.
+    QCheckBox *m_checkBox;       //! CheckBox du sous-noeud.
 public:
     //! Constructeur.
-    CheckSubNodeWidget(const NodeIndex & index, QWidget * parent);
+    CheckSubNodeWidget(const NodeIndex &index, QWidget *parent);
 
     //! Met à jour le widget après un changement de drapeaux.
     void updateFlags() override {
@@ -36,15 +36,15 @@ protected:
 };
 
 /*! \ingroup groupeWidget
- * \brief Classe des sous-noeuds composés d'un label.
+ *\brief Classe des sous-noeuds composés d'un label.
  */
 class LabelSubNodeWidget : public SubNodeWidget {
     Q_OBJECT
 protected:
-    QLabel * m_label;       //! Label du sous-noeud.
+    QLabel *m_label;       //! Label du sous-noeud.
 public:
     //! Constructeur.
-    LabelSubNodeWidget(const NodeIndex & index, QWidget * parent);
+    LabelSubNodeWidget(const NodeIndex &index, QWidget *parent);
 
     //! Met à jour le widget après un changement de drapeaux.
     void updateFlags() override
@@ -55,15 +55,15 @@ protected:
     void updateDataSubNode(flag role) override;
 };
 /*! \ingroup groupeWidget
- * \brief Classe des sous-noeuds composés d'un label et d'une liste de choix.
+ *\brief Classe des sous-noeuds composés d'un label et d'une liste de choix.
  */
 class CodeSubNodeWidget : public LabelSubNodeWidget {
     Q_OBJECT
 protected:
-    widgetMPS::CodeWidget * m_codeWidget;       //! Choix des drapeaux.
+    widgetMPS::CodeWidget *m_codeWidget;       //! Choix des drapeaux.
 public:
     //! Constructeur.
-    CodeSubNodeWidget(const CodeWidget::Cases & cases, const NodeIndex & index, QWidget * parent);
+    CodeSubNodeWidget(const CodeWidget::Cases &cases, const NodeIndex &index, QWidget *parent);
 
     //! Met à jour le widget après un changement de drapeaux.
     void updateFlags() override {
@@ -77,15 +77,15 @@ protected:
 
 
 /*! \ingroup groupeWidget
- * \brief Classe des sous-noeuds composés d'un label et d'une liste de choix.
+ *\brief Classe des sous-noeuds composés d'un label et d'une liste de choix.
  */
 class ComboBoxSubNodeWidget : public LabelSubNodeWidget {
     Q_OBJECT
 protected:
-    QComboBox * m_comboBox;       //! Liste de choix.
+    QComboBox *m_comboBox;       //! Liste de choix.
 public:
     //! Constructeur.
-    ComboBoxSubNodeWidget(const NodeIndex & index, QWidget * parent);
+    ComboBoxSubNodeWidget(const NodeIndex &index, QWidget *parent);
 
     //! Met à jour le widget après un changement de drapeaux.
     void updateFlags() override {
@@ -98,15 +98,15 @@ protected:
 };
 
 /*! \ingroup groupeWidget
- * \brief Classe des sous-noeuds composés d'un label et d'une ligne d'édition de date.
+ *\brief Classe des sous-noeuds composés d'un label et d'une ligne d'édition de date.
  */
 class DateSubNodeWidget : public LabelSubNodeWidget {
     Q_OBJECT
 protected:
-    QDateEdit * m_dateEdit;       //! Ligne d'édition de la date du sous-noeud.
+    QDateEdit *m_dateEdit;       //! Ligne d'édition de la date du sous-noeud.
 public:
     //! Constructeur.
-    DateSubNodeWidget(const NodeIndex & index, QWidget * parent);
+    DateSubNodeWidget(const NodeIndex &index, QWidget *parent);
 
     //! Met à jour le widget après un changement de drapeaux.
     void updateFlags() override {
@@ -119,15 +119,15 @@ protected:
 };
 
 /*! \ingroup groupeWidget
- * \brief Classe des sous-noeuds composés d'un label et d'une ligne d'édition de texte.
+ *\brief Classe des sous-noeuds composés d'un label et d'une ligne d'édition de texte.
  */
 class LineEditSubNodeWidget : public LabelSubNodeWidget {
     Q_OBJECT
 protected:
-    QLineEdit * m_lineEdit;       //! Ligne d'édition du texte du sous-noeud.
+    QLineEdit *m_lineEdit;       //! Ligne d'édition du texte du sous-noeud.
 public:
     //! Constructeur.
-    LineEditSubNodeWidget(const NodeIndex & index, QWidget * parent);
+    LineEditSubNodeWidget(const NodeIndex &index, QWidget *parent);
 
     //! Met à jour le widget après un changement de drapeaux.
     void updateFlags() override {
@@ -140,15 +140,15 @@ protected:
 };
 
 /*! \ingroup groupeWidget
- * \brief Classe des sous-noeuds d'un texte à éditer.
+ *\brief Classe des sous-noeuds d'un texte à éditer.
  */
 class TexteEditNodeWidget : public SubNodeWidget {
     Q_OBJECT
 protected:
-    QTextEdit * m_texteEdit;       //! Éditeur de texte du sous-noeud.
+    QTextEdit *m_texteEdit;       //! Éditeur de texte du sous-noeud.
 public:
     //! Constructeur.
-    TexteEditNodeWidget(const NodeIndex & index, QWidget * parent);
+    TexteEditNodeWidget(const NodeIndex &index, QWidget *parent);
 
     //! Met à jour le widget après un changement de drapeaux.
     void updateFlags() override
@@ -158,7 +158,7 @@ protected:
     void updateDataSubNode(flag role) override;
 };
 /*! \ingroup groupeWidget
- * \brief Classe dessinant les nodes widgets à angles arrondis.
+ *\brief Classe dessinant les nodes widgets à angles arrondis.
  */
 class RoundedArcPainter : public NodeView::ArcPainter {
 public:
@@ -173,10 +173,10 @@ public:
     };
 
     //! Dessine l'arc liant les descendants.
-    void drawArc(ArcNodeViewWidget * arc) const override;
+    void drawArc(ArcNodeViewWidget *arc) const override;
 
     //! Dessine la zone permettant l'expansion du noeud.
-    void drawToolZone(ArcNodeViewWidget * arc) const override;
+    void drawToolZone(ArcNodeViewWidget *arc) const override;
 
     //! Renvoie taille verticale de la zone de demande d'expansion.
     int heightToolZone() const override {return HeightToolsZone;}
@@ -185,18 +185,18 @@ public:
     int leftExpandedMargin() const override {return LeftExpandMargin;}
 
     //! Renvoie taille horizontale de la zone de demande d'expansion.
-    int widthToolZone(NodeView::toolsNode num) const override {return (num +1) * WidthTool;}
+    int widthToolZone(NodeView::toolsNode num) const override {return (num +1) *WidthTool;}
 };
 
 /*! \ingroup groupeWidget
- * \brief Classe dessinant les nodes widgets à angles arrondis.
+ *\brief Classe dessinant les nodes widgets à angles arrondis.
  */
 class RoundedNodePainter : public NodeWidget::NodePainter {
 public:
     enum {Rayon = 10,
          NoSelectedWidth = 2,
          SelectedWidth = NoSelectedWidth,
-         CurrentWidth = 2 * SelectedWidth};
+         CurrentWidth = 2 *SelectedWidth};
 
 protected:
     int m_widthLine = NoSelectedWidth;              //!< Épaisseur du trait.
@@ -207,15 +207,15 @@ public:
         : m_colorLine(QGuiApplication::palette().color(QPalette::Active,QPalette::WindowText)) {}
 
     //! Dessine widget.
-    void paint(QWidget * widget) override;
+    void paint(QWidget *widget) override;
 
     //! Mutateur de l'état de sélection.
-    void setEtatSelection(NodeWidget::EtatSelection etat) override;
+    void set_etatSelection(NodeWidget::EtatSelection etat) override;
 };
 }
 namespace delegateMPS {
 /*! \ingroup groupeDelegate
- * \brief Delegate standard à un NodeView.
+ *\brief Delegate standard à un NodeView.
  */
 class StandardNodeDelegate : public AbstractNodeDelegate {
     Q_OBJECT
@@ -227,14 +227,14 @@ public:
     using AbstractNodeDelegate::AbstractNodeDelegate;
 
     //! Crée un noeud.
-    NodeWidget * createNode(const NodeIndex &index, QWidget * parent = nullptr) const override;
+    NodeWidget *createNode(const NodeIndex &index, QWidget *parent = nullptr) const override;
 
     //! Crée un sous-noeud.
-    virtual SubNodeWidget * createSubNode(const NodeIndex &index, QWidget *parent = nullptr) const;
+    virtual SubNodeWidget *createSubNode(const NodeIndex &index, QWidget *parent = nullptr) const;
 };
 
 /*! \ingroup groupeDelegate
- * \brief Delegate standard à un NodeView avec des noeud de type code.
+ *\brief Delegate standard à un NodeView avec des noeud de type code.
  */
 class CodeStandardNodeDelegate : public StandardNodeDelegate {
     Q_OBJECT
@@ -242,11 +242,11 @@ protected:
     widgetMPS::CodeWidget::Cases  m_cases;
 public:
     //! Constructeur.
-    CodeStandardNodeDelegate(const widgetMPS::CodeWidget::Cases cases, QObject * parent = nullptr)
+    CodeStandardNodeDelegate(const widgetMPS::CodeWidget::Cases cases, QObject *parent = nullptr)
         : StandardNodeDelegate(parent), m_cases(cases) {}
 
     //! Crée un sous-noeud.
-    SubNodeWidget * createSubNode(const NodeIndex &index, QWidget *parent = nullptr) const override;
+    SubNodeWidget *createSubNode(const NodeIndex &index, QWidget *parent = nullptr) const override;
 
     //! Muateur de cases.
     void setCases(const widgetMPS::CodeWidget::Cases cases)

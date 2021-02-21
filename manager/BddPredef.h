@@ -7,7 +7,7 @@
 #include <QFont>
 #include "Bdd.h"
 #include "ManagersPredef.h"
-#include "EntityPredef.h"
+#include "entityPredef.h"
 
 namespace bddMPS {
     namespace bddVersion {
@@ -21,40 +21,40 @@ namespace bddMPS {
     }
 
 /*! \ingroup groupeFile
- * \brief Gestionnaire de la base de donnée pour les entités prédéfinie.
+ *\brief Gestionnaire de la base de donnée pour les entités prédéfinie.
  *
- * Gestionnaire de la base de donnée pour les entités prédéfinie:
- *      - Commentaire,
- *      - CommentaireCible,
- *      - Donnee,
- *      - DonneeCard,
- *      - DonneeCible,
- *      - Evenement,
- *      - EvenementCible,
- *      - EvenementStyle,
- *      - Historique,
- *      - MotCle,
- *      - MotCleCible,
- *      - MotClePermission,
- *      - Restriction,
- *      - Source,
- *      - SourceTexte,
- *      - Texte,
- *      - TexteCible,
- *      - Type,
- *      - TypePermission,
- *      - Utilisation
+ *Gestionnaire de la base de donnée pour les entités prédéfinie:
+ *     - Commentaire,
+ *     - commentaire_cible,
+ *     - donnee,
+ *     - donnee_card,
+ *     - donnee_cible,
+ *     - Evenement,
+ *     - evenement_cible,
+ *     - evenement_style,
+ *     - Historique,
+ *     - mot_cle,
+ *     - mot_cle_cible,
+ *     - mot_cle_permission,
+ *     - Restriction,
+ *     - Source,
+ *     - source_texte,
+ *     - Texte,
+ *     - texte_cible,
+ *     - Type,
+ *     - type_permission,
+ *     - Utilisation
  */
 class BddPredef : public Bdd {
 public:
     //! Constructeur. Donner en argument le type ainsi que le chemin de la base de donnée.
-    BddPredef(const QString & dbtype, const std::vector<int> & version, std::unique_ptr<managerMPS::ManagersPredef> && manager)
+    BddPredef(const QString &dbtype, const std::vector<int> &version, std::unique_ptr<managerMPS::ManagersPredef> &&manager)
         : Bdd(dbtype,version,std::move(manager)) {}
 
     //! Constructeur. Donner en argument le type ainsi que le chemin de la base de donnée.
-    BddPredef(const QString & dbtype, const QString & fileName, const std::vector<int> & version,
-              std::unique_ptr<managerMPS::ManagersPredef> && manager)
-        : Bdd(dbtype,fileName,version,std::move(manager)) {}
+    BddPredef(const QString &dbtype, const QString &name, const std::vector<int> &version,
+              std::unique_ptr<managerMPS::ManagersPredef> &&manager)
+        : Bdd(dbtype,name,version,std::move(manager)) {}
 
     //! Destructeur. Referme la base de donnée.
     ~BddPredef() override = default;
@@ -68,49 +68,49 @@ public:
         {return managers().cible<Ent>();}
 
     //! Suppresseur d'une entité enregistrée comme donnée.
-    void delEntityInDonnee(idt idCible, int cible, int num = 0);
+    void delentityIndonnee(idt id_cible, int cible, int num = 0);
 
     //! Accesseur d'une entité enregistrée comme donnée.
-    template<class Ent> Ent getEntityInDonnee(idt idCible, int cible, int num = 0);
+    template<class Ent> Ent getentityIndonnee(idt id_cible, int cible, int num = 0);
 
     //! Acceseur du manageur.
-    const managerMPS::ManagersPredef & managers() const
+    const managerMPS::ManagersPredef &managers() const
         {return static_cast<const managerMPS::ManagersPredef &>(*m_manager);}
 
     //! Acceseur du manageur.
-    managerMPS::ManagersPredef & managers()
+    managerMPS::ManagersPredef &managers()
         {return static_cast<managerMPS::ManagersPredef &>(*m_manager);}
 
     //! Renvoie le nombre des entités liées à la cible.
-    virtual int nbrEntityCible(int /*cible*/) const
+    virtual int nbrentityCible(int /*cible*/) const
         {return 0;}//à finir
 
     //! Renvoie le nom des entités liées à la cible.
-    virtual std::map<int,QString> nomsEntityCible(int /*cible*/) const
+    virtual std::map<int,QString> nomsentityCible(int /*cible*/) const
         {return std::map<int,QString>();}//à finir
 
     //! Mutateur d'une entité enregistrée comme donnée.
-    template<class Ent> void setEntityInDonnee(const Ent & entity, idt idCible, int cible, int num = 0);
+    template<class Ent> void setentityIndonnee(const Ent &ent, idt id_cible, int cible, int num = 0);
 
     //! Renvoie l'enumeration associé à str pour un groupe de catégorie.
-    enumt strCategorieToEnum(const QString &str, flag categorie, QString & controle) const noexcept override;
+    enumt strCategorieToEnum(const QString &str, flag categorie, QString &controle) const noexcept override;
 
-    //! Renvoie l'enumeration associé à str pour une entitée de type idEntity.
-    enumt strIdToEnum(const QString & str, idt idEntity, QString &controle) const noexcept override;
+    //! Renvoie l'enumeration associé à str pour une entitée de type id_entity.
+    enumt strIdToEnum(const QString &str, idt id_entity, QString &controle) const noexcept override;
 
 protected:
-    //! Supprime l'entité d'identifiant id de type d'identifiant idEntity de la base de données.
-    bool delP(idt id, entidt idEntity) override;
+    //! Supprime l'entité d'identifiant id de type d'identifiant id_entity de la base de données.
+    bool delP(idt id, entidt id_entity) override;
 
     //! Hydrate un attribut de l'entité par la valeur contenue dans le XmlDox à l'endroit pointé par iter.
-    void hydrateAttributXml(entityMPS::Entity & entity, post pos, xml_iterator iter, QString & controle) override;
+    void hydrateAttributXml(entities::entity &ent, post pos, xml_iterator iter, QString &controle) override;
 
     //! Hydrate un attribut de l'entité entity_ass associée à entity avec le couple pair<clé,valeur>.
-    void hydrateAttributAssociatedXml(Entity & entity_ass, const std::pair<const QString,QString> & pair,
-                                      const Entity & entity, QString & controle) override;
+    void hydrateAttributAssociatedXml(entity &ent_ass, const std::pair<const QString,QString> &pair,
+                                      const entity &ent, QString &controle) override;
 
     //! Renvoie le numero de début d'enregistrement d'une entité.
-    std::pair<int, int> intervalEntityInDonnee(idt idCible, int cible, int num);
+    std::pair<int, int> intervalentityIndonnee(idt id_cible, int cible, int num);
 
     //! Teste si un attribut d'une entité associée est multiple.
     bool isMultipleAssociatedXml(const std::pair<const QString,QString> &pair) const override;
@@ -119,93 +119,93 @@ protected:
     void listeMiseAJourBdd(int version, idt type) override;
 
     //! Renvoie la liste des attributs associés un attribut multiple.
-    xml_list_atts listMultipleAssociatedXml(const std::pair<const QString,QString> &pair, QString & controle) override;
+    xml_list_atts listMultipleAssociatedXml(const std::pair<const QString,QString> &pair, QString &controle) override;
 
     //! Renvoie l'autorisation de modification de l'entité donnée en argument.
-    bool testAutorisationP(idt id, entidt idEntity, flag autoris) override;
+    bool testAutorisationP(idt id, entidt id_entity, flag autoris) override;
 };
 
-template<class Ent> Ent BddPredef::getEntityInDonnee(idt idCible, int Cible, int num)
+template<class Ent> Ent BddPredef::getentityIndonnee(idt id_cible, int Cible, int num)
 {
-    using namespace entityMPS;
-    DonneeCible nature(Donnee::EntityNatureIdND,idCible,Cible,num);
+    using namespace entities;
+    donnee_cible nature(donnee::Entity_Nature_IdND,id_cible,Cible,num);
     if(!get(nature) || nature.valeur().toInt() == natureId::Vide || nature.valeur().toInt() != cible<Ent>())
         return Ent();
 
-    std::pair<int,int> interval(intervalEntityInDonnee(idCible,Cible,num));
-    auto liste = getList<DonneeCible>(std::vector<DonneeCible::Position>({DonneeCible::Num,
-                                                     DonneeCible::Num,
-                                                     DonneeCible::IdDonnee,
-                                                     DonneeCible::IdCible,
-                                                     DonneeCible::Cible}),
+    std::pair<int,int> interval(intervalentityIndonnee(id_cible,Cible,num));
+    auto liste = getList<donnee_cible>(std::vector<donnee_cible::Position>({donnee_cible::Num,
+                                                     donnee_cible::Num,
+                                                     donnee_cible::Iddonnee,
+                                                     donnee_cible::Id_Cible,
+                                                     donnee_cible::Cible}),
                                                      std::vector<QVariant>({interval.first,
                                                      interval.second,
-                                                     Donnee::EntityIdND,
-                                                     idCible,
+                                                     donnee::Entity_IdND,
+                                                     id_cible,
                                                      Cible}),
-                                                     std::vector<DonneeCible::Position>({DonneeCible::Num}),
+                                                     std::vector<donnee_cible::Position>({donnee_cible::Num}),
                                                      std::vector<condition>({SupEgal, Inf}));
     Ent entity;
     auto j = liste.begin();
-    for(post i = 0; i != Ent::NbrAtt; ++i, ++j)
-        entity.setData(i,j->valeur());
+    for(post i = 0; i != Ent::Nbr_Att; ++i, ++j)
+        entity.set_data(i,j->valeur());
     return entity;
 }
 
-template<class Ent> void BddPredef::setEntityInDonnee(const Ent & entity, idt idCible, int Cible, int num) {
-    using namespace entityMPS;
+template<class Ent> void BddPredef::setentityIndonnee(const Ent &ent, idt id_cible, int Cible, int num) {
+    using namespace entities;
 
     if(num < 0)
         throw std::invalid_argument("L'argument num doit être positif");
 
-    DonneeCible nature(Donnee::EntityNatureIdND, idCible, Cible, num);
+    donnee_cible nature(donnee::Entity_Nature_IdND, id_cible, Cible, num);
     if(get(nature)) {
         if(nature.valeur().toInt() != cible<Ent>()) {
-            std::pair<int, int> intervalOld(intervalEntityInDonnee(idCible,Cible,num));
-            auto  offset = Ent::NbrAtt - (intervalOld.second - intervalOld.first);
+            std::pair<int, int> intervalOld(intervalentityIndonnee(id_cible,Cible,num));
+            auto  offset = Ent::Nbr_Att - (intervalOld.second - intervalOld.first);
             if(offset != 0) {
-                auto liste  = getList<DonneeCible>(std::vector<DonneeCible::Position>({DonneeCible::Num,
-                                                                 DonneeCible::IdDonnee,
-                                                                 DonneeCible::IdCible,
-                                                                 DonneeCible::Cible}),
+                auto liste  = getList<donnee_cible>(std::vector<donnee_cible::Position>({donnee_cible::Num,
+                                                                 donnee_cible::Iddonnee,
+                                                                 donnee_cible::Id_Cible,
+                                                                 donnee_cible::Cible}),
                                                                  std::vector<QVariant>({intervalOld.second,
-                                                                 Donnee::EntityIdND,
-                                                                 idCible,
+                                                                 donnee::Entity_IdND,
+                                                                 id_cible,
                                                                  Cible}),
-                                                                 std::vector<DonneeCible::Position>({DonneeCible::Num}),
+                                                                 std::vector<donnee_cible::Position>({donnee_cible::Num}),
                                                                  std::vector<condition>({SupEgal}),
                                                                  std::vector<bool>({offset < 0}));
                 for(auto i = liste.begin(); i != liste.end(); ++i) {
-                    i->setNum(i->num() + offset);
+                    i->set_num(i->num() + offset);
                     save(*i);
                 }
             }
-            nature.setValeur(cible<Ent>());
+            nature.set_valeur(cible<Ent>());
             save(nature);
         }
     }
     else {
         if(num != 0) {
-            DonneeCible natureNumPrec(Donnee::EntityNatureIdND, idCible, Cible, num - 1);
-            natureNumPrec.setValeur(natureId::Vide);
-            while(natureNumPrec.num() >= 0 && !existsUnique(natureNumPrec)) {
+            donnee_cible natureNumPrec(donnee::Entity_Nature_IdND, id_cible, Cible, num - 1);
+            natureNumPrec.set_valeur(natureId::Vide);
+            while(natureNumPrec.num() >= 0 &&!existsUnique(natureNumPrec)) {
                 save(natureNumPrec);
-                natureNumPrec.setNum(natureNumPrec.num() - 1);
+                natureNumPrec.set_num(natureNumPrec.num() - 1);
             }
         }
-        nature.setValeur(cible<Ent>());
+        nature.set_valeur(cible<Ent>());
         save(nature);
     }
 
-    std::pair<int, int> interval(intervalEntityInDonnee(idCible,Cible,num));
-    DonneeCible cd;
-    cd.setId1(Donnee::EntityIdND);
-    cd.setIdCible(idCible);
-    cd.setCible(Cible);
-    for(int i = 0; i != Ent::NbrAtt; ++i) {
-        cd.setId(0);
-        cd.setNum(interval.first + i);
-        cd.setValeur(entity.data(i));
+    std::pair<int, int> interval(intervalentityIndonnee(id_cible,Cible,num));
+    donnee_cible cd;
+    cd.set_id_1(donnee::Entity_IdND);
+    cd.set_id_cible(id_cible);
+    cd.set_cible(Cible);
+    for(int i = 0; i != Ent::Nbr_Att; ++i) {
+        cd.set_id(0);
+        cd.set_num(interval.first + i);
+        cd.set_valeur(entity.data(i));
         saveUnique(cd);
     }
 }

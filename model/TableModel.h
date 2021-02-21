@@ -9,12 +9,12 @@
 #include <QMessageBox>
 #include <QPushButton>
 #include "AbstractColonnesModel.h"
-#include "typemps.h"
+#include "type_mps.h"
 
 namespace modelMPS {
-using namespace typeMPS;
+using namespace type_mps;
 /*! \ingroup groupeModel
- * \brief Classe mère des model de type tableau.
+ *\brief Classe mère des model de type tableau.
  */
 class TableModel : public AbstractColonnesModel {
     Q_OBJECT
@@ -25,7 +25,7 @@ protected:
                          InsertOut};
 public:
     /*! \ingroup groupeModel
-     * \brief Classe d'information sur la selection d'un tableau.
+     *\brief Classe d'information sur la selection d'un tableau.
      */
     class SelectedRange {
     protected:
@@ -33,7 +33,7 @@ public:
         int m_bottom;           //!< Indice de ligne de la selection plus basse.
         std::vector<int> m_columnList;   //!< Liste des colonnes selectionnées dans la première ligne séléctionné, vide si la séléction est rectangulaire.
         bool m_isRect;          //!< Vraie si la selection est un rectangle.
-        bool m_isValid;         //!< Vraie si la selection est valide c'est-à-dire si chaque ligne séléctionnée posséde les mêmes colonnes séléctionner.
+        bool m_is_valid;         //!< Vraie si la selection est valide c'est-à-dire si chaque ligne séléctionnée posséde les mêmes colonnes séléctionner.
         int m_left;             //!< Indice de la colonne la plus à gauche.
         int m_right;            //!< Indice de la colonne la plus à droite.
         std::vector<int> m_rowList;    //!< Liste des lignes selectionnées (même partiellement), vide si la séléction est rectangulaire.
@@ -62,7 +62,7 @@ public:
         int columnCount() {return m_isRect ? m_right - m_left +1 : static_cast<int>(columns().size());}
 
         //! Renvoie les colonnes séléctionnées dans la première ligne de la séléction.
-        const std::vector<int> & columns();
+        const std::vector<int> &columns();
 
         //! Test si la selection est un rectangle.
         bool isRect() {
@@ -70,9 +70,9 @@ public:
             return m_isRect;}
 
         //! Test si la selection est valide.
-        bool isValid() {
+        bool is_valid() {
             setValidity();
-            return m_isValid;}
+            return m_is_valid;}
 
         //! Accesseur de left.
         int left() {
@@ -95,7 +95,7 @@ public:
         int rowCount() {return m_isRect ? m_bottom - m_top +1: static_cast<int>(rows().size());}
 
         //! Renvoie l'ensemble des lignes contenant au moins une case séléctionnée.
-        const std::vector<int> & rows();
+        const std::vector<int> &rows();
 
         //! Accesseur de tom.
         int top() {
@@ -113,13 +113,13 @@ protected:
     std::vector<szt> m_rowToLigne;       //!< Correspondances de index.row <-> lignes.
 public:
     //! Constructeur.
-    explicit TableModel(bool uniqueLigne = true, bool valideLigne = true, QObject * parent = nullptr);
+    explicit TableModel(bool uniqueLigne = true, bool valideLigne = true, QObject *parent = nullptr);
 
     //! Destructeur par defaut.
     ~TableModel() override = default;
 
     //! Recherche les lignes de données vérifiant les conditions d'un modéle de recherche donné.
-    void find(AbstractFindModel * findModel) override;
+    void find(AbstractFindModel *findModel) override;
 
     //! Drapeaux d'un item
     Qt::ItemFlags flags(const QModelIndex &index) const override;
@@ -134,21 +134,21 @@ public:
     QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const override;
 
     //! Insert count lignes dans le model juste avant la ligne row.
-    bool insertRows(int row, int count, const QModelIndex & parent = QModelIndex()) override;
+    bool insertRows(int row, int count, const QModelIndex &parent = QModelIndex()) override;
 
     //! Renvoie l'index du parent.
     QModelIndex parent(const QModelIndex &/*index*/) const override
         {return QModelIndex();}
 
     //! Supprime count lignes en commençant par la ligne row.
-    bool removeRows(int row, int count, const QModelIndex & parent = QModelIndex()) override;
+    bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex()) override;
 
     //! Supprime une selection de lignes entières.
     bool removeRowsSelected(const QModelIndexList &selection) override;
 
     //! Renvoie le nombre de lignes.
-    int rowCount(const QModelIndex & parent = QModelIndex()) const override
-        {return parent.isValid() ? 0 : static_cast<int>(m_rowToLigne.size());}
+    int rowCount(const QModelIndex &parent = QModelIndex()) const override
+        {return parent.is_valid() ? 0 : static_cast<int>(m_rowToLigne.size());}
 
     QModelIndex sibling(int row, int column, const QModelIndex &) const override
         {return index(row, column);}
@@ -176,14 +176,14 @@ public slots:
     void updateAllEtats() override;
 
     //! Mets à jour l'état d'une ligne.
-    void updateEtats(int first, int last, const QModelIndex & parent = QModelIndex()) override;
+    void updateEtats(int first, int last, const QModelIndex &parent = QModelIndex()) override;
 
 protected:
     //! Ouvre une fenêtre de dialogue pour demander si l'insertion doit être faite à l'intérieur de la selection ou non.
     DialogSelection dialogColler() const;
 
     //! Fait la correspondance entre l'index et la ligne de donnée.
-    szt ligne(const QModelIndex & index) const override
+    szt ligne(const QModelIndex &index) const override
         {return rowToLigne(index.row());}
 
     //! Fait la correspondance entre la ligne de donnée et la ligne d'index.
@@ -197,7 +197,7 @@ protected:
     void resetRowToLigne() override;
 
     //! Fait la correspondance entre la ligne d'index et la ligne de donnée.
-    szt rowToLigne(int row, const QModelIndex & /*parent*/ = QModelIndex()) const override
+    szt rowToLigne(int row, const QModelIndex &/*parent*/ = QModelIndex()) const override
         {return m_rowToLigne[static_cast<szt>(row)];}
 
     //! Renvoie un vecteur contenant l'ensemble des identifiants des lignes visibles ou de toutes les lignes.

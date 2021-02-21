@@ -2,8 +2,8 @@
 
 using namespace fenMPS;
 
-PredefFenPrincipale::PredefFenPrincipale(AbstractNoyau * noyau, std::unique_ptr<bddMPS::Bdd> &&bdd, PredefZoneCentrale * centralZone,
-                                         const QString & bddPathXML, const QString & configPath, QWidget *parent)
+PredefFenPrincipale::PredefFenPrincipale(AbstractNoyau *noyau, std::unique_ptr<bddMPS::Bdd> &&bdd, PredefZoneCentrale *centralZone,
+                                         const QString &bddPathXML, const QString &configPath, QWidget *parent)
     :   FenPrincipale (noyau,std::move(bdd),centralZone,bddPathXML,configPath,parent)
 {
     addMenuBdd();
@@ -31,40 +31,40 @@ void PredefFenPrincipale::addMenuBdd(){
     //connect(schXml,&QAction::triggered,this,&PredefFenPrincipale::schemaXml);
 }
 
-void PredefFenPrincipale::connectActionToOpenTab(QAction * action, const std::pair<int,int>& pairIndex,
-                                           const std::vector<QVariant> & vec)
+void PredefFenPrincipale::connectActionToOpenTab(QAction *action, const std::pair<int,int>&pairIndex,
+                                           const std::vector<QVariant> &vec)
     {connect(action,&QAction::triggered,this,[this,pairIndex,vec](){centraleZone()->openTab(pairIndex,vec);});}
 
 void PredefFenPrincipale::export_xml() {
     widgetMPS::SelectTableDialog dialog(noyau()->bdd().table_entity_names(),this);
     if(dialog.exec()){
-        auto fileName = QFileDialog::getSaveFileName(this,
+        auto name = QFileDialog::getSaveFileName(this,
                                                      tr("Exporter des données dans un fichier XML"),
-                                                     m_noyau->config().defaultDirectory(),
+                                                     m_noyau->config().default_directory(),
                                                      tr("Fichier XML (*.xml)"));
-        if(!fileName.isEmpty()){
-            conteneurMPS::VectorPtr<entityMPS::Entity> vec;
+        if(!name.isEmpty()){
+            conteneurMPS::vector_ptr<entities::entity> vec;
             for (auto iter = dialog.set().cbegin(); iter != dialog.set().cend(); ++iter)
                 vec<<noyau()->bdd().getList(*iter);
-            m_noyau->exportXml(fileName,std::move(vec),dialog.option());
+            m_noyau->exportXml(name,std::move(vec),dialog.option());
         }
     }
 }
 
 void PredefFenPrincipale::import_xml() {
-    auto fileName = QFileDialog::getOpenFileName(this,
+    auto name = QFileDialog::getOpenFileName(this,
                                              tr("Importer des données à partir d'un fichier XML"),
-                                             m_noyau->config().defaultDirectory(),
+                                             m_noyau->config().default_directory(),
                                              tr("Fichier XML (*.xml)"));
-    if(!fileName.isEmpty())
-        m_noyau->importXml(fileName);
+    if(!name.isEmpty())
+        m_noyau->importXml(name);
 }
 
 void PredefFenPrincipale::schemaXml() {
-    auto fileName = QFileDialog::getSaveFileName(this,
+    auto name = QFileDialog::getSaveFileName(this,
                                                  tr("Écriture du schema xml des fichiers d'importation de données"),
-                                                 m_noyau->config().defaultDirectory(),
+                                                 m_noyau->config().default_directory(),
                                                  tr("Schema XML (*.xsd)"));
-    if(!fileName.isEmpty())
-        m_noyau->schemaXmlForimport(fileName);
+    if(!name.isEmpty())
+        m_noyau->schemaXmlForimport(name);
 }

@@ -20,7 +20,7 @@ bool AbstractTab::openTab(const std::pair<int, int> &pair, const std::vector<QVa
     }
 }
 
-void AbstractTab::connectTab(AbstractTabModule * tab) const
+void AbstractTab::connectTab(AbstractTabModule *tab) const
     {connect(tab,&AbstractTabModule::actionPermise,this,&AbstractTab::actionPermise);}
 
 void AbstractTab::currentChange() {
@@ -33,7 +33,7 @@ void AbstractTab::removeTab(int index) {
     QTabWidget::removeTab(index);
 }
 
-void AbstractTab::removeTab(const std::pair<int,int> & pair) {
+void AbstractTab::removeTab(const std::pair<int,int> &pair) {
     auto iter = m_mapTab.find(pair);
     if(iter != m_mapTab.cend()) {
         QTabWidget::removeTab(indexOf(iter->second));

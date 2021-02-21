@@ -5,13 +5,13 @@
 #define ABSTRACTMANAGERARBRE_H
 
 #include "ManagerSql.h"
-#include "Tree.h"
+#include "tree.h"
 
 namespace managerMPS {
 /*! \ingroup groupeManager
- * \brief Classe template abstraite parent des différents manageurs pour les entités de type arbre.
+ *\brief Classe template abstraite parent des différents manageurs pour les entités de type arbre.
  */
-template<class Ent> class AbstractManagerArbre : public virtual ManagerSql<Ent> {
+template<class Ent> class AbstractManagerarbre : public virtual ManagerSql<Ent> {
 protected:
     using ManagerSqlEnt = ManagerSql<Ent>;
     using ManagerSqlEnt::del;
@@ -22,7 +22,7 @@ public:
     using ManagerSqlEnt::save;
 
     //! Renvoie l'arbre de toutes les entités.
-    tree<Ent> getArbre() override {
+    tree<Ent> getarbre() override {
         auto racines = getListRacinesId();
         tree<Ent> tree;
         auto iter = tree.begin();
@@ -40,11 +40,11 @@ public:
     }
 
     //! Renvoie l'arbre de racine entity.
-    tree<Ent> getArbre(const Ent & entity) override
-        {return getArbre(entity.id());}
+    tree<Ent> getarbre(const Ent &ent) override
+        {return getarbre(entity.id());}
 
     //! Renvoie l'arbre l'entity d'identifiant.
-    tree<Ent> getArbre(idt id) override {
+    tree<Ent> getarbre(idt id) override {
         Ent ent(id);
         if(get(ent)) {
             tree<Ent> tree(ent);
@@ -60,14 +60,14 @@ public:
             return tree;
         }
         else
-            throw std::invalid_argument("L'identifiant transmise en argument de getArbre ne correspond à aucune entité.");
+            throw std::invalid_argument("L'identifiant transmise en argument de getarbre ne correspond à aucune entité.");
     }
 
     //! Renvoie la liste des identifiants des racines.
     virtual std::list<idt> getListRacinesId() = 0;
 
     //! Enregistre l'arbre d'entités.
-    void save(tree<Ent> & tree, bmps::treeSave n = bmps::treeSave::ExternalChange) override;
+    void save(tree<Ent> &tree, bmps::treeSave n = bmps::treeSave::ExternalChange) override;
 
 protected:
     //! Supprime de la Base de données les noeuds hors de l'arbre.
@@ -86,14 +86,14 @@ protected:
     virtual void saveExt(typename tree<Ent>::iterator iter, idt idRoot) = 0;
 
     //! Sauve la racine de l'arbre (donnée et structure).
-    virtual void saveRoot(tree<Ent> & tree) = 0;
+    virtual void saveRoot(tree<Ent> &tree) = 0;
 
     //! Sauve un arbre où le changement de structure consite seulement
     //! l'ajout de nouveaux noeuds et des permutations à l'interieur de l'arbre.
     virtual void saveWithoutDelete(typename tree<Ent>::iterator iter) = 0;
 };
 
-template<class Ent> void AbstractManagerArbre<Ent>::deleteLeafOutOf(typename tree<Ent>::iterator iter) {
+template<class Ent> void AbstractManagerarbre<Ent>::deleteLeafOutOf(typename tree<Ent>::iterator iter) {
     while(iter) {
         if(iter.leaf()) {
             auto childs = getListChildsId(iter->id());
@@ -103,7 +103,7 @@ template<class Ent> void AbstractManagerArbre<Ent>::deleteLeafOutOf(typename tre
 //        else {
 //            auto childs = getListChildsId(iter->id());
 //            for(auto i = childs.cbegin(); i != childs.cend(); ++i){
-//                if(i->num() < 0 || i->num() >= iter->sizeChild())
+//                if(i->num() < 0 || i->num() >= iter->size_child())
 //                    del(*i);
 //            }
 //        }
@@ -111,13 +111,13 @@ template<class Ent> void AbstractManagerArbre<Ent>::deleteLeafOutOf(typename tre
     }
 }
 
-template<class Ent> void AbstractManagerArbre<Ent>::save(tree<Ent> & tree, bmps::treeSave n) {
+template<class Ent> void AbstractManagerarbre<Ent>::save(tree<Ent> &tree, bmps::treeSave n) {
     using namespace bmps;
-    if(n == treeSave::EntityOnly) {
+    if(n == treeSave::entityOnly) {
         for(auto i = tree.begin(); i ; ++i)
             save(*i);
     }
-    else if(n == treeSave::EntityOnlyWhitoutRoot) {
+    else if(n == treeSave::entityOnlyWhitoutRoot) {
         auto i = tree.begin();
         ++i;
         while (i) {
@@ -126,7 +126,7 @@ template<class Ent> void AbstractManagerArbre<Ent>::save(tree<Ent> & tree, bmps:
         }
     }
     else {
-        if(n < treeSave::EntityOnlyWhitoutRoot)
+        if(n < treeSave::entityOnlyWhitoutRoot)
             saveRoot(tree);
         switch (n) {
         case treeSave::AddLeaf:
@@ -151,8 +151,8 @@ template<class Ent> void AbstractManagerArbre<Ent>::save(tree<Ent> & tree, bmps:
             deleteLeafOutOf(tree.begin());
             break;
 
-        case treeSave::EntityOnly:
-        case treeSave::EntityOnlyWhitoutRoot:
+        case treeSave::entityOnly:
+        case treeSave::entityOnlyWhitoutRoot:
             break;
         }
     }

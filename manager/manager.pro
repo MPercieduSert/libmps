@@ -28,20 +28,20 @@ SOURCES += \
     Bdd.cpp \
     BddPredef.cpp \
     InfoBdd.cpp \
-    ManagerForArbre.cpp \
+    ManagerForarbre.cpp \
     Managers.cpp \
     ManagersPredef.cpp \
     ManagerSql.cpp \
     ReqSql.cpp \
     UniqueSqlBase.cpp \
-    ManagerArbre.cpp \
-    ManagerArbreModifControle.cpp \
-    ManagerArbreSimple.cpp \
-    ManagerArbreSimpleModifControle.cpp \
+    Managerarbre.cpp \
+    ManagerarbreModifControle.cpp \
+    Managerarbre_simple.cpp \
+    Managerarbre_simpleModifControle.cpp \
     ManagerModifControle.cpp \
     ManagerPermission.cpp \
     ManagerPermissionModifControle.cpp \
-    AbstractManagerArbre.cpp \
+    AbstractManagerarbre.cpp \
     AbstractGestionRestriction.cpp \
     GestionRestrictionCible.cpp
 
@@ -52,20 +52,20 @@ HEADERS += \
     Bdd.h \
     BddPredef.h \
     InfoBdd.h \
-    ManagerForArbre.h \
+    ManagerForarbre.h \
     Managers.h \
     ManagersPredef.h \
     ManagerSql.h \
     ReqSql.h \
     UniqueSqlBase.h \
-    ManagerArbre.h \
-    ManagerArbreModifControle.h \
-    ManagerArbreSimple.h \
-    ManagerArbreSimpleModifControle.h \
+    Managerarbre.h \
+    ManagerarbreModifControle.h \
+    Managerarbre_simple.h \
+    Managerarbre_simpleModifControle.h \
     ManagerModifControle.h \
     ManagerPermission.h \
     ManagerPermissionModifControle.h \
-    AbstractManagerArbre.h \
+    AbstractManagerarbre.h \
     AbstractGestionRestriction.h \
     GestionRestrictionCible.h
 unix {

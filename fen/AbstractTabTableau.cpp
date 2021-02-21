@@ -2,10 +2,10 @@
 
 using namespace fenMPS;
 
-AbstractTabTableau::AbstractTabTableau(bmps::Bdd & bdd, const std::pair<int, int> &pairIndex, QWidget *parent)
+AbstractTabTableau::AbstractTabTableau(bmps::Bdd &bdd, const std::pair<int, int> &pairIndex, QWidget *parent)
     : AbstractTabModuleWithBdd(bdd,pairIndex, parent) {}
 
-void AbstractTabTableau::becomeCurrent()
+void AbstractTabTableau::become_current()
     {emit actionPermise(EditerActions);}
 
 void AbstractTabTableau::coller()

@@ -35,7 +35,7 @@ SOURCES += \
     FenFoundFile.cpp \
     FenPrincipale.cpp \
     PredefTab.cpp \
-    TabMotCle.cpp \
+    Tabmot_cle.cpp \
     TabGestionBdd.cpp \
     PredefZoneCentrale.cpp \
     PredefFenPrincipale.cpp \
@@ -56,7 +56,7 @@ HEADERS += \
     FenFoundFile.h \
     FenPrincipale.h \
     PredefTab.h \
-    TabMotCle.h \
+    Tabmot_cle.h \
     TabGestionBdd.h \
     PredefZoneCentrale.h \
     PredefFenPrincipale.h \

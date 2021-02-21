@@ -9,7 +9,7 @@
 
 namespace managerMPS {
 /*! \ingroup groupeManager
- * \brief Classe template des différents manageurs à modification controlée de permission.
+ *\brief Classe template des différents manageurs à modification controlée de permission.
  */
 template<class ManagerPerm> class ManagerPermissionModifControle : public ManagerPerm,
                                                                            public ManagerModifControle<typename ManagerPerm::EntType> {
@@ -23,10 +23,10 @@ public:
     using ManagerMC::del;
 
     //! Constructeur
-    ManagerPermissionModifControle (const InfoBdd & info,
-                                    std::unique_ptr<AbstractGestionRestriction<Ent>> && gestionAutorisation
+    ManagerPermissionModifControle (const InfoBdd &info,
+                                    std::unique_ptr<AbstractGestionRestriction<Ent>> &&gestionAutorisation
                                                 = std::make_unique<AbstractGestionRestriction<Ent>>(),
-                                    std::unique_ptr<AbstractUniqueSqlTemp<Ent>> && unique = std::make_unique<NoUniqueSql<Ent>>())
+                                    std::unique_ptr<AbstractUniqueSql_temp<Ent>> &&unique = std::make_unique<NoUniqueSql<Ent>>())
         : ManagerSql<Ent>(info, std::move(unique)),
           ManagerModifControle<Ent>(std::move(gestionAutorisation)) {}
 
@@ -34,11 +34,11 @@ public:
     ~ManagerPermissionModifControle() override = default;
 
     //! Enregistre l'entité entity en base de donnée.
-    void save(Ent & entity) override
+    void save(Ent &ent) override
         {ManagerPerm::save(entity);}
 
     //! Enregistre l'entité entity en base de donnée.
-    void save(const Ent & entity) override
+    void save(const Ent &ent) override
         {ManagerPerm::save(entity);}
 
     //! Retourne le type du manager.
@@ -47,27 +47,27 @@ public:
 
 protected:
     //! Appelle la fonction d'insertion parent souhaitée.
-    void addParent(Ent & entity) override
+    void addParent(Ent &ent) override
         {ManagerMC::add(entity);}
 
     //! Appelle la fonction d'insertion parent souhaitée.
-    void addParent(const Ent & entity) override
+    void addParent(const Ent &ent) override
         {ManagerMC::add(entity);}
 
     //! Réimplemente modify.
-    void modify(const Ent & entity) override
+    void modify(const Ent &ent) override
         {ManagerPerm::modify(entity);}
 
     //! Réimplemente modify.
-    void modify(const Ent & entity, idt id) override
+    void modify(const Ent &ent, idt id) override
         {ManagerPerm::modify(entity,id);}
 
     //! Appelle la fonction de modification parent souhaitée.
-    void modifyParent(const Ent & entity) override
+    void modifyParent(const Ent &ent) override
         {ManagerMC::modify(entity);}
 
     //! Appelle la fonction de modification parent souhaitée.
-    void modifyParent(const Ent & entity, idt id) override
+    void modifyParent(const Ent &ent, idt id) override
         {ManagerMC::modify(entity,id);}
 };
 

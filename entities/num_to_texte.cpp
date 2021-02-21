@@ -1,8 +1,8 @@
-#include "NumToTexte.h"
+#include "num_to_texte.h"
 
-using namespace diversMPS;
+using namespace mps::divers;
 
-const std::vector<std::pair<int,QString>> NumToTexte::m_romain{   {1000,"M"},
+const std::vector<std::pair<int,QString>> num_to_string::m_Romain{   {1000,"M"},
                                                     {900,"CM"},
                                                     {500,"D"},
                                                     {400,"CD"},
@@ -16,88 +16,88 @@ const std::vector<std::pair<int,QString>> NumToTexte::m_romain{   {1000,"M"},
                                                     {4,"IV"},
                                                     {1,"I"}};
 
-void NumToTexte::setStyle(enumt style){
+void num_to_string::set_style(enumt style){
     m_style = style;
     switch (style) {
-    case ArabeSuivant:
-        m_toNum = [](const QString & str)->int{return str.toInt() - 1;};
-        m_toString = [](int num)->QString{return QString::number(num + 1);};
+    case Arabe_Suivant_Style:
+        m_to_num = [](const QString &str)->int{return str.toInt() - 1;};
+        m_to_string = [](int num)->QString{return QString::number(num + 1);};
         m_valide.setRegularExpression(QRegularExpression("[1-9][0-9]*"));
         break;
-    case Majuscule:
-        m_toNum = majusculeToNum;
-        m_toString = majuscule;
+    case Majuscule_Style:
+        m_to_num = Majuscule_to_num;
+        m_to_string = Majuscule;
         m_valide.setRegularExpression(QRegularExpression("[A-Z]*"));
         break;
-    case Romain:
-        m_toNum = romainToNum;
-        m_toString = romain;
+    case Romain_Style:
+        m_to_num = Romain_to_num;
+        m_to_string = Romain;
         m_valide.setRegularExpression(QRegularExpression("M{0,3}"
                                                          "(CM|CD|(D?C{0,3}))"
                                                          "(XC|XL|(L?X{0,3}))"
                                                          "(IX|IV|(V?I{0,3}))"));
         break;
-    case RomainSuivant:
-        m_toNum = [](const QString & str)->int{return romainToNum(str) - 1;};
-        m_toString = [](int num)->QString{return romain(num + 1);};
+    case Romain_Suivant_Style:
+        m_to_num = [](const QString &str)->int{return Romain_to_num(str) - 1;};
+        m_to_string = [](int num)->QString{return Romain(num + 1);};
         m_valide.setRegularExpression(QRegularExpression("M{0,3}"
                                                          "(CM|CD|(D?C{0,3}))"
                                                          "(XC|XL|(L?X{0,3}))"
                                                          "(IX|IV|(V?I{0,3}))"));
         break;
-    case Minuscule:
-        m_toNum = minusculeToNum;
-        m_toString = minuscule;
+    case Minuscule_Style:
+        m_to_num = Minuscule_to_num;
+        m_to_string = Minuscule;
         m_valide.setRegularExpression(QRegularExpression("[a-z]*"));
         break;
-    case GrecMinuscule:
-        m_toNum = grecMinusculeToNum;
-        m_toString = grecMinuscule;
+    case Grec_Minuscule_Style:
+        m_to_num = Grec_minuscule_to_num;
+        m_to_string = Grec_minuscule;
         m_valide.setRegularExpression(QRegularExpression("[\\x{03B1}-\\x{03C9}]*"));
         break;
-    case GrecMajuscule:
-        m_toString = grecMajuscule;
-        m_toNum = grecMajusculeToNum;
+    case Grec_Majuscule_Style:
+        m_to_string = Grec_majuscule;
+        m_to_num = Grec_majuscule_to_num;
         m_valide.setRegularExpression(QRegularExpression("[\\x{0391}-\\x{03A9}]*"));
         break;
     default:
-        m_toNum = [](const QString & str)->int{return str.toInt();};
-        m_toString = [](int num)->QString{return QString::number(num );};
+        m_to_num = [](const QString &str)->int{return str.toInt();};
+        m_to_string = [](int num)->QString{return QString::number(num );};
         m_valide.setRegularExpression(QRegularExpression("[0-9]*"));
     }
 }
 
-QString NumToTexte::romain(int num) {
+QString num_to_string::Romain(int num) {
     QString str;
-    for (auto iter = m_romain.cbegin(); num; ++iter) {
-        while (num >= iter->first) {
-            str.append(iter->second);
-            num -= iter->first;
+    for (auto it = m_Romain.cbegin(); num; ++it) {
+        while (num >= it->first) {
+            str.append(it->second);
+            num -= it->first;
         }
     }
     return str;
 }
 
-int NumToTexte::romainToNum(const QString & str) {
+int num_to_string::Romain_to_num(const QString &str) {
     int num = 0;
     int pos = 0;
-    auto iter = m_romain.cbegin();
-    while(iter != m_romain.cend() && pos != str.count()) {
-        if(iter->second.count() == 1){
-            if(str.at(pos) == iter->second) {
-                num += iter->first;
+    auto it = m_Romain.cbegin();
+    while(it != m_Romain.cend() &&pos != str.count()) {
+        if(it->second.count() == 1){
+            if(str.at(pos) == it->second) {
+                num += it->first;
                 ++pos;
             }
             else
-                ++iter;
+                ++it;
         }
         else {
-            if( pos + 1 != str.count() && str.at(pos) == iter->second.front() && str.at(pos + 1) == iter->second.back()) {
-                num += iter->first;
+            if( pos + 1 != str.count() &&str.at(pos) == it->second.front() &&str.at(pos + 1) == it->second.back()) {
+                num += it->first;
                 pos += 2;
             }
             else
-                ++iter;
+                ++it;
         }
     }
     return num;

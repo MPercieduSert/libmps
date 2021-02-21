@@ -2,42 +2,42 @@
 
 using namespace bddMPS;
 
-entityBaseMPS::Arbre Bdd::arbreXml(xml_iterator iter, QString & controle){
-    entityBaseMPS::Arbre arbre;
-    for (auto att_iter = iter->attributes().cbegin(); att_iter != iter->attributes().cend() && controle.isEmpty(); ++att_iter) {
+entities_base::arbre Bdd::arbreXml(xml_iterator iter, QString &controle){
+    entities_base::arbre arbre;
+    for (auto att_iter = iter->attributes().cbegin(); att_iter != iter->attributes().cend() &&controle.isEmpty(); ++att_iter) {
         if(att_iter->first == "ref_parent") {
-            auto parent = makeEntity(iter.parent()->name());
-            parent->setData(parent->position("Ref"),att_iter->second);
+            auto parent = makeentity(iter.parent()->name());
+            parent->set_data(parent->position("Ref"),att_iter->second);
             if (existsUnique(*parent))
-                arbre.setParent(parent->id());
+                arbre.set_parent(parent->id());
             else
                 controle.append("-> Parent unique introuvable :\n")
                         .append(parent->affiche());
         }
         else if (att_iter->first == "num") {
             if(att_iter->second == "premier")
-                arbre.setNum(0);
+                arbre.set_num(0);
             else if(att_iter->second == "dernier"){
-                arbre.setNum(-1);
+                arbre.set_num(-1);
             }
             else {
                 bool ok;
                 auto num = att_iter->second.toInt(&ok);
                 if (ok)
-                    arbre.setNum(num);
+                    arbre.set_num(num);
                 else
                     controle.append("-> Numéro dans arbre invalide :\n")
                             .append(att_iter->second);
             }
         }
         else
-            controle.append("-> Attribut d'Arbre invalide : ").append(att_iter->first)
+            controle.append("-> Attribut d'arbre invalide : ").append(att_iter->first)
                     .append(".\nNoeud d'arbre de :\n").append(iter.parent()->name());
     }
     return arbre;
 }
 
-void Bdd::associatedXml(Entity & entity, xml_iterator iter, QString & controle) {
+void Bdd::associatedXml(entity &ent, xml_iterator iter, QString &controle) {
     if(iter->name() == "Restriction") {
         auto rest = attributXml(iter,"code",controle);
         if(controle.isEmpty()){
@@ -48,15 +48,15 @@ void Bdd::associatedXml(Entity & entity, xml_iterator iter, QString & controle) 
         if(!controle.isEmpty())
             controle.prepend("-> Dans la restriction\n");
     }
-    else if (iter->name() != "Arbre"){
-        auto ent_ass = makeEntity(iter->name());
+    else if (iter->name() != "arbre"){
+        auto ent_ass = makeentity(iter->name());
         if(!ent_ass)
             controle.append("-> Donnée associée invalide : ").append(iter->name());
         else {
             std::list<decltype(iter->attributes().cbegin())> multi_atts;
             std::list<decltype(iter->attributes().cbegin())> after_atts;
             for (auto iter_att = iter->attributes().cbegin();
-                 iter_att != iter->attributes().cend() && controle.isEmpty(); ++iter_att) {
+                 iter_att != iter->attributes().cend() &&controle.isEmpty(); ++iter_att) {
                 if(isMultipleAssociatedXml(*iter_att))
                     multi_atts.push_back(iter_att);
                 else if(isAfterAssociatedXml(*iter_att))
@@ -71,28 +71,28 @@ void Bdd::associatedXml(Entity & entity, xml_iterator iter, QString & controle) 
                         controle.append("-> Erreur d'unicité :\n").append(ent_ass->affiche());
                     else
                         save(*ent_ass);
-                    for (auto iter = after_atts.cbegin(); iter != after_atts.cend() && controle.isEmpty(); ++iter)
+                    for (auto iter = after_atts.cbegin(); iter != after_atts.cend() &&controle.isEmpty(); ++iter)
                         hydrateAttributAssociatedControledXml(*ent_ass,**iter,entity,controle);
                 }
                 else {
                     std::list<xml_list_atts> multi;
-                    for (auto iter = multi_atts.cbegin(); iter != multi_atts.cend() && controle.isEmpty(); ++iter)
+                    for (auto iter = multi_atts.cbegin(); iter != multi_atts.cend() &&controle.isEmpty(); ++iter)
                         multi.push_back(listMultipleAssociatedXml(**iter,controle));
                     std::list<xml_list_atts::const_iterator> multi_iter;
-                    for (auto iter = multi.cbegin(); iter != multi.cend() && controle.isEmpty(); ++iter) {
+                    for (auto iter = multi.cbegin(); iter != multi.cend() &&controle.isEmpty(); ++iter) {
                         multi_iter.push_back(iter->cbegin());
                         hydrateAttributAssociatedControledXml(*ent_ass,*(iter->cbegin()),entity,controle);
                     }
                     if(controle.isEmpty()) {
                         auto controle_while = true;
-                        while(controle_while && controle.isEmpty()){
-                            ent_ass->setId(0);
+                        while(controle_while &&controle.isEmpty()){
+                            ent_ass->set_id(0);
                             auto exist = existsUniqueEnsemble(*ent_ass);
                             if(exist == existeUni::Conflit)
                                 controle.append("Erreur d'unicité :\n").append(ent_ass->affiche());
                             else
                                 save(*ent_ass);
-                            for (auto iter = after_atts.cbegin(); iter != after_atts.cend() && controle.isEmpty(); ++iter)
+                            for (auto iter = after_atts.cbegin(); iter != after_atts.cend() &&controle.isEmpty(); ++iter)
                                 hydrateAttributAssociatedControledXml(*ent_ass,**iter,entity,controle);
                             if(controle.isEmpty()) {
                                 auto iter_iter = multi_iter.begin();
@@ -109,7 +109,7 @@ void Bdd::associatedXml(Entity & entity, xml_iterator iter, QString & controle) 
                                         ++iter_iter;
                                         ++iter_multi;
                                     }
-                                } while(controle_do && iter_iter != multi_iter.end());
+                                } while(controle_do &&iter_iter != multi_iter.end());
                                 controle_while = iter_iter != multi_iter.end();
                             }
                         }
@@ -120,23 +120,23 @@ void Bdd::associatedXml(Entity & entity, xml_iterator iter, QString & controle) 
     }
 }
 
-flag Bdd::codeFromQString(const QString & str, uint idCat, bool forEntity, QString &controle) const {
+flag Bdd::codeFromQString(const QString &str, uint idCat, bool forentity, QString &controle) const {
     flag code;
     auto list = str.split("|");
-    if(forEntity)
-        for (auto iter = list.cbegin(); iter != list.cend() && controle.isEmpty(); ++iter)
+    if(forentity)
+        for (auto iter = list.cbegin(); iter != list.cend() &&controle.isEmpty(); ++iter)
             code |= strIdToEnum(*iter,idCat,controle);
     else
-        for (auto iter = list.cbegin(); iter != list.cend() && controle.isEmpty(); ++iter)
+        for (auto iter = list.cbegin(); iter != list.cend() &&controle.isEmpty(); ++iter)
             code |= strCategorieToEnum(*iter,idCat,controle);
     return code;
 }
 
-bool Bdd::copy(const QString & name) {
+bool Bdd::copy(const QString &name) {
     Bdd bdd(m_bdd.driverName(), name,{});
-    if(bdd.exists() && bdd.isValid()) {
+    if(bdd.exists() &&bdd.is_valid()) {
         QFile file(name);
-        return file.copy(m_fileName);
+        return file.copy(m_name);
     }
     return false;
 }
@@ -150,81 +150,81 @@ bool Bdd::creer() {
     return false;
 }
 
-bool Bdd::exists(const Entity & entity)
-    {return m_manager->get(entity.idEntity()).exists(entity);}
+bool Bdd::exists(const entity &ent)
+    {return m_manager->get(entity.id_entity()).exists(entity);}
 
-bool Bdd::existsUnique(Entity & entity)
-    {return m_manager->get(entity.idEntity()).existsUnique(entity) != Aucun;}
+bool Bdd::existsUnique(entity &ent)
+    {return m_manager->get(entity.id_entity()).existsUnique(entity) != Aucun;}
 
-bool Bdd::existsUnique(const Entity & entity)
-    {return m_manager->get(entity.idEntity()).existsUnique(entity) != Aucun;}
+bool Bdd::existsUnique(const entity &ent)
+    {return m_manager->get(entity.id_entity()).existsUnique(entity) != Aucun;}
 
-existeUni Bdd::existsUniqueEnsemble(Entity & entity)
-    {return m_manager->get(entity.idEntity()).existsUnique(entity);}
+existeUni Bdd::existsUniqueEnsemble(entity &ent)
+    {return m_manager->get(entity.id_entity()).existsUnique(entity);}
 
-existeUni Bdd::existsUniqueEnsemble(const Entity & entity)
-    {return m_manager->get(entity.idEntity()).existsUnique(entity);}
+existeUni Bdd::existsUniqueEnsemble(const entity &ent)
+    {return m_manager->get(entity.id_entity()).existsUnique(entity);}
 
-std::pair<existeUni,idt> Bdd::existsUniqueId(const Entity & entity)
-    {return m_manager->get(entity.idEntity()).existsUniqueId(entity);}
+std::pair<existeUni,idt> Bdd::existsUniqueId(const entity &ent)
+    {return m_manager->get(entity.id_entity()).existsUniqueId(entity);}
 
-fichierMPS::XmlDoc Bdd::exportXml(VectorPtr<Entity> && vec, flag option) {
-    fichierMPS::XmlDoc doc;
-    doc.begin()->setName("entities");
+fichierMPS::doc_xml Bdd::exportXml(vector_ptr<entity> &&vec, flag option) {
+    fichierMPS::doc_xml doc;
+    doc.begin()->set_name("entities");
     for (auto entity_iter = vec.begin(); entity_iter != vec.end(); ++entity_iter) {
-        auto ent_xml_iter = doc.push_back(doc.begin(),info(*entity_iter).name());
-        for (post pos = entityMPS::Entity::NbrAtt; pos != entity_iter->nbrAtt(); ++pos) {
-            auto att_xml_iter = doc.push_back(ent_xml_iter,entity_iter->nameAttribut(pos));
-            att_xml_iter->setText(entity_iter->data(pos).toString());
+        auto ent_xml_iter = doc.push_back(doc.begin(),info(*ent_iter).name());
+        for (post pos = entities::entity::Nbr_Att; pos != entity_iter->nbr_att(); ++pos) {
+            auto att_xml_iter = doc.push_back(ent_xml_iter,entity_iter->attribut_name(pos));
+            att_xml_iter->set_text(entity_iter->data(pos).to_string());
         }
-        if(option & RestrictionExportationXml) {
+        if(option &RestrictionExportationXml) {
             auto restriction_xml_iter = doc.push_back(ent_xml_iter,"Restriction");
-            auto restriction = getRestriction(*entity_iter);
-            restriction_xml_iter->setAttribut("code",QString::number(restriction.value()));
+            auto restriction = getRestriction(*ent_iter);
+            restriction_xml_iter->set_attribut("code",QString::number(restriction.value()));
         }
-        if(m_manager->get(entity_iter->idEntity()).typeManager() & bddMPS::ArbreTypeManager){
-            auto arb_xml_iter = doc.push_back(ent_xml_iter,"Arbre");
+        if(m_manager->get(entity_iter->id_entity()).typeManager() &bddMPS::arbreTypeManager){
+            auto arb_xml_iter = doc.push_back(ent_xml_iter,"arbre");
             auto pos = entity_iter->position("Ref");
-            if(pos != entity_iter->nbrAtt()) {
-                entity_iter->setId(getIdParent(*entity_iter));
-                if(entity_iter->id() && get(*entity_iter))
-                    arb_xml_iter->setAttribut("ref_parent",entity_iter->data(pos).toString());
+            if(pos != entity_iter->nbr_att()) {
+                entity_iter->set_id(getIdParent(*ent_iter));
+                if(entity_iter->id() &&get(*ent_iter))
+                    arb_xml_iter->set_attribut("ref_parent",entity_iter->data(pos).to_string());
             }
         }
     }
     return doc;
 }
 
-bool Bdd::get(Entity & entity)
-    {return m_manager->get(entity.idEntity()).get(entity);}
+bool Bdd::get(entity &ent)
+    {return m_manager->get(entity.id_entity()).get(entity);}
 
-idt Bdd::getIdParent(const Entity & entity)
-    {return m_manager->get(entity.idEntity()).getIdParent(entity.id());}
+idt Bdd::getIdParent(const entity &ent)
+    {return m_manager->get(entity.id_entity()).getIdParent(entity.id());}
 
-VectorPtr<Entity> Bdd::getList(entidt id_ent)
-    {return m_manager->get(id_ent).getVectorEntity();}
+vector_ptr<entity> Bdd::getList(entidt id_ent)
+    {return m_manager->get(id_ent).getVectorentity();}
 
-flag Bdd::getRestriction(const Entity & entity)
-    {return m_manager->get(entity.idEntity()).getRestriction(entity.id());}
+flag Bdd::getRestriction(const entity &ent)
+    {return m_manager->get(entity.id_entity()).getRestriction(entity.id());}
 
-bool Bdd::getUnique(Entity & entity)
-    {return m_manager->get(entity.idEntity()).getUnique(entity);}
+bool Bdd::getUnique(entity &ent)
+    {return m_manager->get(entity.id_entity()).getUnique(entity);}
 
-void Bdd::hydrateAttributXml(entityMPS::Entity & entity, post pos,
-                             xml_iterator iter, QString & controle) {
-    if(!iter->hasAttributes() || iter->attributes().cbegin()->first != "type") {
+void Bdd::hydrateAttributXml(entities::entity &ent, post pos,
+                             xml_iterator iter, QString &controle) {
+    if(!iter->has_attributes() || iter->attributes().cbegin()->first != "type") {
         auto fkey_iter = info(entity).foreignKeyName().find(pos);
         if(fkey_iter == info(entity).foreignKeyName().end()){
-            if(iter->hasAttributes())
+            if(iter->has_attributes())
                 controle.append("-> Seul les noeuds hydratant une clé étrangère\n")
                         .append("peuvent avoir un attribut différent de 'type'.")
                         .append("Attribut xml : ").append(iter->attributes().cbegin()->first).append(" = ")
                         .append(iter->attributes().cbegin()->second);
             else
-                entity.setData(pos, iter->text());
+                entity.set_data(pos, iter->text());
         }
         else {// Clé étrangère
-            auto fkey_entity = makeEntity(fkey_iter->second);
+            auto fkey_entity = makeentity(fkey_iter->second);
             if(iter.leaf()) {// Définie par un attribut
                 if(iter->attributes().size() != 1)
                     controle.append("-> Une clé étrangère doit être hydratée par un attribut unique\nou par un ensemble de noeuds.");
@@ -232,14 +232,14 @@ void Bdd::hydrateAttributXml(entityMPS::Entity & entity, post pos,
                     auto pair_iter = iter->attributes().cbegin();
                     auto pos_fkey = positionXml(*fkey_entity,pair_iter->first,controle);
                     if(controle.isEmpty())
-                        fkey_entity->setData(pos_fkey,pair_iter->second);
+                        fkey_entity->set_data(pos_fkey,pair_iter->second);
                 }
             }
             else // Définie par un ensemble de noeuds
-                hydrateEntityXml(*fkey_entity,iter,controle);
+                hydrateentityXml(*fkey_entity,iter,controle);
             if(controle.isEmpty()) {
                 if(existsUnique(*fkey_entity))
-                    entity.setData(pos, fkey_entity->id());
+                    entity.set_data(pos, fkey_entity->id());
                 else
                     controle.append("-> Entité unique introuvable:\n").append(fkey_entity->affiche());
             }
@@ -250,25 +250,25 @@ void Bdd::hydrateAttributXml(entityMPS::Entity & entity, post pos,
     else {
         auto type = iter->attributes().cbegin()->second;
         if(type == "code") {
-            auto code = codeFromQString(iter->text(),entity.idEntity(),true,controle);
+            auto code = codeFromQString(iter->text(),entity.id_entity(),true,controle);
             if(controle.isEmpty())
-                entity.setData(pos, code.value());
+                entity.set_data(pos, code.value());
         }
         else if(type == "couleur") {
             QColor color(iter->text());
-            if(color.isValid())
-                entity.setData(pos,color.name());
+            if(color.is_valid())
+                entity.set_data(pos,color.name());
             else
                 controle.append("-> Couleur invalide ").append(iter->name()).append(" = ").append(iter->text());
         }
         else if (type == "enum") {
-            auto i = strIdToEnum(iter->text(),entity.idEntity(),controle);
+            auto i = strIdToEnum(iter->text(),entity.id_entity(),controle);
             if(controle.isEmpty())
-                entity.setData(pos,i);
+                entity.set_data(pos,i);
         }
         else if (type == "police") {
             QFont police;
-            for (auto iter_police = iter.cbeginChild(); iter_police && controle.isEmpty(); ++iter_police) {
+            for (auto iter_police = iter.cbegin_child(); iter_police &&controle.isEmpty(); ++iter_police) {
                 if(iter_police->name() == "Famille")
                     police.setFamily(iter_police->text());
                 else if(iter_police->name() == "Poids") {
@@ -289,7 +289,7 @@ void Bdd::hydrateAttributXml(entityMPS::Entity & entity, post pos,
                     controle.append("-> Noeud de police inconnue : ").append(iter_police->name());
             }
             if(controle.isEmpty())
-                entity.setData(pos,police.toString());
+                entity.set_data(pos,police.to_string());
             else
                 controle.prepend(QString("-> Dans la police de : ").append(iter->name()).append("\n"));
         }
@@ -298,19 +298,19 @@ void Bdd::hydrateAttributXml(entityMPS::Entity & entity, post pos,
     }
 }
 
-void Bdd::hydrateAttributAssociatedXml(Entity &entity_ass, const std::pair<const QString,QString> &pair,
-                                       const Entity &entity, QString &controle) {
+void Bdd::hydrateAttributAssociatedXml(entity &entity_ass, const std::pair<const QString,QString> &pair,
+                                       const entity &entity, QString &controle) {
     if(pair.first == "id_ent"){
         auto pos = positionXml(entity_ass,pair.second,controle);
         if(controle.isEmpty())
-            entity_ass.setData(pos,entity.id());
+            entity_ass.set_data(pos,entity.id());
     }
     else if(pair.first == "code") {
-        auto code = codeFromQString(pair.second,entity_ass.idEntity(),true,controle);
+        auto code = codeFromQString(pair.second,entity_ass.id_entity(),true,controle);
         if(controle.isEmpty()) {
             auto pos = positionXml(entity_ass,"Code",controle);
             if(controle.isEmpty())
-                entity_ass.setData(pos,code.value());
+                entity_ass.set_data(pos,code.value());
         }
     }
     else if(pair.first == "restriction") {
@@ -324,9 +324,9 @@ void Bdd::hydrateAttributAssociatedXml(Entity &entity_ass, const std::pair<const
         controle.append("-> Attribut inconnu : ").append(pair.first);
 }
 
-std::list<Bdd::xml_iterator> Bdd::hydrateEntityXml(Entity &entity, xml_iterator iter, QString &controle) {
+std::list<Bdd::xml_iterator> Bdd::hydrateentityXml(entity &entity, xml_iterator iter, QString &controle) {
     std::list<xml_iterator> assotiated;
-    for (auto sub_iter = iter.cbeginChild(); sub_iter && controle.isEmpty(); ++sub_iter) {
+    for (auto sub_iter = iter.cbegin_child(); sub_iter &&controle.isEmpty(); ++sub_iter) {
         if(isAssociatedXml(sub_iter,entity))
                 assotiated.push_back(sub_iter);
         else {
@@ -338,42 +338,42 @@ std::list<Bdd::xml_iterator> Bdd::hydrateEntityXml(Entity &entity, xml_iterator 
     return assotiated;
 }
 
-QString Bdd::importXml(const fichierMPS::XmlDoc & doc){
-    auto iter = doc.cbegin().cbeginChild();
+QString Bdd::importXml(const fichierMPS::doc_xml &doc){
+    auto iter = doc.cbegin().cbegin_child();
     QString controle;
-    while(controle.isEmpty() && iter) {
-        auto entity = makeEntity(iter->name());
+    while(controle.isEmpty() &&iter) {
+        auto entity = makeentity(iter->name());
         if(!entity)
             controle.append("-> Nom d'entité inconnu : ").append(iter->name());
         else {
-            auto associated = hydrateEntityXml(*entity,iter,controle);
+            auto associated = hydrateentityXml(*ent,iter,controle);
             if(controle.isEmpty()) {
-                if(!entity->isValid())
+                if(!entity->is_valid())
                     controle.append("-> Entité invalide.");
                 else {
-                    auto exist = existsUniqueEnsemble(*entity);
+                    auto exist = existsUniqueEnsemble(*ent);
                     if(exist == existeUni::Conflit)
                         controle.append("-> Erreur d'unicité.");
-                    else if (exist != Aucun || !(m_manager->get(entity->idEntity()).typeManager() & bddMPS::ArbreTypeManager))
-                        save(*entity);
+                    else if (exist != Aucun || !(m_manager->get(entity->id_entity()).typeManager() &bddMPS::arbreTypeManager))
+                        save(*ent);
                     else {
                         auto iter_arbre = std::find_if(associated.cbegin(),associated.cend(),
-                                                    [](const xml_iterator & i){return i->name() == "Arbre";});
-                        entityBaseMPS::Arbre arb;
+                                                    [](const xml_iterator &i){return i->name() == "arbre";});
+                        entities_base::arbre arb;
                         if(iter_arbre != associated.cend()){
                             arb = arbreXml(*iter_arbre, controle);
                             associated.erase(iter_arbre);
                         }
                         if(controle.isEmpty())
-                           insert(*entity,arb.parent(),arb.num());
+                           insert(*ent,arb.parent(),arb.num());
                     }
                 }
                 if(controle.isEmpty())
-                    for (auto iter_list = associated.cbegin(); iter_list != associated.cend() && controle.isEmpty(); ++iter_list)
-                        associatedControledXml(*entity,*iter_list,controle);
+                    for (auto iter_list = associated.cbegin(); iter_list != associated.cend() &&controle.isEmpty(); ++iter_list)
+                        associatedControledXml(*ent,*iter_list,controle);
             }
             if(!controle.isEmpty())
-                controle.prepend(QString("-> Dans l'entité : ").append(info(*entity).name())
+                controle.prepend(QString("-> Dans l'entité : ").append(info(*ent).name())
                                  .append("\n").append(entity->affiche()).append("\n"));
         }
         ++iter;
@@ -381,17 +381,17 @@ QString Bdd::importXml(const fichierMPS::XmlDoc & doc){
     return controle;
 }
 
-const managerMPS::InfoBdd & Bdd::info(const Entity & entity) const
-    {return m_manager->get(entity.idEntity()).info();}
+const managerMPS::InfoBdd &Bdd::info(const entity &ent) const
+    {return m_manager->get(entity.id_entity()).info();}
 
-void Bdd::insert(Entity & entity, idt idParent, int num)
-    {m_manager->get(entity.idEntity()).insert(entity,idParent,num);}
+void Bdd::insert(entity &ent, idt idParent, int num)
+    {m_manager->get(entity.id_entity()).insert(entity,idParent,num);}
 
-void Bdd::insert(const Entity & entity, idt idParent, int num)
-    {m_manager->get(entity.idEntity()).insert(entity,idParent,num);}
+void Bdd::insert(const entity &ent, idt idParent, int num)
+    {m_manager->get(entity.id_entity()).insert(entity,idParent,num);}
 
-bool Bdd::isAssociatedXml(xml_iterator iter, Entity &entity) const {
-        if(!iter->hasAttributes() || iter->hasText())
+bool Bdd::isAssociatedXml(xml_iterator iter, entity &entity) const {
+        if(!iter->has_attributes() || iter->has_text())
             return false;
         if(iter->attributes().size() > 1)
             return true;
@@ -401,7 +401,7 @@ bool Bdd::isAssociatedXml(xml_iterator iter, Entity &entity) const {
         if(att == "restriction")
             return true;
         auto pos = entity.position(iter->name());
-        if(pos == entity.nbrAtt())
+        if(pos == entity.nbr_att())
             return true;
         return info(entity).foreignKeyName().find(pos) == info(entity).foreignKeyName().cend();
     }
@@ -415,12 +415,12 @@ void Bdd::miseAJourBdd() {
     for (idt type = 0; type != m_version.size(); ++type) {
         if(!m_manager->existsVersion(type))
             listeMiseAJourBdd(bddVersion::Initiale,type);
-        auto versionBdd = m_manager->numVersion(type);
-        if(m_version[type] != versionBdd) {
-            if(m_version[type] > versionBdd) {
-                while(m_version[type] != versionBdd) {
-                    listeMiseAJourBdd(versionBdd,type);
-                    versionBdd = m_manager->numVersion(type);
+        auto version_bdd = m_manager->numVersion(type);
+        if(m_version[type] != version_bdd) {
+            if(m_version[type] > version_bdd) {
+                while(m_version[type] != version_bdd) {
+                    listeMiseAJourBdd(version_bdd,type);
+                    version_bdd = m_manager->numVersion(type);
                 }
             }
             else {
@@ -451,70 +451,70 @@ bool Bdd::openBdd() {
     return false;
 }
 
-bool Bdd::sameInBdd(const Entity & entity)
-    {return m_manager->get(entity.idEntity()).sameInBdd(entity);}
+bool Bdd::sameInBdd(const entity &ent)
+    {return m_manager->get(entity.id_entity()).sameInBdd(entity);}
 
-void Bdd::save(Entity & entity)
-    {m_manager->get(entity.idEntity()).save(entity);}
+void Bdd::save(entity &ent)
+    {m_manager->get(entity.id_entity()).save(entity);}
 
-void Bdd::save(const Entity & entity)
-    {m_manager->get(entity.idEntity()).save(entity);}
+void Bdd::save(const entity &ent)
+    {m_manager->get(entity.id_entity()).save(entity);}
 
-void Bdd::save(Entity & entity, flag restrict)
-    {m_manager->get(entity.idEntity()).save(entity, restrict);}
+void Bdd::save(entity &ent, flag restrict)
+    {m_manager->get(entity.id_entity()).save(entity, restrict);}
 
-void Bdd::save(VectorPtr<Entity> & vector) {
+void Bdd::save(vector_ptr<entity> &vector) {
     for (auto iter = vector.begin(); iter != vector.end(); ++iter)
         save(*iter);
 }
 
-void Bdd::save(const VectorPtr<Entity> & vector) {
+void Bdd::save(const vector_ptr<entity> &vector) {
     for (auto iter = vector.cbegin(); iter != vector.cend(); ++iter)
         save(*iter);
 }
 
-void Bdd::saveUnique(Entity & entity)
-    {m_manager->get(entity.idEntity()).saveUnique(entity);}
+void Bdd::saveUnique(entity &ent)
+    {m_manager->get(entity.id_entity()).saveUnique(entity);}
 
-void Bdd::saveUnique(const Entity & entity)
-    {m_manager->get(entity.idEntity()).saveUnique(entity);}
+void Bdd::saveUnique(const entity &ent)
+    {m_manager->get(entity.id_entity()).saveUnique(entity);}
 
-fichierMPS::XmlDoc Bdd::schemaXmlForImport() const{
+fichierMPS::doc_xml Bdd::schemaXmlForImport() const{
     using namespace fichierMPS;
     //const auto restToStr = RestrictionToStr();
-    XmlDoc schema;
+    doc_xml schema;
     auto iter = schema.begin();
-    iter->setName("xs:schema");
-    iter->setAttribut("xmlns:xs","http://www.w3.org/2001/XMLSchema");
-    iter->setAttribut("elementFormDefault","qualified");
+    iter->set_name("xs:schema");
+    iter->set_attribut("xmlns:xs","http://www.w3.org/2001/XMLSchema");
+    iter->set_attribut("elementFormDefault","qualified");
     iter = schema.emplace_back(iter,"xs:element");
-    iter->setAttribut("name","entities");
+    iter->set_attribut("name","entities");
     iter = schema.emplace_back(iter,"xs:complexType");
     iter = schema.emplace_back(iter,"xs:choice");
-    iter->setAttribut("maxOccurs","unbounded");
-    for (entidt i = 0; i <nbrEntity(); ++i) {
+    iter->set_attribut("maxOccurs","unbounded");
+    for (entidt i = 0; i <nbrentity(); ++i) {
         if(managers().valide(i)) {
             auto iter_entity = schema.emplace_back(iter,"xs:element");
-            iter_entity->setAttribut("ref",managers().info(i).name());
+            iter_entity->set_attribut("ref",managers().info(i).name());
         }
     }
-    iter.toRoot();
-    for (entidt i = 0; i < nbrEntity(); ++i) {
+    iter.to_root();
+    for (entidt i = 0; i < nbrentity(); ++i) {
         if(managers().valide(i)) {
             auto iter_entity = schema.emplace_back(iter,"xs:element");
-            iter_entity->setAttribut("name",managers().info(i).name());
+            iter_entity->set_attribut("name",managers().info(i).name());
             iter_entity = schema.emplace_back(iter_entity,"xs:complexType");
             iter_entity = schema.emplace_back(iter_entity,"xs:all");
-            auto namesAtt = managers().get(i).namesAttributs();
+            auto namesAtt = managers().get(i).names_attributs();
             for (szt j = 1; j != namesAtt.size(); ++j) {
                 auto iter_att = schema.emplace_back(iter_entity,"xs:element");
-                iter_att->setAttribut("name",namesAtt.at(j));
+                iter_att->set_attribut("name",namesAtt.at(j));
                 auto iter_key = managers().info(i).foreignKeyName().find(j);
                 if(iter_key != managers().info(i).foreignKeyName().cend()){
                     if(iter_key->second.isEmpty()) {
                         iter_att = schema.emplace_back(iter_att,"xs:complexType");
                         iter_att = schema.emplace_back(iter_att,"xs:element");
-                        iter_att->setAttribut("ref","one_Unique");
+                        iter_att->set_attribut("ref","one_Unique");
                     }
                     else {
                         auto k = managers().find(iter_key->second);
@@ -523,46 +523,46 @@ fichierMPS::XmlDoc Bdd::schemaXmlForImport() const{
                             iter_att = schema.emplace_back(iter_att,"xs:complexType");
                             if(managers().info(k).nbrSetUnique() == 1) {
                                 iter_att = schema.emplace_back(iter_att,"xs:element");
-                                iter_att->setAttribut("ref",iter_key->second + "_Unique");
+                                iter_att->set_attribut("ref",iter_key->second + "_Unique");
                             }
                             else {
                                 iter_att = schema.emplace_back(iter_att,"xs:choice");
                                 for(numt l = 0; l != managers().info(k).nbrSetUnique(); ++l) {
                                     auto iter_unique = schema.emplace_back(iter_att,"xs:element");
-                                    iter_unique->setAttribut("ref",iter_key->second + "_Unique"+QString::number(l));
+                                    iter_unique->set_attribut("ref",iter_key->second + "_Unique"+QString::number(l));
                                 }
                             }
                         }
                     }
                 }
             }
-            iter_entity.toParent();
+            iter_entity.to_parent();
 //            auto restriction = managers().get(i).enableRestriction();
 //            for (auto iter_restriction = restToStr.cbegin(); iter_restriction != restToStr.cend(); ++iter_restriction) {
-//                if(restriction & iter_restriction->first) {
+//                if(restriction &iter_restriction->first) {
 //                    auto iter_rest = schema.emplace_back(iter_entity,"xs:attribute");
-//                    iter_rest->setAttribut("name",iter_restriction->second);
+//                    iter_rest->set_attribut("name",iter_restriction->second);
 //                }
 //            }
         }
 
     }
-    for (entidt i = 0; i < nbrEntity(); ++i){
+    for (entidt i = 0; i < nbrentity(); ++i){
         if(managers().valide(i)) {
             for(numt j = 0; j != managers().info(i).nbrSetUnique(); ++j) {
                 auto iter_unique = schema.emplace_back(iter,"xs:element");
-                iter_unique->setAttribut("name",managers().info(i).name()  + "_Unique"+QString::number(j));
+                iter_unique->set_attribut("name",managers().info(i).name()  + "_Unique"+QString::number(j));
                 iter_unique = schema.emplace_back(iter_unique,"xs:complexType");
                 auto attUnique = managers().info(i).attributUnique(j);
                 if(attUnique.size() == 1){
                     iter_unique = schema.emplace_back(iter_unique,"xs:element");
-                    iter_unique->setAttribut("name",managers().get(i).namesAttributs().at(attUnique.at(0)));
+                    iter_unique->set_attribut("name",managers().get(i).names_attributs().at(attUnique.at(0)));
                 }
                 else {
                     iter_unique = schema.emplace_back(iter_unique,"xs:all");
                     for (auto iter_num = attUnique.cbegin(); iter_num != attUnique.cend(); ++iter_num) {
                         auto iter_att = schema.emplace_back(iter_unique,"xs:element");
-                        iter_att->setAttribut("name",managers().get(i).namesAttributs().at(*iter_num));
+                        iter_att->set_attribut("name",managers().get(i).names_attributs().at(*iter_num));
                     }
                 }
             }
@@ -571,8 +571,8 @@ fichierMPS::XmlDoc Bdd::schemaXmlForImport() const{
     return schema;
 }
 
-void Bdd::setRestriction(const Entity & entity, flag restrict)
-    {m_manager->get(entity.idEntity()).setRestriction(entity.id(), restrict);}
+void Bdd::setRestriction(const entity &ent, flag restrict)
+    {m_manager->get(entity.id_entity()).setRestriction(entity.id(), restrict);}
 
 void Bdd::setBdd() {
     m_bdd.exec("PRAGMA foreign_keys = ON;");
@@ -581,15 +581,15 @@ void Bdd::setBdd() {
     m_manager->setRequete(req);
 }
 
-void Bdd::setFileName(const QString & fileName) {
-    FileInterface::setFileName(fileName);
+void Bdd::set_name(const QString &name) {
+    file_interface::set_name(name);
     if(m_bdd.isOpen())
         m_bdd.close();
-    m_bdd.setDatabaseName(fileName);
+    m_bdd.set_databaseName(name);
 }
 
-enumt Bdd::strCategorieToEnum(const QString & str, flag categorie, QString &controle) const noexcept {
-    if(categorie & RestrictionCode) {
+enumt Bdd::strCategorieToEnum(const QString &str, flag categorie, QString &controle) const noexcept {
+    if(categorie &RestrictionCode) {
         if(str == "Aucune")
             return bddMPS::Aucune;
         if(str == QString("modification"))
@@ -597,7 +597,7 @@ enumt Bdd::strCategorieToEnum(const QString & str, flag categorie, QString &cont
         if(str == QString("suppression"))
             return bddMPS::Suppr;
     }
-    if(categorie & LineStyle) {
+    if(categorie &LineStyle) {
         if(str == "SolidLine")
             return Qt::SolidLine;
         if(str == "DashLine")
@@ -609,7 +609,7 @@ enumt Bdd::strCategorieToEnum(const QString & str, flag categorie, QString &cont
         if(str == "DashDotDotLine")
             return Qt::DashDotDotLine;
     }
-    if(categorie & BrushStyle) {
+    if(categorie &BrushStyle) {
         if(str == "NoBrush")
             return Qt::NoBrush;
         if(str == "SolidPattern")
@@ -649,7 +649,7 @@ enumt Bdd::strCategorieToEnum(const QString & str, flag categorie, QString &cont
         if(str == "TexturePattern")
             return Qt::TexturePattern;
     }
-    if(categorie & FontWeight) {
+    if(categorie &FontWeight) {
         if(str == "Thin")
             return QFont::Thin;
         if(str == "ExtraLight")
@@ -676,12 +676,12 @@ enumt Bdd::strCategorieToEnum(const QString & str, flag categorie, QString &cont
 
 Bdd::vector_id_name Bdd::table_entity_names(bool arbre) const {
     std::vector<std::pair<int,QString>> vec;
-    vec.reserve(nbrEntity());
-    for(entidt i = 0; i < nbrEntity(); ++i) {
+    vec.reserve(nbrentity());
+    for(entidt i = 0; i < nbrentity(); ++i) {
         if(managers().valide(i)) {
             vec.emplace_back(i,managers().info(i).name());
-            if(arbre && !managers().get(i).infoArbre().name().isEmpty())
-                vec.emplace_back(-i,managers().get(i).infoArbre().name());
+            if(arbre &&!managers().get(i).infoarbre().name().isEmpty())
+                vec.emplace_back(-i,managers().get(i).infoarbre().name());
         }
     }
     std::sort(vec.begin(),vec.end(),
@@ -689,5 +689,5 @@ Bdd::vector_id_name Bdd::table_entity_names(bool arbre) const {
     return vec;
 }
 
-bool Bdd::testAutorisationP(idt id, entidt idEntity, flag autoris)
-    {return !(m_manager->get(idEntity).getRestriction(id) & autoris);}
+bool Bdd::testAutorisationP(idt id, entidt id_entity, flag autoris)
+    {return !(m_manager->get(id_entity).getRestriction(id) &autoris);}

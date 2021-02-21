@@ -9,15 +9,15 @@
 
 //! \ingroup groupeManager
 //! Début du coprs des deux methodes save.
-#define SAVE_MODIF_DEBUT if(entity.isValid()) \
-    {if(entity.isNew()) \
+#define SAVE_MODIF_DEBUT if(entity.is_valid()) \
+    {if(entity.is_new()) \
         {if(existsUnique(entity) == bmps::Aucun) \
             {Ent ent(entity); \
             add(ent);
 
 namespace managerMPS {
 /*! \ingroup groupeManager
- * \brief Classe template mère des différents manageurs à modification controlée.
+ *\brief Classe template mère des différents manageurs à modification controlée.
  */
 template<class Ent> class BaseManagerModifControle {
 protected:
@@ -25,14 +25,14 @@ protected:
     std::unique_ptr<AbstractGestionRestriction<Ent>>  m_gestionRestriction;   //!< Gestionnaire de restriction.
 public:
     //! Constructeur. (Posséde le gestionnaire de restriction.)
-    BaseManagerModifControle(std::unique_ptr<AbstractGestionRestriction<Ent>> &&  gestionRestriction)
+    BaseManagerModifControle(std::unique_ptr<AbstractGestionRestriction<Ent>> && gestionRestriction)
         : m_gestionRestriction(std::move(gestionRestriction)) {}
 
     //! Destructeur.
     virtual ~BaseManagerModifControle() = default;
 
     //! Accesseur du gestionnaire de restriction.
-    AbstractGestionRestriction<Ent> & gestionRestriction() const
+    AbstractGestionRestriction<Ent> &gestionRestriction() const
         {return *m_gestionRestriction;}
 
     //! Ajoute des restrictions gérées par le gestionnaire.
@@ -56,7 +56,7 @@ public:
         {m_gestionRestriction->setEnableRestriction(restriction);}
 
     //! Mutateur du gestionnaire d'autorisations.
-    void setGestionRestriction(AbstractGestionRestriction<Ent> * gestionRestriction)
+    void setGestionRestriction(AbstractGestionRestriction<Ent> *gestionRestriction)
         {m_gestionRestriction = gestionRestriction;}
 
     //! Modifie les restrictions de modification pour une entité donnée.
@@ -68,7 +68,7 @@ public:
         {return m_bypass ? false : m_gestionRestriction->testRestriction(id, restrict);}
 
     //! Teste la restriction de modification pour une entité d'identifiant id avec les valeurs de entity.
-    virtual bool testRestriction(idt id, flag restrict, const Ent & entity)
+    virtual bool testRestriction(idt id, flag restrict, const Ent &ent)
         {return m_bypass ? false : m_gestionRestriction->testRestriction(id, restrict, entity);}
 
 protected:
@@ -82,7 +82,7 @@ protected:
 };
 
 /*! \ingroup groupeManager
- * \brief Classe template manageurs à modification controlée.
+ *\brief Classe template manageurs à modification controlée.
  */
 template<class Ent> class ManagerModifControle : public virtual ManagerSql<Ent>, public BaseManagerModifControle<Ent> {
 protected:
@@ -106,10 +106,10 @@ public:
     using ManagerSqlEnt::save;
 
     //! Constructeur
-    ManagerModifControle (const InfoBdd & info,
-                          std::unique_ptr<AbstractGestionRestriction<Ent>> && gestionRestriction
+    ManagerModifControle (const InfoBdd &info,
+                          std::unique_ptr<AbstractGestionRestriction<Ent>> &&gestionRestriction
                                       = std::make_unique<AbstractGestionRestriction<Ent>>(),
-                          std::unique_ptr<AbstractUniqueSqlTemp<Ent>> && unique = std::make_unique<NoUniqueSql<Ent>>())
+                          std::unique_ptr<AbstractUniqueSql_temp<Ent>> &&unique = std::make_unique<NoUniqueSql<Ent>>())
         : ManagerSql<Ent>(info,std::move(unique)), BaseManagerModifControle<Ent>(std::move(gestionRestriction))
             {m_gestionRestriction->setEnableRestriction(bmps::ModifSupr);}
 
@@ -123,7 +123,7 @@ public:
 
     //! Supprime de la table en base de donnée l'entité d'identifiant id.
     bool del(idt id) override
-        {return !testRestriction(id,bddMPS::Suppr) &&  ManagerSqlEnt::del(id);}
+        {return !testRestriction(id,bddMPS::Suppr) && ManagerSqlEnt::del(id);}
 
     //! Demande les restriction de modification pour l'entité d'identifiant id.
     flag getRestriction(idt id) override
@@ -142,7 +142,7 @@ public:
         {return ManagerBMC::testRestriction(id, restrict);}
 
     //! Teste la restriction de modification pour une entité d'identifiant id avec les valeurs de entity.
-    bool testRestriction(idt id, flag restrict, const Ent & entity) override
+    bool testRestriction(idt id, flag restrict, const Ent &ent) override
         {return ManagerBMC::testRestriction(id, restrict, entity);}
 
     //! Retourne le type du manager.
@@ -151,13 +151,13 @@ public:
 
 protected:
     //! Constructeur.
-    ManagerModifControle(std::unique_ptr<AbstractGestionRestriction<Ent>> && gestionRestriction
+    ManagerModifControle(std::unique_ptr<AbstractGestionRestriction<Ent>> &&gestionRestriction
                          = std::make_unique<AbstractGestionRestriction<Ent>>())
         : BaseManagerModifControle<Ent>(std::move(gestionRestriction))
         {m_gestionRestriction->setEnableRestriction(bmps::ModifSupr);}
 
     //! Met à jour l'entité entity en base de donnée.
-    void modify(const Ent & entity) override {
+    void modify(const Ent &ent) override {
         if(!testRestriction(entity.id(), bmps::Modif,entity))
             ManagerSqlEnt::modify(entity);
         else
@@ -167,7 +167,7 @@ protected:
     }
 
     //! Met à jour l'entité entity en base de donnée d'identifiant id avec les valeurs d'entity.
-    void modify(const Ent & entity, idt id) override {
+    void modify(const Ent &ent, idt id) override {
         if(!testRestriction(id, bmps::Modif, entity))
             ManagerSqlEnt::modify(entity,id);
         else
@@ -177,7 +177,7 @@ protected:
     }
 
     //! Enregistre l'entité entity en base en ignorant les restrictions.
-    void saveByPass(Ent & entity) override {
+    void saveByPass(Ent &ent) override {
         ouvrir();
         save(entity);
         fermer();

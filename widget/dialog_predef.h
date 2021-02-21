@@ -12,13 +12,13 @@
 #include <QListWidget>
 #include <QPushButton>
 #include <QVBoxLayout>
-#include <typemps.h>
+#include <type_mps.h>
 #include <set>
 
 namespace widgetMPS {
-using namespace typeMPS;
+using namespace type_mps;
 /*! \ingroup groupeWidget
- * \brief Dialogue de selection d'une table.
+ *\brief Dialogue de selection d'une table.
  */
 class SelectTableDialog : public QDialog {
     Q_OBJECT
@@ -36,10 +36,10 @@ protected:
     QVBoxLayout *m_main_layout;         //!< Calque principale
 public:
     //! Constructeur.
-    SelectTableDialog(bddMPS::Bdd::vector_id_name && vec, QWidget *parent = nullptr);
+    SelectTableDialog(bddMPS::Bdd::vector_id_name &&vec, QWidget *parent = nullptr);
 
     //! Acceseur de l'ensemble des identifiants.
-    const std::set<entidt> & set() const
+    const std::set<entidt> &set() const
         {return m_set;}
 
     //! Renvoie un drapeaux sur les options.

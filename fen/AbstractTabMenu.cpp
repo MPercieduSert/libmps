@@ -12,5 +12,5 @@ AbstractTabMenu::AbstractTabMenu(const std::pair<int, int> &pairIndex, QWidget *
         connect(m_bddButton,&QPushButton::clicked,
                 [this]{emit this->openTabRequested(std::pair<int,int>(BddTabIndex,SingleTab));});
         connect(m_motCleButton,&QPushButton::clicked,
-                [this]{emit this->openTabRequested(std::pair<int,int>(MotCleTabIndex,SingleTab));});
+                [this]{emit this->openTabRequested(std::pair<int,int>(mot_cleTabIndex,SingleTab));});
 }

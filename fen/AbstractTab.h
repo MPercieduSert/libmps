@@ -11,7 +11,7 @@
 
 namespace fenMPS {
 /*! \ingroup groupeFen
- * \brief Fenêtre à onglet.
+ *\brief Fenêtre à onglet.
  */
 class AbstractTab : public QTabWidget {
     Q_OBJECT
@@ -30,10 +30,10 @@ public:
     ~AbstractTab() override = default;
 
     //! Connect l'onglet aux signaux commun à tous les onglets.
-    virtual void connectTab(AbstractTabModule * tab) const;
+    virtual void connectTab(AbstractTabModule *tab) const;
 
     //! Créateur d'onglet.
-    virtual AbstractTabModule *createTab(const std::pair<int,int>& pair, const std::vector<QVariant> & args = std::vector<QVariant>()) const = 0;
+    virtual AbstractTabModule *createTab(const std::pair<int,int>&pair, const std::vector<QVariant> &args = std::vector<QVariant>()) const = 0;
 
 signals:
     //! Signal d'activation/désactivation des actions.
@@ -56,7 +56,7 @@ public slots:
     void effacer()  {static_cast<AbstractTabModule*>(currentWidget())->effacer();}
 
     //! Ouvre un nouvel onglet et le crée si celui-ci n'existe pas.
-    bool openTab(const std::pair<int,int> & pair, const std::vector<QVariant> & args = std::vector<QVariant>());
+    bool openTab(const std::pair<int,int> &pair, const std::vector<QVariant> &args = std::vector<QVariant>());
 
     //! Supprime un onglet.
     void removeTab(int index);

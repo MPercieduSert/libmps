@@ -2,17 +2,17 @@
 
 using namespace fenMPS;
 
-AbstractTabGestionBdd::AbstractTabGestionBdd(QSqlDatabase & bdd, entidt nbrEntity,
+AbstractTabGestionBdd::AbstractTabGestionBdd(QSqlDatabase &bdd, entidt nbrentity,
                                              const std::pair<int, int> &pairIndex, QWidget *parent)
     : AbstractTabModule(pairIndex, parent),
-      m_nbrEntity(nbrEntity),
-      m_tables(nbrEntity) {
+      m_nbrentity(nbrentity),
+      m_tables(nbrentity) {
     m_listName = new QListWidget();
     m_stack = new QStackedWidget();
     //m_stack = new QStackedLayout();
     std::map<int,QString> nomAttributsBdd;
-    QStringList nomArbreAttributs;
-    nomArbreAttributs<<"Id"<<"Parent"<<"Feuille"<<"Num";
+    QStringList nomarbre_attributs;
+    nomarbre_attributs<<"Id"<<"Parent"<<"Feuille"<<"Num";
     for(auto i = m_tables.begin(); i != m_tables.end(); ++i) {
         i->model = new QSqlTableModel(this,bdd);
         i->model->setTable(i->nomBdd);
@@ -24,8 +24,8 @@ AbstractTabGestionBdd::AbstractTabGestionBdd(QSqlDatabase & bdd, entidt nbrEntit
         i->view->setModel(i->model);
         m_listName->addItem(i->nom);
         //m_stack->addWidget(i->view);
-        QPushButton * insertButton = new QPushButton("Ajouter");
-        QPushButton * supprButton = new QPushButton("Supprimer");
+        QPushButton *insertButton = new QPushButton("Ajouter");
+        QPushButton *supprButton = new QPushButton("Supprimer");
         connect(insertButton,&QPushButton::clicked,[i](){i->model->insertRow(i->model->rowCount());});
         connect(supprButton,&QPushButton::clicked,[i]()
             {
@@ -33,8 +33,8 @@ AbstractTabGestionBdd::AbstractTabGestionBdd(QSqlDatabase & bdd, entidt nbrEntit
                 for(auto j = indexList.cbegin(); j != indexList.cend(); ++j)
                     i->model->removeRow((*j).row());
             });
-        auto * wdgt = new QWidget();
-        auto * vLayout = new QVBoxLayout(wdgt);
+        auto *wdgt = new QWidget();
+        auto *vLayout = new QVBoxLayout(wdgt);
         vLayout->addWidget(i->view);
         vLayout->addWidget(insertButton);
         vLayout->addWidget(supprButton);

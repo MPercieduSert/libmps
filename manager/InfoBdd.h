@@ -7,18 +7,18 @@
 #include<map>
 #include<QString>
 #include<vector>
-#include "Entity.h"
+#include "entity.h"
 
 /*! \defgroup groupeManager Manageurs
- * \brief Ensemble de classes représentant les managers des entités de la base de donnée.
+ *\brief Ensemble de classes représentant les managers des entités de la base de donnée.
  */
 
 /*! \ingroup groupeManager
- * \brief Espace de nom pour la base de donnée.
+ *\brief Espace de nom pour la base de donnée.
  */
 namespace bddMPS {
-using namespace typeMPS;
-namespace emps = entityMPS;
+using namespace type_mps;
+namespace emps = entities;
 
     //! Restriction de modification d'une entité.
     enum restriction : flag::flag_type {Aucune = 0x0,
@@ -48,7 +48,7 @@ namespace emps = entityMPS;
     enum typeAttributBdd{Blob,
                    Bool,
                    Date,
-                   DateTime,
+                   Date_Time,
                    Double,
                    Integer,
                    Numeric,
@@ -61,13 +61,13 @@ namespace emps = entityMPS;
     //! Type de Manager
     enum typeManager : flag::flag_type {
         NormalTypeManager = 0,
-        ArbreTypeManager = 0x1,
-        ArbreSimpleTypeManager = 0x2,
+        arbreTypeManager = 0x1,
+        arbre_simpleTypeManager = 0x2,
         ModifControleTypeManager = 0x4,
         PermissionTypeManager = 0x8};
 
     /*! \brief Les différents cas des résultats des tests d'existence d'unicité.
-     * (concordance d'indentifiant: ou bien l'identifiant en base de donnée et le même celui de l'entité testée ou bien ce dernier est nul.)
+     *(concordance d'indentifiant: ou bien l'identifiant en base de donnée et le même celui de l'entité testée ou bien ce dernier est nul.)
      *
      */
     enum existeUni {
@@ -80,19 +80,19 @@ namespace emps = entityMPS;
             };
 
     //! Enumeration des différent type de sauvegarde d'un arbre.
-    enum treeSave {EntityOnly,
+    enum treeSave {entityOnly,
                    AddLeaf,
                    WithoutDelete,
                    InternalChange,
                    ExternalChange,
-                   EntityOnlyWhitoutRoot,
+                   entityOnlyWhitoutRoot,
                    AddLeafWhitoutRoot,
                    WithoutDeleteWhitoutRoot,
                    InternalChangeWhitoutRoot,
                    ExternalChangeWhitoutRoot};
 
 /*! \ingroup groupeManager
- * \brief Classe des informations d'une entité sur sa table dans la base de données.
+ *\brief Classe des informations d'une entité sur sa table dans la base de données.
  */
 class InfoBdd {
 public:
@@ -112,47 +112,47 @@ public:
     InfoBdd() = default;
 
     //! Constructeur.
-    InfoBdd(const QString & name, const QString & table, const std::map<post,QString> & att,
-            const std::vector<Caract> & attCaract,
-            const std::vector<std::vector<post>> & attUnique = std::vector<std::vector<post>>(),
-            const std::map<post,QString> & foreignKeyName = std::map<post,QString>(),
-            const std::map<post,QString> & foreignKeyTable = std::map<post,QString>());
+    InfoBdd(const QString &name, const QString &table, const std::map<post,QString> &att,
+            const std::vector<Caract> &attCaract,
+            const std::vector<std::vector<post>> &attUnique = std::vector<std::vector<post>>(),
+            const std::map<post,QString> &foreignKeyName = std::map<post,QString>(),
+            const std::map<post,QString> &foreignKeyTable = std::map<post,QString>());
 
     //! Constructeur. Information à completer sur les attributs.
-    InfoBdd(const QString & name, const QString & table, post nbrAtt, const std::vector<post> & nbrAttUnique = std::vector<post>());
+    InfoBdd(const QString &name, const QString &table, post nbr_att, const std::vector<post> &nbr_attUnique = std::vector<post>());
 
     //! Constructeur de copie.
-    InfoBdd(const InfoBdd & ) = default;
+    InfoBdd(const InfoBdd &) = default;
 
     //! Destructeur.
     ~InfoBdd() = default;
 
     //! Retourne le nom en base de donnee du n-ième attribut.
-    const QString & attribut(post n) const
+    const QString &attribut(post n) const
         {return m_attSql[n];}
 
     //! Liste des indices des attributs uniques.
-    const std::vector<post> & attributUnique(numt num = 0) const
+    const std::vector<post> &attributUnique(numt num = 0) const
         {return m_attUnique[num];}
 
     //! Liste des propriétés des attributs lors de la création de la table.
-    const Caract & creerAttribut(post num) const
+    const Caract &creerAttribut(post num) const
         {return m_attCaract[num-1];}
 
     //! Liste des clés étrangères avec le nom des entités.
-    const std::map<post,QString> & foreignKeyName() const
+    const std::map<post,QString> &foreignKeyName() const
         {return m_foreignKeyName;}
 
     //! Liste des clés étrangères avec le nom de tables.
-    const std::map<post,QString> & foreignKeyTable() const
+    const std::map<post,QString> &foreignKeyTable() const
         {return m_foreignKeyTable;}
 
     //! Renvoie le nom de l'entité géré par le manager.
-    const QString & name() const
+    const QString &name() const
         {return m_name;}
 
     //! Nombre d'attribut de la table.
-    post nbrAtt() const
+    post nbr_att() const
         {return static_cast<post>(m_attSql.size());}
 
     //! Nombre de jeu d'attribut unique de la table.
@@ -161,19 +161,19 @@ public:
 
 
     //! Mutateur d'un attribut.
-    void setAttribut(post num, const QString & name, typeAttributBdd typeAtt = typeAttributBdd::Integer, bool notNull = true) {
+    void set_attribut(post num, const QString &name, typeAttributBdd typeAtt = typeAttributBdd::Integer, bool not_null = true) {
         m_attSql[num] = name;
-        m_attCaract[num-1] = Caract(typeAtt,notNull);
+        m_attCaract[num-1] = Caract(typeAtt,not_null);
     }
 
     //! Mutateur d'une clé étrangère.
-    void setForeignKey(post numAtt, const InfoBdd & info) {
+    void setForeignKey(post numAtt, const InfoBdd &info) {
         m_foreignKeyName[numAtt] = info.name();
         m_foreignKeyTable[numAtt] = info.table();
     }
 
     //! Mutateur de l'entité géré par le manager.
-    void setName(const QString & name)
+    void set_name(const QString &name)
         {m_name = name;}
 
     //! Mutateur d'un attribut unique.
@@ -181,7 +181,7 @@ public:
         {m_attUnique[numSet][numUnique] = numAtt;}
 
     //! Nom de la table.
-    const QString & table() const
+    const QString &table() const
         {return m_table;}
 };
 }

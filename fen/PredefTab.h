@@ -6,18 +6,18 @@
 
 #include "AbstractTab.h"
 #include "AbstractTabMenu.h"
-#include "TabMotCle.h"
+#include "Tabmot_cle.h"
 #include "TabGestionBdd.h"
 #include "TabGestionType.h"
 
 namespace fenMPS {
 /*! \ingroup groupeFen
- * \brief Classe de création des onglets prédéfinis.
+ *\brief Classe de création des onglets prédéfinis.
  */
 class PredefTab : public AbstractTab {
     Q_OBJECT
 protected:
-    bmps::BddPredef & m_bdd;          //!< Référence à la base de donnée.
+    bmps::BddPredef &m_bdd;          //!< Référence à la base de donnée.
 
 public:
     enum tabName{GestionBddTabId,
@@ -26,14 +26,14 @@ public:
 
 
     //! Constructeur.
-    explicit PredefTab(bmps::BddPredef & bdd, QWidget *parent = nullptr)
+    explicit PredefTab(bmps::BddPredef &bdd, QWidget *parent = nullptr)
         : AbstractTab(parent), m_bdd(bdd) {}
 
     //! Destructeur par default.
     ~PredefTab() override = default;
 
     //! Créateur d'onglet.
-    AbstractTabModule *createTab(const std::pair<int,int> & pair, const std::vector<QVariant> & args = std::vector<QVariant>()) const override;
+    AbstractTabModule *createTab(const std::pair<int,int> &pair, const std::vector<QVariant> &args = std::vector<QVariant>()) const override;
 };
 }
 #endif // PREDEFTAB_H

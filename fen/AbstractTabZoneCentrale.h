@@ -9,17 +9,17 @@
 
 namespace fenMPS {
 /*! \ingroup groupeFen
- * \brief Zone centrale de type porte onglets.
+ *\brief Zone centrale de type porte onglets.
  */
 class AbstractTabZoneCentrale : public AbstractZoneCentrale {
     Q_OBJECT
 protected:
-    AbstractTab * m_tab;            //!< Porte onglet.
-    QHBoxLayout * m_mainLayout;     //!< Calque Principale.
+    AbstractTab *m_tab;            //!< Porte onglet.
+    QHBoxLayout *m_mainLayout;     //!< Calque Principale.
 
 public:
     //! Constructeur.
-    explicit AbstractTabZoneCentrale(AbstractTab * tab, QWidget *parent = nullptr);
+    explicit AbstractTabZoneCentrale(AbstractTab *tab, QWidget *parent = nullptr);
 
     //! Destructeur.
     ~AbstractTabZoneCentrale() override = default;
@@ -40,7 +40,7 @@ public slots:
     void effacer() override {m_tab->effacer();}
 
     //! Demande l'ouverture d'un onglet.
-    void openTab(const std::pair<int,int> & pair, const std::vector<QVariant> & args = std::vector<QVariant>()) {m_tab->openTab(pair,args);}
+    void openTab(const std::pair<int,int> &pair, const std::vector<QVariant> &args = std::vector<QVariant>()) {m_tab->openTab(pair,args);}
 
     //! Demande à l'onglet actif de sauvegarder.
     void sauver() override    {m_tab->sauver();}

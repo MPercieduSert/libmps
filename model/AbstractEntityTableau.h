@@ -8,25 +8,25 @@
 
 namespace modelMPS {
 namespace cmps = conteneurMPS;
-using Entity = entityMPS::Entity;
+using entity = entityMPS::entity;
 /*! \ingroup groupeModel
- * \brief Classe mère des models de type tableau d'entités.
+ *\brief Classe mère des models de type tableau d'entités.
  */
-class AbstractEntityTableau : public AbstractColonnesModel::AbstractTableau {
+class AbstractentityTableau : public AbstractColonnesModel::AbstractTableau {
 public:
     //! Type du tableau de d'entités.
-    using Tableau = std::list<cmps::VectorPtr<Entity>>;
+    using Tableau = std::list<cmps::vector_ptr<entity>>;
 
 protected:
-    bddMPS::Bdd & m_bdd;    //! Lien avec la base de données.
+    bddMPS::Bdd &m_bdd;    //! Lien avec la base de données.
     Tableau m_data;         //!< Donnée du model.
 
 public:
     //! Constructeur.
-    AbstractEntityTableau(bddMPS::Bdd & bdd) : m_bdd(bdd) {}
+    AbstractentityTableau(bddMPS::Bdd &bdd) : m_bdd(bdd) {}
 
     //! Destructeur.
-    ~AbstractEntityTableau() override = default;
+    ~AbstractentityTableau() override = default;
 
     // Ajoute count lignes au tableau.
     void add(szt count) override;
@@ -41,7 +41,7 @@ public:
     void erase(szt first, szt last) override;
 
 //    //! Fabrique une colonne lié aux données du tableau.
-//    virtual std::unique_ptr<AbstractColonne> makeColonne(const QString & name, int type,
+//    virtual std::unique_ptr<AbstractColonne> makeColonne(const QString &name, int type,
 //                                                         Qt::ItemFlags flags,int pos) const = 0;
 
     //! Taille (nombre de lignes).
@@ -50,25 +50,25 @@ public:
 //    //! Selectionne les lignes à afficher vérifiant une condition
 //    template<class UnaryPredicat> void find(UnaryPredicat predicat, bool reset = true);
 
-    //! Ajoute une colonne de données et renvoie son identifiant (Factory: unique_ptr<Entity>(*factory)(szt)).
+    //! Ajoute une colonne de données et renvoie son identifiant (Factory: unique_ptr<entity>(*factory)(szt)).
     template<class Factory> Tableau::iterator push_backData(Factory factory, szt count = 0);
 
     //! Ajoute une colonne de données et renvoie son identifiant.
-    template<class Ent> Tableau::iterator push_backData(const cmps::VectorPtr<Ent> & vec);
+    template<class Ent> Tableau::iterator push_backData(const cmps::vector_ptr<Ent> &vec);
 
     //! Ajoute une colonne de données et renvoie son identifiant.
-    template<class Ent> Tableau::iterator push_backData(cmps::VectorPtr<Ent> && vec);
+    template<class Ent> Tableau::iterator push_backData(cmps::vector_ptr<Ent> &&vec);
 
 protected:
     //! Renvoie un pointeur vers une entity.
-    virtual Entity * entityFactory(szt ligne, szt pos) = 0;
+    virtual entity *entFactory(szt ligne, szt pos) = 0;
 };
 
-/////////////////////////////////// AbstractTableEntityModel /////////////////////////////////////////
+/////////////////////////////////// AbstractTableentityModel /////////////////////////////////////////
 
-//template<class UnaryPredicat> void AbstractTableEntityModel::find(UnaryPredicat predicat, bool reset) {
+//template<class UnaryPredicat> void AbstractTableentityModel::find(UnaryPredicat predicat, bool reset) {
 //    beginResetModel();
-//        if(reset && nbrRow() != nbrLignes())
+//        if(reset &&nbrRow() != nbrLignes())
 //            resetRowToLigne();
 //        szt size = 0;
 //        auto write = m_rowToLigne.begin();
@@ -83,34 +83,34 @@ protected:
 //    endResetModel();
 //}
 
-template<class Factory> AbstractEntityTableau::Tableau::iterator
-        AbstractEntityTableau::push_backData(Factory factory, szt count) {
+template<class Factory> AbstractentityTableau::Tableau::iterator
+        AbstractentityTableau::push_backData(Factory factory, szt count) {
     if(count == 0)
         count = size();
-    else if(!m_data.empty() &&  size() != count)
-        throw std::invalid_argument("AbstractTableEntityModel::Tableau::iterator "
-                                    "AbstractTableEntityModel::push_backData(szt):"
+    else if(!m_data.empty() && size() != count)
+        throw std::invalid_argument("AbstractTableentityModel::Tableau::iterator "
+                                    "AbstractTableentityModel::push_backData(szt):"
                                     "Taille de la nouvelle donnée ne coorespond pas au nombre des ligne du model.");
-    auto col = cmps::VectorPtr<Entity>(count,nullptr);
+    auto col = cmps::vector_ptr<entity>(count,nullptr);
     for (szt i = 0; i < col.size(); ++i)
-        col.setPtr(i,factory(i));
+        col.set_ptr(i,factory(i));
     return m_data.insert(m_data.end(),std::move(col));
 }
 
-template<class Ent> AbstractEntityTableau::Tableau::iterator
-        AbstractEntityTableau::push_backData(const cmps::VectorPtr<Ent> & vec) {
-    if(!m_data.empty() && vec.size() != size())
-        throw std::invalid_argument("AbstractTableEntityModel::Tableau::iterator "
-                                    "AbstractTableEntityModel::push_backData(const cmps::VectorPtr<Ent> &):"
+template<class Ent> AbstractentityTableau::Tableau::iterator
+        AbstractentityTableau::push_backData(const cmps::vector_ptr<Ent> &vec) {
+    if(!m_data.empty() &&vec.size() != size())
+        throw std::invalid_argument("AbstractTableentityModel::Tableau::iterator "
+                                    "AbstractTableentityModel::push_backData(const cmps::vector_ptr<Ent> &):"
                                     "Taille de la nouvelle donnée ne coorespond pas au nombre des ligne du model.");
     return m_data.insert(m_data.end(),vec);
 }
 
-template<class Ent> AbstractEntityTableau::Tableau::iterator
-        AbstractEntityTableau::push_backData(cmps::VectorPtr<Ent> && vec) {
-    if(!m_data.empty() && vec.size() != size())
-        throw std::invalid_argument("AbstractTableEntityModel::Tableau::iterator "
-                                    "AbstractTableEntityModel::push_backData(cmps::VectorPtr<Ent> &&):"
+template<class Ent> AbstractentityTableau::Tableau::iterator
+        AbstractentityTableau::push_backData(cmps::vector_ptr<Ent> &&vec) {
+    if(!m_data.empty() &&vec.size() != size())
+        throw std::invalid_argument("AbstractTableentityModel::Tableau::iterator "
+                                    "AbstractTableentityModel::push_backData(cmps::vector_ptr<Ent> &&):"
                                     "Taille de la nouvelle donnée ne coorespond pas au nombre de lignes du model.");
     return m_data.insert(m_data.end(),std::move(vec));
 }

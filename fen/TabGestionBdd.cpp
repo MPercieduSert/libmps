@@ -2,19 +2,19 @@
 
 using namespace fenMPS;
 
-TabGestionBdd::TabGestionBdd(bmps::Bdd & bdd, const std::pair<int, int> &pairIndex, QWidget *parent)
+TabGestionBdd::TabGestionBdd(bmps::Bdd &bdd, const std::pair<int, int> &pairIndex, QWidget *parent)
     : AbstractTabModuleWithBdd (bdd, pairIndex, parent),
       m_info(m_pairIndex.second > 0 ? m_bdd.managers().info(static_cast<entidt>(m_pairIndex.second))
-                                  : m_bdd.managers().get(static_cast<entidt>(-m_pairIndex.second)).infoArbre()),
-      m_namesAttributs( m_pairIndex.second > 0 ? m_bdd.managers().get(static_cast<entidt>(m_pairIndex.second)).namesAttributs()
-                                               : entityBaseMPS::Arbre::NamesAttributs())
+                                  : m_bdd.managers().get(static_cast<entidt>(-m_pairIndex.second)).infoarbre()),
+      m_Names_attributs( m_pairIndex.second > 0 ? m_bdd.managers().get(static_cast<entidt>(m_pairIndex.second)).names_attributs()
+                                               : entities_base::arbre::Names_attribut())
 {
     m_model = new QSqlTableModel(this,m_bdd.db());
     m_model->setTable(m_info.table());
     m_model->setEditStrategy(QSqlTableModel::OnManualSubmit);
     m_model->select();
-    for(szt j = 0; j != m_namesAttributs.size(); ++j)
-        m_model->setHeaderData(static_cast<int>(j),Qt::Horizontal,m_namesAttributs[j]);
+    for(szt j = 0; j != m_Names_attributs.size(); ++j)
+        m_model->setHeaderData(static_cast<int>(j),Qt::Horizontal,m_Names_attributs[j]);
     m_view = new QTableView();
     m_view->setModel(m_model);
     m_refreshButton = new QPushButton(tr("Actualiser"));
@@ -30,7 +30,7 @@ TabGestionBdd::TabGestionBdd(bmps::Bdd & bdd, const std::pair<int, int> &pairInd
                 m_model->removeRow(j->row());
         });
     connect(m_refreshButton,&QPushButton::clicked,m_model,&QSqlTableModel::submitAll);
-    auto * buttonLayout = new QHBoxLayout;
+    auto *buttonLayout = new QHBoxLayout;
     buttonLayout->addWidget(m_refreshButton);
     buttonLayout->addWidget(m_insertButton);
     buttonLayout->addWidget(m_saveButton);

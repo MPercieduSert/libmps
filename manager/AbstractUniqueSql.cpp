@@ -3,7 +3,7 @@
 using namespace managerMPS;
 using namespace bddMPS;
 
-QString AbstractUniqueSql::uniqueString(const InfoBdd & info, numt num) const {
+QString AbstractUniqueSql::uniqueString(const InfoBdd &info, numt num) const {
     QString sql("SELECT ID FROM ");
     sql.append(info.table()).append(" WHERE");
     auto numAttUnique = info.attributUnique(num);
@@ -15,7 +15,7 @@ QString AbstractUniqueSql::uniqueString(const InfoBdd & info, numt num) const {
     return sql;
 }
 
-QString AbstractUniqueSql::uniqueCreerString(const InfoBdd & info, numt num, bool numero) const {
+QString AbstractUniqueSql::uniqueCreerString(const InfoBdd &info, numt num, bool numero) const {
     QString sql;
     sql.append(wordSqlString(wordSql::Constraint))
             .append(" UN").append(info.table()).append(numero ? "" : QString::number(num + 1))

@@ -35,9 +35,9 @@ void CompositionTableau::hydrate(szt ligne)
 bool CompositionTableau::newOrModif(szt ligne) const
     TEST_COMPOSITION_TABLEAU(NewOrModifModule,newOrModif(ligne))
 
-void CompositionTableau::push_back(std::unique_ptr<AbstractTableau> && tableau, bool actif){
-    if(!m_tableaux.empty() && tableau->size() != size())
-        throw std::runtime_error(QString("void CompositionTableau::push_back(std::unique_ptr<AbstractTableau> && )\n"
+void CompositionTableau::push_back(std::unique_ptr<AbstractTableau> &&tableau, bool actif){
+    if(!m_tableaux.empty() &&tableau->size() != size())
+        throw std::runtime_error(QString("void CompositionTableau::push_back(std::unique_ptr<AbstractTableau> &&)\n"
                                  "La taille du nouveau tableau (").append(QString::number(tableau->size()))
                                  .append(") ne correspond pas à ceux déjà présents (").append(QString::number(size())).toStdString());
     m_tableaux.push_back(std::move(tableau));
@@ -52,4 +52,4 @@ void CompositionTableau::save(szt ligne)
     OPERATION_COMPOSITION_TABLEAU(SaveModule,save(ligne))
 
 bool CompositionTableau::valide(szt ligne) const
-    TEST_COMPOSITION_TABLEAU(ValideModule,valide(ligne))
+    TEST_COMPOSITION_TABLEAU(_valideModule,valide(ligne))

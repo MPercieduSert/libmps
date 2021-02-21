@@ -6,7 +6,7 @@ DESTR_VIDE_DEF(AbstractNewModifForm)
 DESTR_VIDE_DEF(NewModifDialog)
 
 //AbstractNomForm
-AbstractNomNewModifForm::AbstractNomNewModifForm(bddMPS::Bdd & bdd, const QString & label, bool newEnt, QWidget * parent)
+AbstractNomNewModifForm::AbstractNomNewModifForm(bddMPS::Bdd &bdd, const QString &label, bool newEnt, QWidget *parent)
     : AbstractNewModifForm (bdd,newEnt,parent)
 {
     m_mainLayout = new QVBoxLayout(this);
@@ -39,9 +39,9 @@ void AbstractNomNewModifForm::connexion() {
         });
 }
 
-//AbstractNcNomForm
-AbstractNcNomNewModifForm::AbstractNcNomNewModifForm(bddMPS::Bdd &bdd, const QString &labelNc, const QString &labelNom,
-                                                     bool newEnt, QWidget * parent)
+//Abstractnc_nomForm
+Abstractnc_nomNewModifForm::Abstractnc_nomNewModifForm(bddMPS::Bdd &bdd, const QString &labelNc, const QString &labelNom,
+                                                     bool newEnt, QWidget *parent)
     : AbstractNomNewModifForm(bdd,labelNom,newEnt,parent) {
     m_ncLabel = new QLabel(labelNc);
     m_ncLine = new QLineEdit;
@@ -53,16 +53,16 @@ AbstractNcNomNewModifForm::AbstractNcNomNewModifForm(bddMPS::Bdd &bdd, const QSt
     m_mainLayout->addLayout(m_ncLayout);
 }
 
-void AbstractNcNomNewModifForm::connexion() {
+void Abstractnc_nomNewModifForm::connexion() {
     AbstractNomNewModifForm::connexion();
     connect(m_ncLine,&QLineEdit::textChanged,this,[this](){emit savePermis(valide());});
 }
 
-//AbstractTypeNcNomForm
-AbstractTypeNcNomNewModifForm::AbstractTypeNcNomNewModifForm(bddMPS::BddPredef & bdd, const QString & refRoot, idt idEntity,
-                                                             const QString & labelType, const QString &labelNc, const QString &labelNom,
-                                                             bool newEnt, QWidget * parent)
-    : AbstractNcNomNewModifForm(bdd,labelNc,labelNom,newEnt,parent), m_cible(bdd.cible(idEntity)), m_valide(!m_new)
+//AbstractTypenc_nomForm
+AbstractTypenc_nomNewModifForm::AbstractTypenc_nomNewModifForm(bddMPS::BddPredef &bdd, const QString &refRoot, idt id_entity,
+                                                             const QString &labelType, const QString &labelNc, const QString &labelNom,
+                                                             bool newEnt, QWidget *parent)
+    : Abstractnc_nomNewModifForm(bdd,labelNc,labelNom,newEnt,parent), m_cible(bdd.cible(id_entity)), m_valide(!m_new)
 {
     m_typeLabel = new QLabel(labelType);
     m_mainLayout->addWidget(m_typeLabel);
@@ -73,11 +73,11 @@ AbstractTypeNcNomNewModifForm::AbstractTypeNcNomNewModifForm(bddMPS::BddPredef &
     m_typeTree->setColumnCount(nbrColumn);
     m_typeTree->setHeaderLabels(QStringList({"nom","nom abrégé"}));
     m_typeTree->setSelectionModel(new QItemSelectionModel(m_typeTree->model()));
-    m_typeTree->setTreeRef(m_bdd.getArbre<Type>(m_bdd.refToId<Type>(refRoot)),
-                        [this](const Type & tp)->QTreeWidgetItem *{
+    m_typeTree->setTreeRef(m_bdd.getarbre<Type>(m_bdd.refToId<Type>(refRoot)),
+                        [this](const Type &tp)->QTreeWidgetItem *{
         auto item = new QTreeWidgetItem({tp.nom(),tp.nc()});
-        item->setData(widgetMPS::TreeWidget::IdColonne,widgetMPS::TreeWidget::IdRole,tp.id());
-        Permission perm(item->data(nomType,widgetMPS::TreeWidget::IdRole).toUInt(),m_cible);
+        item->set_data(widgetMPS::TreeWidget::IdColonne,widgetMPS::TreeWidget::IdRole,tp.id());
+        Permission perm(item->data(nom_type,widgetMPS::TreeWidget::IdRole).toUInt(),m_cible);
         m_bdd.getUnique(perm);
         if(perm.test(bddMPS::code::Attribuable))
             item->setFlags(Qt::ItemIsEnabled|Qt::ItemIsSelectable);
@@ -89,21 +89,21 @@ AbstractTypeNcNomNewModifForm::AbstractTypeNcNomNewModifForm(bddMPS::BddPredef &
     m_typeTree->setSelectionBehavior(QAbstractItemView::SelectRows);
 }
 
-void AbstractTypeNcNomNewModifForm::connexion() {
-    AbstractNcNomNewModifForm::connexion();
+void AbstractTypenc_nomNewModifForm::connexion() {
+    Abstractnc_nomNewModifForm::connexion();
     connect(m_typeTree->selectionModel(),&QItemSelectionModel::selectionChanged,this,[this](){
-        Permission perm(idType(),m_cible);
+        Permission perm(id_type(),m_cible);
         m_bdd.getUnique(perm);
         m_valide = perm.test(bddMPS::code::Attribuable);
         emit savePermis(valide());
     });
 }
 
-//AbstractParentNcNomForm
-AbstractParentNcNomNewModifForm::AbstractParentNcNomNewModifForm(bddMPS::Bdd & bdd, const QStringList & header,
-                                                             const QString & labelParent, const QString &labelNc, const QString &labelNom,
-                                                             bool newEnt, QWidget * parent)
-    : AbstractNcNomNewModifForm(bdd,labelNc,labelNom,newEnt,parent)
+//AbstractParentnc_nomForm
+AbstractParentnc_nomNewModifForm::AbstractParentnc_nomNewModifForm(bddMPS::Bdd &bdd, const QStringList &header,
+                                                             const QString &labelParent, const QString &labelNc, const QString &labelNom,
+                                                             bool newEnt, QWidget *parent)
+    : Abstractnc_nomNewModifForm(bdd,labelNc,labelNom,newEnt,parent)
 {
     m_parentLabel = new QLabel(labelParent);
     m_mainLayout->addWidget(m_parentLabel);
@@ -118,7 +118,7 @@ AbstractParentNcNomNewModifForm::AbstractParentNcNomNewModifForm(bddMPS::Bdd & b
 
 //NewModifDialog
 
-NewModifDialog::NewModifDialog(AbstractNewModifForm * form, QWidget * parent)
+NewModifDialog::NewModifDialog(AbstractNewModifForm *form, QWidget *parent)
     : QDialog (parent),
       m_form(form)
 {

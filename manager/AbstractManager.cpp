@@ -3,5 +3,5 @@
 using namespace managerMPS;
 
 DESTR_VIDE_DEF(AbstractManager)
-DESTR_VIDE_DEF(UniqueEntityException)
+DESTR_VIDE_DEF(Uniqueentity_exception)
 

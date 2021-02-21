@@ -22,30 +22,30 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-    AbstractEntitySelectWidget.cpp \
+    AbstractentitySelectWidget.cpp \
     #BarPlotter.cpp \
     Checklist.cpp \
     #EditTreeWidget.cpp \
     FindNoeudWidget.cpp \
     #Histogramme.cpp \
     IdComboBox.cpp \
-    #MotCleDelegate.cpp \
-    #MotCleModel.cpp \
-    #MotCleWidget.cpp \
+    #mot_cleDelegate.cpp \
+    #mot_cleModel.cpp \
+    #mot_cleWidget.cpp \
     NewModifDialog.cpp \
     NewModifPredef.cpp \
-    #NewMotCleDialog.cpp \
+    #Newmot_cleDialog.cpp \
     #Plotter.cpp \
     #ReadTreeWidget.cpp \
-    #SelectDonneeDialog.cpp \
+    #SelectdonneeDialog.cpp \
     SelectInListBox.cpp \
     SpinBox.cpp \
-    TableEntityView.cpp \
-    #TreeModelEditEntity.cpp \
-    #TreeModelMotCle.cpp \
-    #TreeModelReadEntity.cpp \
-    #TreeModelReadTemp.cpp \
-    #TreeModelTemp.cpp \
+    TableentityView.cpp \
+    #TreeModelEditentity.cpp \
+    #TreeModelmot_cle.cpp \
+    #TreeModelReadentity.cpp \
+    #TreeModelRead_temp.cpp \
+    #TreeModel_temp.cpp \
     TreeWidget.cpp \
     NodeView.cpp \
     FindWidget.cpp \
@@ -54,30 +54,30 @@ SOURCES += \
     dialog_predef.cpp
 
 HEADERS += \
-    AbstractEntitySelectWidget.h \
+    AbstractentitySelectWidget.h \
     #BarPlotter.h \
     Checklist.h \
     #EditTreeWidget.h \
     FindNoeudWidget.h \
     #Histogramme.h \
     IdComboBox.h \
-    #MotCleDelegate.h \
-    #MotCleModel.h \
-    #MotCleWidget.h \
+    #mot_cleDelegate.h \
+    #mot_cleModel.h \
+    #mot_cleWidget.h \
     NewModifDialog.h \
     NewModifPredef.h \
-    #NewMotCleDialog.h \
+    #Newmot_cleDialog.h \
     #Plotter.h \
     #ReadTreeWidget.h \
-    #SelectDonneeDialog.h \
+    #SelectdonneeDialog.h \
     SelectInListBox.h \
     SpinBox.h \
-    TableEntityView.h \
-    #TreeModelEditEntity.h \
-    #TreeModelMotCle.h \
-    #TreeModelReadEntity.h \
-    #TreeModelReadTemp.h \
-    #TreeModelTemp.h \
+    TableentityView.h \
+    #TreeModelEditentity.h \
+    #TreeModelmot_cle.h \
+    #TreeModelReadentity.h \
+    #TreeModelRead_temp.h \
+    #TreeModel_temp.h \
     TreeWidget.h \
     NodeView.h \
     FindWidget.h \

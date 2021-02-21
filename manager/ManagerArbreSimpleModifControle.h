@@ -5,16 +5,16 @@
 #define MANAGERARBRESIMPLEMODIFCONTROLE_H
 
 #include "ManagerModifControle.h"
-#include "ManagerArbreSimple.h"
+#include "ManagerarbreSimple.h"
 
 namespace managerMPS {
 /*! \ingroup groupeManager
- * \brief Classe template mère des différents manageurs pour les entités de type arbre simple avec un controle de modification.
+ *\brief Classe template mère des différents manageurs pour les entités de type arbre simple avec un controle de modification.
  */
-template<class Ent> class ManagerArbreSimpleModifControle : public ManagerArbreSimple<Ent>,
+template<class Ent> class ManagerarbreSimpleModifControle : public ManagerarbreSimple<Ent>,
                                                                       public ManagerModifControle<Ent> {
 protected:
-    using ManagerArb = ManagerArbreSimple<Ent>;
+    using ManagerArb = ManagerarbreSimple<Ent>;
     using ManagerMC = ManagerModifControle<Ent>;
 
     using ManagerMC::modify;
@@ -24,26 +24,26 @@ public:
     using ManagerMC::testRestriction;
 
     //! Constructeur.
-    ManagerArbreSimpleModifControle(const InfoBdd & info,
-                                    std::unique_ptr<AbstractGestionRestriction<Ent>> && gestionAutorisation
+    ManagerarbreSimpleModifControle(const InfoBdd &info,
+                                    std::unique_ptr<AbstractGestionRestriction<Ent>> &&gestionAutorisation
                                                 = std::make_unique<AbstractGestionRestriction<Ent>>(),
-                                      std::unique_ptr<AbstractUniqueSqlTemp<Ent>> && unique = std::make_unique<NoUniqueSql<Ent>>())
+                                      std::unique_ptr<AbstractUniqueSql_temp<Ent>> &&unique = std::make_unique<NoUniqueSql<Ent>>())
         : ManagerSql<Ent>(info,std::move(unique)),
           ManagerModifControle<Ent>(std::move(gestionAutorisation)) {}
 
     //! Destructeur.
-    ~ManagerArbreSimpleModifControle() override = default;
+    ~ManagerarbreSimpleModifControle() override = default;
 
     //! Supprime de la table en base de donnée l'entité d'identifiant id.
     bool del(idt id) override
-        {return !testRestriction(id,bddMPS::Suppr) && ManagerArb::del(id);}
+        {return !testRestriction(id,bddMPS::Suppr) &&ManagerArb::del(id);}
 
     //! Enregistre l'entité entity en base de donnée.
-    void save(Ent & entity) override
+    void save(Ent &ent) override
         {ManagerArb::save(entity);}
 
     //! Enregistre l'entité entity en base de donnée.
-    void save(const Ent & entity) override
+    void save(const Ent &ent) override
         {ManagerArb::save(entity);}
 
     //! Retourne le type du manager.
@@ -52,7 +52,7 @@ public:
 
 protected:
     //! Constructeur.
-    ManagerArbreSimpleModifControle(std::unique_ptr<AbstractGestionRestriction<Ent>> && gestionAutorisation
+    ManagerarbreSimpleModifControle(std::unique_ptr<AbstractGestionRestriction<Ent>> &&gestionAutorisation
                                     = std::make_unique<AbstractGestionRestriction<Ent>>())
         : ManagerModifControle<Ent>(std::move(gestionAutorisation))
     {}

@@ -4,10 +4,10 @@
 #ifndef FENFLAGS_H
 #define FENFLAGS_H
 
-#include "typemps.h"
+#include "type_mps.h"
 
 namespace fenMPS {
-using namespace typeMPS;
+using namespace type_mps;
 
 //! Enumeration des actions
 enum actionFlags : flag::flag_type {NoActions = 0x0,

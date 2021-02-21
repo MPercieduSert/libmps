@@ -4,14 +4,14 @@
 #ifndef MANAGERARBRESIMPLE_H
 #define MANAGERARBRESIMPLE_H
 
-#include "AbstractManagerArbre.h"
+#include "AbstractManagerarbre.h"
 
 
 namespace managerMPS {
 /*! \ingroup groupeManager
- * \brief Classe template mère des différents manageurs pour les entités de type arbreSimple.
+ *\brief Classe template mère des différents manageurs pour les entités de type arbreSimple.
  */
-template<class Ent> class ManagerArbreSimple : public AbstractManagerArbre<Ent> {
+template<class Ent> class ManagerarbreSimple : public AbstractManagerarbre<Ent> {
 protected:
     using ManagerSqlEnt = ManagerSql<Ent>;
 
@@ -26,7 +26,7 @@ protected:
 //    using ManagerSqlEnt::table;
 
 public:
-    using AbstractManagerArbre<Ent>::AbstractManagerArbre;
+    using AbstractManagerarbre<Ent>::AbstractManagerarbre;
 //    using ManagerSqlEnt::attribut;
 //    using ManagerSqlEnt::existsUnique;
    using ManagerSqlEnt::exists;
@@ -38,13 +38,13 @@ public:
 //    using ManagerSqlEnt::save;
 
     //! Destructeur.
-    ~ManagerArbreSimple() override = default;
+    ~ManagerarbreSimple() override = default;
 
     //! Supprime de la base de donnée le noeud d'identifiant id ainsi que tous ses déscendants (opération stable).
     bool del(idt id) override;
 
     //! Renvoie le liste des descendant direct d'entity.
-    VectorPtr<Ent> getListChilds(const Ent & entity) override
+    vector_ptr<Ent> getListChilds(const Ent &ent) override
         {return getList(Ent::Parent,entity.id(),Ent::Ordre);}
 
     //! Renvoie le liste des identifiants des descendant direct de l'entité d'identifiant id.
@@ -69,36 +69,36 @@ public:
         {return getListId(Ent::Parent,QVariant(QVariant::Int),Ent::Ordre,bmps::condition::Is);}
 
 //    //! Renvoie le vecteur des descendant direct d'entity.
-//    VectorPtr<Ent> getVectorChilds(const Ent & entity) override
+//    vector_ptr<Ent> getVectorChilds(const Ent &ent) override
 //        {return getListChilds(entity);}
 
     //! Test la validité de la paternité.
-    bool isValidParent(const Ent & entity)
+    bool is_validParent(const Ent &ent)
         {return entity.parent() == 0 || exists(Ent(entity.parent()));}
 
     //! Enregistre l'entité entity en base de donnée.
-    void save(Ent & entity) override {
+    void save(Ent &ent) override {
         exceptionParentInvalid(entity);
         ManagerSqlEnt::save(entity);
     }
 
     //! Enregistre l'entité entity en base de donnée.
-    void save(const Ent & entity) override {
+    void save(const Ent &ent) override {
         exceptionParentInvalid(entity);
         ManagerSqlEnt::save(entity);
     }
 
     //! Retourne le type du manager.
     virtual flag typeManager() const
-        {return bmps::ArbreSimpleTypeManager;}
+        {return bmps::arbreSimpleTypeManager;}
 
 protected:
     //! Lance une execption si la paternité n'est pas valide.
-    void exceptionParentInvalid(const Ent & entity) {
-        if(!isValidParent(entity))
-            throw entityMPS::InvalideEntityException(QString("void ManagerArbreSimple<").append(name())
+    void exceptionParentInvalid(const Ent &ent) {
+        if(!is_validParent(entity))
+            throw entityMPS::invalide_entity_exception(QString("void ManagerarbreSimple<").append(name())
                                                      .append(">::exceptionParentInvalid(const ").append(name()).append(" &)")
-                                                     .append("L'entité transmise en argument de getArbre n'est pas valide, "
+                                                     .append("L'entité transmise en argument de getarbre n'est pas valide, "
                                                              "le parent spécifié n'existe pas."),entity);
     }
 
@@ -107,7 +107,7 @@ protected:
     virtual void saveExt(typename tree<Ent>::iterator /*iter*/, idt /*idRoot*/) override {}
 
     //! Sauve la racine de l'arbre (donnée et structure).
-    void saveRoot(tree<Ent> & tree) override
+    void saveRoot(tree<Ent> &tree) override
         {save(*tree.begin());}
 
     //! Sauve un arbre où le changement de structure consite seulement l'ajout de nouveaux noeuds
@@ -115,14 +115,14 @@ protected:
     void saveWithoutDelete(typename tree<Ent>::iterator iter) override;
 };
 
-template<class Ent> bool ManagerArbreSimple<Ent>::del(idt id) {
+template<class Ent> bool ManagerarbreSimple<Ent>::del(idt id) {
     if(!exists(Ent::Parent,id))
         return ManagerSqlEnt::del(id);
     else
         return false;
-    /*ListPtr<Ent> childs = getList(Ent::Parent,id);
-    typename ListPtr<Ent>::iterator i = childs.begin();
-    while(i != childs.end() && del((*i).id()))
+    /*list_ptr<Ent> childs = getList(Ent::Parent,id);
+    typename list_ptr<Ent>::iterator i = childs.begin();
+    while(i != childs.end() &&del((*i).id()))
         ++i;
     if(i == childs.end())
         return ManagerSqlEnt::del(id);
@@ -130,9 +130,9 @@ template<class Ent> bool ManagerArbreSimple<Ent>::del(idt id) {
         return false;*/
 }
 
-template<class Ent> void ManagerArbreSimple<Ent>::saveWithoutDelete(typename tree<Ent>::iterator iter) {
-    for(auto child = iter.beginChild(); child; ++child) {
-        child->setParent(iter->id());
+template<class Ent> void ManagerarbreSimple<Ent>::saveWithoutDelete(typename tree<Ent>::iterator iter) {
+    for(auto child = iter.begin_child(); child; ++child) {
+        child->set_parent(iter->id());
         save(*child);
         saveWithoutDelete(child);
     }

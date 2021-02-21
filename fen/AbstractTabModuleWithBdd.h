@@ -10,23 +10,23 @@
 namespace fenMPS {
 namespace bmps = bddMPS;
 /*! \ingroup groupeFen
- * \brief Mère des onglet utilisant la base de données.
+ *\brief Mère des onglet utilisant la base de données.
  */
 class AbstractTabModuleWithBdd : public AbstractTabModule {
     Q_OBJECT
 protected:
-    bmps::Bdd& m_bdd;    //!< Référence sur la base de donnée.
+    bmps::Bdd&m_bdd;    //!< Référence sur la base de donnée.
 
 public:
     //! Constructeur.
-    explicit AbstractTabModuleWithBdd(bmps::Bdd & bdd, const std::pair<int, int> &pairIndex, QWidget *parent = nullptr)
+    explicit AbstractTabModuleWithBdd(bmps::Bdd &bdd, const std::pair<int, int> &pairIndex, QWidget *parent = nullptr)
         : AbstractTabModule(pairIndex, parent), m_bdd(bdd) {}
 
     //! Destructeur.
     ~AbstractTabModuleWithBdd() override = default;
 
     //! Accesseur de la base de donnée.
-    virtual bmps::Bdd & bdd() const
+    virtual bmps::Bdd &bdd() const
         {return m_bdd;}
 };
 }

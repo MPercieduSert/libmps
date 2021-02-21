@@ -8,12 +8,12 @@
 
 namespace modelMPS {
 /*! \ingroup groupeModel
- * \brief Model de selection pour les view d'un AbstractNodeModel.
+ *\brief Model de selection pour les view d'un AbstractNodeModel.
  */
 class NodeSelectionModel : public QObject {
     Q_OBJECT
 protected:
-    ItemNodeModel * m_model;        //!< Model associé à la selection.
+    ItemNodeModel *m_model;        //!< Model associé à la selection.
     bool m_hasSelection = false;                //!< Sélection non vide.
     NodeIndex m_currentIndex;           //!< Index courant.
     std::list<NodeIndex> m_selection;   //!< Sélection courant.
@@ -30,7 +30,7 @@ public:
     };
 
     //! Constructeur.
-    NodeSelectionModel(ItemNodeModel * model = nullptr, QObject * parent = nullptr);
+    NodeSelectionModel(ItemNodeModel *model = nullptr, QObject *parent = nullptr);
 
     //! Accesseur de l'index courant.
     NodeIndex currentIndex() const
@@ -41,26 +41,26 @@ public:
         {return m_hasSelection;}
 
     //! Teste si index et l'index courant.
-    bool isCurrentIndex(const NodeIndex & index)
-        {return m_hasSelection && m_currentIndex == index;}
+    bool isCurrentIndex(const NodeIndex &index)
+        {return m_hasSelection &&m_currentIndex == index;}
 
     //! Teste si un index est sélectionné.
-    bool isSelected(const NodeIndex & index) {
-        if(m_hasSelection && m_model == index.model())
+    bool isSelected(const NodeIndex &index) {
+        if(m_hasSelection &&m_model == index.model())
             return std::find(m_selection.cbegin(),m_selection.cend(),index) != m_selection.cend();
         return false;
     }
 
     //! Accesseur du model.
-    ItemNodeModel * model() const noexcept
+    ItemNodeModel *model() const noexcept
         {return m_model;}
 
     //! Accesseur de la liste de index sélectionnés.
-    const std::list<NodeIndex> & selectedIndex() const
+    const std::list<NodeIndex> &selectedIndex() const
         {return m_selection;}
 
     //! Mutateur du model.
-    void setModel(ItemNodeModel * model)
+    void setModel(ItemNodeModel *model)
         {m_model = model;}
 public slots:
     //! Efface la sélection et l'index courant (émet selectionChanged et currentChanged).
@@ -76,25 +76,25 @@ public slots:
     void reset() {}
 
     //! Sélectionne (émet selectionChanged)
-    void select(const NodeIndex & /*index*/, flag /*selectionFlag*/) {}
+    void select(const NodeIndex &/*index*/, flag /*selectionFlag*/) {}
 
     //! Sélectionne (émet selectionChanged)
-    void select(const std::list<NodeIndex> & /*index*/, flag /*selectionFlag*/) {}
+    void select(const std::list<NodeIndex> &/*index*/, flag /*selectionFlag*/) {}
 
     //! Mutateur de l'index courant.
-    void setCurrentIndex(const NodeIndex & index, flag selectionFlag);
+    void setCurrentIndex(const NodeIndex &index, flag selectionFlag);
 signals:
     //! L'index courant a changé.
-    void currentChanged(const NodeIndex & current, const NodeIndex & previous);
+    void currentChanged(const NodeIndex &current, const NodeIndex &previous);
 
     //! Le model a changé.
-    void modelChanged(ItemNodeModel * model);
+    void modelChanged(ItemNodeModel *model);
 
     //! La sélection à changé.
-    void selectionChanged(const std::list<NodeIndex> & selected, const std::list<NodeIndex> & deselected);
+    void selectionChanged(const std::list<NodeIndex> &selected, const std::list<NodeIndex> &deselected);
 protected:
     //! Compare les deux sélections puis émét selectionChanged.
-    void emitSelectionChanged(const std::list<NodeIndex> & /*newSelection*/, const std::list<NodeIndex> & /*oldSelection*/) {}
+    void emitSelectionChanged(const std::list<NodeIndex> &/*newSelection*/, const std::list<NodeIndex> &/*oldSelection*/) {}
 };
 }
 #endif // NODESELECTIONMODEL_H

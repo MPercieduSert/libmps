@@ -1,12 +1,12 @@
 /*Auteur: PERCIE DU SERT Maxime
  *Date: 29/11/2019
  */
-#ifndef TYPEMPS_H
-#define TYPEMPS_H
+#ifndef TYPE_MPS_H
+#define TYPE_MPS_H
 
-//! \ingroup groupeAttributEntity
+//! \ingroup groupe_attribut_entity
 //! Type des attributs
-namespace typeMPS {
+namespace mps {
 //! Type des identifiants.
 using idt = unsigned;
 //! Type des tailles et indices de veteur.
@@ -37,12 +37,12 @@ public:
         {return !m_value;}
 
     //! Revoie un drapeaux correspondant à l'intersection.
-    flag operator & (flag_type value) const noexcept
-        {return m_value & value;}
+    flag operator &(flag_type value) const noexcept
+        {return m_value &value;}
 
     //! Revoie un drapeaux correspondant à l'intersection.
-    flag operator & (flag f) const noexcept
-        {return m_value & f.m_value;}
+    flag operator &(flag f) const noexcept
+        {return m_value &f.m_value;}
 
     //! Revoie un drapeaux correspondant à l'union.
     flag operator | (flag_type value) const noexcept
@@ -65,23 +65,23 @@ public:
         {return ~m_value;}
 
     //! Revoie un drapeaux correspondant à l'intersection.
-    flag & operator &= (flag_type value) noexcept {
+    flag &operator &= (flag_type value) noexcept {
         m_value &= value;
         return *this;}
 
     //! Revoie un drapeaux correspondant à l'intersection.
-    flag & operator &= (flag f) noexcept {
+    flag &operator &= (flag f) noexcept {
         m_value &= f.m_value;
         return *this;}
 
     //! Revoie un drapeaux correspondant à l'union.
-    flag & operator |= (flag_type value) noexcept {
+    flag &operator |= (flag_type value) noexcept {
         m_value |= value;
         return *this;
     }
 
     //! Revoie un drapeaux correspondant à l'union.
-    flag & operator |= (flag f) noexcept {
+    flag &operator |= (flag f) noexcept {
         m_value |= f.m_value;
         return *this;
     }
@@ -107,13 +107,13 @@ public:
         {return m_value;}
 
     //! Conversion.
-    flag & operator =(flag_type value) noexcept {
+    flag &operator =(flag_type value) noexcept {
         m_value = value;
         return *this;
     }
 
     //! Test d'égalité.
-    bool operator ==(const flag & value) const
+    bool operator ==(const flag &value) const
         {return m_value == value.m_value;}
 
     //! Test d'égalité.
@@ -121,7 +121,7 @@ public:
         {return m_value == value;}
 
     //! Test de différence.
-    bool operator !=(const flag & value) const
+    bool operator !=(const flag &value) const
         {return m_value != value.m_value;}
 
     //! Test de différence.
@@ -129,12 +129,12 @@ public:
         {return m_value != value;}
 
     //! Mutateur de la valeur.
-    void setValue(flag_type value) noexcept
+    void set_value(flag_type value) noexcept
         {m_value = value;}
 
     //! Teste si l'intersection n'est pas vide.
     bool test(flag_type value) const noexcept
-        {return m_value & value;}
+        {return m_value &value;}
 
     //! Accesseur de la valeur.
     flag_type value() const noexcept
@@ -142,4 +142,4 @@ public:
 };
 }
 
-#endif // TYPEMPS_H
+#endif // TYPE_MPS_H

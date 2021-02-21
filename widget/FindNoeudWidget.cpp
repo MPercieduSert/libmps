@@ -6,23 +6,23 @@ using namespace findNoeudModel;
 using namespace widgetMPS;
 
 ///////////////////////////// FindNoeudDelegate ////////////////////////////
-QWidget * FindNoeudDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const {
-    if(index.isValid()) {
+QWidget *FindNoeudDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const {
+    if(index.is_valid()) {
         if(index.column() == OpColumn) {
-            auto * comboBox = new QComboBox(parent);
+            auto *comboBox = new QComboBox(parent);
             for (uint i = 0; i != NbrOperation; ++i)
                 comboBox->addItem(OperationNoeud::Strings[i],i);
             return comboBox;
         }
         if(index.column() == ColonneColumn) {
-            auto * comboBox = new QComboBox(parent);
+            auto *comboBox = new QComboBox(parent);
             auto vec = static_cast<const modelMPS::FindNoeudModel *>(index.model())->nomColonnes();
             for (uint i = 0; i != vec.size(); ++i)
                 comboBox->addItem(vec[i],i);
             return comboBox;
         }
-        if(index.column() == ComparaisonColumn && index.model()->data(index,Qt::UserRole).toUInt() & ComparaisonSet) {
-            auto * comboBox = new QComboBox(parent);
+        if(index.column() == ComparaisonColumn &&index.model()->data(index,Qt::UserRole).toUInt() &ComparaisonSet) {
+            auto *comboBox = new QComboBox(parent);
             for (uint i = 0; i != NbrComparaison; ++i)
                 comboBox->addItem(AbstractComparaisonNoeud::Strings[i],i);
             return comboBox;
@@ -33,12 +33,12 @@ QWidget * FindNoeudDelegate::createEditor(QWidget *parent, const QStyleOptionVie
 
 bool FindNoeudDelegate::editorEvent(QEvent *event, QAbstractItemModel *model,
                                         const QStyleOptionViewItem &option, const QModelIndex &index) {
-    if(index.isValid() && index.column() == NegColumn
-            && event->type() == QEvent::MouseButtonPress
-            && model->flags(index).testFlag(Qt::ItemIsEnabled)) {
+    if(index.is_valid() &&index.column() == NegColumn
+            &&event->type() == QEvent::MouseButtonPress
+            &&model->flags(index).testFlag(Qt::ItemIsEnabled)) {
         auto eventMouse = static_cast<QMouseEvent *>(event);
         if(eventMouse->button() == Qt::LeftButton) {
-            model->setData(index,!model->data(index,Qt::EditRole).toBool());
+            model->set_data(index,!model->data(index,Qt::EditRole).toBool());
             return true;
         }
     }
@@ -46,10 +46,10 @@ bool FindNoeudDelegate::editorEvent(QEvent *event, QAbstractItemModel *model,
 }
 
 void FindNoeudDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const {
-    if(index.isValid() && (index.column() == OpColumn
+    if(index.is_valid() &&(index.column() == OpColumn
                            || index.column() == ColonneColumn
-                           || index.model()->data(index,Qt::UserRole).toUInt() & ComparaisonSet)) {
-        auto * comboBox = static_cast<QComboBox *>(editor);
+                           || index.model()->data(index,Qt::UserRole).toUInt() &ComparaisonSet)) {
+        auto *comboBox = static_cast<QComboBox *>(editor);
         comboBox->setCurrentIndex(index.model()->data(index,Qt::EditRole).toInt());
     }
     else
@@ -57,11 +57,11 @@ void FindNoeudDelegate::setEditorData(QWidget *editor, const QModelIndex &index)
 }
 
 void FindNoeudDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const {
-    if(index.isValid() && (index.column() == OpColumn
+    if(index.is_valid() &&(index.column() == OpColumn
                            || index.column() == ColonneColumn
-                           || index.model()->data(index,Qt::UserRole).toUInt() & ComparaisonSet)) {
-        auto * comboBox = static_cast<QComboBox *>(editor);
-        model->setData(index,comboBox->currentIndex());
+                           || index.model()->data(index,Qt::UserRole).toUInt() &ComparaisonSet)) {
+        auto *comboBox = static_cast<QComboBox *>(editor);
+        model->set_data(index,comboBox->currentIndex());
     }
     else
         QStyledItemDelegate::setModelData(editor,model,index);
@@ -76,8 +76,8 @@ FindNoeudWidget::FindNoeudWidget(FindNoeudModel *model, QWidget *parent)
     m_findButton = new QPushButton(tr("Chercher"));
     m_resetButton = new QPushButton(tr("Réinitialiser"));
     m_view = new QTreeView;
-    setFindModel(model);
-    auto * delegateOld = m_view->itemDelegate();
+    set_findModel(model);
+    auto *delegateOld = m_view->itemDelegate();
     m_view->setItemDelegate(new Delegate(this));
     delete delegateOld;
     m_view->setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -96,7 +96,7 @@ FindNoeudWidget::FindNoeudWidget(FindNoeudModel *model, QWidget *parent)
     m_mainLayout->addLayout(m_buttonsLayout);
 }
 
-void FindNoeudWidget::setFindModel(FindNoeudModel * model) {
+void FindNoeudWidget::set_findModel(FindNoeudModel *model) {
     m_view->setModel(model);
     if(m_model) {
         m_addButton->disconnect(this);
@@ -116,5 +116,5 @@ void FindNoeudWidget::setFindModel(FindNoeudModel * model) {
                                                 m_view->selectionModel()->currentIndex().parent().siblingAtColumn(0));});
         connect(m_findButton,&QPushButton::clicked,m_model,&FindNoeudModel::find);
     }
-    m_model->setParent(this);
+    m_model->set_parent(this);
 }

@@ -22,38 +22,38 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-    AttributMultiple.cpp \
-    AttributSimple.cpp \
-    Config.cpp \
-    Entity.cpp \
-    EntityCible.cpp \
-    EntityDivers.cpp \
-    EntityRelation.cpp \
-    FileInterface.cpp \
-    infoEntity.cpp \
-    EntityPredef.cpp \
-    XmlMps.cpp \
-    Tree.cpp \
-    ConteneurPtr.cpp \
-    NumToTexte.cpp
+    tree.cpp \
+    xml.cpp \
+    num_to_texte.cpp \
+    info_entity.cpp \
+    file_interface.cpp \
+    config.cpp \
+    conteneur_ptr.cpp \
+    attribut_simple.cpp \
+    attribut_multiple.cpp \
+    entity.cpp \
+    entity_divers.cpp \
+    entity_relation.cpp \
+    entity_cible.cpp \
+    entity_predef.cpp
 
 HEADERS += \
-    AttributMultiple.h \
-    AttributSimple.h \
-    Config.h \
-    Entity.h \
-    EntityCible.h \
-    EntityDivers.h \
-    EntityPredef.h \
-    EntityRelation.h \
-    FileInterface.h \
-    infoEntity.h \
-    macrolibmps.h \
-    XmlMps.h \
-    Tree.h \
-    ConteneurPtr.h \
-    typemps.h \
-    NumToTexte.h
+    type_mps.h \
+    tree.h \
+    xml.h \
+    num_to_texte.h \
+    macro_mps.h \
+    info_entity.h \
+    file_interface.h \
+    config.h \
+    conteneur_ptr.h \
+    attribut_simple.h \
+    attribut_multiple.h \
+    entity.h \
+    entity_divers.h \
+    entity_relation.h \
+    entity_cible.h \
+    entity_predef.h
 unix {
     target.path = /usr/lib
     INSTALLS += target

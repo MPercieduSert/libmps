@@ -1,22 +1,22 @@
 /*Auteur: PERCIE DU SERT Maxime
  *Date: 23/07/2018
  */
-#ifndef MACROLIBMPS_H
-#define MACROLIBMPS_H
+#ifndef MACRO_MPS_H
+#define MACRO_MPS_H
 
 /*! \defgroup groupeMacroBase Macro de base
- * \brief Ensemble des macros de base.
+ *\brief Ensemble des macros de base.
  */
 //! \ingroup groupeMacro
 //! Macro déclarant par défaut les constructeurs et les opérateurs de copie et de déplacement.
 #define CONSTR_AFFECT_DEFAUT(T) /*! Constructeur de recopie.*/ \
-    T(const T & ) = default; \
+    T(const T &) = default; \
     /*! Constructeur de déplacement.*/ \
-    T(T && ) = default; \
+    T(T &&) = default; \
     /*! Affectation par copie.*/ \
-    T& operator = (const T &) = default; \
+    T&operator = (const T &) = default; \
     /*! Affectation par déplacement.*/ \
-    T& operator = (T &&) = default;
+    T&operator = (T &&) = default;
 
 //! \ingroup groupeMacro
 //! Macro déclarant le constructeur par défaut.

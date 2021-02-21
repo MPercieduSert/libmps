@@ -3,7 +3,7 @@
 using namespace modelMPS;
 using namespace findNodeModel;
 
-FindModel::FindModel(AbstractColonnesModel * model, QObject *parent)
+FindModel::FindModel(AbstractColonnesModel *model, QObject *parent)
     :   ItemNodeModel (parent), m_model(model)
     {m_data.setRoot(std::make_unique<FindNode>(this,FindNode::NoColonne,ChoiceNodeType));}
 
@@ -12,11 +12,11 @@ void FindModel::find(){
         m_model->find(this);
 }
 
-std::list<IterNode> FindModel::insert(const NodeIndex & parent, numt pos, numt count, int type) {
+std::list<IterNode> FindModel::insert(const NodeIndex &parent, numt pos, numt count, int type) {
     if(checkIndex(parent)){
         if(getNode(parent).type() == OperationNodeType)
             return ItemNodeModel::insert(parent,pos,count,type);
-        else if (count != 0 && pos == 0) {
+        else if (count != 0 &&pos == 0) {
             Node node = m_data.moveNode(parent, std::make_unique<FindNode>(this,Et,OperationNodeType));
             emit dataChanged(parent,TypeRole);
             std::list<IterNode> list;
@@ -41,7 +41,7 @@ QMap<QString,QVariant> FindModel::nomColonnes() const {
         return QMap<QString,QVariant>();
 }
 
-Node FindModel::nodeFactory(const NodeIndex & parent, numt pos, int type) {
+Node FindModel::nodeFactory(const NodeIndex &parent, numt pos, int type) {
     switch (type) {
     case ChoiceNodeType:
     case ItemNodeModel::DefaultType:
@@ -55,8 +55,8 @@ Node FindModel::nodeFactory(const NodeIndex & parent, numt pos, int type) {
 Node FindModel::nodeConditionFactory(szt col){
     switch (m_model->colonne(col).type()) {
     case BoolNodeType: {
-        const auto & colonne = m_model->colonne(col);
-        const auto & boolColonne = static_cast<const AbstractBoolColonne &>(colonne);
+        const auto &colonne = m_model->colonne(col);
+        const auto &boolColonne = static_cast<const AbstractBoolColonne &>(colonne);
         return std::make_unique<BoolNode>(this,col,boolColonne.falseLabel(),boolColonne.trueLabel());
     }
     case DateNodeType:
@@ -68,15 +68,15 @@ Node FindModel::nodeConditionFactory(szt col){
     }
 }
 
-bool FindModel::remove(const NodeIndex & node, numt count){
-    if(checkIndex(node) && !node.isRoot()){
+bool FindModel::remove(const NodeIndex &node, numt count){
+    if(checkIndex(node) &&!node.isRoot()){
         if(node.parent().childCount() == count + 1) {
-            if(indexToIterator(node).firstBrother())
-                m_data.move(node.lastBrother(),node.parent());
+            if(indexToIterator(node).first())
+                m_data.move(node.last(),node.parent());
             else
-                m_data.move(node.firstBrother(),node.parent());
+                m_data.move(node.first(),node.parent());
             emit dataChanged(node.parent(),TypeRole);
-            return ItemNodeModel::remove(node.firstBrother(),count + 1);
+            return ItemNodeModel::remove(node.first(),count + 1);
         }
         else
             return ItemNodeModel::remove(node,count);
@@ -91,8 +91,8 @@ void FindModel::reset() {
 }
 
 bool FindModel::set(const NodeIndex &index, const QVariant &value, int role) {
-    if(index.isValid()) {
-        if(index.cible() == ColonneCible && value.toInt() >= 0 && value.toInt() < m_model->columnCount()) {
+    if(index.is_valid()) {
+        if(index.cible() == ColonneCible &&value.toInt() >= 0 &&value.toInt() < m_model->columnCount()) {
             if(getNode(index).type() != m_model->colonne(value.toUInt()).type())
                 m_data.setNode(index,nodeConditionFactory(value.toUInt()));
             else
@@ -105,30 +105,30 @@ bool FindModel::set(const NodeIndex &index, const QVariant &value, int role) {
     return false;
 }
 
-void FindModel::setModel(AbstractColonnesModel * model) {
+void FindModel::setModel(AbstractColonnesModel *model) {
     beginResetModel();
         m_model = model;
     endResetModel();
 }
 
 bool FindModel::testRoot(szt id) const{
-    auto & root = static_cast<const FindNode &>(m_data.getRoot());
+    auto &root = static_cast<const FindNode &>(m_data.getRoot());
     return root.negation() ? !root.test(id,m_model)
                            : root.test(id,m_model);
 }
 
 bool FindModel::testTree(szt id) const{
     auto iter = m_data.crbegin();
-    iter.toFirstLeaf();
+    iter.to_first_leaf();
     auto test = true;
     while (!iter.root()) {
-        if(iter.leaf() && !static_cast<const FindNode &>(**iter).empty())
+        if(iter.leaf() &&!static_cast<const FindNode &>(**iter).empty())
             test = static_cast<const FindNode &>(**iter).test(id,m_model);
         if(static_cast<const FindNode &>(**iter).negation())
             test = !test;
-        if((test && static_cast<const FindNode &>(**iter.parent()).pos() == Ou)
-                || (!test && static_cast<const FindNode &>(**iter.parent()).pos() == Et)){
-            iter.toParent();
+        if((test &&static_cast<const FindNode &>(**iter.parent()).pos() == Ou)
+                || (!test &&static_cast<const FindNode &>(**iter.parent()).pos() == Et)){
+            iter.to_parent();
         }
         else
             --iter;
@@ -180,22 +180,22 @@ QVariant FindNode::data(int cible, int role, numt num) const {
         break;
     case SubNodeCible:
         if(role == SubNodeRole) {
-            if(num == FindModel::NegationPosition && type() != FindModel::ChoiceNodeType) {
+            if(num == FindModel::Negationposition &&type() != FindModel::ChoiceNodeType) {
                 QList<QVariant> init;
                 init.append(FindModel::NegCible);
                 init.append(0);
                 init.append(CheckSubNode);
                 return init;
             }
-            if(num == FindModel::NegationPosition
-                    || (num == FindModel::ColonnePosition && type() != FindModel::OperationNodeType)) {
+            if(num == FindModel::Negationposition
+                    || (num == FindModel::Colonneposition &&type() != FindModel::OperationNodeType)) {
                 QList<QVariant> init;
                 init.append(FindModel::ColonneCible);
                 init.append(0);
                 init.append(ComboBoxSubNode);
                 return init;
             }
-            if(num == FindModel::OperationOperationPosition && type() == FindModel::OperationNodeType) {
+            if(num == FindModel::OperationOperationposition &&type() == FindModel::OperationNodeType) {
                 QList<QVariant> init;
                 init.append(FindModel::OpCible);
                 init.append(0);
@@ -220,7 +220,7 @@ numt FindNode::dataCount(int cible) const {
     return ItemNode::dataCount(cible);
 }
 
-flag FindNode::setData(int cible, const QVariant & value, int role, numt num) {
+flag FindNode::set_data(int cible, const QVariant &value, int role, numt num) {
     switch (cible) {
     case FindModel::NegCible:
         if(role == CheckStateRole){
@@ -236,7 +236,7 @@ flag FindNode::setData(int cible, const QVariant & value, int role, numt num) {
         }
         break;
     }
-    return ItemNode::setData(cible,value,role,num);
+    return ItemNode::set_data(cible,value,role,num);
 }
 ///////////////////////////// ComparaisonNode ///////////////////
 QVariant ComparaisonNode::data(int cible, int role, numt num) const{
@@ -257,7 +257,7 @@ QVariant ComparaisonNode::data(int cible, int role, numt num) const{
             return map;
         }}
     }
-    else if (cible == SubNodeCible && num == FindModel::ComparaisonPosition) {
+    else if (cible == SubNodeCible &&num == FindModel::Comparaisonposition) {
         QList<QVariant> init;
         init.append(FindModel::ComparaisonCible);
         init.append(0);
@@ -267,12 +267,12 @@ QVariant ComparaisonNode::data(int cible, int role, numt num) const{
     return FindNode::data(cible,role,num);
 }
 
-flag ComparaisonNode::setData(int cible, const QVariant & value, int role, numt num) {
-    if(cible == FindModel::ComparaisonCible && role == NumRole) {
+flag ComparaisonNode::set_data(int cible, const QVariant &value, int role, numt num) {
+    if(cible == FindModel::ComparaisonCible &&role == NumRole) {
         m_comp = value.toUInt();
         return IntRole;
     }
-    return FindNode::setData(cible,value,role,num);
+    return FindNode::set_data(cible,value,role,num);
 }
 ////////////////////////////// BoolNode /////////////////////////////
 QVariant BoolNode::data(int cible, int role, numt num) const {
@@ -291,14 +291,14 @@ QVariant BoolNode::data(int cible, int role, numt num) const {
         break;
     case SubNodeCible:
         if(role == SubNodeRole){
-            if(num == FindModel::TruePosition) {
+            if(num == FindModel::Trueposition) {
                 QList<QVariant> init;
                 init.append(FindModel::TrueCible);
                 init.append(0);
                 init.append(CheckSubNode);
                 return init;
             }
-            if(num == FindModel::FalsePosition) {
+            if(num == FindModel::Falseposition) {
                 QList<QVariant> init;
                 init.append(FindModel::FalseCible);
                 init.append(0);
@@ -317,7 +317,7 @@ numt BoolNode::dataCount(int cible) const {
     return  FindNode::dataCount(cible);
 }
 
-flag BoolNode::setData(int cible, const QVariant & value, int role, numt num) {
+flag BoolNode::set_data(int cible, const QVariant &value, int role, numt num) {
     if(role == CheckStateRole) {
         if(cible == FindModel::TrueCible){
             m_true = value.toBool();
@@ -328,7 +328,7 @@ flag BoolNode::setData(int cible, const QVariant & value, int role, numt num) {
             return CheckStateRole;
         }
     }
-    return FindNode::setData(cible,value,role,num);
+    return FindNode::set_data(cible,value,role,num);
 }
 ///////////////////////////// DateNode ///////////////////////////
 QVariant DateNode::data(int cible, int role, numt num) const {
@@ -338,7 +338,7 @@ QVariant DateNode::data(int cible, int role, numt num) const {
         if(role == DateRole)
             return m_date;
     }
-    if(cible == SubNodeCible && role == SubNodeRole && num == FindModel::DatePosition) {
+    if(cible == SubNodeCible &&role == SubNodeRole &&num == FindModel::Dateposition) {
         QList<QVariant> init;
         init.append(FindModel::DateCible);
         init.append(0);
@@ -354,15 +354,15 @@ numt DateNode::dataCount(int cible) const {
     return  ComparaisonNode::dataCount(cible);
 }
 
-flag DateNode::setData(int cible, const QVariant & value, int role, numt num) {
-    if(cible == FindModel::DateCible && role == DateRole) {
+flag DateNode::set_data(int cible, const QVariant &value, int role, numt num) {
+    if(cible == FindModel::DateCible &&role == DateRole) {
         m_date = value.toDate();
         return DateRole;
     }
-    return ComparaisonNode::setData(cible,value,role,num);
+    return ComparaisonNode::set_data(cible,value,role,num);
 }
 
-bool DateNode::testValue(const QVariant & value) const {
+bool DateNode::testValue(const QVariant &value) const {
     switch (m_comp) {
     case FindModel::Egal:
         return m_date == value.toDate();
@@ -383,7 +383,7 @@ bool DateNode::testValue(const QVariant & value) const {
 ///////////////////////////// TexteNode ///////////////////////////
 QVariant TexteNode::data(int cible, int role, numt num) const {
     switch (cible) {
-    case FindModel::TexteCible:
+    case FindModel::texte_cible:
         if(role == StringRole)
             return m_texte;
         if(role == LabelRole)
@@ -404,21 +404,21 @@ QVariant TexteNode::data(int cible, int role, numt num) const {
     case SubNodeCible:
         if(role == SubNodeRole){
             switch (num) {
-            case FindModel::TextePosition: {
+            case FindModel::Texteposition: {
                 QList<QVariant> init;
-                init.append(FindModel::TexteCible);
+                init.append(FindModel::texte_cible);
                 init.append(0);
                 init.append(LineEditSubNode);
                 return init;
             }
-            case FindModel::CasePosition: {
+            case FindModel::Caseposition: {
                 QList<QVariant> init;
                 init.append(FindModel::CaseCible);
                 init.append(0);
                 init.append(CheckSubNode);
                 return init;
             }
-            case FindModel::RegexPosition: {
+            case FindModel::Regexposition: {
                 QList<QVariant> init;
                 init.append(FindModel::RegexCible);
                 init.append(0);
@@ -437,11 +437,11 @@ numt TexteNode::dataCount(int cible) const {
     return  FindNode::dataCount(cible);
 }
 
-flag TexteNode::setData(int cible, const QVariant & value, int role, numt num) {
+flag TexteNode::set_data(int cible, const QVariant &value, int role, numt num) {
     switch (cible) {
-    case FindModel::TexteCible:
+    case FindModel::texte_cible:
         if(role == StringRole) {
-                m_texte = value.toString();
+                m_texte = value.to_string();
                 if(m_regex)
                     m_regular.setPattern(m_texte);
                 return StringRole;
@@ -456,18 +456,18 @@ flag TexteNode::setData(int cible, const QVariant & value, int role, numt num) {
         break;
     case FindModel::RegexCible:
         if(role == CheckStateRole
-                && (m_regex = value.toBool())) {
+                &&(m_regex = value.toBool())) {
             m_regular.setPattern(m_texte);
             return CheckStateRole;
         }
         break;
     }
-    return FindNode::setData(cible,value,role,num);
+    return FindNode::set_data(cible,value,role,num);
 }
 
-bool TexteNode::testValue(const QVariant & value) const {
+bool TexteNode::testValue(const QVariant &value) const {
     if(m_regex)
-        return m_regular.match(value.toString(),0).hasMatch();
+        return m_regular.match(value.to_string(),0).hasMatch();
     else
-        return value.toString().contains(m_texte, m_case ? Qt::CaseSensitive : Qt::CaseInsensitive);
+        return value.to_string().contains(m_texte, m_case ? Qt::CaseSensitive : Qt::CaseInsensitive);
 }

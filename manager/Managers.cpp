@@ -2,20 +2,20 @@
 
 using namespace managerMPS;
 
-Managers::Managers(const entidt nbrEntity, const QString & versionTable,
-                   std::map<entidt,std::unique_ptr<AbstractManager>> && managers,
-                   const QSqlQuery & req)
-      : m_nbrEntity(nbrEntity),
+Managers::Managers(const entidt nbrentity, const QString &versionTable,
+                   std::map<entidt,std::unique_ptr<AbstractManager>> &&managers,
+                   const QSqlQuery &req)
+      : m_nbrentity(nbrentity),
         m_requete(req),
-        m_managers(nbrEntity) {
-      using UniqueVersion = NumTypeUniqueSql<VersionBdd>;
-      InfoBdd infoVersion("Version",versionTable,VersionBdd::NbrAtt,{UniqueVersion::NbrUnique});
-      infoVersion.setAttribut(VersionBdd::DateTime,"dt",bmps::typeAttributBdd::DateTime);
-      infoVersion.setAttribut(VersionBdd::Num,"num");
-      infoVersion.setAttribut(VersionBdd::Type,"tp");
-      infoVersion.setUnique(VersionBdd::Num,UniqueVersion::NumUnique);
-      infoVersion.setUnique(VersionBdd::Type,UniqueVersion::TypeUnique);
-      m_managerVersion = std::make_unique<ManagerSql<VersionBdd>>(infoVersion, std::make_unique<UniqueVersion>());
+        m_managers(nbrentity) {
+      using UniqueVersion = num_typeUniqueSql<version_bdd>;
+      InfoBdd infoVersion("Version",versionTable,version_bdd::Nbr_Att,{UniqueVersion::NbrUnique});
+      infoVersion.set_attribut(version_bdd::Date_Time,"dt",bmps::typeAttributBdd::Date_Time);
+      infoVersion.set_attribut(version_bdd::Num,"num");
+      infoVersion.set_attribut(version_bdd::Type,"tp");
+      infoVersion.setUnique(version_bdd::Num,UniqueVersion::NumUnique);
+      infoVersion.setUnique(version_bdd::Type,UniqueVersion::TypeUnique);
+      m_managerVersion = std::make_unique<ManagerSql<version_bdd>>(infoVersion, std::make_unique<UniqueVersion>());
 
       for(auto i = managers.begin(); i != managers.end(); ++i)
           m_managers[i->first] = std::move(i->second);
@@ -27,15 +27,15 @@ void Managers::creerVersion() {
 }
 
 bool Managers::existsVersion(idt type)
-    {return m_managerVersion->exists(VersionBdd::Type,type);}
+    {return m_managerVersion->exists(version_bdd::Type,type);}
 
-entityBaseMPS::VersionBdd Managers::getVersion(idt type) {
-    VersionBdd ver(numVersion(type),type);
+entities_base::version_bdd Managers::getVersion(idt type) {
+    version_bdd ver(numVersion(type),type);
     m_managerVersion->getUnique(ver);
     return ver;
 }
 
-const InfoBdd & Managers::info(entidt id) const {
+const InfoBdd &Managers::info(entidt id) const {
     if(valide(id))
             return m_managers[id]->info();
     else
@@ -43,45 +43,45 @@ const InfoBdd & Managers::info(entidt id) const {
                                     .append(QString::number(id)).append("invalide").toStdString());
 }
 
-InfoBdd Managers::infoBddArbre(const QString & table) const {
-    using Arbre = entityBaseMPS::Arbre;
-    using UniqueArbre = ArbreUniqueSql<Arbre>;
-    InfoBdd infoArbre(table,table, Arbre::NbrAtt,{UniqueArbre::NbrUnique});
-    infoArbre.setAttribut(Arbre::Parent,"pt",bmps::typeAttributBdd::Integer,false);
-    infoArbre.setAttribut(Arbre::Feuille,"fl",bmps::typeAttributBdd::Bool,true);
-    infoArbre.setAttribut(Arbre::Num,"num",bmps::typeAttributBdd::Integer,true);
-    infoArbre.setUnique(Arbre::Parent,UniqueArbre::ParentUnique);
-    infoArbre.setUnique(Arbre::Num,UniqueArbre::NumUnique);
-    infoArbre.setForeignKey(Arbre::Parent,infoArbre);
-    return infoArbre;
+InfoBdd Managers::infoBddarbre(const QString &table) const {
+    using arbre = entities_base::arbre;
+    using Uniquearbre = arbreUniqueSql<arbre>;
+    InfoBdd infoarbre(table,table, arbre::Nbr_Att,{Uniquearbre::NbrUnique});
+    infoarbre.set_attribut(arbre::Parent,"pt",bmps::typeAttributBdd::Integer,false);
+    infoarbre.set_attribut(arbre::Feuille,"fl",bmps::typeAttributBdd::Bool,true);
+    infoarbre.set_attribut(arbre::Num,"num",bmps::typeAttributBdd::Integer,true);
+    infoarbre.setUnique(arbre::Parent,Uniquearbre::ParentUnique);
+    infoarbre.setUnique(arbre::Num,Uniquearbre::NumUnique);
+    infoarbre.setForeignKey(arbre::Parent,infoarbre);
+    return infoarbre;
 }
 
-std::unique_ptr<Entity> Managers::makeEntity(const QString & entity) const {
+std::unique_ptr<entity> Managers::makeentity(const QString &ent) const {
     auto i = find(entity);
-    if(i == m_nbrEntity)
+    if(i == m_nbrentity)
         return nullptr;
     else
-        return m_managers[i]->makeEntity();
+        return m_managers[i]->makeentity();
 }
 
 int Managers::numVersion(numt type)
-    {return m_managerVersion->fonctionAgrega(bmps::Max,VersionBdd::Num,VersionBdd::Type,type).toInt();}
+    {return m_managerVersion->fonctionAgrega(bmps::Max,version_bdd::Num,version_bdd::Type,type).toInt();}
 
 void Managers::saveVersion(int num, numt type)
-    {m_managerVersion->save(VersionBdd(num,type));}
+    {m_managerVersion->save(version_bdd(num,type));}
 
-void Managers::setRequete(const QSqlQuery & req) {
+void Managers::setRequete(const QSqlQuery &req) {
     m_requete = req;
     AbstractManagerSql::setRequete(&m_requete);
 }
 
 //bmps::Table Managers::table(entidt id) const {
-//    if(id < m_nbrEntity) {
+//    if(id < m_nbrentity) {
 //        if(m_managers[id]){
 //            bmps::Table tab;
 //            tab.name = m_managers[id]->name();
 //            tab.nameBdd = m_managers[id]->info().table();
-//            tab.namesAttributs = m_managers[id]->namesAttributs();
+//            tab.Names_attributs = m_managers[id]->Names_attributs();
 //            tab.foreignKeys = m_managers[id]->info().foreignKey();
 //            return tab;
 //        }

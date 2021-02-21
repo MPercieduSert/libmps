@@ -9,16 +9,16 @@
 
 namespace managerMPS {
 /*! \ingroup groupeManager
- * \brief Classe template d'une classe abstraite de gestionnaire d'autorisation de type cible.
+ *\brief Classe template d'une classe abstraite de gestionnaire d'autorisation de type cible.
  */
 template<class Ent, class Restrict> class AbstractGestionRestrictionCible : public AbstractGestionRestriction<Ent> {
 protected:
     const entidt m_cible;  //!< Identifiant de ciblage de l'entité Ent.
-    AbstractManagerTemp<Restrict> & m_managerRestriction;   //!< Pointeur vers le gertionnaire des restriction.
+    AbstractManager_temp<Restrict> &m_managerRestriction;   //!< Pointeur vers le gertionnaire des restriction.
 
 public:
     //! Constructeur. (Ne posséde pas le manageur de restriction)
-    AbstractGestionRestrictionCible(entidt cible, AbstractManagerTemp<Restrict> & managerRestriction,
+    AbstractGestionRestrictionCible(entidt cible, AbstractManager_temp<Restrict> &managerRestriction,
                                      flag restriction = bddMPS::Aucune)
         : AbstractGestionRestriction<Ent>(restriction), m_cible(cible), m_managerRestriction(managerRestriction)
     {}
@@ -27,22 +27,22 @@ public:
     ~AbstractGestionRestrictionCible() override = default;
 
     //! Accesseur du manageur de restriction.
-    AbstractManagerTemp<Restrict> & managerRestriction()
+    AbstractManager_temp<Restrict> &managerRestriction()
         {return m_managerRestriction;}
 
     //! Accesseur du manageur de restriction.
-    const AbstractManagerTemp<Restrict> & managerRestriction() const
+    const AbstractManager_temp<Restrict> &managerRestriction() const
         {return m_managerRestriction;}
 
     //! Mutateur du manageur de restriction.
-    void setManagerRestriction(AbstractManagerTemp<Restrict> & manager)
+    void setManagerRestriction(AbstractManager_temp<Restrict> &manager)
         {m_managerRestriction = manager;}
 };
 
 /*! \ingroup groupeManager
- * \brief Classe template d'un gestionnaire d'autorisation de type cible et code.
+ *\brief Classe template d'un gestionnaire d'autorisation de type cible et code.
  */
-template<class Ent, class Restrict> class GestionRestrictionCibleCode : public AbstractGestionRestrictionCible<Ent,Restrict> {
+template<class Ent, class Restrict> class GestionRestrictioncible_code : public AbstractGestionRestrictionCible<Ent,Restrict> {
 protected:
     using AbstractGestionRestrictionCible<Ent, Restrict>::m_cible;
     using AbstractGestionRestrictionCible<Ent, Restrict>::m_managerRestriction;
@@ -51,20 +51,20 @@ public:
     using AbstractGestionRestrictionCible<Ent,Restrict>::AbstractGestionRestrictionCible;
 
     //! Destructeur.
-    ~GestionRestrictionCibleCode() override = default;
+    ~GestionRestrictioncible_code() override = default;
 
     //! Ajoute des restrictions de modification pour l'entité d'identifiant id.
     void addRestriction(idt id, flag restrict) override {
         AbstractGestionRestrictionCible<Ent,Restrict>::setRestriction(id,restrict);
         Restrict restriction(id, m_cible);
         if(m_managerRestriction.getUnique(restriction)) {
-            if(~restriction.code() & restrict){
-                restriction.setCode(restriction.code() |= restrict);
+            if(~restriction.code() &restrict){
+                restriction.set_code(restriction.code() |= restrict);
                 m_managerRestriction.save(restriction);
             }
         }
         else if(restrict) {
-            restriction.setCode(restrict);
+            restriction.set_code(restrict);
             m_managerRestriction.save(restriction);
         }
     }
@@ -86,14 +86,14 @@ public:
                 m_managerRestriction.save(restriction);
         }
         else if(restrict) {
-            restriction.setCode(restrict);
+            restriction.set_code(restrict);
             m_managerRestriction.save(restriction);
         }
     }
 
     //! Teste la restriction de modification pour une entité d'identifiant id.
     bool testRestriction(idt id, flag restrict) override
-        {return getRestriction(id) & restrict;}
+        {return getRestriction(id) &restrict;}
 };
 }
 #endif // GESTIONAUTORISATIONCIBLE_H

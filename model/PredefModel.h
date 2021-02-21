@@ -9,7 +9,7 @@
 
 namespace modelMPS {
 /*! \ingroup groupeModel
- * \brief Model de gestion des types.
+ *\brief Model de gestion des types.
  */
 class PermissionModel : public ItemNodeBddModel {
     Q_OBJECT
@@ -20,32 +20,32 @@ protected:
 
 public:
     enum {TypeNode = 1,
-         NcNomOffset = 2,
-         NcNomRefOffset = 3};
+         nc_nomOffset = 2,
+         nc_nom_refOffset = 3};
     //! Cible des données du model.
     enum dataCible {NcCible,
                     NomCible,
                     RefCible,
                     PermissionCible};
-    //! Position des sous-noeud.
-    enum positionNode{ZeroPosition,
-                      UnPosition,
-                      DeuxPosition,
-                      NomPosition = ZeroPosition,
-                      NcPosition = UnPosition,
-                      RefPosition = DeuxPosition};
+    //! position des sous-noeud.
+    enum positionNode{Zeroposition,
+                      Unposition,
+                      Deuxposition,
+                      Nomposition = Zeroposition,
+                      Ncposition = Unposition,
+                      Refposition = Deuxposition};
     //! Constructeur.
-    PermissionModel(bddMPS::BddPredef &bdd, enumt offset = NcNomOffset, QObject * parent = nullptr);
+    PermissionModel(bddMPS::BddPredef &bdd, enumt offset = nc_nomOffset, QObject *parent = nullptr);
 
     //! Accesseur de la base de données.
-    bddMPS::BddPredef & bdd() const
+    bddMPS::BddPredef &bdd() const
         {return static_cast<bddMPS::BddPredef &>(m_bdd);}
 
     //! Nombre de donné associé à une cible.
-    numt dataCount(const NodeIndex & index) const override;
+    numt dataCount(const NodeIndex &index) const override;
 
     //! Nom d'une cible.
-    const QString & nomCible(entidt num) const
+    const QString &nomCible(entidt num) const
         {return m_idNomVec.at(m_cibleVec.at(num)).second;}
 
     //! Numero de cible.
@@ -53,7 +53,7 @@ public:
         {return m_idNomVec.at(m_cibleVec.at(num)).first;}
 
     //! Accesseur de la liste des cibles.
-    const std::vector<std::pair<int,QString>> & idNomVec() const noexcept
+    const std::vector<std::pair<int,QString>> &idNomVec() const noexcept
         {return m_idNomVec;}
 
     //! Accesseur de l'offset de postion des cibles
@@ -61,11 +61,11 @@ public:
         {return m_offset;}
 
     //! Muateur de la présence d'une cible.
-    void setCible(entidt num, bool visible);
+    void set_cible(entidt num, bool visible);
 };
 
 /*! \ingroup groupeModel
- * \brief Classe abstraite mère des neuds d'un model de permission.
+ *\brief Classe abstraite mère des neuds d'un model de permission.
  */
 class AbstractPermissionNode : public ItemBddNode {
 public:
@@ -77,17 +77,17 @@ public:
 };
 
 /*! \ingroup groupeModel
- * \brief Classe mère des neuds d'un model de permission.
+ *\brief Classe mère des neuds d'un model de permission.
  */
 template<class Ent, class Permission> class PermissionNode : public AbstractPermissionNode {
 protected:
     Ent m_ent;                              //!< Type associé au noeud.
     std::map<int,flag> m_permissionMap;     //!< Map des permission du type.
-    PermissionModel * m_model;              //!< Pointeur sur le model.
+    PermissionModel *m_model;              //!< Pointeur sur le model.
 public:
     enum {NoFlag = 0};
     //! Constructeur.
-    PermissionNode(PermissionModel * model)
+    PermissionNode(PermissionModel *model)
         : AbstractPermissionNode(PermissionModel::TypeNode), m_model(model) {}
 
     NODE_COPIE(PermissionNode)
@@ -106,25 +106,25 @@ public:
         {return m_ent.id();}
 
     //! Enregistre les données du noeud.
-    void save(bddMPS::Bdd & bdd) override{
+    void save(bddMPS::Bdd &bdd) override{
         bdd.save(m_ent);
         savePermission(bdd);
     }
 
     //! Enregistre les données du noeud.
-    void savePermission(bddMPS::Bdd & bdd);
+    void savePermission(bddMPS::Bdd &bdd);
 
     //! Mutateur des données du noeud.
-    flag setData(int cible, const QVariant & value, int role, numt num = 0) override;
+    flag set_data(int cible, const QVariant &value, int role, numt num = 0) override;
 
     //! Mutateur de l'entité.
-    void setEnt(const Ent & entity);
+    void setEnt(const Ent &ent);
 };
 
 /*! \ingroup groupeModel
- * \brief Classe des neuds du model de permission pour une entité de type arbre.
+ *\brief Classe des neuds du model de permission pour une entité de type arbre.
  */
-template<class Ent, class Permission> class ArbrePermissionNode : public PermissionNode<Ent,Permission> {
+template<class Ent, class Permission> class arbrePermissionNode : public PermissionNode<Ent,Permission> {
 protected:
     using PermNode = PermissionNode<Ent,Permission>;
     using PermNode::m_iter;
@@ -134,10 +134,10 @@ public:
     //! Constructeur.
     using PermNode::PermissionNode;
 
-    NODE_COPIE(ArbrePermissionNode)
+    NODE_COPIE(arbrePermissionNode)
 
     //! Enregistre les données du noeud.
-    void insert(bddMPS::Bdd & bdd) override{
+    void insert(bddMPS::Bdd &bdd) override{
         idt idParent = 0;
         if(!m_iter.parent().root())
             idParent = static_cast<const PermNode &>(**m_iter.parent()).idEnt();
@@ -147,9 +147,9 @@ public:
 };
 
 /*! \ingroup groupeModel
- * \brief Classe des neuds du model de permission pour une entité de type arbre simple.
+ *\brief Classe des neuds du model de permission pour une entité de type arbre simple.
  */
-template<class Ent, class Permission> class ArbreSimplePermissionNode : public PermissionNode<Ent,Permission> {
+template<class Ent, class Permission> class arbre_simplePermissionNode : public PermissionNode<Ent,Permission> {
 protected:
     using PermNode = PermissionNode<Ent,Permission>;
     using PermNode::m_iter;
@@ -159,53 +159,53 @@ public:
     //! Constructeur.
     using PermNode::PermissionNode;
 
-    NODE_COPIE(ArbreSimplePermissionNode)
+    NODE_COPIE(arbre_simplePermissionNode)
 
     //! Enregistre les données du noeud.
-    void insert(bddMPS::Bdd & bdd) override{
+    void insert(bddMPS::Bdd &bdd) override{
         if(!m_iter.parent().root())
-            m_ent.setParent(static_cast<const PermNode &>(**m_iter.parent()).idEnt());
+            m_ent.set_parent(static_cast<const PermNode &>(**m_iter.parent()).idEnt());
         bdd.save(m_ent);
         savePermission(bdd);
     }
 };
 
 /*! \ingroup groupeModel
- * \brief Model de gestion des type et de leur permission.
+ *\brief Model de gestion des type et de leur permission.
  */
-class MotClePermissionModel : public PermissionModel {
+class mot_cle_permissionModel : public PermissionModel {
     Q_OBJECT
 public:
-    using MotClePermissionNode = ArbrePermissionNode<entityMPS::MotCle,entityMPS::MotClePermission>;
+    using mot_cle_permissionNode = arbrePermissionNode<entities::mot_cle,entities::mot_cle_permission>;
     //! Constructeur.
-    MotClePermissionModel(bddMPS::BddPredef &bdd, QObject * parent = nullptr);
+    mot_cle_permissionModel(bddMPS::BddPredef &bdd, QObject *parent = nullptr);
 
     //! Fabrique des noeuds.
-    Node nodeFactory(const NodeIndex & /*parent*/, numt /*pos*/, int /*type*/) override
-        {return std::make_unique<MotClePermissionNode>(this);}
+    Node nodeFactory(const NodeIndex &/*parent*/, numt /*pos*/, int /*type*/) override
+        {return std::make_unique<mot_cle_permissionNode>(this);}
 };
 
 /*! \ingroup groupeModel
- * \brief Model de gestion des type et de leur permission.
+ *\brief Model de gestion des type et de leur permission.
  */
-class TypePermissionModel : public PermissionModel {
+class type_permissionModel : public PermissionModel {
     Q_OBJECT
 public:
-    using TypePermissionNode = ArbreSimplePermissionNode<entityMPS::Type,entityMPS::TypePermission>;
+    using type_permissionNode = arbre_simplePermissionNode<entities::Type,entities::type_permission>;
     //! Constructeur.
-    TypePermissionModel(bddMPS::BddPredef &bdd, QObject * parent = nullptr);
+    type_permissionModel(bddMPS::BddPredef &bdd, QObject *parent = nullptr);
 
     //! Fabrique des noeuds.
-    Node nodeFactory(const NodeIndex & /*parent*/, numt /*pos*/, int /*type*/) override
-        {return std::make_unique<TypePermissionNode>(this);}
+    Node nodeFactory(const NodeIndex &/*parent*/, numt /*pos*/, int /*type*/) override
+        {return std::make_unique<type_permissionNode>(this);}
 };
 
 ///////////////////////////////////////////////// definition PermissionNode ///////////////////////////////////
 template<class Ent, class Permission> void PermissionNode<Ent,Permission>::addCible(int cible) {
     if(m_permissionMap.find(cible) == m_permissionMap.end()) {
         Permission perm;
-        perm.setCible(cible);
-        perm.setId1(m_ent.id());
+        perm.set_cible(cible);
+        perm.set_id_1(m_ent.id());
         if(m_model->bdd().getUnique(perm))
             m_permissionMap[cible] = perm.code();
         else
@@ -248,17 +248,17 @@ template<class Ent, class Permission> QVariant PermissionNode<Ent,Permission>::d
                 return init;
             }
             switch (num) {
-            case PermissionModel::NomPosition:
+            case PermissionModel::Nomposition:
                 init.append(PermissionModel::NomCible);
                 init.append(0);
                 init.append(LineEditSubNode);
                 return init;
-            case PermissionModel::NcPosition:
+            case PermissionModel::Ncposition:
                 init.append(PermissionModel::NcCible);
                 init.append(0);
                 init.append(LineEditSubNode);
                 return init;
-            case PermissionModel::RefPosition:
+            case PermissionModel::Refposition:
                 init.append(PermissionModel::RefCible);
                 init.append(0);
                 init.append(LineEditSubNode);
@@ -275,24 +275,24 @@ template<class Ent, class Permission> flag PermissionNode<Ent,Permission>::flags
     auto flag = AbstractPermissionNode::flags(cible,num);
     if(cible == NodeCible || cible == PermissionModel::NomCible
             || cible == PermissionModel::NcCible || cible == PermissionModel::RefCible) {
-        entityMPS::Restriction restriction;
-        restriction.setCible(m_model->bdd().cible(Ent::ID));
-        restriction.setIdCible(m_ent.id());
+        entities::Restriction restriction;
+        restriction.set_cible(m_model->bdd().cible(Ent::ID));
+        restriction.set_id_cible(m_ent.id());
         m_model->bdd().getUnique(restriction);
         if(restriction.code().test(bddMPS::Modif)
-                && (cible == PermissionModel::NomCible || cible == PermissionModel::NcCible || cible == PermissionModel::RefCible))
+                &&(cible == PermissionModel::NomCible || cible == PermissionModel::NcCible || cible == PermissionModel::RefCible))
             flag ^= EnableFlagNode;
-        if(restriction.code().test(bddMPS::Suppr) && (cible == NodeCible))
+        if(restriction.code().test(bddMPS::Suppr) &&(cible == NodeCible))
             flag ^= DelEnableFlagNode;
     }
     if(cible == PermissionModel::PermissionCible){
         Permission perm;
-        perm.setCible(m_model->cible(num));
-        perm.setId1(m_ent.id());
+        perm.set_cible(m_model->cible(num));
+        perm.set_id_1(m_ent.id());
         if(m_model->bdd().existsUnique(perm)) {
-            entityMPS::Restriction restriction;
-            restriction.setCible(m_model->bdd().cible(Permission::ID));
-            restriction.setIdCible(perm.id());
+            entities::Restriction restriction;
+            restriction.set_cible(m_model->bdd().cible(Permission::ID));
+            restriction.set_id_cible(perm.id());
             m_model->bdd().getUnique(restriction);
             if(restriction.code().test(bddMPS::Modif))
                 flag ^= EnableFlagNode;
@@ -300,34 +300,34 @@ template<class Ent, class Permission> flag PermissionNode<Ent,Permission>::flags
     }
     return flag;
 }
-template<class Ent, class Permission> void PermissionNode<Ent,Permission>::savePermission(bddMPS::Bdd & bdd) {
+template<class Ent, class Permission> void PermissionNode<Ent,Permission>::savePermission(bddMPS::Bdd &bdd) {
     for(auto iter = m_permissionMap.cbegin(); iter != m_permissionMap.cend(); ++iter) {
         Permission perm;
-        perm.setId1(m_ent.id());
-        perm.setCible(iter->first);
-        perm.setCode(iter->second);
+        perm.set_id_1(m_ent.id());
+        perm.set_cible(iter->first);
+        perm.set_code(iter->second);
         bdd.save(perm);
     }
 }
 
 template<class Ent, class Permission> flag PermissionNode<Ent,Permission>::
-                setData(int cible, const QVariant &value, int role, numt num) {
+                set_data(int cible, const QVariant &value, int role, numt num) {
     switch (cible) {
     case PermissionModel::NcCible:
         if(role == StringRole) {
-            m_ent.setNc(value.toString());
+            m_ent.set_nc(value.to_string());
             return StringRole;
         }
         break;
     case PermissionModel::NomCible:
         if(role == StringRole) {
-            m_ent.setNom(value.toString());
+            m_ent.set_nom(value.to_string());
             return StringRole;
         }
         break;
     case PermissionModel::RefCible:
         if(role == StringRole) {
-            m_ent.setRef(value.toString());
+            m_ent.set_ref(value.to_string());
             return StringRole;
         }
         break;
@@ -338,15 +338,15 @@ template<class Ent, class Permission> flag PermissionNode<Ent,Permission>::
         }
         break;
     }
-    return ItemNode::setData(cible,value,role,num);
+    return ItemNode::set_data(cible,value,role,num);
 }
 
-template<class Ent, class Permission> void PermissionNode<Ent,Permission>::setEnt(const Ent & entity) {
+template<class Ent, class Permission> void PermissionNode<Ent,Permission>::setEnt(const Ent &ent) {
     m_ent = entity;
     for(auto iter = m_permissionMap.begin(); iter != m_permissionMap.end(); ++iter) {
         Permission perm;
-        perm.setId1(entity.id());
-        perm.setCible(iter->first);
+        perm.set_id_1(entity.id());
+        perm.set_cible(iter->first);
         m_model->bdd().getUnique(perm);
         iter->second = perm.code();
     }

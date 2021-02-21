@@ -15,32 +15,32 @@
 #include <QtGlobal>
 #include <QVBoxLayout>
 #include "BddPredef.h"
-#include "EntityPredef.h"
+#include "entityPredef.h"
 #include "IdComboBox.h"
 #include "TreeWidget.h"
 
 /*! \defgroup groupeDialogue Fenêtre de Dialogue
- * \brief Ensemble de classes représentant des fenêtres de dialogue.
+ *\brief Ensemble de classes représentant des fenêtres de dialogue.
  */
 
 /*! \ingroup groupeDialogue
- * \brief Espace de noms des fenêtres de dialogue.
+ *\brief Espace de noms des fenêtres de dialogue.
  */
 namespace dialogMPS {
-using namespace typeMPS;
+using namespace type_mps;
 
 /*! \ingroup groupeDialogue
- * \brief Classe abstraite mère de formulaire pour les dialogues
+ *\brief Classe abstraite mère de formulaire pour les dialogues
  */
 class AbstractNewModifForm : public QWidget {
     Q_OBJECT
 protected:
     const bool m_new;                   //! true->création et false->modification ou suppression.
-    bddMPS::Bdd & m_bdd;                //! Base de données.
+    bddMPS::Bdd &m_bdd;                //! Base de données.
 
 public:
     //! Constructeur.
-    AbstractNewModifForm(bddMPS::Bdd & bdd, bool newEnt, QWidget * parent = nullptr)
+    AbstractNewModifForm(bddMPS::Bdd &bdd, bool newEnt, QWidget *parent = nullptr)
         : QWidget(parent),
           m_new(newEnt),
           m_bdd(bdd) {}
@@ -86,25 +86,25 @@ signals:
 };
 
 /*! \ingroup groupeDialogue
- * \brief Classe des formulaires pour les dialogues commençant par le choix du nom.
+ *\brief Classe des formulaires pour les dialogues commençant par le choix du nom.
  */
 class AbstractNomNewModifForm : public AbstractNewModifForm {
     Q_OBJECT
 protected:
-    QLabel * m_nameLabel;               //!< Label du nom.
-    QLineEdit * m_nameLine;             //!< Ligne d'édition du nom.
-    widgetMPS::IdComboBox * m_nameCB;   //!< Liste à choix du nom.
-    QHBoxLayout * m_nameLayout;         //!< Calque du nom.
-    QVBoxLayout * m_mainLayout;         //!< Calque principal du formulaire.
+    QLabel *m_nameLabel;               //!< Label du nom.
+    QLineEdit *m_nameLine;             //!< Ligne d'édition du nom.
+    widgetMPS::IdComboBox *m_nameCB;   //!< Liste à choix du nom.
+    QHBoxLayout *m_nameLayout;         //!< Calque du nom.
+    QVBoxLayout *m_mainLayout;         //!< Calque principal du formulaire.
 public:
     //! Constructeur.
-    AbstractNomNewModifForm(bddMPS::Bdd & bdd, const QString &label, bool newEnt, QWidget * parent = nullptr);
+    AbstractNomNewModifForm(bddMPS::Bdd &bdd, const QString &label, bool newEnt, QWidget *parent = nullptr);
 
     //! Constructeur.
-    AbstractNomNewModifForm(bddMPS::Bdd & bdd, const QString &label, const std::vector<std::pair<idt,QString>> & noms,
-                            bool newEnt, QWidget * parent = nullptr)
+    AbstractNomNewModifForm(bddMPS::Bdd &bdd, const QString &label, const std::vector<std::pair<idt,QString>> &noms,
+                            bool newEnt, QWidget *parent = nullptr)
         : AbstractNomNewModifForm (bdd,label,newEnt,parent)
-        {setNoms(noms);}
+        {set_noms(noms);}
 
     //! Destructeur par défaut.
     ~AbstractNomNewModifForm() override = default;
@@ -121,7 +121,7 @@ public:
         {return m_new ? m_nameLine->text() : m_nameCB->currentText();}
 
     //! Mutateur de la liste des noms.
-    void setNoms(const std::vector<std::pair<idt,QString>> & noms) {
+    void set_noms(const std::vector<std::pair<idt,QString>> &noms) {
         if(!m_new){
             m_nameCB->clear();
             m_nameCB->addText(noms);
@@ -129,18 +129,18 @@ public:
     }
 
     //! Mutateur de la liste des noms.
-    template<class Ent> void setNoms(const conteneurMPS::VectorPtr<Ent> & vec) {
+    template<class Ent> void set_noms(const conteneurMPS::vector_ptr<Ent> &vec) {
         if(!m_new){
             m_nameCB->clear();
-            m_nameCB->addText(vec,[](const Ent & entity)->const QString &{return entity.nom();});
+            m_nameCB->addText(vec,[](const Ent &ent)->const QString &{return entity.nom();});
         }
     }
 
     //! Mutateur de la liste des noms.
-    template<class Ent> void setNoms(conteneurMPS::VectorPtr<Ent> && vec) {
+    template<class Ent> void set_noms(conteneurMPS::vector_ptr<Ent> &&vec) {
         if(!m_new){
             m_nameCB->clear();
-            m_nameCB->addText(std::move(vec),[](const Ent & entity)->const QString &{return entity.nom();});
+            m_nameCB->addText(std::move(vec),[](const Ent &ent)->const QString &{return entity.nom();});
         }
     }
 
@@ -150,25 +150,25 @@ public:
 
 protected:
     //! Récupère l'entité en base de donné et met à jours les données du formulaire
-    template<class Ent> void updateTemp(Ent & entity);
+    template<class Ent> void update_temp(Ent &ent);
 };
 
 /*! \ingroup groupeDialogue
- * \brief Classe des formulaires pour les dialogues commençant par le choix du nom et le nom cours.
+ *\brief Classe des formulaires pour les dialogues commençant par le choix du nom et le nom cours.
  */
-class AbstractNcNomNewModifForm : public AbstractNomNewModifForm {
+class Abstractnc_nomNewModifForm : public AbstractNomNewModifForm {
     Q_OBJECT
 protected:
     using AbstractNomNewModifForm::m_mainLayout;
-    QLabel * m_ncLabel;               //!< Label du nom court.
-    QLineEdit * m_ncLine;             //!< Ligne d'édition du nom court.
-    QHBoxLayout * m_ncLayout;         //!< Calque du nom court.
+    QLabel *m_ncLabel;               //!< Label du nom court.
+    QLineEdit *m_ncLine;             //!< Ligne d'édition du nom court.
+    QHBoxLayout *m_ncLayout;         //!< Calque du nom court.
 public:
     //! Constructeur.
-    AbstractNcNomNewModifForm(bddMPS::Bdd & bdd, const QString &lableNc, const QString &labelNom, bool newEnt, QWidget * parent = nullptr);
+    Abstractnc_nomNewModifForm(bddMPS::Bdd &bdd, const QString &lableNc, const QString &labelNom, bool newEnt, QWidget *parent = nullptr);
 
     //! Destructeur.
-    ~AbstractNcNomNewModifForm() override = default;
+    ~Abstractnc_nomNewModifForm() override = default;
 
     //! Connecte les signals et slots du formulaire.
     void connexion() override;
@@ -178,105 +178,105 @@ public:
         {return m_ncLine->text();}
 
     //! Mutateur du nom cours.$
-    void setNc(const QString & nc)
-        {m_ncLine->setText(nc);}
+    void set_nc(const QString &nc)
+        {m_ncLine->set_text(nc);}
 
     //! Teste si le formulaire est valide.
     bool valide() const override
-        {return AbstractNomNewModifForm::valide() && !m_ncLine->text().isEmpty();}
+        {return AbstractNomNewModifForm::valide() &&!m_ncLine->text().isEmpty();}
 protected:
     //! Récupère l'entité en base de donné et met à jours les données du formulaire
-    template<class Ent> void updateTemp(Ent & entity);
+    template<class Ent> void update_temp(Ent &ent);
 };
 
 /*! \ingroup groupeDialogue
- * \brief Classe des formulaires pour les dialogues commençant par le choix du nom, le nom court et le type.
+ *\brief Classe des formulaires pour les dialogues commençant par le choix du nom, le nom court et le type.
  */
-class AbstractTypeNcNomNewModifForm : public AbstractNcNomNewModifForm {
+class AbstractTypenc_nomNewModifForm : public Abstractnc_nomNewModifForm {
     Q_OBJECT
 protected:
-    using Type = entityMPS::ensembleType::Type;
-    using Permission = entityMPS::ensembleType::TypePermission;
-    using AbstractNcNomNewModifForm::m_mainLayout;
+    using Type = entities::ensemble_type::Type;
+    using Permission = entities::ensemble_type::type_permission;
+    using Abstractnc_nomNewModifForm::m_mainLayout;
     int m_cible;                        //!< Numero de cible de l'entité
     bool m_valide;                      //!< Controle de la validité du type
-    QLabel * m_typeLabel;               //!< Label du nom
-    widgetMPS::TreeWidget * m_typeTree; //!< Séléction du type
+    QLabel *m_typeLabel;               //!< Label du nom
+    widgetMPS::TreeWidget *m_typeTree; //!< Séléction du type
 public:
-    enum {nomType,ncType,nbrColumn};
+    enum {nom_type,ncType,nbrColumn};
     //! Constructeur.
-    AbstractTypeNcNomNewModifForm(bddMPS::BddPredef &bdd, const QString &refRoot, idt idEntity, const QString & labelType,
-                                  const QString &labelNc, const QString &labelNom, bool newEnt, QWidget * parent = nullptr);
+    AbstractTypenc_nomNewModifForm(bddMPS::BddPredef &bdd, const QString &refRoot, idt id_entity, const QString &labelType,
+                                  const QString &labelNc, const QString &labelNom, bool newEnt, QWidget *parent = nullptr);
 
     //! Destructeur.
-    ~AbstractTypeNcNomNewModifForm() override = default;
+    ~AbstractTypenc_nomNewModifForm() override = default;
 
     //! Connecte les signals et slots du formulaire.
     void connexion() override;
 
     //! Renvoie l'identifiant du type sélectionné.
-    idt idType() const
+    idt id_type() const
         {return m_typeTree->id();}
 
     //! Mutateur du type.
-    void setType(idt idType)
-        {m_typeTree->setId(idType);}
+    void set_type(idt id_type)
+        {m_typeTree->set_id(id_type);}
 
     //! Teste si le formulaire est valide.
     bool valide() const override
-        {return AbstractNcNomNewModifForm::valide() && m_valide;}
+        {return Abstractnc_nomNewModifForm::valide() &&m_valide;}
 
 protected:
     //! Récupère l'entité en base de donné et met à jours les données du formulaire
-    template<class Ent> void updateTemp(Ent & entity);
+    template<class Ent> void update_temp(Ent &ent);
 };
 
 /*! \ingroup groupeDialogue
- * \brief Classe des formulaires pour les dialogues commençant par le choix du nom, le nom court et du parent.
+ *\brief Classe des formulaires pour les dialogues commençant par le choix du nom, le nom court et du parent.
  */
-class AbstractParentNcNomNewModifForm : public AbstractNcNomNewModifForm {
+class AbstractParentnc_nomNewModifForm : public Abstractnc_nomNewModifForm {
     Q_OBJECT
 protected:
-    using AbstractNcNomNewModifForm::m_mainLayout;
-    QLabel * m_parentLabel;             //!< Label du parent
-    widgetMPS::TreeWidget * m_parentTree;         //!< Ligne d'édition du nom.
+    using Abstractnc_nomNewModifForm::m_mainLayout;
+    QLabel *m_parentLabel;             //!< Label du parent
+    widgetMPS::TreeWidget *m_parentTree;         //!< Ligne d'édition du nom.
 public:
     enum {nomParent,ncParent,nbrColumn};
     //! Constructeur.
-    AbstractParentNcNomNewModifForm(bddMPS::Bdd &bdd, const QStringList & header, const QString & parentType,
-                                  const QString &labelNc, const QString &labelNom, bool newEnt, QWidget * parent = nullptr);
+    AbstractParentnc_nomNewModifForm(bddMPS::Bdd &bdd, const QStringList &header, const QString &parentType,
+                                  const QString &labelNc, const QString &labelNom, bool newEnt, QWidget *parent = nullptr);
 
     //! Destructeur.
-    ~AbstractParentNcNomNewModifForm() override = default;
+    ~AbstractParentnc_nomNewModifForm() override = default;
 
     //! Renvoie l'identifiant du parent sélectionné.
     idt idParent() const
         {return m_parentTree->id();}
 
     //! Mutateur du type.
-    void setParent(idt idParent)
-        {m_parentTree->setId(idParent);}
+    void set_parent(idt idParent)
+        {m_parentTree->set_id(idParent);}
 
 protected:
     //! Récupère l'entité en base de donné et met à jours les données du formulaire
-    template<class Ent> void updateTemp(Ent & entity);
+    template<class Ent> void update_temp(Ent &ent);
 };
 
 /*! \ingroup groupeDialogue
- * \brief Fenêtre de dialogue de création, modification ou suppression.
+ *\brief Fenêtre de dialogue de création, modification ou suppression.
  */
 class NewModifDialog : public QDialog {
     Q_OBJECT
 protected:
-    QPushButton * m_annulButton;                //!< Bouton annuler.
-    QPushButton * m_okButton;                   //!< Bouton Ok.
-    QPushButton * m_supprButton;                //!< Bouton Suppr
-    QHBoxLayout * m_buttonLayout;               //!< Calque des boutons.
-    QVBoxLayout * m_mainLayout;               //!< Calque principal.
-    AbstractNewModifForm * m_form;                      //!< Formulaire.
+    QPushButton *m_annulButton;                //!< Bouton annuler.
+    QPushButton *m_okButton;                   //!< Bouton Ok.
+    QPushButton *m_supprButton;                //!< Bouton Suppr
+    QHBoxLayout *m_buttonLayout;               //!< Calque des boutons.
+    QVBoxLayout *m_mainLayout;               //!< Calque principal.
+    AbstractNewModifForm *m_form;                      //!< Formulaire.
 public:
     //! Constructeur.
-    NewModifDialog(AbstractNewModifForm * form, QWidget * parent = nullptr);
+    NewModifDialog(AbstractNewModifForm *form, QWidget *parent = nullptr);
 
     //! Destructeur.
     ~NewModifDialog() override;
@@ -288,14 +288,14 @@ public slots:
             m_form->save();
             QDialog::accept();
         }
-        catch(managerMPS::UniqueEntityException & e){
+        catch(managerMPS::Uniqueentity_exception &e){
             QMessageBox box(QMessageBox::Critical,tr("Erreur d'enregistrement"),tr("Impossible d'enregistrer dans la base de données.\n"
                                                                                    "La nouvelle entrée entre en conflit avec une donnée"
                                                                                    " existante."),QMessageBox::Close,this);
             box.setDetailedText(e.what());
             box.exec();
         }
-        catch(entityMPS::InvalideEntityException & e){
+        catch(entities::invalide_entity_exception &e){
             QMessageBox box(QMessageBox::Critical,tr("Erreur d'enregistrement"),tr("Impossible d'enregistrer dans la base de données.\n"
                                                                                    "L'entrée proposée est invalide."),QMessageBox::Close,this);
             box.setDetailedText(e.what());
@@ -304,27 +304,27 @@ public slots:
     }
 };
 
-template<class Ent> void AbstractNomNewModifForm::updateTemp(Ent & entity) {
-    entity.setId(id());
+template<class Ent> void AbstractNomNewModifForm::update_temp(Ent &ent) {
+    entity.set_id(id());
     m_bdd.get(entity);
     m_nameCB->setEditable(m_bdd.testAutorisation(entity,bddMPS::Modif));
     emit effacerPermis(m_bdd.testAutorisation(entity,bddMPS::Suppr));
 }
 
-template<class Ent> void AbstractNcNomNewModifForm::updateTemp(Ent & entity) {
-    AbstractNomNewModifForm::updateTemp<Ent>(entity);
+template<class Ent> void Abstractnc_nomNewModifForm::update_temp(Ent &ent) {
+    AbstractNomNewModifForm::update_temp<Ent>(entity);
     m_ncLine->setReadOnly(!m_bdd.testAutorisation(entity,bddMPS::Modif));
-    setNc(entity.nc());
+    set_nc(entity.nc());
 }
 
-template<class Ent> void AbstractTypeNcNomNewModifForm::updateTemp(Ent & entity) {
-    AbstractNcNomNewModifForm::updateTemp<Ent>(entity);
-    setType(entity.type());
+template<class Ent> void AbstractTypenc_nomNewModifForm::update_temp(Ent &ent) {
+    Abstractnc_nomNewModifForm::update_temp<Ent>(entity);
+    set_type(entity.type());
 }
 
-template<class Ent> void AbstractParentNcNomNewModifForm::updateTemp(Ent & entity) {
-    AbstractNcNomNewModifForm::updateTemp<Ent>(entity);
-    setParent(entity.parent());
+template<class Ent> void AbstractParentnc_nomNewModifForm::update_temp(Ent &ent) {
+    Abstractnc_nomNewModifForm::update_temp<Ent>(entity);
+    set_parent(entity.parent());
 }
 }
 #endif // NEWMODIFDIALOG_H

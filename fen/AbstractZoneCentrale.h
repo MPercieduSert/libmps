@@ -10,7 +10,7 @@
 
 namespace fenMPS {
 /*! \ingroup groupeFen
- * \brief Zone centrale.
+ *\brief Zone centrale.
  */
 class AbstractZoneCentrale : public QWidget {
     Q_OBJECT
@@ -19,10 +19,10 @@ protected:
 
 public:
     //! Constructeur.
-    AbstractZoneCentrale(QWidget * parent = nullptr) : QWidget(parent) {}
+    AbstractZoneCentrale(QWidget *parent = nullptr) : QWidget(parent) {}
 
     //! Initialise le widget.
-    //virtual void init(QWidget * parent) = 0;
+    //virtual void init(QWidget *parent) = 0;
 signals:
     //! Signal d'activation/désactivation des actions.
     void actionPermise(flag);

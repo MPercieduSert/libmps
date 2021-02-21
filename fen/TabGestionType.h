@@ -15,27 +15,27 @@
 
 namespace fenMPS {
 /*! \ingroup groupeFen
- * \brief Classe de l'onglets de gestion des types.
+ *\brief Classe de l'onglets de gestion des types.
  */
 class TabGestionType : public AbstractTabModuleWithBdd
 {
 protected:
-    modelMPS::TypePermissionModel * m_model;    //!< Model.
-    widgetMPS::NodeView * m_view;               //!< Vue.
-    QListWidget * m_cibleListWidget;            //!< Sélection des cibles.
-    QPushButton * m_saveButton;                 //!< Bouton de sauvegarde.
+    modelMPS::type_permissionModel *m_model;    //!< Model.
+    widgetMPS::NodeView *m_view;               //!< Vue.
+    QListWidget *m_cibleListWidget;            //!< Sélection des cibles.
+    QPushButton *m_saveButton;                 //!< Bouton de sauvegarde.
 
     // Calque
-    QVBoxLayout * m_cibleLayout;                //!< Calque des cibles.
-    QHBoxLayout * m_mainLayout;                 //!< Calque principal.
+    QVBoxLayout *m_cibleLayout;                //!< Calque des cibles.
+    QHBoxLayout *m_mainLayout;                 //!< Calque principal.
 
 public:
-    //! Position des cases.
+    //! position des cases.
     enum positionCase {Visible,
                       Attribuable,
                       NbrCase};
     //! Constructeur.
-    TabGestionType(bmps::Bdd & bdd, const std::pair<int, int> &pairIndex, QWidget * parent = nullptr);
+    TabGestionType(bmps::Bdd &bdd, const std::pair<int, int> &pairIndex, QWidget *parent = nullptr);
 
     //! Accesseur du titre.
     QString title() const override
@@ -43,7 +43,7 @@ public:
 
 public slots:
     //! Action à effectuer lorsque l'onglet devient actif.
-    void becomeCurrent() override;
+    void become_current() override;
 
     //! Slot coorepondant à l'action sauver.
     void sauver() override

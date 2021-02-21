@@ -2,11 +2,11 @@
 
 using namespace managerMPS;
 
-QSqlQuery * ReqSql::m_requete = nullptr;
+QSqlQuery *ReqSql::m_requete = nullptr;
 
 void ReqSql::affError() const {
     QSqlError err(m_requete->lastError());
-    if(err.isValid())
+    if(err.is_valid())
         throw std::invalid_argument(err.text().append("\n"+err.nativeErrorCode()+"\n"+m_requete->lastQuery()).toStdString());
 }
 
@@ -18,7 +18,7 @@ QString ReqSql::typeAttributSqlString(bmps::typeAttributBdd n) {
     case typeAttributBdd::Bool:
     case typeAttributBdd::Integer:
         return "integer";
-    case typeAttributBdd::DateTime:
+    case typeAttributBdd::Date_Time:
     case typeAttributBdd::Date:
     case typeAttributBdd::Text:
         return "text";
@@ -40,7 +40,7 @@ QString ReqSql::wordSqlString(bmps::wordSql n) {
     switch (n) {
     case wordSql::Create:
         return "CREATE TABLE";
-    case wordSql::NotNull:
+    case wordSql::Not_null:
         return "not null";
     case wordSql::Constraint:
         return "constraint";

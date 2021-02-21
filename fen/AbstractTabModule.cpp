@@ -6,5 +6,5 @@ AbstractTabModule::AbstractTabModule(const std::pair<int, int> &pairIndex, QWidg
     : QWidget(parent),
     m_pairIndex(pairIndex){}
 
-void AbstractTabModule::becomeCurrent()
+void AbstractTabModule::become_current()
     {emit actionPermise(NoActions);}

@@ -8,25 +8,25 @@ void TreeColonnesModel::find(AbstractFindModel *findModel) {
     if(findModel) {
         beginResetModel();
             m_tree.setTree(m_fullTree);
-            if(findModel->rootLeaf())
-                m_tree.tree().removeLeafIf([findModel](tree<szt>::leaf_iterator iter)->bool{return findModel->testRoot(*iter);});
+            if(findModel->root_leaf())
+                m_tree.tree().remove_leaf_if([findModel](tree<szt>::leaf_iterator iter)->bool{return findModel->testRoot(*iter);});
             else
-                m_tree.tree().removeLeafIf([findModel](tree<szt>::leaf_iterator iter)->bool{return findModel->testTree(*iter);});
-            if(m_colonneSorted >=0 && m_colonneSorted < columnCount())
+                m_tree.tree().remove_leaf_if([findModel](tree<szt>::leaf_iterator iter)->bool{return findModel->testTree(*iter);});
+            if(m_colonneSorted >=0 &&m_colonneSorted < columnCount())
                 sort(m_colonneSorted,m_orderSort);
         endResetModel();
     }
 }
 
-bool TreeColonnesModel::insertRows(int row, int count, const QModelIndex & parent) {
+bool TreeColonnesModel::insertRows(int row, int count, const QModelIndex &parent) {
     if (count <= 0 || row < 0 || row > rowCount())
         return false;
     auto nbrLigneOld = nbrLignes();
     m_data->add(static_cast<szt>(count));
     // Insertion des nouvelles lignes dans le vecteur des indices.
     beginInsertRows(parent, row, row + count - 1);
-        auto iter = m_tree.getIter(parent).toChild(row);
-        auto iterFull = m_fullTree.begin().toPath(iter.path());
+        auto iter = m_tree.getIter(parent).to_child(row);
+        auto iterFull = m_fullTree.begin().to_path(iter.path());
         for(szt ligne = nbrLigneOld; ligne != nbrLignes(); ++ligne) {
             m_tree.tree().insert(iter,ligne);
             m_fullTree.insert(iterFull,ligne);
@@ -35,14 +35,14 @@ bool TreeColonnesModel::insertRows(int row, int count, const QModelIndex & paren
     return true;
 }
 
-bool TreeColonnesModel::removeRows(int /*row*/, int /*count*/, const QModelIndex & /*parent*/) {
+bool TreeColonnesModel::removeRows(int /*row*/, int /*count*/, const QModelIndex &/*parent*/) {
 //    count = std::min(count, rowCount(parent)-row);
 //    if(count <= 0 || row < 0)
 //        return false;
 //    beginRemoveRows(parent,row,row + count - 1);
-//        auto first = m_tree.getIter(parent).toChild(row);
+//        auto first = m_tree.getIter(parent).to_child(row);
 //        // Suppression d'une ligne.
-//        if (count == 1 && first.leaf()) {
+//        if (count == 1 &&first.leaf()) {
 //            auto ligne = *first;
 //            if(!m_data->existsInternalData(ligne) || m_data->removeInternalData(ligne)){
 //                m_tree.tree().erase(first);
@@ -54,7 +54,7 @@ bool TreeColonnesModel::removeRows(int /*row*/, int /*count*/, const QModelIndex
 //            // Récupération des indices des lignes à supprimer et suppression des lignes du vecteur des lignes.
 //            std::list<szt> listId;
 //            auto end = first;
-//            end.toBrother(count - 1);
+//            end.to_brother(count - 1);
 //            auto read = first;
 //            for(auto i = 0; i != count; ++i, ++read){
 //                if(!m_data->existsInternalData(*read) ||m_data->removeInternalData(*read)){
@@ -75,7 +75,7 @@ bool TreeColonnesModel::removeRows(int /*row*/, int /*count*/, const QModelIndex
 //            for (auto write = m_rowToLigne.begin(); write != m_rowToLigne.end(); ++write) {
 //                szt pos = 0;
 //                read = vecId.begin();
-//                while (read != vecId.end() && *write > *read) {
+//                while (read != vecId.end() &&*write > *read) {
 //                    ++pos;
 //                    ++read;
 //                }

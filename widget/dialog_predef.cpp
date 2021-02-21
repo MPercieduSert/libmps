@@ -9,14 +9,14 @@ SelectTableDialog::SelectTableDialog(bddMPS::Bdd::vector_id_name &&vec, QWidget 
     m_list_widget = new QListWidget;
     for (auto iter = vec.cbegin(); iter != vec.cend(); ++iter) {
         auto item = new QListWidgetItem(iter->second);
-        item->setData(Qt::UserRole,iter->first);
+        item->set_data(Qt::UserRole,iter->first);
         item->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
         item->setCheckState(Qt::Unchecked);
         m_list_widget->addItem(item);
     }
     m_list_widget->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
     connect(m_list_widget,&QListWidget::itemChanged,this,
-            [this](QListWidgetItem * item) {
+            [this](QListWidgetItem *item) {
         if(item->checkState() == Qt::Checked)
             m_set.insert(item->data(Qt::UserRole).toUInt());
         else

@@ -11,69 +11,69 @@
 
 namespace managerMPS {
 /*! \ingroup groupeManager
- * \brief Classe template frabriquant les liens avec la base de donnée à partir de l'ordre des attributs des entité.
+ *\brief Classe template frabriquant les liens avec la base de donnée à partir de l'ordre des attributs des entité.
  */
-template<class Attribut, class AttPre, class AttSuiv, post Pos> class LinkSqlDichot;
+template<class Attribut, class att_pre, class att_suiv, post Pos> class LinkSqlDichot;
 template<class Attribut, post Pos = 0> using LinkSqlAttribut
-                                            = LinkSqlDichot<Attribut, typename Attribut::AttPre, typename Attribut::AttSuiv, Pos>;
+                                            = LinkSqlDichot<Attribut, typename Attribut::att_pre, typename Attribut::att_suiv, Pos>;
 
-template<class Attribut, class AttPre, class AttSuiv, post Pos> class LinkSqlDichot :
-        public LinkSqlAttribut<AttPre, Pos>,
-        public LinkSqlAttribut<AttSuiv, AttPre::NbrAtt + Pos> {
+template<class Attribut, class att_pre, class att_suiv, post Pos> class LinkSqlDichot :
+        public LinkSqlAttribut<att_pre, Pos>,
+        public LinkSqlAttribut<att_suiv, att_pre::Nbr_Att + Pos> {
 public:
-    enum {PosPre = Pos, PosSuiv = AttPre::NbrAtt + Pos};
-    using LinkPre = LinkSqlAttribut<AttPre, PosPre>;
-    using LinkSuiv = LinkSqlAttribut<AttSuiv, PosSuiv>;
+    enum {PosPre = Pos, PosSuiv = att_pre::Nbr_Att + Pos};
+    using LinkPre = LinkSqlAttribut<att_pre, PosPre>;
+    using LinkSuiv = LinkSqlAttribut<att_suiv, PosSuiv>;
 
     //! Transmet les valeurs des attributs à la requète SQL préparée.
-    void bindValues(const Attribut & entity) {
+    void bindValues(const Attribut &ent) {
         LinkPre::bindValues(entity);
         LinkSuiv::bindValues(entity);
     }
 
     //! Transmet les valeurs des attributs à la requète SQL préparée.
-    void bindValues(Attribut & entity) {
+    void bindValues(Attribut &ent) {
         LinkPre::bindValues(entity);
         LinkSuiv::bindValues(entity);
     }
 
     //! Hydrate l'entité entity avec à partir de la requète.
-    void fromRequete(Attribut & entity) const {
+    void fromRequete(Attribut &ent) const {
         LinkPre::fromRequete(entity);
         LinkSuiv::fromRequete(entity);
     }
 };
 
-template<class Attribut, post Pos> class LinkSqlDichot<Attribut, attributMPS::NoAttribut, attributMPS::NoAttribut, Pos>
+template<class Attribut, post Pos> class LinkSqlDichot<Attribut, attributMPS::no_attribut, attributMPS::no_attribut, Pos>
         : public virtual ReqSql {
 public:
     enum {PosPre = Pos};
     //! Transmet les valeurs des attributs à la requète SQL préparée.
-    void bindValues(const Attribut & entity)
-        {bindValue(PosPre - 1,entity.getToBdd());}
+    void bindValues(const Attribut &ent)
+        {bindValue(PosPre - 1,entity.get_to_bdd());}
 
     //! Transmet les valeurs des attributs à la requète SQL préparée.
-    void bindValues(Attribut & entity)
-        {bindValue(PosPre - 1,entity.getToBdd());}
+    void bindValues(Attribut &ent)
+        {bindValue(PosPre - 1,entity.get_to_bdd());}
 
     //! Hydrate l'entité entity avec à partir de la requète.
-    void fromRequete(Attribut & entity) const
-        {entity.set(value<typename Attribut::AttType>(PosPre));}
+    void fromRequete(Attribut &ent) const
+        {entity.set(value<typename Attribut::att_type>(PosPre));}
 };
 
-template<> class LinkSqlDichot<Entity, attributMPS::NoAttribut, attributMPS::NoAttribut, 0> : public virtual ReqSql {
+template<> class LinkSqlDichot<entity, attributMPS::no_attribut, attributMPS::no_attribut, 0> : public virtual ReqSql {
 public:
     enum {PosPre = 0};
     //! Transmet les valeurs des attributs à la requète SQL préparée.
-    void bindValues(const Entity & /*entity*/)
+    void bindValues(const entity &/*ent*/)
         {}
 
     //! Hydrate l'entité entity avec à partir de la requète.
-    void fromRequete(Entity & entity) const
-        {entity.setId(value<Entity::AttType>(PosPre));}
+    void fromRequete(entity &ent) const
+        {entity.set_id(value<entity::att_type>(PosPre));}
 
     //! Mutateur de l'identifiant.
-    void setId(const Entity & entity, post pos = 0)
+    void set_id(const entity &ent, post pos = 0)
         {m_requete->bindValue(static_cast<int>(pos),entity.id());}
 };
 
@@ -86,8 +86,8 @@ public:
 
     //! Crée dynamiquement une nouvelle entité de type Classe, l'hydrate à partir de la requète SQL.
     //! Puis retourne un  pointeur vers cette nouvelle entité.
-    Ent * newFromRequete() const {
-        Ent * ptr = new Ent();
+    Ent *newFromRequete() const {
+        Ent *ptr = new Ent();
         fromRequete(*ptr);
         return ptr;
     }

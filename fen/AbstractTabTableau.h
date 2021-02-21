@@ -12,28 +12,28 @@
 
 namespace fenMPS {
 /*! \ingroup groupeFen
- * \brief Classe mère des onglets contenant des tableaux
+ *\brief Classe mère des onglets contenant des tableaux
  */
 class AbstractTabTableau : public AbstractTabModuleWithBdd {
     Q_OBJECT
 protected:
-    QPushButton * m_addColumnButton;        //!< Bouton pour ajouter une colonne
-    QStyledItemDelegate * m_delegate;       //!< Déleguer
-    modelMPS::TableModel * m_model;          //!< Model
-    QTableView * m_view;                    //!< Vue
-    QPushButton * m_saveButton;             //!< Bouton save
+    QPushButton *m_addColumnButton;        //!< Bouton pour ajouter une colonne
+    QStyledItemDelegate *m_delegate;       //!< Déleguer
+    modelMPS::TableModel *m_model;          //!< Model
+    QTableView *m_view;                    //!< Vue
+    QPushButton *m_saveButton;             //!< Bouton save
 public:
     //! Constructeur.
-    explicit AbstractTabTableau(bmps::Bdd & bdd, const std::pair<int, int> &pairIndex, QWidget *parent = nullptr);
+    explicit AbstractTabTableau(bmps::Bdd &bdd, const std::pair<int, int> &pairIndex, QWidget *parent = nullptr);
 
     //! Destructeur.
     ~AbstractTabTableau() override = default;
 
     //! Action à effectuer lorsque l'onglet devient actif.
-    void becomeCurrent() override;
+    void become_current() override;
 
     //! Renvoie un pointeur sur le model.
-    virtual modelMPS::TableModel * model() const
+    virtual modelMPS::TableModel *model() const
         {return m_model;}
 
 signals:

@@ -16,7 +16,7 @@ FindNoeudModel::FindNoeudModel(QObject *parent)
     m_header[OpColumn] = QString(tr("Opération"));
     m_header[ColonneColumn] = QString(tr("Colonne"));
 
-    // Arbre par défaut.
+    // arbre par défaut.
     auto racine = std::make_unique<ChoiceNoeud>();
     m_data.setTree(Tree(std::move(racine)));
 }
@@ -26,7 +26,7 @@ void FindNoeudModel::find(){
         m_model->find(this);
 }
 
-void FindNoeudModel::insertNoeud(int row, const QModelIndex & parent) {
+void FindNoeudModel::insertNoeud(int row, const QModelIndex &parent) {
     if(getData(parent).type() == OperationNoeudType)
         insertNoeuds(ChoiceNoeudType,row,1,parent);
     else {
@@ -51,7 +51,7 @@ std::vector<QString> FindNoeudModel::nomColonnes() const {
         return std::vector<QString>();
 }
 
-TreeNoeudModel::Noeud FindNoeudModel::nodeFactory(int type, int row, const QModelIndex & parent) {
+TreeNoeudModel::Noeud FindNoeudModel::nodeFactory(int type, int row, const QModelIndex &parent) {
     switch (type) {
     case ChoiceNoeudType:
         return std::make_unique<ChoiceNoeud>();
@@ -62,10 +62,10 @@ TreeNoeudModel::Noeud FindNoeudModel::nodeFactory(int type, int row, const QMode
 }
 
 TreeNoeudModel::Noeud FindNoeudModel::nodeConditionFactory(szt pos){
-    const auto & colonne = m_model->colonne(pos);
+    const auto &colonne = m_model->colonne(pos);
     switch (m_model->colonne(pos).type()) {
     case BoolNoeudType:
-        {const auto & boolColonne = static_cast<const AbstractBoolColonne &>(colonne);
+        {const auto &boolColonne = static_cast<const AbstractBoolColonne &>(colonne);
         return std::make_unique<BoolNoeud>(pos,colonne.header(),boolColonne.trueLabel(),boolColonne.falseLabel());}
     case DateNoeudType:
         return std::make_unique<DateNoeud>(pos,colonne.header());
@@ -76,8 +76,8 @@ TreeNoeudModel::Noeud FindNoeudModel::nodeConditionFactory(szt pos){
     }
 }
 
-void FindNoeudModel::removeNoeud(int row, const QModelIndex & parent){
-    if(parent.isValid() && row >= 0 && row < rowCount(parent)){
+void FindNoeudModel::removeNoeud(int row, const QModelIndex &parent){
+    if(parent.is_valid() &&row >= 0 &&row < rowCount(parent)){
         if(rowCount(parent) == 2) {
             m_data.getValidData(parent) = std::move(m_data.getValidData(index(1 - row,0,parent)));
             removeRows(0,2,parent);
@@ -88,12 +88,12 @@ void FindNoeudModel::removeNoeud(int row, const QModelIndex & parent){
     }
 }
 
-bool FindNoeudModel::setData(const QModelIndex &index, const QVariant &value, int role) {
-    if(index.isValid()) {
+bool FindNoeudModel::set_data(const QModelIndex &index, const QVariant &value, int role) {
+    if(index.is_valid()) {
         if(role == Qt::EditRole) {
             if(index.column() == OpColumn){
                 if(getData(index).type() == ChoiceNoeudType
-                        && value.toInt() >= 0 && value.toInt() < NbrOperation) {
+                        &&value.toInt() >= 0 &&value.toInt() < NbrOperation) {
                     m_data.getValidData(index) = std::make_unique<OperationNoeud>(value.toUInt());
                     dataChanged(index.siblingAtColumn(0),index.siblingAtColumn(NbrColumn));
                     insertNoeuds(ChoiceNoeudType,0,2,index);
@@ -102,7 +102,7 @@ bool FindNoeudModel::setData(const QModelIndex &index, const QVariant &value, in
             }
             else if (index.column() == ColonneColumn) {
                 if(getData(index).type() != OperationNoeudType
-                        && value.toInt() >= 0 && value.toInt() < m_model->columnCount()) {
+                        &&value.toInt() >= 0 &&value.toInt() < m_model->columnCount()) {
                     if(getData(index).type() != m_model->colonne(value.toUInt()).type())
                         m_data.getValidData(index) = nodeConditionFactory(value.toUInt());
                     else{
@@ -115,32 +115,32 @@ bool FindNoeudModel::setData(const QModelIndex &index, const QVariant &value, in
 
             }
         }
-        return TreeNoeudModel::setData(index,value,role);
+        return TreeNoeudModel::set_data(index,value,role);
     }
     return false;
 }
 
-void FindNoeudModel::setModel(AbstractColonnesModel * model)
+void FindNoeudModel::setModel(AbstractColonnesModel *model)
     {m_model = model;}
 
 bool FindNoeudModel::testRoot(szt id) const{
-    auto & root = static_cast<const AbstractConditionNoeud &>(**m_data.tree().cbegin().toFirstChild());
+    auto &root = static_cast<const AbstractConditionNoeud &>(**m_data.tree().cbegin().to_first());
     return root.negation() ? !root.test(id,m_model)
                            : root.test(id,m_model);
 }
 
 bool FindNoeudModel::testTree(szt id) const{
     auto iter = m_data.tree().crbegin();
-    iter.toFirstLeaf();
+    iter.to_first_leaf();
     auto test = true;
     while (!iter.parent().root()) {
         if(iter.leaf())
             test = static_cast<const AbstractConditionNoeud &>(**iter).test(id,m_model);
         if(static_cast<const AbstractNegationNoeud &>(**iter).negation())
             test = !test;
-        if((test && static_cast<const OperationNoeud &>(**iter.parent()).operation() == Ou)
-                || (!test && static_cast<const OperationNoeud &>(**iter.parent()).operation() == Et)){
-            iter.toParent();
+        if((test &&static_cast<const OperationNoeud &>(**iter.parent()).operation() == Ou)
+                || (!test &&static_cast<const OperationNoeud &>(**iter.parent()).operation() == Et)){
+            iter.to_parent();
         }
         else
             --iter;
@@ -160,8 +160,8 @@ QVariant AbstractNegationNoeud::data(int column, int role) const {
     }
     return QVariant();
 }
-bool AbstractNegationNoeud::setData(int column, const QVariant & value, int role) {
-    if(column == NegColumn && role == Qt::EditRole) {
+bool AbstractNegationNoeud::set_data(int column, const QVariant &value, int role) {
+    if(column == NegColumn &&role == Qt::EditRole) {
         m_negation = value.toBool();
         return true;
     }
@@ -179,12 +179,12 @@ QVariant AbstractComparaisonNoeud::data(int column, int role) const{
     }
     return AbstractConditionNoeud::data(column,role);
 }
-bool AbstractComparaisonNoeud::setData(int column, const QVariant & value, int role) {
-    if(column == ComparaisonColumn && role == Qt::EditRole) {
+bool AbstractComparaisonNoeud::set_data(int column, const QVariant &value, int role) {
+    if(column == ComparaisonColumn &&role == Qt::EditRole) {
         m_comp = value.toUInt();
         return true;
     }
-    return AbstractConditionNoeud::setData(column,value,role);
+    return AbstractConditionNoeud::set_data(column,value,role);
 }
 ///////////////////////////// AbstractConditionNoeud /////////////////////
 QVariant AbstractConditionNoeud::data(int column, int role) const{
@@ -196,14 +196,14 @@ QVariant AbstractConditionNoeud::data(int column, int role) const{
     }
     return AbstractNegationNoeud::data(column,role);
 }
-bool AbstractConditionNoeud::setData(int column, const QVariant & value, int role) {
-    if(column == ColonneColumn && role == Qt::EditRole) {
+bool AbstractConditionNoeud::set_data(int column, const QVariant &value, int role) {
+    if(column == ColonneColumn &&role == Qt::EditRole) {
         m_pos = value.toUInt();
         return true;
     }
-    return AbstractNegationNoeud::setData(column,value,role);
+    return AbstractNegationNoeud::set_data(column,value,role);
 }
-bool AbstractConditionNoeud::test(szt id, AbstractColonnesModel * model) const
+bool AbstractConditionNoeud::test(szt id, AbstractColonnesModel *model) const
     {return testValue(model->colonne(m_pos).dataTest(id));}
 ////////////////////////////// BoolNoeud /////////////////////////////
 QVariant BoolNoeud::data(int column, int role) const {
@@ -221,7 +221,7 @@ QVariant BoolNoeud::data(int column, int role) const {
     }
     return AbstractConditionNoeud::data(column,role);
 }
-bool BoolNoeud::setData(int column, const QVariant & value, int role) {
+bool BoolNoeud::set_data(int column, const QVariant &value, int role) {
     if(column == TrueColumn){
         if(role == Qt::CheckStateRole)
             return m_true = value.toBool();
@@ -230,7 +230,7 @@ bool BoolNoeud::setData(int column, const QVariant & value, int role) {
         if(role == Qt::CheckStateRole)
             return m_false = value.toBool();
     }
-    return AbstractConditionNoeud::setData(column,value,role);
+    return AbstractConditionNoeud::set_data(column,value,role);
 }
 ///////////////////////////// ChoiceNoeud //////////////////////////////
 QVariant ChoiceNoeud::data(int column, int role) const {
@@ -244,18 +244,18 @@ QVariant ChoiceNoeud::data(int column, int role) const {
 }
 ///////////////////////////// DateNoeud ///////////////////////////
 QVariant DateNoeud::data(int column, int role) const {
-    if(column == DateColumn && (role == Qt::DisplayRole || role == Qt::EditRole))
+    if(column == DateColumn &&(role == Qt::DisplayRole || role == Qt::EditRole))
         return m_date;
     return AbstractComparaisonNoeud::data(column,role);
 }
-bool DateNoeud::setData(int column, const QVariant & value, int role) {
-    if(column == DateColumn && role == Qt::EditRole) {
+bool DateNoeud::set_data(int column, const QVariant &value, int role) {
+    if(column == DateColumn &&role == Qt::EditRole) {
         m_date = value.toDate();
         return true;
     }
-    return AbstractComparaisonNoeud::setData(column,value,role);
+    return AbstractComparaisonNoeud::set_data(column,value,role);
 }
-bool DateNoeud::testValue(const QVariant & value) const {
+bool DateNoeud::testValue(const QVariant &value) const {
     switch (m_comp) {
     case Egal:
         return m_date == value.toDate();
@@ -283,12 +283,12 @@ QVariant OperationNoeud::data(int column, int role) const {
     }
     return AbstractNegationNoeud::data(column,role);
 }
-bool OperationNoeud::setData(int column, const QVariant & value, int role) {
-    if(column == OpColumn && role == Qt::EditRole) {
+bool OperationNoeud::set_data(int column, const QVariant &value, int role) {
+    if(column == OpColumn &&role == Qt::EditRole) {
         m_operation = value.toUInt();
         return true;
     }
-    return AbstractNegationNoeud::setData(column,value,role);
+    return AbstractNegationNoeud::set_data(column,value,role);
 }
 ///////////////////////////// TexteNoeud ///////////////////////////
 QVariant TexteNoeud::data(int column, int role) const {
@@ -312,11 +312,11 @@ QVariant TexteNoeud::data(int column, int role) const {
     }
     return AbstractConditionNoeud::data(column,role);
 }
-bool TexteNoeud::setData(int column, const QVariant & value, int role) {
+bool TexteNoeud::set_data(int column, const QVariant &value, int role) {
     switch (column) {
     case TexteColumn:
         if(role == Qt::EditRole) {
-                m_texte = value.toString();
+                m_texte = value.to_string();
                 if(m_regex)
                     m_regular.setPattern(m_texte);
         }
@@ -328,16 +328,16 @@ bool TexteNoeud::setData(int column, const QVariant & value, int role) {
         break;
     case RegexColumn:
         if(role == Qt::CheckStateRole
-                && (m_regex = value.toBool()))
+                &&(m_regex = value.toBool()))
             m_regular.setPattern(m_texte);
 
         break;
     }
-    return AbstractConditionNoeud::setData(column,value,role);
+    return AbstractConditionNoeud::set_data(column,value,role);
 }
-bool TexteNoeud::testValue(const QVariant & value) const {
+bool TexteNoeud::testValue(const QVariant &value) const {
     if(m_regex)
-        return m_regular.match(value.toString(),0).hasMatch();
+        return m_regular.match(value.to_string(),0).hasMatch();
     else
-        return value.toString().contains(m_texte, m_case ? Qt::CaseSensitive : Qt::CaseInsensitive);
+        return value.to_string().contains(m_texte, m_case ? Qt::CaseSensitive : Qt::CaseInsensitive);
 }

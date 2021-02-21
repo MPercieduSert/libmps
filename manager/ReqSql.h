@@ -14,7 +14,7 @@
 #include "AbstractManager.h"
 
 /*! \ingroup groupeManager
- * \brief Macro rappelant les méthodes de ReqSql dans les classes patrons.
+ *\brief Macro rappelant les méthodes de ReqSql dans les classes patrons.
  */
 #define USING_REQSQL(T) using T::exec; \
 using T::finish; \
@@ -25,7 +25,7 @@ using T::toInt;
 namespace bddMPS {
     //! Mot clé sql.
     enum wordSql{Create,
-                NotNull,
+                Not_null,
                 Constraint,
                 Unique,
                 Foreign,
@@ -34,11 +34,11 @@ namespace bddMPS {
 
 namespace managerMPS {
 /*! \ingroup groupeManager
- * \brief Classe mère des liens contenant la référence sur l'objet de requète ouvert sur le base de donnée.
+ *\brief Classe mère des liens contenant la référence sur l'objet de requète ouvert sur le base de donnée.
  */
 class ReqSql {
 protected:
-    static QSqlQuery * m_requete;  //!< Référence vers la requète employée dans le manageur.
+    static QSqlQuery *m_requete;  //!< Référence vers la requète employée dans le manageur.
 
 public:
     CONSTR_DEFAUT(ReqSql)
@@ -54,7 +54,7 @@ public:
         {return m_requete->lastQuery();}
 
     //! Modifie le pointeur vers l'objet requête.
-    static void setRequete(QSqlQuery * req)
+    static void setRequete(QSqlQuery *req)
         {m_requete = req;}
 
     //! Renvoie une QString correspondant au type.
@@ -62,11 +62,11 @@ public:
 
 protected:
     //! Transmet une valeur à la requète.
-    void bindValue(numt n, const QVariant & value)
+    void bindValue(numt n, const QVariant &value)
         {m_requete->bindValue(static_cast<int>(n),value);}
 
     //! Transmet une valeur à la requète.
-    void bindValue(int n, const QVariant & value)
+    void bindValue(int n, const QVariant &value)
         {m_requete->bindValue(n,value);}
 
     //! Exécute la dernière requète préparée et lance une execption si celle-ci n'est pas valide.
@@ -76,7 +76,7 @@ protected:
     }
 
     //! Exécute la requéte SQL donnée en argument et lance une execption si celle-ci n'est pas valide.
-    void exec(const QString & requete) {
+    void exec(const QString &requete) {
         m_requete->exec(requete);
         affError();
     }
@@ -88,7 +88,7 @@ protected:
     }
 
     //! Exécute la requéte SQL donnée en argument et lance une execption si celle-ci n'est pas valide.
-    void execFinish(const QString & requete) {
+    void execFinish(const QString &requete) {
         exec(requete);
         finish();
     }
@@ -98,7 +98,7 @@ protected:
         {m_requete->finish();}
 
     //! Accesseur de l'identifiant.
-    idt id(post pos = Entity::Id) const
+    idt id(post pos = entity::Id) const
         {return value<idt>(pos);}
 
     //! Place la requète sur la position suivante.
@@ -106,14 +106,14 @@ protected:
         {return m_requete->next();}
 
     //! Prepare la requète SQL.
-    void prepare(const QString & requete)
+    void prepare(const QString &requete)
         {m_requete->prepare(requete);}
 
     //! Récupère la nième valeur de la requète au type T.
     template<class T> inline T value(post n = 0) const;
 
     //! Convertit un entier en QVariant, en remplaçant 0 par QVariant(QVariant::Int).
-    template<class T> QVariant zeroToNull(T n) const
+    template<class T> QVariant zeroTo_null(T n) const
         {return n != 0 ? n : QVariant(QVariant::Int);}
 };
 

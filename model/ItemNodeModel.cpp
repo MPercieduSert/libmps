@@ -24,13 +24,13 @@ QVariant ItemNodeModel::data(const NodeIndex &index, int role) const {
     return QVariant();
 }
 
-numt ItemNodeModel::dataCount(const NodeIndex & index) const {
+numt ItemNodeModel::dataCount(const NodeIndex &index) const {
     if(checkIndex(index))
         return m_data.getNode(index).dataCount(index.cible());
     return ItemNode::NoData;
 }
 
-flag ItemNodeModel::flags(const NodeIndex & index) const {
+flag ItemNodeModel::flags(const NodeIndex &index) const {
     if(checkIndex(index))
         return m_data.getNode(index).flags(index.cible(), index.num());
     return NoFlagNode;
@@ -45,9 +45,9 @@ NodeIndex ItemNodeModel::createIndex(IterNode iter, int cible, numt num) const n
 }
 
 NodeIndex ItemNodeModel::index(const NodeIndex &parent, numt pos, int cible, numt num) const {
-    if(parent.isValid()) {
+    if(parent.is_valid()) {
         auto iter = indexToIterator(parent);
-        iter.toChildU(pos);
+        iter.to_childU(pos);
         if (iter)
             return createIndex(iter,cible,num);
     }
@@ -57,10 +57,10 @@ NodeIndex ItemNodeModel::index(const NodeIndex &parent, numt pos, int cible, num
 }
 
 std::list<IterNode> ItemNodeModel::insert(const NodeIndex &parent, numt pos, numt count, int type) {
-    if (checkIndex(parent) && pos <= parent.childCount()) {
+    if (checkIndex(parent) &&pos <= parent.childCount()) {
         beginInsertNodes(parent,pos,count);
             auto r = m_data.insertNodes(parent,pos,count,
-                               [this,type](const NodeIndex & parentArg, numt posArg){return nodeFactory(parentArg,posArg,type);});
+                               [this,type](const NodeIndex &parentArg, numt posArg){return nodeFactory(parentArg,posArg,type);});
         endInsertNodes();
         return r;
     }
@@ -81,7 +81,7 @@ bool ItemNodeModel::remove(const NodeIndex &index, numt count) {
 
 bool ItemNodeModel::set(const NodeIndex &index, const QVariant &value, int role) {
     if(checkIndex(index)){
-        auto changeRole = m_data.getNode(index).setData(index.cible(),value,role,index.num());
+        auto changeRole = m_data.getNode(index).set_data(index.cible(),value,role,index.num());
         if(changeRole)
             dataChanged(index,changeRole);
         return true;
@@ -92,10 +92,10 @@ bool ItemNodeModel::set(const NodeIndex &index, const QVariant &value, int role)
 QVariant NodeIndex::data(int role) const
     {return m_model ? m_model->data(*this, role) : QVariant();}
 
-NodeIndex NodeIndex::firstBrother() const noexcept {
-    if(isValid()) {
+NodeIndex NodeIndex::first() const noexcept {
+    if(is_valid()) {
         auto ind = *this;
-        ind.m_iter.toFirstBrother();
+        ind.m_iter.to_first_brother();
         return ind;
     }
     return NodeIndex();
@@ -105,37 +105,37 @@ flag NodeIndex::flags() const
     {return m_model ? m_model->flags(*this)
                       : Qt::NoItemFlags;}
 
-NodeIndex NodeIndex::lastBrother() const noexcept {
-    if(isValid()) {
+NodeIndex NodeIndex::last() const noexcept {
+    if(is_valid()) {
         auto ind = *this;
-        ind.m_iter.toLastBrother();
+        ind.m_iter.to_last_brother();
         return ind;
     }
     return NodeIndex();
 }
 
 NodeIndex NodeIndex::nextBrother() const noexcept {
-    if(isValid()) {
+    if(is_valid()) {
         auto ind = *this;
-        ind.m_iter.toNextBrother();
+        ind.m_iter.to_next();
         return ind;
     }
     return NodeIndex();
 }
 
 NodeIndex NodeIndex::parent() const noexcept {
-    if(isValid()) {
+    if(is_valid()) {
         auto ind = *this;
-        ind.m_iter.toParent();
+        ind.m_iter.to_parent();
         return ind;
     }
     return NodeIndex();
 }
 
 NodeIndex NodeIndex::prevBrother() const noexcept {
-    if(isValid()) {
+    if(is_valid()) {
         auto ind = *this;
-        ind.m_iter.toPrevBrother();
+        ind.m_iter.to_prev();
         return ind;
     }
     return NodeIndex();
@@ -143,7 +143,7 @@ NodeIndex NodeIndex::prevBrother() const noexcept {
 
 //////////////////////////////////// ItemNodeBddModel ////////////////////////////
 void ItemNodeBddModel::save() {
-    std::set<IterNode,decltype (&IterNode::less_ptr)> changeSet(&IterNode::less_ptr);
+    std::set<IterNode,decltype (&IterNode::Less_ptr)> changeSet(&IterNode::Less_ptr);
     std::list<IterNode> insertList;
     for(auto iter = m_changeList.cbegin(); iter != m_changeList.cend(); ++iter)
         switch (iter->type) {
@@ -165,30 +165,30 @@ void ItemNodeBddModel::save() {
 }
 
 /////////////////////////////////// TreeForNodeModel ///////////////////////////
-Node TreeForNodeModel::moveNode(const NodeIndex & index, Node && node){
+Node TreeForNodeModel::moveNode(const NodeIndex &index, Node &&node){
     Node old = takeNode(index);
     setNode(index,std::move(node));
     return old;
 }
 
-Node TreeForNodeModel::moveNode(const NodeIndex & from, const NodeIndex & to) {
+Node TreeForNodeModel::moveNode(const NodeIndex &from, const NodeIndex &to) {
     Node old = takeNode(to);
     move(from,to);
     return old;
 }
 
 bool TreeForNodeModel::removeNodes(const NodeIndex &parent, numt pos, numt count) {
-    if(!parent.isValid())
+    if(!parent.is_valid())
         return false;
     numt comp = 0;
     for(numt i = 0; i != count; ++i) {
         std::forward_list<iterator> pile;
         auto iter = parent.m_iter;
-        pile.push_front(iter.toChildU(pos));
+        pile.push_front(iter.to_childU(pos));
         bool remove = true;
-        while(!pile.empty() && remove) {
+        while(!pile.empty() &&remove) {
             if(!pile.front().leaf())
-                pile.push_front(pile.front().crbeginChild());
+                pile.push_front(pile.front().crbegin_child());
             else {
                 remove = (**pile.front()).del();
                 if(remove) {

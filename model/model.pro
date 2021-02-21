@@ -23,7 +23,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
     AbstractColonnesModel.cpp \
-    AbstractEntityTableau.cpp \
+    AbstractentityTableau.cpp \
     AbstractModel.cpp \
     ColonnesForModel.cpp \
     FindNoeudModel.cpp \
@@ -38,7 +38,7 @@ SOURCES += \
 
 HEADERS += \
     AbstractColonnesModel.h \
-    AbstractEntityTableau.h \
+    AbstractentityTableau.h \
     AbstractModel.h \
     ColonnesForModel.h \
     FindNoeudModel.h \

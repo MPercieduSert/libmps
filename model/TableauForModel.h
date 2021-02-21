@@ -9,7 +9,7 @@
 namespace modelMPS {
 ///////////////////////////////////////// Tableau ///////////////////////////////////////////////////////////
 /*! \ingroup groupeModel
- * \brief Classe template générique d'un tableau composer d'une colonne de donné.
+ *\brief Classe template générique d'un tableau composer d'une colonne de donné.
  */
 template<class T, class Vec> class AbstractVecTableau : public AbstractColonnesModel::AbstractTableau {
 protected:
@@ -18,11 +18,11 @@ public:
     //! Constructeur d'une colonne vide.
     AbstractVecTableau() = default;
     //! Constructeur d'un tableau d'une colonne de size value.
-    AbstractVecTableau(szt size, const T & value = T()) : m_vec(size,value) {}
+    AbstractVecTableau(szt size, const T &value = T()) : m_vec(size,value) {}
     //! Constructeur d'un tableau constitué de vec.
-    AbstractVecTableau(const Vec & vec) : m_vec(vec) {}
+    AbstractVecTableau(const Vec &vec) : m_vec(vec) {}
     //! Constructeur d'un tableau constitué de vec.
-    AbstractVecTableau(Vec & vec) : m_vec(std::move(vec)) {}
+    AbstractVecTableau(Vec &vec) : m_vec(std::move(vec)) {}
     //! Constructeur d'un tableau d'une colonne de size valeur fabriquée.(Factory: T(*factory)(szt)).
     template<class Factory> AbstractVecTableau(szt size, Factory factory);
 
@@ -40,23 +40,23 @@ public:
     void erase(szt first, szt last) override;
 
     //! Accesseur de la donnée d'une ligne.
-    const T & internalData(szt ligne) const
+    const T &internalData(szt ligne) const
         {return m_vec.at(ligne);}
 
     //! Accesseur de la donnée d'une ligne.
-    T & internalData(szt ligne)
+    T &internalData(szt ligne)
         {return m_vec.at(ligne);}
 
     //! Mutateur de la donnée d'une ligne.
-    void setInternalData(szt ligne, const T & data)
+    void setInternalData(szt ligne, const T &data)
         {m_vec.at(ligne) = data;}
 
     //! Mutateur du vecteur de donné.
-    void setVecData(const Vec & data)
+    void setVecData(const Vec &data)
         {m_vec = data;}
 
     //! Mutateur du vecteur de donné.
-    void setVecData(Vec && data)
+    void setVecData(Vec &&data)
         {m_vec = std::move(data);}
 
     //! Taille (nombre de lignes).
@@ -64,7 +64,7 @@ public:
 };
 
 /*! \ingroup groupeModel
- * \brief Classe template générique d'un tableau composer d'une colonne de type std::vector<T>.
+ *\brief Classe template générique d'un tableau composer d'une colonne de type std::vector<T>.
  */
 template<class T> class VectorTableau : public AbstractVecTableau<T,std::vector<T>>{
 protected:
@@ -83,53 +83,53 @@ public:
 
 
 /*! \ingroup groupeModel
- * \brief Classe template générique d'un tableau composer d'une colonne de type vectorPtr<Ent>.
+ *\brief Classe template générique d'un tableau composer d'une colonne de type vectorPtr<Ent>.
  */
-template<class Ent> class AbstractVectorEntTableau : public AbstractVecTableau<Ent,conteneurMPS::VectorPtr<Ent>> {
+template<class Ent> class AbstractVectorEntTableau : public AbstractVecTableau<Ent,conteneurMPS::vector_ptr<Ent>> {
 protected:
-    using AbstractVecTableau<Ent,conteneurMPS::VectorPtr<Ent>>::m_vec;
+    using AbstractVecTableau<Ent,conteneurMPS::vector_ptr<Ent>>::m_vec;
 public:
     //! Constructeur.
-    using AbstractVecTableau<Ent,conteneurMPS::VectorPtr<Ent>>::AbstractVecTableau;
+    using AbstractVecTableau<Ent,conteneurMPS::vector_ptr<Ent>>::AbstractVecTableau;
 
     //! Ajoute count lignes au tableau.
     void add(szt count) override {m_vec.resize(m_vec.size() + count, [](){return new Ent();});}
 
     //! Teste si la ligne correspond à une donnée interne.
-    bool existsInternalData(szt ligne) const override {return !m_vec[ligne].isNew();}
+    bool existsInternalData(szt ligne) const override {return !m_vec[ligne].is_new();}
 
     //! Teste si la ligne de donnée est valide.
-    bool valide(szt ligne) const {return m_vec[ligne].isValid();}
+    bool valide(szt ligne) const {return m_vec[ligne].is_valid();}
 };
 
 /*! \ingroup groupeModel
- * \brief Classe template générique d'un tableau composer d'une colonne de type vectorPtr<Ent> lier à la base de donnée.
+ *\brief Classe template générique d'un tableau composer d'une colonne de type vectorPtr<Ent> lier à la base de donnée.
  */
 template<class Ent> class AbstractBddVectorEntTableau : public AbstractVectorEntTableau<Ent> {
 protected:
     using AbstractVectorEntTableau<Ent>::m_vec;
-    bddMPS::Bdd & m_bdd;        //! Lien avec la base de données.
+    bddMPS::Bdd &m_bdd;        //! Lien avec la base de données.
 public:
     //! Constructeur d'une colonne vide
-    AbstractBddVectorEntTableau(bddMPS::Bdd & bdd) : m_bdd(bdd) {}
+    AbstractBddVectorEntTableau(bddMPS::Bdd &bdd) : m_bdd(bdd) {}
     //! Constructeur d'un tableau d'une colonne de size value.
-    AbstractBddVectorEntTableau(bddMPS::Bdd & bdd, szt size, const Ent & value = Ent())
+    AbstractBddVectorEntTableau(bddMPS::Bdd &bdd, szt size, const Ent &value = Ent())
         : AbstractVectorEntTableau<Ent>(size,value), m_bdd(bdd) {}
     //! Constructeur d'un tableau constitué de vec.
-    AbstractBddVectorEntTableau(bddMPS::Bdd & bdd, const conteneurMPS::VectorPtr<Ent> & vec)
+    AbstractBddVectorEntTableau(bddMPS::Bdd &bdd, const conteneurMPS::vector_ptr<Ent> &vec)
         : AbstractVectorEntTableau<Ent>(vec), m_bdd(bdd) {}
     //! Constructeur d'un tableau constitué de vec.
-    AbstractBddVectorEntTableau(bddMPS::Bdd & bdd, conteneurMPS::VectorPtr<Ent> && vec)
+    AbstractBddVectorEntTableau(bddMPS::Bdd &bdd, conteneurMPS::vector_ptr<Ent> &&vec)
         : AbstractVectorEntTableau<Ent>(std::move(vec)), m_bdd(bdd) {}
     //! Constructeur d'un tableau d'une colonne de size valeur fabriquée.(Factory: T(*factory)(szt)).
-    template<class Factory> AbstractBddVectorEntTableau(bddMPS::Bdd & bdd, szt size, Factory factory)
+    template<class Factory> AbstractBddVectorEntTableau(bddMPS::Bdd &bdd, szt size, Factory factory)
         : AbstractVectorEntTableau<Ent>(size,factory), m_bdd(bdd) {}
 
     //! Hydrate la donnée d'une ligne du tableau et retourne le succés de l'opération.
     void hydrate(szt ligne) override {m_bdd.get(m_vec[ligne]);}
 
     //! Teste si la ligne est nouvelle ou modifiée.
-    bool newOrModif(szt ligne) const override {return m_vec[ligne].isNew() || !m_bdd.sameInBdd(m_vec[ligne]);}
+    bool newOrModif(szt ligne) const override {return m_vec[ligne].is_new() || !m_bdd.sameInBdd(m_vec[ligne]);}
 
     //! Supprime les données correspondant à la ligne dans la base de donnée.
     //! Ne doit pas supprimer de ligne de donnée du model.
@@ -140,7 +140,7 @@ public:
 };
 
 /*! \ingroup groupeModel
- * \brief Classe template générique d'un tableau composer d'une colonne de type std::vector<std::list<T>> avec la liste ordonnée.
+ *\brief Classe template générique d'un tableau composer d'une colonne de type std::vector<std::list<T>> avec la liste ordonnée.
  */
 template<class T> class AbstractVectorListTableau : public AbstractVecTableau<T,std::vector<std::list<T>>>{
 protected:
@@ -149,31 +149,31 @@ public:
     //! Constructeur d'une colonne vide.
     AbstractVectorListTableau() = default;
     //! Constructeur d'un tableau constitué de vec.
-    AbstractVectorListTableau(const std::vector<std::list<T>> & vec)
+    AbstractVectorListTableau(const std::vector<std::list<T>> &vec)
         : AbstractVecTableau<T,std::vector<std::list<T>>>(vec) {}
     //! Constructeur d'un tableau constitué de vec.
-    AbstractVectorListTableau(std::vector<std::list<T>> & vec)
+    AbstractVectorListTableau(std::vector<std::list<T>> &vec)
         : AbstractVecTableau<T,std::vector<std::list<T>>>(std::move(vec)) {}
 
     //! Constructeur d'un tableau d'une colonne de size value.
-    AbstractVectorListTableau(szt size, const std::list<T> & value = std::list<T>())
+    AbstractVectorListTableau(szt size, const std::list<T> &value = std::list<T>())
         : AbstractVecTableau<T,std::vector<std::list<T>>>(std::vector<std::list<T>>(size,value)) {}
 
     //! Constructeur d'un tableau d'une colonne de size value.
-    AbstractVectorListTableau(szt size, const T & value)
+    AbstractVectorListTableau(szt size, const T &value)
         : AbstractVecTableau<T,std::vector<std::list<T>>>(std::vector<std::list<T>>(size,std::list<T>({value}))) {}
 
     //! Ajoute count lignes au tableau.
     void add(szt count) override {m_vec.resize(m_vec.size() + count);}
 
     //! Ajoute un élément à une ligne.
-    void addElement(szt ligne, const T & element) {
+    void addElement(szt ligne, const T &element) {
         m_vec.at(ligne).push_back(element);
         m_vec.at(ligne).sort();
     }
 
     //! Ajoute un élément à une ligne.
-    void addElement(szt ligne, T && element) {
+    void addElement(szt ligne, T &&element) {
         m_vec.at(ligne).push_back(std::move(element));
         m_vec.at(ligne).sort();
     }
@@ -182,44 +182,44 @@ public:
     bool egal(szt ligne1, szt ligne2) const override;
 
     //! Comparaison d'égalité entre deux éléments d'une liste.
-    virtual bool egalElement(const T & element1, const T & element2) const = 0;
+    virtual bool egalElement(const T &element1, const T &element2) const = 0;
 
     //! Accesseur de la donnée d'une ligne.
-    const std::list<T> & internalData(szt ligne) const
+    const std::list<T> &internalData(szt ligne) const
         {return m_vec.at(ligne);}
 
     //! Accesseur de la donnée d'une ligne.
-    std::list<T> & internalData(szt ligne)
+    std::list<T> &internalData(szt ligne)
         {return m_vec.at(ligne);}
 
     //! Mutateur de la donnée d'une ligne.
-    void setInternalData(szt ligne, const std::list<T> & data) {
+    void setInternalData(szt ligne, const std::list<T> &data) {
         m_vec.at(ligne) = data;
         m_vec.at(ligne).sort();
     }
 
     //! Mutateur de la donnée d'une ligne.
-    void setInternalData(szt ligne, std::list<T> && data) {
+    void setInternalData(szt ligne, std::list<T> &&data) {
         m_vec.at(ligne) = std::move(data);
         m_vec.at(ligne).sort();
     }
 };
 
 /*! \ingroup groupeModel
- * \brief Classe template générique d'un tableau composer d'une colonne de type vectorPtr<Ent> lier à la base de donnée.
+ *\brief Classe template générique d'un tableau composer d'une colonne de type vectorPtr<Ent> lier à la base de donnée.
  */
 template<class Ent> class AbstractBddVectorListTableau : public AbstractVectorListTableau<Ent> {
 protected:
     using AbstractVectorListTableau<Ent>::m_vec;
-    bddMPS::Bdd & m_bdd;        //! Lien avec la base de données.
+    bddMPS::Bdd &m_bdd;        //! Lien avec la base de données.
 public:
     //! Constructeur d'une colonne vide
-    AbstractBddVectorListTableau(bddMPS::Bdd & bdd) : m_bdd(bdd) {}
+    AbstractBddVectorListTableau(bddMPS::Bdd &bdd) : m_bdd(bdd) {}
     //! Constructeur d'un tableau d'une colonne de size value.
-    AbstractBddVectorListTableau(bddMPS::Bdd & bdd, szt size)
+    AbstractBddVectorListTableau(bddMPS::Bdd &bdd, szt size)
         : AbstractVectorListTableau<Ent>(size), m_bdd(bdd) {}
     //! Constructeur d'un tableau constitué de vec.
-    AbstractBddVectorListTableau(bddMPS::Bdd & bdd, const conteneurMPS::VectorPtr<Ent> & vec)
+    AbstractBddVectorListTableau(bddMPS::Bdd &bdd, const conteneurMPS::vector_ptr<Ent> &vec)
         : AbstractVectorEntTableau<Ent>(vec.size()), m_bdd(bdd) {
         auto iterVec = m_vec.begin();
         for(auto iter = vec.cbegin(); iter != vec.cend(); ++iter)
@@ -227,7 +227,7 @@ public:
     }
 
     //! Constructeur d'un tableau d'une colonne de size valeur fabriquée.(Factory: T(*factory)(szt)).
-    template<class Factory> AbstractBddVectorListTableau(bddMPS::Bdd & bdd, szt size, Factory factory)
+    template<class Factory> AbstractBddVectorListTableau(bddMPS::Bdd &bdd, szt size, Factory factory)
         : AbstractVectorListTableau<Ent>(size,factory), m_bdd(bdd) {}
 
     //! Teste si la ligne correspond à une donnée interne.
@@ -254,7 +254,7 @@ public:
 //! Macro de définition des membres test de CompositionTableau.
 #define TEST_COMPOSITION_TABLEAU(MODULE,MEMBRE){auto iterTableau = m_tableaux.cbegin(); \
     auto iterTest = m_module[MODULE].cbegin(); \
-    while(iterTableau != m_tableaux.cend() && (!*iterTest || (*iterTableau)->MEMBRE)){ \
+    while(iterTableau != m_tableaux.cend() &&(!*iterTest || (*iterTableau)->MEMBRE)){ \
         ++iterTableau; ++iterTest;} \
     return iterTableau == m_tableaux.cend();}
 
@@ -264,7 +264,7 @@ public:
         if(*iterActif) (*iter)->MEMBRE;}
 
 /*! \ingroup groupeModel
- * \brief Classe de composition paramétrée de plusieurs tableaux en un.
+ *\brief Classe de composition paramétrée de plusieurs tableaux en un.
  */
 class CompositionTableau : public AbstractColonnesModel::AbstractTableau {
 protected:
@@ -280,7 +280,7 @@ public:
                  NewOrModifModule,
                  RemoveModule,
                  SaveModule,
-                 ValideModule,
+                 _valideModule,
                  NbrModule};
 
     //! Constructeur.
@@ -315,14 +315,14 @@ public:
     void hydrate(szt ligne) override;
 
     //! Fabrique une colonne lié aux données du tableau.
-    std::unique_ptr<AbstractColonnesModel::AbstractColonne> makeColonne(const AbstractColonnesModel::NewColonneInfo & info) override
+    std::unique_ptr<AbstractColonnesModel::AbstractColonne> makeColonne(const AbstractColonnesModel::NewColonneInfo &info) override
         {return m_tableaux.at(info.tableau)->makeColonne(info);}
 
     //! Teste si la ligne est nouvelle ou modifiée.
     bool newOrModif(szt ligne) const override;
 
     //! Ajoute un tableau à la composition. Le nouveau tableau doit avoir la même taille que ceux auquel il est associé.
-    void push_back(std::unique_ptr<AbstractTableau> && tableau, bool actif = true);
+    void push_back(std::unique_ptr<AbstractTableau> &&tableau, bool actif = true);
 
     //! Supprime les données correspondant à la ligne dans la base de donnée.
     //! Ne doit pas supprimer de ligne de donnée du model.
@@ -340,11 +340,11 @@ public:
         {return m_tableaux.empty() ? 0 : m_tableaux.front()->size();}
 
     //! Accesseur des tableaux.
-    AbstractTableau & tableau(szt pos)
+    AbstractTableau &tableau(szt pos)
         {return *m_tableaux.at(pos);}
 
     //! Accesseur des tableaux.
-    const AbstractTableau & tableau(szt pos) const
+    const AbstractTableau &tableau(szt pos) const
         {return *m_tableaux.at(pos);}
 
     //! Teste si la ligne de donnée est valide.
@@ -354,7 +354,7 @@ public:
 ////////////////////////////////////////////////////////// HeterogeneTailleTableau /////////////////////////////////////
 
 /*! \ingroup groupeModel
- * \brief Classe d'un tableau composé de listes de longueurs hétérogènes.
+ *\brief Classe d'un tableau composé de listes de longueurs hétérogènes.
  */
 template<class T> class HeterogeneTailleTableau : public AbstractColonnesModel::AbstractTableau {
 protected:
@@ -379,19 +379,19 @@ public:
     }
 
     //! Acceseur d'une des colonnes du tableau avec vérification.
-    const std::vector<T> & colonneAt(szt num) const
+    const std::vector<T> &colonneAt(szt num) const
         {return *m_tableau.at(num);}
 
     //! Acceseur d'une des colonnes du tableau avec vérification.
-    std::vector<T> & colonneAt(szt num)
+    std::vector<T> &colonneAt(szt num)
         {return *m_tableau.at(num);}
 
     //! Acceseur d'une des colonnes du tableau sans vérification.
-    const std::vector<T> & colonne(szt num) const
+    const std::vector<T> &colonne(szt num) const
         {return *m_tableau[num];}
 
     //! Acceseur d'une des colonnes du tableau sans vérification.
-    std::vector<T> & colonne(szt num)
+    std::vector<T> &colonne(szt num)
         {return *m_tableau[num];}
 
     //! Comparaison d'égalité de deux ligne.
@@ -415,11 +415,11 @@ public:
         {m_tableau.push_back(std::make_unique<std::vector<T>>(size));}
 
     //! Ajoute un tableau.
-    void push_back(const std::vector<T> & vec = std::vector<T>())
+    void push_back(const std::vector<T> &vec = std::vector<T>())
         {m_tableau.push_back(std::make_unique<std::vector<T>>(vec));}
 
     //! Ajoute un tableau.
-    void push_back(std::vector<T> && vec)
+    void push_back(std::vector<T> &&vec)
         {m_tableau.push_back(std::make_unique<std::vector<T>>(std::move(vec)));}
 
     //! Taille (nombre de lignes).
@@ -453,7 +453,7 @@ template<class T> bool AbstractVectorListTableau<T>::egal(szt ligne1, szt ligne2
         return false;
     auto iter1 = m_vec[ligne1].cbegin();
     auto iter2 = m_vec[ligne2].cbegin();
-    while(iter1 != m_vec[ligne1].cend() && egalElement(*iter1,*iter2)) {
+    while(iter1 != m_vec[ligne1].cend() &&egalElement(*iter1,*iter2)) {
         ++iter1;
         ++iter2;
     }
@@ -464,7 +464,7 @@ template<class T> bool AbstractBddVectorListTableau<T>::existsInternalData(szt l
     if(m_vec[ligne].empty())
         return false;
     auto iter = m_vec[ligne].cbegin();
-    while(iter != m_vec[ligne].cend() && iter->isNew())
+    while(iter != m_vec[ligne].cend() &&iter->is_new())
         ++iter;
     return iter == m_vec[ligne].cend();
 }
@@ -473,7 +473,7 @@ template<class T> bool AbstractBddVectorListTableau<T>::removeInternalData(szt l
     if(m_vec[ligne].empty())
         return true;
     auto iter = m_vec[ligne].cbegin();
-    while(iter != m_vec[ligne].cend() && m_bdd.del(*iter))
+    while(iter != m_vec[ligne].cend() &&m_bdd.del(*iter))
         ++iter;
     return iter == m_vec[ligne].cend();
 }
@@ -488,13 +488,13 @@ template<class T> bool AbstractBddVectorListTableau<T>::valide(szt ligne) const 
     if(m_vec[ligne].empty())
         return true;
     auto iter = m_vec[ligne].cbegin();
-    while(iter != m_vec[ligne].cend() && iter->isValid())
+    while(iter != m_vec[ligne].cend() &&iter->is_valid())
         ++iter;
     return iter == m_vec[ligne].cend();
 }
 
 template <class T> std::unique_ptr<AbstractColonnesModel::AbstractColonne>
-                        VectorTableau<T>::makeColonne(const AbstractColonnesModel::NewColonneInfo & info) {
+                        VectorTableau<T>::makeColonne(const AbstractColonnesModel::NewColonneInfo &info) {
     switch (info.type) {
     case BoolColonneType:
         if(info.args.size() == 0)
@@ -505,7 +505,7 @@ template <class T> std::unique_ptr<AbstractColonnesModel::AbstractColonne>
             return std::make_unique<VectorValColonne<T>>(info.name,info.flags,info.type,m_vec,
                                                          [](T element)->bool{return element;},
                                                          [](bool value, bool element){element = value;},
-                                                         info.args[0].toString(),info.args[1].toString());
+                                                         info.args[0].to_string(),info.args[1].to_string());
     case DoubleColonneType:
     case IntColonneType:
     case UIntColonneType:
@@ -514,17 +514,17 @@ template <class T> std::unique_ptr<AbstractColonnesModel::AbstractColonne>
                         if(role == Qt::DisplayRole || role == Qt::EditRole)
                             return element;
                         return QVariant();},
-                    [](const QVariant & value, T element, int role){
+                    [](const QVariant &value, T element, int role){
                         if(role == Qt::EditRole)
                             element = value.value<T>();
                         return QVariant();});
     default:
         return std::make_unique<VectorRefColonne<T>>(info.name,info.flags,info.type,m_vec,
-                    [](const T & element, int role){
+                    [](const T &element, int role){
                         if(role == Qt::DisplayRole || role == Qt::EditRole)
                             return element;
                         return QVariant();},
-                    [](const QVariant & value, T & element, int role){
+                    [](const QVariant &value, T &element, int role){
                         if(role == Qt::EditRole)
                             element = value.value<T>();
                         return QVariant();});
@@ -534,14 +534,14 @@ template <class T> std::unique_ptr<AbstractColonnesModel::AbstractColonne>
 template<class T> bool HeterogeneTailleTableau<T>::egal(szt ligne1, szt ligne2) const {
     auto iter = m_tableau.begin();
     while(iter != m_tableau.end()
-          && ((ligne1 >= (**iter).size() && ligne2 >= (**iter).size())
-               || (ligne1 < (**iter).size() && ligne2 < (**iter).size() && (**iter).operator[](ligne1) == (**iter).operator[](ligne2))))
+          &&((ligne1 >= (**iter).size() &&ligne2 >= (**iter).size())
+               || (ligne1 < (**iter).size() &&ligne2 < (**iter).size() &&(**iter).operator[](ligne1) == (**iter).operator[](ligne2))))
         ++iter;
     return iter == m_tableau.end();
 }
 
 template<class T> void HeterogeneTailleTableau<T>::erase(szt first, szt last) {
-     if(first < m_nbrLine && last <= m_nbrLine && first < last) {
+     if(first < m_nbrLine &&last <= m_nbrLine &&first < last) {
         for (auto iter = m_tableau.begin();iter != m_tableau.end(); ++iter)
             if(first < (**iter).size()) {
                 if(last < (**iter).size())

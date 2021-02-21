@@ -8,7 +8,7 @@
 
 namespace managerMPS {
 /*! \ingroup groupeManager
- * \brief Classe template abstraite mère des différents gestionnaire d'autorisation.
+ *\brief Classe template abstraite mère des différents gestionnaire d'autorisation.
  */
 template<class Ent> class AbstractGestionRestriction {
 protected:
@@ -27,7 +27,7 @@ public:
 
     //! Ajoute des restrictions de modification pour une entité donnée.
     virtual void addRestriction(idt /*id*/, flag restrict) {
-        if(restrict & ~m_restriction)
+        if(restrict &~m_restriction)
             throw std::invalid_argument(QString("void AbstractGestionRestriction<").append(Ent::Name())
                                         .append(">::addRestriction(idt,flag))\n ")
                                         .append("restriction non gérée par le gestionére d'autorisation :")
@@ -48,7 +48,7 @@ public:
 
     //! Modifie les restrictions de modification pour une entité donnée.
     virtual void setRestriction(idt /*id*/, flag restrict) {
-        if(restrict & ~m_restriction)
+        if(restrict &~m_restriction)
             throw std::invalid_argument(QString("void AbstractGestionRestriction<").append(Ent::Name())
                                         .append(">::setRestriction(idt,flag))\n ")
                                         .append("restriction non gérée par le gestionére d'autorisation :")
@@ -60,7 +60,7 @@ public:
         {return false;}
 
     //! Teste la restriction de modification pour une entité d'identifiant id avec les valeur de entity.
-    virtual bool testRestriction(idt id, flag restrict, const Ent & /*entity*/)
+    virtual bool testRestriction(idt id, flag restrict, const Ent &/*ent*/)
         {return testRestriction(id,restrict);}
 };
 }

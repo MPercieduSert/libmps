@@ -12,40 +12,40 @@
 
 namespace widgetMPS {
 /*! \ingroup groupeWidget
- * \brief Widget de recherche définissant un arbre de filtres à appliquer à un model de type AbstractColonnesModel.
+ *\brief Widget de recherche définissant un arbre de filtres à appliquer à un model de type AbstractColonnesModel.
  */
 class FindWidget : public QWidget {
     Q_OBJECT
 protected:
-    // Model & delegate
+    // Model &delegate
     using Delegate = delegateMPS::StandardNodeDelegate;
     using FindModel = modelMPS::FindModel;
-    FindModel * m_model = nullptr;                //!< Model de recherche.
+    FindModel *m_model = nullptr;                //!< Model de recherche.
     // Widget
-    QPushButton * m_findButton;     //!< Bouton de recherche.
-    QPushButton * m_resetButton;    //!< Bouton de réinitialisation de la recherche.
-    NodeView * m_view;              //!< Vue de l'arbre de recherche.
+    QPushButton *m_findButton;     //!< Bouton de recherche.
+    QPushButton *m_resetButton;    //!< Bouton de réinitialisation de la recherche.
+    NodeView *m_view;              //!< Vue de l'arbre de recherche.
 
     // Calque
-    QVBoxLayout * m_mainLayout;     //!< Calque principal.
-    QHBoxLayout * m_buttonsLayout;  //!< Claque des boutton.
+    QVBoxLayout *m_mainLayout;     //!< Calque principal.
+    QHBoxLayout *m_buttonsLayout;  //!< Claque des boutton.
 public:
     //! Constructeur.
-    FindWidget(FindModel * model = new FindModel(),QWidget * parent = nullptr);
+    FindWidget(FindModel *model = new FindModel(),QWidget *parent = nullptr);
 
     //! Constructeur.
-    FindWidget(modelMPS::AbstractColonnesModel * model,QWidget * parent = nullptr)
+    FindWidget(modelMPS::AbstractColonnesModel *model,QWidget *parent = nullptr)
         : FindWidget(new FindModel(model),parent) {}
 
     //! Accesseur du Model.
-    FindModel * findModel() const
+    FindModel *findModel() const
         {return m_model;}
 
     //! Mutateur du model de recheche.
-    void setFindModel(FindModel * model);
+    void set_findModel(FindModel *model);
 
     //! Mutateur du model filtré.
-    void setModel(modelMPS::AbstractColonnesModel * model) {
+    void setModel(modelMPS::AbstractColonnesModel *model) {
         if(m_model)
             m_model->setModel(model);
     }

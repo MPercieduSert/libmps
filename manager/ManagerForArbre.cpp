@@ -1,49 +1,49 @@
-#include "ManagerForArbre.h"
+#include "ManagerForarbre.h"
 
 using namespace managerMPS;
 
-ManagerForArbre::ManagerForArbre(const InfoBdd & info)
-    : ManagerSqlArbre(info, std::make_unique<ArbreUniqueSql<Arbre>>()) {
+ManagerForarbre::ManagerForarbre(const InfoBdd &info)
+    : ManagerSqlarbre(info, std::make_unique<arbreUniqueSql<arbre>>()) {
     // Get Parent
     m_sqlGetParent.append("SELECT ");
-    m_sqlGetParent.append(attribut(Arbre::Parent));
+    m_sqlGetParent.append(attribut(arbre::Parent));
     m_sqlGetParent.append(" FROM ");
     m_sqlGetParent.append(table()).append(" WHERE ");
-    m_sqlGetParent.append(attribut(Arbre::Id));
+    m_sqlGetParent.append(attribut(arbre::Id));
     m_sqlGetParent.append("=?");
     m_sqlGetParent.squeeze();
 }
 
-void ManagerForArbre::add(Arbre &node) {
+void ManagerForarbre::add(arbre &node) {
     if(node.feuille()) {
         if(node.parent()) {
-            Arbre parent(node.parent());
+            arbre parent(node.parent());
             get(parent);
             if(parent.feuille()) {
                 if(node.num())
                     throw std::invalid_argument("Le premier descendant doit avoir un numéro nul.");
                 else
-                    ManagerSqlArbre::add(node);
+                    ManagerSqlarbre::add(node);
                 parent.setFeuille(false);
-                ManagerSqlArbre::modify(parent);
+                ManagerSqlarbre::modify(parent);
             }
             else {
                 auto max = size(node.parent());
                 if(node.num() < 0 || node.num() > max) {
                     node.setNum(max+1);
-                    ManagerSqlArbre::add(node);
+                    ManagerSqlarbre::add(node);
                 }
                 else {
-                    VectorPtr<Arbre> nodes = getList(Arbre::Parent,node.parent(),
-                                                 Arbre::Num,node.num(),
-                                                 Arbre::Num,
+                    vector_ptr<arbre> nodes = getList(arbre::Parent,node.parent(),
+                                                 arbre::Num,node.num(),
+                                                 arbre::Num,
                                                  bmps::condition::Egal,bmps::condition::SupEgal,
                                                  false);
                     for(auto i = nodes.begin(); i != nodes.end(); ++i) {
                         i->setNum(i->num() + 1);
-                        ManagerSqlArbre::modify(*i);
+                        ManagerSqlarbre::modify(*i);
                     }
-                    ManagerSqlArbre::add(node);
+                    ManagerSqlarbre::add(node);
                 }
             }
         }
@@ -51,37 +51,37 @@ void ManagerForArbre::add(Arbre &node) {
             if(node.num())
                 throw std::invalid_argument("Une racine doit avoir un numéro nul.");
             else
-                ManagerSqlArbre::add(node);
+                ManagerSqlarbre::add(node);
         }
     }
     else
         throw std::invalid_argument("Le nouveau noeud ajouté doit être une feuille.");
 }
 
-void ManagerForArbre::add(const Arbre &node) {
+void ManagerForarbre::add(const arbre &node) {
     if(node.feuille()) {
         if(node.parent()) {
-            Arbre parent(node.parent());
+            arbre parent(node.parent());
             get(parent);
             if(parent.feuille()) {
                 if(node.num())
                     throw std::invalid_argument("Le premier descendnat doit avoir un numéro nul.");
                 else
-                    ManagerSqlArbre::add(node);
+                    ManagerSqlarbre::add(node);
                 parent.setFeuille(false);
-                ManagerSqlArbre::modify(parent);
+                ManagerSqlarbre::modify(parent);
             }
             else {
                 auto max = size(node.parent());
                 if(node.num() < 0 || node.num() > max)
-                    ManagerSqlArbre::add(Arbre(true,max+1,node.parent()));
+                    ManagerSqlarbre::add(arbre(true,max+1,node.parent()));
                 else {
-                    VectorPtr<Arbre> nodes = getList(Arbre::Num,node.num(),Arbre::Num,bmps::condition::SupEgal,false);
+                    vector_ptr<arbre> nodes = getList(arbre::Num,node.num(),arbre::Num,bmps::condition::SupEgal,false);
                     for(auto i = nodes.begin(); i != nodes.end(); ++i) {
                         i->setNum(i->num() + 1);
-                        ManagerSqlArbre::modify(*i);
+                        ManagerSqlarbre::modify(*i);
                     }
-                    ManagerSqlArbre::add(node);
+                    ManagerSqlarbre::add(node);
                 }
             }
         }
@@ -89,35 +89,35 @@ void ManagerForArbre::add(const Arbre &node) {
             if(node.num())
                 throw std::invalid_argument("Une racine doit avoir un numéro nul.");
             else
-                ManagerSqlArbre::add(node);
+                ManagerSqlarbre::add(node);
         }
     }
     else
         throw std::invalid_argument("Le nouveau noeud ajouté doit être une feuille.");
 }
 
-void ManagerForArbre::addUnstable(Arbre &node) {
+void ManagerForarbre::addUnstable(arbre &node) {
     if(node.feuille()) {
         if(node.parent()) {
-            Arbre parent(node.parent());
+            arbre parent(node.parent());
             get(parent);
             if(parent.feuille()) {
                 if(node.num())
                     throw std::invalid_argument("Le premier descendnat doit avoir un numéro nul.");
                 else
-                    ManagerSqlArbre::add(node);
+                    ManagerSqlarbre::add(node);
                 parent.setFeuille(false);
-                ManagerSqlArbre::modify(parent);
+                ManagerSqlarbre::modify(parent);
             }
             else {
                 auto max = size(node.parent());
                 if(node.num() < 0 || node.num() > max) {
                     node.setNum(max+1);
-                    ManagerSqlArbre::add(node);
+                    ManagerSqlarbre::add(node);
                 }
                 else {
                     deplace(node);
-                    ManagerSqlArbre::add(node);
+                    ManagerSqlarbre::add(node);
                 }
             }
         }
@@ -125,33 +125,33 @@ void ManagerForArbre::addUnstable(Arbre &node) {
             if(node.num())
                 throw std::invalid_argument("Une racine doit avoir un numéro nul.");
             else
-                ManagerSqlArbre::add(node);
+                ManagerSqlarbre::add(node);
         }
     }
     else
         throw std::invalid_argument("Le nouveau noeud ajouté doit être une feuille.");
 }
 
-void ManagerForArbre::addUnstable(const Arbre &node) {
+void ManagerForarbre::addUnstable(const arbre &node) {
     if(node.feuille()) {
         if(node.parent()) {
-            Arbre parent(node.parent());
+            arbre parent(node.parent());
             get(parent);
             if(parent.feuille()) {
                 if(node.num())
                     throw std::invalid_argument("Le premier descendnat doit avoir un numéro nul.");
                 else
-                    ManagerSqlArbre::add(node);
+                    ManagerSqlarbre::add(node);
                 parent.setFeuille(false);
-                ManagerSqlArbre::modify(parent);
+                ManagerSqlarbre::modify(parent);
             }
             else {
                 auto max = size(node.parent());
                 if(node.num() < 0 || node.num() > max)
-                    ManagerSqlArbre::add(Arbre(true,max+1,node.parent()));
+                    ManagerSqlarbre::add(arbre(true,max+1,node.parent()));
                 else {
                     deplace(node);
-                    ManagerSqlArbre::add(node);
+                    ManagerSqlarbre::add(node);
                 }
             }
         }
@@ -159,54 +159,54 @@ void ManagerForArbre::addUnstable(const Arbre &node) {
             if(node.num())
                 throw std::invalid_argument("Une racine doit avoir un numéro nul.");
             else
-                ManagerSqlArbre::add(node);
+                ManagerSqlarbre::add(node);
         }
     }
     else
         throw std::invalid_argument("Le nouveau noeud ajouté doit être une feuille.");
 }
 
-bool ManagerForArbre::del(idt id) {
-    Arbre node(id);
+bool ManagerForarbre::del(idt id) {
+    arbre node(id);
     if(!get(node))
         return true;
-    if(!node.feuille() || !ManagerSqlArbre::del(node.id()))
+    if(!node.feuille() || !ManagerSqlarbre::del(node.id()))
         return false;
     if(node.parent()) {
-        if(exists(Arbre::Parent,node.parent())) {
-            VectorPtr<Arbre> nodes = getList(Arbre::Num,node.num(),Arbre::Parent,node.parent(),Arbre::Num,bmps::condition::Sup);
+        if(exists(arbre::Parent,node.parent())) {
+            vector_ptr<arbre> nodes = getList(arbre::Num,node.num(),arbre::Parent,node.parent(),arbre::Num,bmps::condition::Sup);
             for(auto i = nodes.begin(); i != nodes.end(); ++i) {
                 i->setNum(i->num() - 1);
-                ManagerSqlArbre::modify(*i);
+                ManagerSqlarbre::modify(*i);
             }
         }
         else {
-            Arbre parent(node.parent());
+            arbre parent(node.parent());
             get(parent);
             parent.setFeuille(true);
-            ManagerSqlArbre::modify(parent);
+            ManagerSqlarbre::modify(parent);
         }
     }
     return true;
 }
 
-/*void ManagerForArbre::delUnstable(const Arbre & node)
+/*void ManagerForarbre::delUnstable(const arbre &node)
 {
     if(!node.feuille())
     {
-        ListPtr<Arbre> childs(getList(Arbre::Parent,node.id()));
-        for(ListPtr<Arbre>::iterator i = childs.begin(); i != childs.end(); ++i)
+        list_ptr<arbre> childs(getList(arbre::Parent,node.id()));
+        for(list_ptr<arbre>::iterator i = childs.begin(); i != childs.end(); ++i)
             delUnstable(*i);
     }
-    ManagerSqlArbre::del(node.id());
+    ManagerSqlarbre::del(node.id());
 }*/
 
-bool ManagerForArbre::deplace(const Arbre & node) {
-    Arbre nodeBdd(node.num(),node.parent());
+bool ManagerForarbre::deplace(const arbre &node) {
+    arbre nodeBdd(node.num(),node.parent());
     if(existsUnique(nodeBdd)) {
         if(nodeBdd.id() != node.id()) {
             nodeBdd.setNum(-nodeBdd.num());
-            ManagerSqlArbre::modify(nodeBdd);
+            ManagerSqlarbre::modify(nodeBdd);
             return true;
         }
         else
@@ -216,8 +216,8 @@ bool ManagerForArbre::deplace(const Arbre & node) {
         return true;
 }
 
-void ManagerForArbre::modify(const Arbre & node) {
-    Arbre nodeBdd(node.id());
+void ManagerForarbre::modify(const arbre &node) {
+    arbre nodeBdd(node.id());
     get(nodeBdd);
     auto idParentBdd = nodeBdd.parent();
     auto numBdd = nodeBdd.num();
@@ -229,39 +229,39 @@ void ManagerForArbre::modify(const Arbre & node) {
                 num = max;
             if(numBdd != num) {
                 nodeBdd.setNum(-numBdd);
-                ManagerSqlArbre::modify(nodeBdd);
+                ManagerSqlarbre::modify(nodeBdd);
                 if(std::abs(numBdd - num) == 1) {
-                    Arbre nodeSuivant(num,node.parent());
+                    arbre nodeSuivant(num,node.parent());
                     getUnique(nodeSuivant);
                     nodeSuivant.setNum(numBdd);
-                    ManagerSqlArbre::modify(nodeSuivant);
+                    ManagerSqlarbre::modify(nodeSuivant);
                 }
                 else if(num < numBdd) {
-                    VectorPtr<Arbre> nodes = getList(Arbre::Parent,node.parent(),Arbre::Num,num,Arbre::Num,numBdd,
-                                                Arbre::Num,bmps::condition::Egal,bmps::condition::SupEgal,bmps::condition::Inf,false);
+                    vector_ptr<arbre> nodes = getList(arbre::Parent,node.parent(),arbre::Num,num,arbre::Num,numBdd,
+                                                arbre::Num,bmps::condition::Egal,bmps::condition::SupEgal,bmps::condition::Inf,false);
                     for(auto i = nodes.begin(); i != nodes.end(); ++i) {
                         i->setNum(i->num() + 1);
-                        ManagerSqlArbre::modify((*i));
+                        ManagerSqlarbre::modify((*i));
                     }
                 }
                 else {
-                    VectorPtr<Arbre> nodes = getList(Arbre::Parent,node.parent(),Arbre::Num,numBdd,Arbre::Num,num,
-                                                Arbre::Num,bmps::condition::Egal,bmps::condition::Sup,bmps::condition::InfEgal);
+                    vector_ptr<arbre> nodes = getList(arbre::Parent,node.parent(),arbre::Num,numBdd,arbre::Num,num,
+                                                arbre::Num,bmps::condition::Egal,bmps::condition::Sup,bmps::condition::InfEgal);
                     for(auto i = nodes.begin(); i != nodes.end(); ++i) {
                         i->setNum(i->num() - 1);
-                        ManagerSqlArbre::modify((*i));
+                        ManagerSqlarbre::modify((*i));
                     }
                 }
                 nodeBdd.setNum(num);
             }
         }
         else {
-            nodeBdd.setParent(node.parent());
-            Arbre parent(nodeBdd.parent());
+            nodeBdd.set_parent(node.parent());
+            arbre parent(nodeBdd.parent());
             get(parent);
             if(parent.feuille()) {
                 parent.setFeuille(false);
-                ManagerSqlArbre::modify(parent);
+                ManagerSqlarbre::modify(parent);
                 nodeBdd.setNum(0);
             }
             else {
@@ -269,95 +269,95 @@ void ManagerForArbre::modify(const Arbre & node) {
                 if(node.num() < 0 || node.num() > max)
                     nodeBdd.setNum(max + 1);
                 else {
-                    VectorPtr<Arbre> nodes(getList(Arbre::Parent,node.parent(),Arbre::Num,node.num(),
-                                                Arbre::Num,bmps::condition::Egal,bmps::condition::SupEgal,false));
+                    vector_ptr<arbre> nodes(getList(arbre::Parent,node.parent(),arbre::Num,node.num(),
+                                                arbre::Num,bmps::condition::Egal,bmps::condition::SupEgal,false));
                     for(auto i = nodes.begin(); i != nodes.end(); ++i) {
                         i->setNum(i->num() + 1);
-                        ManagerSqlArbre::modify((*i));
+                        ManagerSqlarbre::modify((*i));
                     }
                     nodeBdd.setNum(node.num());
                 }
             }
         }
-        ManagerSqlArbre::modify(nodeBdd);
+        ManagerSqlarbre::modify(nodeBdd);
     }
     else {
-        nodeBdd.setParent(0);
+        nodeBdd.set_parent(0);
         nodeBdd.setNum(0);
-        ManagerSqlArbre::modify(nodeBdd);
+        ManagerSqlarbre::modify(nodeBdd);
     }
 
-    if(idParentBdd != 0 && idParentBdd != nodeBdd.parent()) {
-        if(exists(Arbre::Parent,idParentBdd)) {
-            VectorPtr<Arbre> nodes
-                    = getList(Arbre::Parent,idParentBdd,Arbre::Num,numBdd,Arbre::Num,bmps::condition::Egal,bmps::condition::Sup);
+    if(idParentBdd != 0 &&idParentBdd != nodeBdd.parent()) {
+        if(exists(arbre::Parent,idParentBdd)) {
+            vector_ptr<arbre> nodes
+                    = getList(arbre::Parent,idParentBdd,arbre::Num,numBdd,arbre::Num,bmps::condition::Egal,bmps::condition::Sup);
             for(auto i = nodes.begin(); i != nodes.end(); ++i) {
                 i->setNum(i->num() - 1);
-                ManagerSqlArbre::modify(*i);
+                ManagerSqlarbre::modify(*i);
             }
         }
         else {
-            Arbre parent(idParentBdd);
+            arbre parent(idParentBdd);
             get(parent);
             parent.setFeuille(true);
-            ManagerSqlArbre::modify(parent);
+            ManagerSqlarbre::modify(parent);
         }
     }
 }
 
-void ManagerForArbre::modifyUnstable(const Arbre & node) {
-    Arbre nodeBdd(node.id());
+void ManagerForarbre::modifyUnstable(const arbre &node) {
+    arbre nodeBdd(node.id());
     get(nodeBdd);
     auto max = size(node.parent());
     if(node.num() < 0 || node.num() > max)
-        ManagerSqlArbre::modify(Arbre(nodeBdd.feuille(),max+1,node.parent(),node.id()));
+        ManagerSqlarbre::modify(arbre(nodeBdd.feuille(),max+1,node.parent(),node.id()));
     else {
         if(deplace(node))
-            ManagerSqlArbre::modify(node);
+            ManagerSqlarbre::modify(node);
     }
 
     if(node.parent() != nodeBdd.parent()) {
-        if(!exists(Arbre::Parent,nodeBdd.parent())) {
-            Arbre nodeBddParent(nodeBdd.parent());
+        if(!exists(arbre::Parent,nodeBdd.parent())) {
+            arbre nodeBddParent(nodeBdd.parent());
             get(nodeBddParent);
             nodeBddParent.setFeuille(true);
-            ManagerSqlArbre::modify(nodeBddParent);
+            ManagerSqlarbre::modify(nodeBddParent);
         }
 
-        Arbre nodeParent(node.parent());
+        arbre nodeParent(node.parent());
         get(nodeParent);
         if(nodeParent.feuille()) {
             nodeParent.setFeuille(false);
-            ManagerSqlArbre::modify(nodeParent);
+            ManagerSqlarbre::modify(nodeParent);
         }
     }
 }
 
-void ManagerForArbre::modifyStableUnstable(const Arbre & node) {
-    Arbre nodeBdd(node.id());
+void ManagerForarbre::modifyStableUnstable(const arbre &node) {
+    arbre nodeBdd(node.id());
     get(nodeBdd);
     auto max = size(node.parent());
     if(node.num() < 0 || node.num() > max)
-        ManagerSqlArbre::modify(Arbre(nodeBdd.feuille(),max+1,node.parent(),node.id()));
+        ManagerSqlarbre::modify(arbre(nodeBdd.feuille(),max+1,node.parent(),node.id()));
     else {
         if(deplace(node))
-            ManagerSqlArbre::modify(node);
+            ManagerSqlarbre::modify(node);
     }
 
-    if(nodeBdd.parent() != 0 && nodeBdd.parent() != node.parent()) {
-        if(exists(Arbre::Parent,nodeBdd.parent())) {
-            VectorPtr<Arbre> nodes
-                    = getList(Arbre::Parent,nodeBdd.parent(),Arbre::Num,nodeBdd.num(),Arbre::Num,bmps::condition::Egal,bmps::condition::Sup);
+    if(nodeBdd.parent() != 0 &&nodeBdd.parent() != node.parent()) {
+        if(exists(arbre::Parent,nodeBdd.parent())) {
+            vector_ptr<arbre> nodes
+                    = getList(arbre::Parent,nodeBdd.parent(),arbre::Num,nodeBdd.num(),arbre::Num,bmps::condition::Egal,bmps::condition::Sup);
             for(auto i = nodes.begin(); i != nodes.end(); ++i) {
                 i->setNum(i->num() - 1);
-                ManagerSqlArbre::modify((*i));
+                ManagerSqlarbre::modify((*i));
             }
         }
         else {
-            Arbre parent(nodeBdd.parent());
+            arbre parent(nodeBdd.parent());
             get(parent);
             parent.setFeuille(true);
-            ManagerSqlArbre::modify(parent);
+            ManagerSqlarbre::modify(parent);
         }
     }
 }

@@ -3,33 +3,33 @@
 using namespace modelMPS;
 
 ///////////////////////////////////////// TableModel //////////////////////////
-TableModel::TableModel(bool uniqueLigne, bool valideLigne, QObject * parent)
+TableModel::TableModel(bool uniqueLigne, bool valideLigne, QObject *parent)
     : AbstractColonnesModel (uniqueLigne,valideLigne,parent){
     connect(this,&TableModel::etatLigneChanged,this,[this](szt ligne){
         auto row = ligneToRow(ligne);
         if(row != -1)
             emit headerDataChanged(Qt::Vertical,row,row);});
-    connect(this,&TableModel::etatRowsChanged,this,[this](const QModelIndex & parent, int first, int last){
-        if(!parent.isValid())
+    connect(this,&TableModel::etatRowsChanged,this,[this](const QModelIndex &parent, int first, int last){
+        if(!parent.is_valid())
             emit headerDataChanged(Qt::Vertical,first,last);});
     connect(this,&TableModel::etatsChanged,this,[this](){emit headerDataChanged(Qt::Vertical,0,rowCount());});
 }
 
-void TableModel::coller(const QModelIndexList & selection) {
+void TableModel::coller(const QModelIndexList &selection) {
     SelectedRange range(selection);
-    if(!range.isValid())
+    if(!range.is_valid())
         QMessageBox::critical(nullptr,tr("Erreur de séléction"),
                               tr("Ce type de séléction multiple n'est pas valide pour éffectuer un collage"));
     else {
         auto str = QApplication::clipboard()->text();
         auto rows = str.splitRef('\n');
-        if(!rows.isEmpty() && rows.last().isEmpty())
+        if(!rows.isEmpty() &&rows.last().isEmpty())
             {rows.removeLast();}
         auto numRows = rows.count();
         auto numColumns = rows.first().count('\t') + 1;
         DialogSelection n = DialogSelection::NoDialog;
-        if(range.rowCount() * range.columnCount() != 1
-            && (range.rowCount() < numRows || range.columnCount() < numColumns))
+        if(range.rowCount() *range.columnCount() != 1
+            &&(range.rowCount() < numRows || range.columnCount() < numColumns))
             n = dialogColler();
 
         switch (n) {
@@ -47,8 +47,8 @@ void TableModel::coller(const QModelIndexList & selection) {
                     for (auto j = 0; j < numColumns; ++j) {
                         auto row = range.top() + i;
                         auto column = range.left() + j;
-                        if (row < rowCount() && column < columnCount())
-                            setData(index(row, column), columns.at(j).toString());
+                        if (row < rowCount() &&column < columnCount())
+                            set_data(index(row, column), columns.at(j).to_string());
                     }
                 }
             }
@@ -60,8 +60,8 @@ void TableModel::coller(const QModelIndexList & selection) {
                                     range.row(i) : range.rows().back() + i - range.rowCount() + 1;
                         auto column =  j < range.columnCount() ?
                                     range.column(j) : range.columns().back() + j - range.columnCount() + 1;
-                        if (row < rowCount() && column < columnCount())
-                            setData(index(row, column), columns.at(j).toString());
+                        if (row < rowCount() &&column < columnCount())
+                            set_data(index(row, column), columns.at(j).to_string());
                     }
                 }
             }
@@ -74,7 +74,7 @@ void TableModel::coller(const QModelIndexList & selection) {
 
 void TableModel::copier(const QModelIndexList &selection) {
     SelectedRange range(selection);
-    if(!range.isValid())
+    if(!range.is_valid())
         QMessageBox::critical(nullptr,tr("Erreur de séléction"),
                               tr("Ce type de séléction multiple n'est pas valide pour éffectuer un collage"));
     else {
@@ -86,7 +86,7 @@ void TableModel::copier(const QModelIndexList &selection) {
                 for (int j = 0; j < range.columnCount(); ++j) {
                     if (j > 0)
                         str.append("\t");
-                    str.append(data(index(range.top() + i, range.left() + j)).toString());
+                    str.append(data(index(range.top() + i, range.left() + j)).to_string());
                 }
             }
         }
@@ -97,11 +97,11 @@ void TableModel::copier(const QModelIndexList &selection) {
                 for (int j = 0; j < range.columnCount(); ++j)  {
                     if (j > 0)
                         str += "\t";
-                    str += data(index(range.row(i), range.column(j))).toString();
+                    str += data(index(range.row(i), range.column(j))).to_string();
                 }
             }
         }
-        QApplication::clipboard()->setText(str);
+        QApplication::clipboard()->set_text(str);
     }
 }
 
@@ -112,11 +112,11 @@ void TableModel::couper(const QModelIndexList &selection) {
 
 TableModel::DialogSelection TableModel::dialogColler() const {
     QMessageBox dial;
-    dial.setText(tr("Erreur collage"));
+    dial.set_text(tr("Erreur collage"));
     dial.setInformativeText(tr("La taille de la selection est plus petite que la taille du contenu du presse papier."));
     dial.addButton(QMessageBox::Cancel);
-    QPushButton * collerInBouton = dial.addButton(tr("Coller dans la selection"),QMessageBox::YesRole);
-    QPushButton * collerOutBouton = dial.addButton(tr("Coller tout"),QMessageBox::NoRole);
+    QPushButton *collerInBouton = dial.addButton(tr("Coller dans la selection"),QMessageBox::YesRole);
+    QPushButton *collerOutBouton = dial.addButton(tr("Coller tout"),QMessageBox::NoRole);
     dial.exec();
 
     if(dial.clickedButton() == collerInBouton)
@@ -128,14 +128,14 @@ TableModel::DialogSelection TableModel::dialogColler() const {
 
 void TableModel::effacer(const QModelIndexList &selection) {
     for(QModelIndexList::const_iterator i = selection.cbegin(); i != selection.cend(); ++i)
-        setData(*i,QVariant());
+        set_data(*i,QVariant());
 }
 
 void TableModel::find(AbstractFindModel *findModel) {
     if(findModel){
         beginResetModel();
             m_rowToLigne.clear();
-            if(findModel->rootLeaf()){
+            if(findModel->root_leaf()){
                 for (szt id = 0; id != nbrLignes(); ++id)
                     if(findModel->testRoot(id))
                         m_rowToLigne.push_back(id);
@@ -145,7 +145,7 @@ void TableModel::find(AbstractFindModel *findModel) {
                     if(findModel->testTree(id))
                         m_rowToLigne.push_back(id);
             }
-            if(m_colonneSorted >=0 && m_colonneSorted < columnCount())
+            if(m_colonneSorted >=0 &&m_colonneSorted < columnCount())
                 sort(m_colonneSorted,m_orderSort);
         endResetModel();
     }
@@ -153,14 +153,14 @@ void TableModel::find(AbstractFindModel *findModel) {
 
 Qt::ItemFlags TableModel::flags(const QModelIndex &index) const {
     Qt::ItemFlags f = AbstractColonnesModel::flags(index);
-    if (index.isValid())
+    if (index.is_valid())
         f |= Qt::ItemNeverHasChildren;
     return f;
 }
 
 bool TableModel::hasChildren(const QModelIndex &parent) const {
-    if (!parent.isValid())
-        return rowCount(parent) > 0 && columnCount(parent) > 0;
+    if (!parent.is_valid())
+        return rowCount(parent) > 0 &&columnCount(parent) > 0;
     return false;
 }
 
@@ -168,7 +168,7 @@ QVariant TableModel::headerData(int section, Qt::Orientation orientation, int ro
     if(orientation == Qt::Vertical){
         if(role == Qt::DisplayRole)
             return section + 1;
-        if((m_valideLigne || m_uniqueLigne) && role == Qt::BackgroundRole)
+        if((m_valideLigne || m_uniqueLigne) &&role == Qt::BackgroundRole)
             return m_brush[m_etats[m_rowToLigne[static_cast<szt>(section)]]];
     }
     return AbstractColonnesModel::headerData(section,orientation,role);
@@ -178,7 +178,7 @@ QModelIndex TableModel::index(int row, int column, const QModelIndex &parent) co
     {return hasIndex(row, column, parent) ? createIndex(row, column) : QModelIndex();}
 
 
-bool TableModel::insertRows(int row, int count, const QModelIndex & parent) {
+bool TableModel::insertRows(int row, int count, const QModelIndex &parent) {
     if (count <= 0 || row < 0 || row > rowCount())
         return false;
     auto nbrLigneOld = nbrLignes();
@@ -195,14 +195,14 @@ bool TableModel::insertRows(int row, int count, const QModelIndex & parent) {
 int TableModel::ligneToRow(szt ligne) const {
     int row = 0;
     auto iter = m_rowToLigne.cbegin();
-    while (iter != m_rowToLigne.end() && *iter != ligne){
+    while (iter != m_rowToLigne.end() &&*iter != ligne){
         ++row;
         ++iter;
     }
     return iter != m_rowToLigne.end() ? row : -1;
 }
 
-bool TableModel::removeRows(int row, int count, const QModelIndex & parent) {
+bool TableModel::removeRows(int row, int count, const QModelIndex &parent) {
     count = std::min(count, rowCount()-row);
     if(count <= 0 || row < 0)
         return false;
@@ -247,7 +247,7 @@ bool TableModel::removeRows(int row, int count, const QModelIndex & parent) {
             for (auto write = m_rowToLigne.begin(); write != m_rowToLigne.end(); ++write) {
                 szt pos = 0;
                 read = vecId.begin();
-                while (read != vecId.end() && *write > *read) {
+                while (read != vecId.end() &&*write > *read) {
                     ++pos;
                     ++read;
                 }
@@ -279,7 +279,7 @@ bool TableModel::removeRows(int row, int count, const QModelIndex & parent) {
 
 bool TableModel::removeRowsSelected(const QModelIndexList &selection) {
     SelectedRange range(selection);
-    if(range.isValid() && range.left() == 0 && range.right() == columnCount() - 1){
+    if(range.is_valid() &&range.left() == 0 &&range.right() == columnCount() - 1){
         auto bloc = range.rowBloc();
         for (auto read = bloc.crbegin(); read != bloc.crend(); ++read)
             removeRows(read->first,read->second);
@@ -292,7 +292,7 @@ bool TableModel::removeRowsSelected(const QModelIndexList &selection) {
 void TableModel::resetRowToLigne() {
     m_rowToLigne.resize(nbrLignes());
     std::iota(m_rowToLigne.begin(),m_rowToLigne.end(),0);
-    if(m_colonneSorted >=0 && m_colonneSorted < columnCount())
+    if(m_colonneSorted >=0 &&m_colonneSorted < columnCount())
         sort(m_colonneSorted);
 }
 
@@ -327,8 +327,8 @@ void TableModel::updateAllEtats() {
     headerDataChanged(Qt::Vertical,0,rowCount()-1);
 }
 
-void TableModel::updateEtats(int first, int last, const QModelIndex & parent) {
-    if(!parent.isValid()) {
+void TableModel::updateEtats(int first, int last, const QModelIndex &parent) {
+    if(!parent.is_valid()) {
         AbstractColonnesModel::updateEtats(first,last,parent);
         headerDataChanged(Qt::Vertical,first,last);
     }
@@ -344,7 +344,7 @@ TableModel::SelectedRange::SelectedRange(const QModelIndexList &range)
         m_right = -1;
         m_top = -1;
         m_isRect = false;
-        m_isValid = false;
+        m_is_valid = false;
         m_cornersFound = true;
         m_validitySet = true;
     }
@@ -354,8 +354,8 @@ TableModel::SelectedRange::SelectedRange(const QModelIndexList &range)
     }
 }
 
-const std::vector<int> & TableModel::SelectedRange::columns() {
-    if(isRect() && m_columnList.empty()){
+const std::vector<int> &TableModel::SelectedRange::columns() {
+    if(isRect() &&m_columnList.empty()){
         m_columnList.resize(static_cast<szt>(m_right - m_left + 1));
         std::iota(m_columnList.begin(),m_columnList.end(),m_left);
     }
@@ -397,8 +397,8 @@ void TableModel::SelectedRange::findCorners() {
             else if(i->column() > m_right)
                 m_right = i->column();
         }
-        if((m_isRect = (m_right - m_left + 1) *  (m_bottom - m_top + 1) == m_selection.count())) {
-            m_isValid = true;
+        if((m_isRect = (m_right - m_left + 1) * (m_bottom - m_top + 1) == m_selection.count())) {
+            m_is_valid = true;
             m_validitySet = true;
         }
         m_cornersFound = true;
@@ -422,8 +422,8 @@ std::list<std::pair<int,int>> TableModel::SelectedRange::rowBloc(){
     return list;
 }
 
-const std::vector<int> & TableModel::SelectedRange::rows() {
-    if(isRect() && m_rowList.empty()){
+const std::vector<int> &TableModel::SelectedRange::rows() {
+    if(isRect() &&m_rowList.empty()){
         m_rowList.resize(static_cast<szt>(m_bottom - m_top + 1));
         std::iota(m_rowList.begin(),m_rowList.end(),m_top);
     }
@@ -433,7 +433,7 @@ const std::vector<int> & TableModel::SelectedRange::rows() {
 
 void TableModel::SelectedRange::setValidity() {
     if(!m_validitySet) {
-        if(!(m_isValid = isRect())){
+        if(!(m_is_valid = isRect())){
             // Réorganise la sélection ligne par ligne.
             std::map<int,std::list<int>> list;
             for(auto i = m_selection.cbegin(); i != m_selection.cend(); ++i)
@@ -446,12 +446,12 @@ void TableModel::SelectedRange::setValidity() {
             for (auto i = list.cbegin(); i != list.cend(); ++i, ++j)
                 *j = i->first;
             // Vérifie si tout les lignes contiennent la même sélection.
-            m_isValid = true;
+            m_is_valid = true;
             if(list.size() != 1) {
                 auto i = ++(list.begin());
-                while(m_isValid && i != list.end()) {
+                while(m_is_valid &&i != list.end()) {
                     i->second.sort();
-                    m_isValid = list.cbegin()->second == i->second;
+                    m_is_valid = list.cbegin()->second == i->second;
                     ++i;
                 }
             }

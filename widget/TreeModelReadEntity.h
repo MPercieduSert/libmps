@@ -5,7 +5,7 @@
 #define TREEMODELREADENTITY_H
 
 #include "AbstractManager.h"
-#include "Entity.h"
+#include "entity.h"
 #include "TreeModelReadTemp.h"
 
 namespace modelMPS {

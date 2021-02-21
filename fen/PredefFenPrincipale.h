@@ -11,10 +11,10 @@
 
 namespace fenMPS {
 /*! \ingroup groupeFen
- * \brief Fenêtre principale de l'application avec de fonctionnalité prédéfinie.
+ *\brief Fenêtre principale de l'application avec de fonctionnalité prédéfinie.
  *
- * Fenêtre principale:
- *  + Crée le menu de gestion de la base de donées.
+ *Fenêtre principale:
+ * + Crée le menu de gestion de la base de donées.
  *
  */
 class PredefFenPrincipale : public FenPrincipale {
@@ -27,16 +27,16 @@ protected:
 
 public:
     //! Constructeur.
-    explicit PredefFenPrincipale(AbstractNoyau * noyau, std::unique_ptr<bddMPS::Bdd> &&bdd, PredefZoneCentrale * centralZone,
-                           const QString & bddPathXML,
-                           const QString & configPath = QDir::currentPath().append("/Config.xml"),
+    explicit PredefFenPrincipale(AbstractNoyau *noyau, std::unique_ptr<bddMPS::Bdd> &&bdd, PredefZoneCentrale *centralZone,
+                           const QString &bddPathXML,
+                           const QString &configPath = QDir::currentPath().append("/Config.xml"),
                            QWidget *parent = nullptr);
 
     //! Destructeur.
     ~PredefFenPrincipale() override = default;
 
     //! Accesseur du pointeur de la zone centrale.
-    PredefZoneCentrale * centraleZone()
+    PredefZoneCentrale *centraleZone()
         {return static_cast<PredefZoneCentrale *>(m_zoneCentrale);}
 
 protected:
@@ -44,8 +44,8 @@ protected:
     void addMenuBdd();
 
     //! Connecte une QAction à l'ouverture d'un onglet.
-    void connectActionToOpenTab(QAction * action, const std::pair<int,int>& pairIndex,
-                                const std::vector<QVariant> & vec = std::vector<QVariant>());
+    void connectActionToOpenTab(QAction *action, const std::pair<int,int>&pairIndex,
+                                const std::vector<QVariant> &vec = std::vector<QVariant>());
 public slots:
     //! Exporte des entités de la base de données dans un fichier xml.
     void export_xml();

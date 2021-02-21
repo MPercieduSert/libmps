@@ -20,10 +20,10 @@
 
 namespace fenMPS {
 /*! \ingroup groupeFen
- * \brief Fenêtre principale de l'application.
+ *\brief Fenêtre principale de l'application.
  *
- * Fenêtre principale:
- *  + Crée les différents menus.
+ *Fenêtre principale:
+ * + Crée les différents menus.
  *
  */
 class FenPrincipale : public QMainWindow {
@@ -49,20 +49,20 @@ protected:
     AbstractZoneCentrale *m_zoneCentrale;    //!< Zone centrale.
 
     // Noyau
-    AbstractNoyau * m_noyau;                //!< Noyau de l'application.
+    AbstractNoyau *m_noyau;                //!< Noyau de l'application.
 
 public:
     //! Constructeur.
-    explicit FenPrincipale(AbstractNoyau * noyau, std::unique_ptr<bddMPS::Bdd> &&bdd, AbstractZoneCentrale * centralZone,
-                           const QString & bddPathXML,
-                           const QString & configPath = QDir::currentPath().append("/Config.xml"),
+    explicit FenPrincipale(AbstractNoyau *noyau, std::unique_ptr<bddMPS::Bdd> &&bdd, AbstractZoneCentrale *centralZone,
+                           const QString &bddPathXML,
+                           const QString &configPath = QDir::currentPath().append("/Config.xml"),
                            QWidget *parent = nullptr);
 
     //! Destructeur.
     ~FenPrincipale() override = default;
 
     //! Accesseur du noyau.
-    virtual AbstractNoyau * noyau()
+    virtual AbstractNoyau *noyau()
         {return m_noyau;}
 
 public slots:
@@ -74,7 +74,7 @@ protected:
     void addMenuBdd();
 
     //! Connecte une QAction à l'ouverture d'un dialogue de création et modification.
-    template<class From> void connectActionToNewModifDialog(QAction * action, bool newEnt);
+    template<class From> void connectActionToNewModifDialog(QAction *action, bool newEnt);
 
     //! Crée les différente action des menus et toolbars de la fenêtre principale.
     void createAction();
@@ -86,9 +86,9 @@ protected:
     void createToolBar();
 };
 
-template<class Form> void FenPrincipale::connectActionToNewModifDialog(QAction * action, bool newEnt) {
+template<class Form> void FenPrincipale::connectActionToNewModifDialog(QAction *action, bool newEnt) {
     connect(action,&QAction::triggered,this, [this,newEnt](){
-                            auto * form = new Form(noyau()->bdd(), newEnt);
+                            auto *form = new Form(noyau()->bdd(), newEnt);
                             dialogMPS::NewModifDialog diag(form,this);
                             diag.exec();
                         });

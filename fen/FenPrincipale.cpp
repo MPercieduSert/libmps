@@ -2,15 +2,15 @@
 
 using namespace fenMPS;
 
-FenPrincipale::FenPrincipale(AbstractNoyau * noyau, std::unique_ptr<bmps::Bdd> && bdd, AbstractZoneCentrale * zoneCentrale,
-                             const QString & bddPathXML, const QString & configPath, QWidget *parent) :
+FenPrincipale::FenPrincipale(AbstractNoyau *noyau, std::unique_ptr<bmps::Bdd> &&bdd, AbstractZoneCentrale *zoneCentrale,
+                             const QString &bddPathXML, const QString &configPath, QWidget *parent) :
     QMainWindow(parent), m_zoneCentrale(zoneCentrale), m_noyau(noyau) {
-    m_noyau->setParent(this);
+    m_noyau->set_parent(this);
     m_noyau->setConfigByPath(configPath,this);
     m_noyau->setBdd(std::move(bdd),bddPathXML,this);
 
     //m_menuNew = new QMenu(this);
-    //m_menuNew->setParent(this);
+    //m_menuNew->set_parent(this);
     // Initialise la zone centrale.
 
     //zoneCentrale->init(this);

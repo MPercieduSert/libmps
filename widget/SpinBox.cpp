@@ -10,7 +10,7 @@ SpinBoxAnnee::SpinBoxAnnee(int value, QWidget *parent): QAbstractSpinBox(parent)
 }
 
 void SpinBoxAnnee::printValue()
-    {lineEdit()->setText(QString::number(m_value)+"-"+QString::number(m_value+1));}
+    {lineEdit()->set_text(QString::number(m_value)+"-"+QString::number(m_value+1));}
 
 void SpinBoxAnnee::stepBy(int steps) {
     if(m_value + steps > 0) {
@@ -23,7 +23,7 @@ QAbstractSpinBox::StepEnabled SpinBoxAnnee::stepEnabled() const noexcept
     {return StepUpEnabled|StepDownEnabled;}
 
 ////////////////////////////////////////////// SpinBoxNumExclu /////////////////////////////////////////
-SpinBoxNumExclu::SpinBoxNumExclu(const std::list<int> & liste, QWidget *parent)
+SpinBoxNumExclu::SpinBoxNumExclu(const std::list<int> &liste, QWidget *parent)
     : QAbstractSpinBox(parent), m_list(liste) {
     setReadOnly(true);
     setAlignment(Qt::AlignHCenter);
@@ -32,18 +32,18 @@ SpinBoxNumExclu::SpinBoxNumExclu(const std::list<int> & liste, QWidget *parent)
 }
 
 void SpinBoxNumExclu::printValue() {
-    if(!m_minVisible && m_value == m_minimum)
-        lineEdit()->setText(QString());
+    if(!m_minVisible &&m_value == m_minimum)
+        lineEdit()->set_text(QString());
     else
-        lineEdit()->setText(QString::number(m_value + m_offset));
+        lineEdit()->set_text(QString::number(m_value + m_offset));
 }
 
 void SpinBoxNumExclu::setList(const std::list<int> &list) {
     m_list = list;
-    setValue(m_value);
+    set_value(m_value);
 }
 
-void SpinBoxNumExclu::setValue(int val) {
+void SpinBoxNumExclu::set_value(int val) {
     if(val >= m_minimum) {
         m_value = val;
         if(std::find(m_list.cbegin(),m_list.cend(),val) == m_list.cend()) {

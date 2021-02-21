@@ -1,9 +1,9 @@
-#include "TableEntityView.h"
+#include "TableentityView.h"
 
 using namespace widgetMPS;
 
-TableEntityView::TableEntityView(QWidget *parent)
+TableentityView::TableentityView(QWidget *parent)
  : QTableView (parent)
 {}
 
-TableEntityView::~TableEntityView() = default;
+TableentityView::~TableentityView() = default;

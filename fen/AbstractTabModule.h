@@ -10,7 +10,7 @@
 
 namespace fenMPS {
 /*! \ingroup groupeFen
- * \brief Classe mère des onglets.
+ *\brief Classe mère des onglets.
  */
 class AbstractTabModule : public QWidget {
     Q_OBJECT
@@ -20,7 +20,7 @@ protected:
 public:
     enum {NoId = -1};
     //! Constructeur.
-    explicit AbstractTabModule(const std::pair<int,int> & pairIndex, QWidget * parent = nullptr);
+    explicit AbstractTabModule(const std::pair<int,int> &pairIndex, QWidget *parent = nullptr);
 
     //! Destructeur.
     virtual ~AbstractTabModule() override = default;
@@ -29,7 +29,7 @@ public:
     virtual QString title() const = 0;
 
     //! Accesseur de pairIndex.
-    const std::pair<int,int> & pairIndex() const noexcept
+    const std::pair<int,int> &pairIndex() const noexcept
         {return m_pairIndex;}
 
 signals:
@@ -41,7 +41,7 @@ signals:
 
 public slots:
     //! Action à effectuer lorsque l'onglet devient actif.
-    virtual void becomeCurrent();
+    virtual void become_current();
 
     //! A réimplémenter pour effectuer l'action coller.
     virtual void coller()   {}

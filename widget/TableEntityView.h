@@ -5,20 +5,20 @@
 #define TABLEENTITYVIEW_H
 
 #include <QTableView>
-#include "AbstractEntityTableau.h"
+#include "AbstractentityTableau.h"
 
 namespace widgetMPS {
 /*! \ingroup groupeWidget
- * \brief Vue en tableau des donnée d'un model de type AbstractTableEntityModel.
+ *\brief Vue en tableau des donnée d'un model de type AbstractTableentityModel.
  */
-class TableEntityView : public QTableView {
+class TableentityView : public QTableView {
     Q_OBJECT
 protected:
 
 public:
-    TableEntityView(QWidget * parent = nullptr);
+    TableentityView(QWidget *parent = nullptr);
 
-    ~TableEntityView();
+    ~TableentityView();
 };
 }
 #endif // TABLEENTITYVIEW_H

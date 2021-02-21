@@ -10,7 +10,7 @@
 #include <QVBoxLayout>
 #include <QWidget>
 
-#include "EntityPredef.h"
+#include "entity_predef.h"
 #include "MotCleModel.h"
 
 namespace widgetMPS {

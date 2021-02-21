@@ -9,19 +9,19 @@
 #include <QLineEdit>
 #include <QList>
 #include <QSpinBox>
-#include "NumToTexte.h"
+#include "num_to_texte.h"
 
 /*! \defgroup groupeWidget Widgets
- * \brief Ensemble de widgets spécialisés.
+ *\brief Ensemble de widgets spécialisés.
  */
 
 /*! \ingroup groupeWidget
- * \brief Espace de noms des widgets personnalisé.
+ *\brief Espace de noms des widgets personnalisé.
  */
 namespace widgetMPS {
-using namespace typeMPS;
+using namespace type_mps;
 /*! \ingroup groupeWidget
- * \brief Spin Box pour les années scolaires.
+ *\brief Spin Box pour les années scolaires.
  */
 class SpinBoxAnnee : public QAbstractSpinBox
 {
@@ -50,7 +50,7 @@ public slots:
 };
 
 /*! \ingroup groupeWidget
- * \brief Spin Box affichant un multiple d'une décimale donné (inverse d'un entier fixé).
+ *\brief Spin Box affichant un multiple d'une décimale donné (inverse d'un entier fixé).
  */
 class SpinBoxDecimale : public QSpinBox {
     Q_OBJECT
@@ -59,15 +59,15 @@ protected:
     int m_precision;                    //!< Nombre de chiffre après.
     QRegularExpressionValidator m_valide;   //!< Validateur de l'expression.
 public:
-    using QSpinBox::setValue;
+    using QSpinBox::set_value;
 
     //! Constructeur.
-    SpinBoxDecimale(QWidget * parent = nullptr)
+    SpinBoxDecimale(QWidget *parent = nullptr)
         : QSpinBox(parent)
     {setPrecision(1);}
 
     //! Constructeur.
-    SpinBoxDecimale(int decimale, int precision = 1, QWidget * parent = nullptr)
+    SpinBoxDecimale(int decimale, int precision = 1, QWidget *parent = nullptr)
         : QSpinBox(parent) {
         setDecimale(decimale);
         setPrecision(precision);
@@ -88,11 +88,11 @@ public:
     //! Mutateur de l'inverse de l'atome.
     void setDecimale(int decimale) {
         if(decimale > 0) {
-            auto val = static_cast<int>(std::lround(static_cast<double>(value()) / m_decimale * decimale));
-            auto max = static_cast<int>(std::lround(static_cast<double>(maximum()) / m_decimale * decimale));
+            auto val = static_cast<int>(std::lround(static_cast<double>(value()) / m_decimale *decimale));
+            auto max = static_cast<int>(std::lround(static_cast<double>(maximum()) / m_decimale *decimale));
             m_decimale = decimale;
             setMaximum(max);
-            setValue(val);
+            set_value(val);
         }
         else
             throw std::invalid_argument("SpinBoxDecimale::setDecimale(int) : l'argument doit être strictement positif");
@@ -100,11 +100,11 @@ public:
 
     //! Mutateur du maximum en double.
     void setMaximumDouble(double max)
-        {setMaximum(static_cast<int>(std::lround(max * m_decimale)));}
+        {setMaximum(static_cast<int>(std::lround(max *m_decimale)));}
 
     //! Mutateur du minimum en double.
     void setMinimumDouble(double max)
-        {setMinimum(static_cast<int>(std::lround(max * m_decimale)));}
+        {setMinimum(static_cast<int>(std::lround(max *m_decimale)));}
 
     //! Mutateur de la présicion.
     void setPrecision(int precision) {
@@ -114,16 +114,16 @@ public:
                 m_valide.setRegularExpression(QRegularExpression(QString("\\d*")));
             else
                 m_valide.setRegularExpression(QRegularExpression(QString("\\d*.?\\d{0,").append(QString::number(m_precision)).append("}")));
-            lineEdit()->setText(textFromValue(value()));
+            lineEdit()->set_text(textFromValue(value()));
         }
     }
 
     //! Mutateur de la valeur en double.
-    void setValueDouble(double value)
-        {setValue(static_cast<int>(std::lround(value * m_decimale)));}
+    void set_valueDouble(double value)
+        {set_value(static_cast<int>(std::lround(value *m_decimale)));}
 
     //! Teste la validité d'un QString pour le style courant.
-    QValidator::State validate(QString &input, int & pos) const override
+    QValidator::State validate(QString &input, int &pos) const override
         {return m_valide.validate(input,pos);}
 
     //! Accesseur de la valeur en double.
@@ -136,29 +136,29 @@ protected:
         {return QString::number(static_cast<double>(value)/m_decimale,'f',m_precision);}
 
     //! Réimplémentation de la manière de lire les valeur.
-    int valueFromText(const QString & text) const override
-        {return static_cast<int>(std::lround(text.toDouble() * m_decimale));}
+    int valueFromText(const QString &text) const override
+        {return static_cast<int>(std::lround(text.toDouble() *m_decimale));}
 };
 
 /*! \ingroup groupeWidget
- * \brief Spin Box affichant un entier positif sous diférent style
- * (arabe, romain, lettre minuscule, majsucule, grec minuscule, grec Majuscule.
+ *\brief Spin Box affichant un entier positif sous diférent style
+ *(arabe, romain, lettre minuscule, majsucule, grec minuscule, grec Majuscule.
  */
 class SpinBoxLettre : public QSpinBox {
     Q_OBJECT
 protected:
-    diversMPS::NumToTexte m_numToText;  //!< Convertisseur.
+    diversMPS::num_to_string m_numToText;  //!< Convertisseur.
 public:
     //! Constructeur.
-    SpinBoxLettre(enumt style = diversMPS::NumToTexte::Arabe, QWidget * parent = nullptr)
+    SpinBoxLettre(enumt style = diversMPS::num_to_string::Arabe_Style, QWidget *parent = nullptr)
         : QSpinBox(parent), m_numToText(style) {
         setMinimum(0);
     }
 
     //! Mutateur du style d'affichage des numéros.
-    void setStyle(enumt style) {
-        m_numToText.setStyle(style);
-        lineEdit()->setText(textFromValue(value()));
+    void set_style(enumt style) {
+        m_numToText.set_style(style);
+        lineEdit()->set_text(textFromValue(value()));
     }
 
     //! Acceseur du style d'affichage des numéros.
@@ -166,7 +166,7 @@ public:
         {return m_numToText.style();}
 
     //! Teste la validité d'un QString pour le style courant.
-    QValidator::State validate(QString &input, int & pos) const override
+    QValidator::State validate(QString &input, int &pos) const override
         {return m_numToText.validate(input,pos);}
 
 protected:
@@ -175,12 +175,12 @@ protected:
         {return m_numToText.texte(value);}
 
     //! Réimplémentation de la manière de lire les valeur.
-    int valueFromText(const QString & text) const override
+    int valueFromText(const QString &text) const override
         {return m_numToText.num(text);}
 };
 
 /*! \ingroup groupeWidget
- * \brief Spin Box affichant des entier strictement positif n'étant pas dans la liste transmise.
+ *\brief Spin Box affichant des entier strictement positif n'étant pas dans la liste transmise.
  */
 class SpinBoxNumExclu : public QAbstractSpinBox {
     Q_OBJECT
@@ -225,7 +225,7 @@ public:
     void setMinimum(int min) {
         m_minimum = min;
         if(m_value < m_minimum)
-            setValue(m_minimum);
+            set_value(m_minimum);
     }
 
     //! Mutateur de la visibilité du minimum.
@@ -241,7 +241,7 @@ public:
     }
 
     //! Mutateur de la valeur courante.
-    void setValue(int val);
+    void set_value(int val);
 
     //! Méthode virtuelle d'incrémentation.
     void stepBy(int steps) override;

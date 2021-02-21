@@ -12,7 +12,7 @@ FindWidget::FindWidget(FindModel *model, QWidget *parent)
     m_findButton = new QPushButton(tr("Chercher"));
     m_resetButton = new QPushButton(tr("Réinitialiser"));
     m_view = new NodeView(std::make_unique<widgetMPS::RoundedArcPainter>());
-    setFindModel(model);
+    set_findModel(model);
     m_view->setDelegate(new Delegate(this));
 
     // Calque
@@ -24,7 +24,7 @@ FindWidget::FindWidget(FindModel *model, QWidget *parent)
     m_mainLayout->addLayout(m_buttonsLayout);
 }
 
-void FindWidget::setFindModel(FindModel * model) {
+void FindWidget::set_findModel(FindModel *model) {
     m_view->setModel(model);
     if(m_model) {
         m_findButton->disconnect(this);
@@ -36,5 +36,5 @@ void FindWidget::setFindModel(FindModel * model) {
         connect(m_resetButton,&QPushButton::clicked,m_model,&FindModel::reset);
         connect(m_findButton,&QPushButton::clicked,m_model,&FindModel::find);
     }
-    m_model->setParent(this);
+    m_model->set_parent(this);
 }

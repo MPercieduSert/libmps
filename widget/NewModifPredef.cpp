@@ -2,13 +2,13 @@
 
 using namespace dialogMPS;
 //////////////////////////////////////////////// EvenementNewModifForm ////////////////////////////////////////
-EvenementNewModifForm::EvenementNewModifForm(bddMPS::Bdd &bdd, bool newEnt, QWidget * parent)
-    : AbstractTypeNcNomNewModifForm(static_cast<bddMPS::BddPredef &>(bdd),"evenement_root_tp",Evenement::ID,
+EvenementNewModifForm::EvenementNewModifForm(bddMPS::Bdd &bdd, bool newEnt, QWidget *parent)
+    : AbstractTypenc_nomNewModifForm(static_cast<bddMPS::BddPredef &>(bdd),"evenement_root_tp",Evenement::ID,
                                     "Type de l'événement :","Nom abrégé de l'événement :","Nom de l'événement :",
                                     newEnt,parent){
     // Nom
     if(!m_new)
-        setNoms(bdd.getList<Evenement>(Evenement::Nom));
+        set_noms(bdd.getList<Evenement>(Evenement::Nom));
     // Debut
     m_debutGroupe = new QGroupBox(tr("Début :"));
     m_debutDate = new QCalendarWidget;
@@ -27,8 +27,8 @@ EvenementNewModifForm::EvenementNewModifForm(bddMPS::Bdd &bdd, bool newEnt, QWid
     // Style
     m_styleLabel = new QLabel(tr("Style :"));
     m_styleICB = new widgetMPS::IdComboBox;
-    m_styleICB->addText(bdd.getList<EvenementStyle>(EvenementStyle::Nom),
-                        [](const EvenementStyle & style){return style.nom();});
+    m_styleICB->addText(bdd.getList<evenement_style>(evenement_style::Nom),
+                        [](const evenement_style &style){return style.nom();});
 
     // Titre
     m_titreLabel = new QLabel(tr("Titre :"));
@@ -63,7 +63,7 @@ EvenementNewModifForm::EvenementNewModifForm(bddMPS::Bdd &bdd, bool newEnt, QWid
 }
 
 void EvenementNewModifForm::connexion() {
-    AbstractTypeNcNomNewModifForm::connexion();
+    AbstractTypenc_nomNewModifForm::connexion();
     connect(m_unJourOption,&QCheckBox::stateChanged,this,[this](){
         if(m_unJourOption->checkState() == Qt::Checked) {
             m_finDate->setSelectedDate(m_debutDate->selectedDate());
@@ -102,8 +102,8 @@ void EvenementNewModifForm::save() {
     if(!m_new)
         m_bdd.get(eve);
     else
-        eve.setCreation(QDateTime::currentDateTime());
-    eve.setIdStyle(m_styleICB->id());
+        eve.set_creation(QDateTime::currentDate_Time());
+    eve.set_id_style(m_styleICB->id());
     if(m_unJourOption->isChecked())
         eve.add(Evenement::UnJour);
     if(m_jourEntierOption->isChecked())
@@ -111,43 +111,43 @@ void EvenementNewModifForm::save() {
     QDateTime dt;
     dt.setDate(m_debutDate->selectedDate());
     dt.setTime(m_debutHeure->time());
-    eve.setDebut(dt);
+    eve.set_debut(dt);
     dt.setDate(m_finDate->selectedDate());
     dt.setTime(m_finHeure->time());
-    eve.setFin(dt);
-    eve.setNc(nc());
-    eve.setNom(nom());
-    eve.setType(idType());
-    eve.setTitre(m_titreEdit->text());
+    eve.set_fin(dt);
+    eve.set_nc(nc());
+    eve.set_nom(nom());
+    eve.set_type(id_type());
+    eve.set_titre(m_titreEdit->text());
     m_bdd.save(eve);
 }
 void EvenementNewModifForm::updateData() {
     if(!m_new) {
         Evenement eve;
-        updateTemp<Evenement>(eve);
-        m_styleICB->setCurrentIndexId(eve.idStyle());
+        update_temp<Evenement>(eve);
+        m_styleICB->setCurrentIndexId(eve.id_style());
         m_unJourOption->setChecked(eve.code().test(Evenement::UnJour));
         m_jourEntierOption->setChecked(eve.code().test(Evenement::JourEntier));
         m_debutDate->setSelectedDate(eve.debut().date());
         m_debutHeure->setTime(eve.debut().time());
         m_finDate->setSelectedDate(eve.fin().date());
         m_finHeure->setTime(eve.fin().time());
-        m_titreEdit->setText(eve.titre());
+        m_titreEdit->set_text(eve.titre());
     }
 }
 
-//////////////////////////////////////////////// EvenementStyleNewModifForm ///////////////////////////////////
-EvenementStyleNewModifForm::EvenementStyleNewModifForm(bddMPS::Bdd &bdd, bool newEnt, QWidget * parent)
+//////////////////////////////////////////////// evenement_styleNewModifForm ///////////////////////////////////
+evenement_styleNewModifForm::evenement_styleNewModifForm(bddMPS::Bdd &bdd, bool newEnt, QWidget *parent)
     : AbstractNomNewModifForm(bdd,
                               tr("Nom du style d'événements :"),
                               newEnt,parent) {
     if(!newEnt)
-        setNoms(bdd.getList<EvenementStyle>(EvenementStyle::Nom));
+        set_noms(bdd.getList<evenement_style>(evenement_style::Nom));
     // Forme
     m_formGroupe = new QGroupBox(tr("Forme et bordure:"));
     m_formCB = new QComboBox;
-    for (auto forme = 0; forme != EvenementStyle::NbrFormeStyle; ++forme)
-        m_formCB->addItem(EvenementStyle::formeString(forme),forme);
+    for (auto forme = 0; forme != evenement_style::Nbr_Forme_Style; ++forme)
+        m_formCB->addItem(evenement_style::forme_string(forme),forme);
     m_bordureCB = new QComboBox;
     m_bordureCB->addItem(tr("Continue"), static_cast<int>(Qt::SolidLine));
     m_bordureCB->addItem(tr("Tiret"), static_cast<int>(Qt::DashLine));
@@ -233,19 +233,19 @@ EvenementStyleNewModifForm::EvenementStyleNewModifForm(bddMPS::Bdd &bdd, bool ne
     m_mainLayout->addWidget(m_texteGroupe);
 }
 
-void EvenementStyleNewModifForm::setColor(objet ob, const QColor & color) {
+void evenement_styleNewModifForm::setColor(objet ob, const QColor &color) {
     switch (ob) {
     case Bordure:
         m_bordureCouleur = color;
         m_bordureLabel->setStyleSheet("QLabel {background-color:"+m_bordureCouleur.name()+" }");
-        m_bordureLabel->setText(m_fondCouleur.name());
+        m_bordureLabel->set_text(m_fondCouleur.name());
         break;
     case Fond:
         m_fondCouleur = color;
         m_fondLabel->setStyleSheet("QLabel {background-color:"+m_fondCouleur.name()+" }");
         m_texteLabel->setStyleSheet("QLabel {background-color:"+m_fondCouleur.name()+"; color:"+m_texteCouleur.name()+" }");
         m_titreLabel->setStyleSheet("QLabel {background-color:"+m_fondCouleur.name()+"; color:"+m_titreCouleur.name()+" }");
-        m_fondLabel->setText(m_fondCouleur.name());
+        m_fondLabel->set_text(m_fondCouleur.name());
         break;
     case Texte:
         m_texteCouleur = color;
@@ -258,29 +258,29 @@ void EvenementStyleNewModifForm::setColor(objet ob, const QColor & color) {
     }
 }
 
-void EvenementStyleNewModifForm::save(){
-    EvenementStyle style(id());
-    style.setCouleurBordure(m_bordureCouleur.name());
-    style.setCouleurFond(m_fondCouleur.name());
-    style.setCouleurTexte(m_texteCouleur.name());
-    style.setCouleurTitre(m_titreCouleur.name());
-    style.setBordure(m_bordureCB->currentData().toInt());
-    style.setForme(m_formCB->currentData().toInt());
-    style.setTexture(m_textureCB->currentData().toUInt());
-    style.setPoliceTexte(m_texteLabel->font().toString());
-    style.setPoliceTitre(m_titreLabel->font().toString());
-    style.setNom(nom());
+void evenement_styleNewModifForm::save(){
+    evenement_style style(id());
+    style.set_couleur_bordure(m_bordureCouleur.name());
+    style.set_couleur_fond(m_fondCouleur.name());
+    style.set_couleur_texte(m_texteCouleur.name());
+    style.set_couleur_titre(m_titreCouleur.name());
+    style.set_bordure(m_bordureCB->currentData().toInt());
+    style.set_forme(m_formCB->currentData().toInt());
+    style.set_texture(m_textureCB->currentData().toUInt());
+    style.set_police_texte(m_texteLabel->font().to_string());
+    style.set_police_titre(m_titreLabel->font().to_string());
+    style.set_nom(nom());
     m_bdd.save(style);
 }
 
-void EvenementStyleNewModifForm::updateData() {
-    EvenementStyle style;
+void evenement_styleNewModifForm::updateData() {
+    evenement_style style;
     if(m_new) {
-        style.setId(EvenementStyle::IdStyleDefault);
+        style.set_id(evenement_style::Id_Style_Default);
         m_bdd.get(style);
     }
     else
-        updateTemp<EvenementStyle>(style);
+        update_temp<evenement_style>(style);
     setColor(Bordure,QColor(style.couleurBordure()));
     setColor(Fond,QColor(style.couleurFond()));
     setColor(Texte,QColor(style.couleurTexte()));
@@ -299,15 +299,15 @@ void EvenementStyleNewModifForm::updateData() {
 void SourceNewModifForm::save() {
     Source src;
     if(!m_new)
-        src.setId(id());
-    src.setNc(nc());
-    src.setNom(nom());
-    src.setType(idType());
+        src.set_id(id());
+    src.set_nc(nc());
+    src.set_nom(nom());
+    src.set_type(id_type());
     m_bdd.save(src);
 }
 void SourceNewModifForm::updateData() {
     if(!m_new) {
         Source src;
-        updateTemp<Source>(src);
+        update_temp<Source>(src);
     }
 }

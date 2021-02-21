@@ -12,22 +12,22 @@
 
 namespace widgetMPS {
 /*! \ingroup groupeWidget
- * \brief Classe mère des widget de séléction d'une entité.
+ *\brief Classe mère des widget de séléction d'une entité.
  */
-class AbstractEntitySelectWidget : public QWidget {
+class AbstractentitySelectWidget : public QWidget {
     Q_OBJECT
 protected:
-    QBoxLayout * m_mainLayout;
-    bddMPS::Bdd & m_bdd;
+    QBoxLayout *m_mainLayout;
+    bddMPS::Bdd &m_bdd;
 public:
     //! Constructeur.
-    AbstractEntitySelectWidget(bddMPS::Bdd & bdd, Qt::Orientations orientation = Qt::Horizontal, QWidget * parent = nullptr);
+    AbstractentitySelectWidget(bddMPS::Bdd &bdd, Qt::Orientations orientation = Qt::Horizontal, QWidget *parent = nullptr);
 
     //! Acceseur de l'identifiant de l'entité séléctionnée.
     virtual idt id() const = 0;
 public slots:
     //! Mutateur de l'identifiant de l'entité séléctionnée.
-    virtual void setId(idt id) = 0;
+    virtual void set_id(idt id) = 0;
 
 signals :
     //! La valeur de l'identifiant change.
@@ -35,25 +35,25 @@ signals :
 };
 
 /*! \ingroup groupeWidget
- * \brief Classe mère des widget de séléction d'une entitée par un idCombox.
+ *\brief Classe mère des widget de séléction d'une entitée par un idCombox.
  */
-class ComboBoxEntitySelectWidget : public widgetMPS::AbstractEntitySelectWidget{
+class ComboBoxentitySelectWidget : public widgetMPS::AbstractentitySelectWidget{
     Q_OBJECT
 protected:
-    QLabel * m_label;     //!< Label du choix de l'annee.
-    widgetMPS::IdComboBox * m_box;      //!< Choix de l'annee Scolaire.
+    QLabel *m_label;     //!< Label du choix de l'annee.
+    widgetMPS::IdComboBox *m_box;      //!< Choix de l'annee Scolaire.
 
 public:
     //! Constructeur.
-    ComboBoxEntitySelectWidget(bddMPS::Bdd & bdd, const QString & label = QString(),
-                         Qt::Orientations orientation = Qt::Horizontal, QWidget * parent = nullptr);
+    ComboBoxentitySelectWidget(bddMPS::Bdd &bdd, const QString &label = QString(),
+                         Qt::Orientations orientation = Qt::Horizontal, QWidget *parent = nullptr);
 
     //! Acceseur de l'identifiant de l'entité séléctionnée.
     idt id() const override
         {return m_box->id();}
 public slots:
     //! Mutateur de l'identifiant de l'entité séléctionnée.
-    void setId(idt id) override
+    void set_id(idt id) override
         {m_box->setCurrentIndexId(id);}
 };
 }

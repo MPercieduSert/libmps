@@ -28,17 +28,17 @@ CodeWidget::CaseOption CodeWidget::caseStyle(styleCase sc, flag code) {
     return caseOption;
 }
 
-CodeWidget::CodeWidget(const Cases & cases, int cote, QWidget * parent)
+CodeWidget::CodeWidget(const Cases &cases, int cote, QWidget *parent)
     : QWidget(parent), m_cote(cote), m_cases(cases) {
     setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Fixed);
 }
 
 void CodeWidget::mousePressEvent(QMouseEvent *event) {
-    if(!m_readOnly && event->button() == Qt::LeftButton)
-        setCode(m_code ^ m_cases.at(static_cast<szt>(event->x()/m_cote)).code);
+    if(!m_readOnly &&event->button() == Qt::LeftButton)
+        set_code(m_code ^ m_cases.at(static_cast<szt>(event->x()/m_cote)).code);
 }
 
-void CodeWidget::paintEvent(QPaintEvent * /*event*/) {
+void CodeWidget::paintEvent(QPaintEvent */*event*/) {
     QPainter painter(this);
     QPen pen;
     pen.setColor(QGuiApplication::palette().color(QPalette::Active,QPalette::WindowText));
@@ -66,7 +66,7 @@ void CodeWidget::paintEvent(QPaintEvent * /*event*/) {
     }
 }
 
-void CodeWidget::setCode(flag code) {
+void CodeWidget::set_code(flag code) {
     m_code = code;
     update();
     emit codeChanged(m_code);

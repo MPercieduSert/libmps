@@ -8,17 +8,17 @@
 #include <QWidget>
 
 /*! \defgroup groupeFen Fenêtre
- * \brief Ensemble de classes des fenêtres.
+ *\brief Ensemble de classes des fenêtres.
  */
 
 /*! \ingroup groupeFen
- * \brief Espace de noms des fenêtres.
+ *\brief Espace de noms des fenêtres.
  */
 
 namespace fenMPS {
 /*! \ingroup groupeFen
  *
- * \brief Classe parente des fenêtres autre que la fenêtre principale.
+ *\brief Classe parente des fenêtres autre que la fenêtre principale.
  */
 class Fen : public QWidget {
     Q_OBJECT

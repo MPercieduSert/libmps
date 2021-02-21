@@ -2,7 +2,7 @@
 
 using namespace fenMPS;
 
-PredefZoneCentrale::PredefZoneCentrale(PredefTab * tab, QWidget *parent)
+PredefZoneCentrale::PredefZoneCentrale(PredefTab *tab, QWidget *parent)
     : AbstractTabZoneCentrale (tab,parent)
 {
 

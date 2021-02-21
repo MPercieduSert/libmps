@@ -8,7 +8,7 @@
 
 namespace managerMPS {
 /*! \ingroup groupeManager
- * \brief Classe template mère des différents manageurs de permissions code.
+ *\brief Classe template mère des différents manageurs de permissions code.
  */
 template<class Ent> class AbstractManagerPermission : virtual public ManagerSql<Ent> {
 protected:
@@ -25,7 +25,7 @@ public:
     ~AbstractManagerPermission() override = default;
 
     //! Teste s'il y a dans la base de donnée une entité ayant exactement les mêmes attributs (identifiant compris).
-    bool sameInBdd(const Ent & entity) {
+    bool sameInBdd(const Ent &ent) {
         if(isVirtual(entity))
             return !exists(entity);
         else
@@ -33,7 +33,7 @@ public:
     }
 
     //! Teste s'il y a dans la base de donnée une entité d'identifiant id ayant exactement les mêmes attributs.
-    bool sameInBdd(const Ent & entity, idt id) {
+    bool sameInBdd(const Ent &ent, idt id) {
         if(isVirtual(entity))
             return !exists(Ent(id));
         else
@@ -47,30 +47,30 @@ public:
 protected:
     //! Insert la nouvelle entité entity dans la base de donnée
     //! et assigne l'identifiant de l'entité insérée en base de donnée à entity.
-    void add(Ent & entity) override {
+    void add(Ent &ent) override {
         if(!isVirtual(entity))
             addParent(entity);
     }
 
     //! Insert la nouvelle entité entity dans la base de donnée.
-    void add(const Ent & entity) override {
+    void add(const Ent &ent) override {
         if(!isVirtual(entity))
             addParent(entity);
     }
 
     //! Appelle la fonction d'insertion parent souhaitée.
-    virtual void addParent(Ent & entity)
+    virtual void addParent(Ent &ent)
         {ManagerSqlEnt::add(entity);}
 
     //! Appelle la fonction d'insertion parent souhaitée.
-    virtual void addParent(const Ent & entity)
+    virtual void addParent(const Ent &ent)
         {ManagerSqlEnt::add(entity);}
 
     //! Test si l'entité doit exister dans la base de donnée.
     virtual bool isVirtual(const Ent entity) const = 0;
 
     //! Met à jour l'entité entity en base de donnée.
-    void modify(const Ent & entity) override {
+    void modify(const Ent &ent) override {
         if(isVirtual(entity))
             del(entity.id());
         else
@@ -78,7 +78,7 @@ protected:
     }
 
     //! Met à jour l'entité entity en base de donnée d'identifiant id avec les valeurs d'entity.
-    void modify(const Ent & entity, idt id) override {
+    void modify(const Ent &ent, idt id) override {
         if(isVirtual(entity))
             del(id);
         else
@@ -86,16 +86,16 @@ protected:
     }
 
     //! Appelle la fonction de modification parent souhaitée.
-    virtual void modifyParent(const Ent & entity)
+    virtual void modifyParent(const Ent &ent)
         {ManagerSqlEnt::modify(entity);}
 
     //! Appelle la fonction de modification parent souhaitée.
-    virtual void modifyParent(const Ent & entity, idt id)
+    virtual void modifyParent(const Ent &ent, idt id)
         {ManagerSqlEnt::modify(entity,id);}
 };
 
 /*! \ingroup groupeManager
- * \brief Classe template mère des différents manageurs de permissions num.
+ *\brief Classe template mère des différents manageurs de permissions num.
  */
 template<class Ent> class ManagerPermissionNum : virtual public AbstractManagerPermission<Ent>
 {
@@ -113,7 +113,7 @@ protected:
 };
 
 /*! \ingroup groupeManager
- * \brief Classe template mère des différents manageurs de permissions code.
+ *\brief Classe template mère des différents manageurs de permissions code.
  */
 template<class Ent> class ManagerPermissionCode : virtual public AbstractManagerPermission<Ent>
 {

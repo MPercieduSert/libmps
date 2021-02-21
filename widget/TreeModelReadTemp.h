@@ -8,7 +8,7 @@
 #include <QMessageBox>
 
 #include "AbstractModel.h"
-#include "Tree.h"
+#include "tree.h"
 
 namespace modelMPS {
 namespace cmps = conteneurMPS;
