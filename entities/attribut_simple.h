@@ -81,7 +81,7 @@
  *\brief Macro de déclaration d'un attribut de type clé dans les entités.
  */
 #define SINGLE_ATTRIBUT_ID(ATTRIBUT,MERE,NUM) /*! \ingroup groupe_attribut_entity \brief Classe de l'attribut ATTRIBUT.*/ \
-    SINGLE_ATTRIBUT_DEBUT(ATTRIBUT,MERE,Id ## NUM,id_ ## NUM) \
+    SINGLE_ATTRIBUT_DEBUT(ATTRIBUT,MERE,Id_ ## NUM,id_ ## NUM) \
     /*! Nom de l'attribut.*/ \
     QString name_attribut() const override {return name_id_ ## NUM();}\
     /*! Nom de identifiant*/ \

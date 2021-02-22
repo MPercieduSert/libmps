@@ -1,8 +1,8 @@
 /*Auteur: PERCIE DU SERT Maxime
  *Date: 03/08/2018
  */
-#ifndef ENTITYPREDEF_H
-#define ENTITYPREDEF_H
+#ifndef ENTITY_PREDEF_H
+#define ENTITY_PREDEF_H
 
 #include "entity_cible.h"
 #include "entity_divers.h"
@@ -20,7 +20,7 @@ namespace donnee_info {
                 Contenu};
 
     //! Différents types des valeurs des données
-    enum typeVal {Nodonnee = 0,
+    enum typeVal {No_Donnee = 0,
                   Int = 1,
                   String = 2,
                   Bool = 3,
@@ -45,7 +45,7 @@ namespace entities {
  */
 namespace ensemble_commentaire {
 using commentaire = entities_base::texte_entity<info_entity::Commentaire>;
-ID1_ENTITY(commentaire_cible,cible_date_time_current_num,info_entity::Commentair_Cible,commentaire)
+ID1_ENTITY(commentaire_cible,cible_date_time_current_num,info_entity::Commentair_Cible,Commentaire,commentaire)
 }
 using namespace ensemble_commentaire;
 
@@ -147,7 +147,7 @@ public:
         set_exact(exact);
     }
 };
-ID1_ENTITY_NEG(donnee_cible,cible_neg_date_time_current_num_valeur_variant,info_entity::donnee_Cible,donnee)
+ID1_ENTITY_NEG(donnee_cible,cible_neg_date_time_current_num_valeur_variant,info_entity::donnee_Cible,Donnee,donnee)
 }
 using namespace ensemble_donnee;
 
@@ -155,7 +155,7 @@ using namespace ensemble_donnee;
  *\brief Ensemble des classes de la fonctionalité événement.
  */
 namespace ensemble_evenement {
-ID1_ENTITY(evenement_cible,cible_date_time_current_num_tp_val_valeur_variant,info_entity::Evenemen_Cible,evenement)
+ID1_ENTITY(evenement_cible,cible_date_time_current_num_tp_val_valeur_variant,info_entity::Evenemen_Cible,Evenement,evenement)
 /*! \ingroup groupe_entity
  *\brief Représentation de l'entité Evenement.
  */
@@ -193,7 +193,7 @@ public:
                        Titre = position_enum<titre_attribut>::Position,
                        Type = position_enum<type_attribut>::Position,
                        Nbr_Att = eaid::Nbr_Att,
-                       IdStyle = Id_1};
+                       Id_Style = Id_1};
     using eaid::entity_id;
     BASE_ENTITY(evenement)
     ALIAS_CLE(style,1)
@@ -311,10 +311,10 @@ using namespace ensemble_historique;
  */
 namespace ensemble_mot_cle {
 using mot_cle = entities_base::nc_nom_ref_entity<info_entity::Mot_Cle>;
-ID1_ENTITY(mot_cle_cible,cible,info_entity::Mot_Cle_Cible,mot_cle)
-ID1_ENTITY(mot_cle_permission,id_cible_code,info_entity::Mot_Cle_Permission,mot_cle)
-ID1_ENTITY(mot_prog_cible,cible_ref,info_entity::Mot_Prog_Cible,mot_cle)
-ID1_ENTITY(mot_prog_permission,id_cible_code_ref,info_entity::Mot_Prog_Permission,mot_cle)
+ID1_ENTITY(mot_cle_cible,cible,info_entity::Mot_Cle_Cible,Mot_Cle,mot_cle)
+ID1_ENTITY(mot_cle_permission,id_cible_code,info_entity::Mot_Cle_Permission,Mot_Cle,mot_cle)
+ID1_ENTITY(mot_prog_cible,cible_ref,info_entity::Mot_Prog_Cible,Mot_Cle,mot_cle)
+ID1_ENTITY(mot_prog_permission,id_cible_code_ref,info_entity::Mot_Prog_Permission,Mot_Cle,mot_cle)
 }
 using namespace ensemble_mot_cle;
 
@@ -322,7 +322,7 @@ using namespace ensemble_mot_cle;
  *\brief Ensemble des classes de la fonctionalité restriction.
  */
 namespace ensemble_restriction {
-ID1_ENTITY(restriction,id_cible_code,info_entity::Restriction,cible)
+ID1_ENTITY(restriction,id_cible_code,info_entity::Restriction,Cible,cible)
 }
 using namespace ensemble_restriction;
 
@@ -331,9 +331,9 @@ using namespace ensemble_restriction;
  */
 namespace ensemble_texte {
 using source = entities_base::nc_nom_type_entity<info_entity::Source>;
-RELATION_ENTITY(source_texte,relation,info_entity::source_texte,source,texte)
+RELATION_ENTITY(source_texte,relation,info_entity::source_texte,Source,source,Texte,texte)
 using texte = entities_base::texte_entity<info_entity::Texte>;
-ID1_ENTITY(texte_cible,cible_date_time_current_num_type,info_entity::Texte_Cible,texte)
+ID1_ENTITY(texte_cible,cible_date_time_current_num_type,info_entity::Texte_Cible,Texte,texte)
 }
 using namespace ensemble_texte;
 
@@ -342,7 +342,7 @@ using namespace ensemble_texte;
  */
 namespace ensemble_type {
 using type = entities_base::arbre_simple_nc_nom_ref_entity<info_entity::Type>;
-ID1_ENTITY(type_permission,id_cible_code,info_entity::Type_Permission,type)
+ID1_ENTITY(type_permission,id_cible_code,info_entity::Type_Permission,Type,type)
 }
 using namespace ensemble_type;
 
@@ -351,8 +351,8 @@ using namespace ensemble_type;
  */
 namespace ensemble_utilisation {
 using usage = entities_base::nc_nom_ref_type_entity<info_entity::Usage>;
-ID1_ENTITY(utilisation,utilisation,info_entity::Utilisation,usage)
+ID1_ENTITY(utilisation,utilisation,info_entity::Utilisation,Usage,usage)
 }
 using namespace ensemble_utilisation;
 }}
-#endif // ENTITYPREDEF_H
+#endif // ENTITY_PREDEF_H

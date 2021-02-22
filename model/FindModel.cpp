@@ -252,8 +252,8 @@ QVariant ComparaisonNode::data(int cible, int role, numt num) const{
             map.insert("\u2260",FindModel::Different);
             map.insert("<",FindModel::Inferieure);
             map.insert(">",FindModel::Superieure);
-            map.insert("\u2264",FindModel::InfEgal);
-            map.insert("\u2265",FindModel::SupEgal);
+            map.insert("\u2264",FindModel::Inf_Egal);
+            map.insert("\u2265",FindModel::Sup_Egal);
             return map;
         }}
     }
@@ -372,9 +372,9 @@ bool DateNode::testValue(const QVariant &value) const {
         return m_date > value.toDate();
     case FindModel::Superieure:
         return m_date < value.toDate();
-    case FindModel::InfEgal:
+    case FindModel::Inf_Egal:
         return m_date >= value.toDate();
-    case FindModel::SupEgal:
+    case FindModel::Sup_Egal:
         return m_date <= value.toDate();
     default:
         return false;

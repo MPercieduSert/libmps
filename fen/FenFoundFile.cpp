@@ -58,7 +58,7 @@ QString FenFoundFile::is_valid(bool copy) {
     }
 }
 
-void FenFoundFile::openInConf(fichierMPS::Config &config, const QString &path, bool save) {
+void FenFoundFile::openInConf(fichier::Config &config, const QString &path, bool save) {
     //! Cherche l'entrée path dans le fichier de configuration
     //! et affiche une fenêtre de demande d'ouverture de fichier si l'entrée n'est pas présente.
     QString pathFile;

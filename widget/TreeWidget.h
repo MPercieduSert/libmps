@@ -37,7 +37,7 @@ public:
     template<class T, class ChildFactory> void setTree(const conteneurMPS::tree<T> &tree, ChildFactory child);
 
     //! Mutateur des donnés affichés (Nom, Nc) avec id.
-    template<class Ent> void setTreenc_nomId(const conteneurMPS::tree<Ent> &tree) {
+    template<class Ent> void setTreenc_nomId(const conteneurMPS::tree<Ent> &tr) {
         setTreeRef(tree, [](const Ent &ent)->QTreeWidgetItem *{
                 auto item = new QTreeWidgetItem({ent.nom(),ent.nc()});
                 item->set_data(widgetMPS::TreeWidget::IdColonne,widgetMPS::TreeWidget::IdRole,ent.id());

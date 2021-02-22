@@ -22,52 +22,52 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-    AbstractLinkSql.cpp \
-    AbstractManager.cpp \
-    AbstractUniqueSql.cpp \
-    Bdd.cpp \
-    BddPredef.cpp \
-    InfoBdd.cpp \
-    ManagerForarbre.cpp \
-    Managers.cpp \
-    ManagersPredef.cpp \
-    ManagerSql.cpp \
-    ReqSql.cpp \
-    UniqueSqlBase.cpp \
-    Managerarbre.cpp \
-    ManagerarbreModifControle.cpp \
-    Managerarbre_simple.cpp \
-    Managerarbre_simpleModifControle.cpp \
-    ManagerModifControle.cpp \
-    ManagerPermission.cpp \
-    ManagerPermissionModifControle.cpp \
-    AbstractManagerarbre.cpp \
-    AbstractGestionRestriction.cpp \
-    GestionRestrictionCible.cpp
+    abstract_manager.cpp \
+    info_bdd.cpp \
+    unique_sql_base.cpp \
+    manager_arbre.cpp \
+    manager_arbre_modif_controle.cpp \
+    req_sql.cpp \
+    abstract_link_sql.cpp \
+    abstract_unique_sql.cpp \
+    manager_sql.cpp \
+    abstract_gestion_restriction.cpp \
+    manager_permission.cpp \
+    gestion_restriction_cible.cpp \
+    abstract_manager_arbre.cpp \
+    manager_for_arbre.cpp \
+    manager_modif_controle.cpp \
+    manager_permission_modif_controle.cpp \
+    manager_arbre_simple.cpp \
+    manager_arbre_simple_modif_controle.cpp \
+    managers_base.cpp \
+    managers_predef.cpp \
+    bdd.cpp \
+    bdd_predef.cpp
 
 HEADERS += \
-    AbstractLinkSql.h \
-    AbstractManager.h \
-    AbstractUniqueSql.h \
-    Bdd.h \
-    BddPredef.h \
-    InfoBdd.h \
-    ManagerForarbre.h \
-    Managers.h \
-    ManagersPredef.h \
-    ManagerSql.h \
-    ReqSql.h \
-    UniqueSqlBase.h \
-    Managerarbre.h \
-    ManagerarbreModifControle.h \
-    Managerarbre_simple.h \
-    Managerarbre_simpleModifControle.h \
-    ManagerModifControle.h \
-    ManagerPermission.h \
-    ManagerPermissionModifControle.h \
-    AbstractManagerarbre.h \
-    AbstractGestionRestriction.h \
-    GestionRestrictionCible.h
+    abstract_manager.h \
+    info_bdd.h \
+    unique_sql_base.h \
+    manager_arbre.h \
+    manager_arbre_modif_controle.h \
+    req_sql.h \
+    abstract_link_sql.h \
+    abstract_unique_sql.h \
+    manager_sql.h \
+    abstract_gestion_restriction.h \
+    manager_permission.h \
+    gestion_restriction_cible.h \
+    abstract_manager_arbre.h \
+    manager_for_arbre.h \
+    manager_modif_controle.h \
+    manager_permission_modif_controle.h \
+    manager_arbre_simple.h \
+    manager_arbre_simple_modif_controle.h \
+    managers_base.h \
+    managers_predef.h \
+    bdd.h \
+    bdd_predef.h
 unix {
     target.path = /usr/lib
     INSTALLS += target

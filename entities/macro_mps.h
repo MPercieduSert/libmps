@@ -32,4 +32,4 @@
 //! Macro définisant le destructeur vide.
 #define DESTR_VIDE_DEF(T) T::~T() = default;
 
-#endif // MACROLIBMPS_H
+#endif // MACRO_MPS_H

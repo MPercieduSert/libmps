@@ -6,7 +6,7 @@ DESTR_VIDE_DEF(AbstractNewModifForm)
 DESTR_VIDE_DEF(NewModifDialog)
 
 //AbstractNomForm
-AbstractNomNewModifForm::AbstractNomNewModifForm(bddMPS::Bdd &bdd, const QString &label, bool newEnt, QWidget *parent)
+AbstractNomNewModifForm::AbstractNomNewModifForm(b2d::Bdd &bdd, const QString &label, bool newEnt, QWidget *parent)
     : AbstractNewModifForm (bdd,newEnt,parent)
 {
     m_mainLayout = new QVBoxLayout(this);
@@ -40,7 +40,7 @@ void AbstractNomNewModifForm::connexion() {
 }
 
 //Abstractnc_nomForm
-Abstractnc_nomNewModifForm::Abstractnc_nomNewModifForm(bddMPS::Bdd &bdd, const QString &labelNc, const QString &labelNom,
+Abstractnc_nomNewModifForm::Abstractnc_nomNewModifForm(b2d::Bdd &bdd, const QString &labelNc, const QString &labelNom,
                                                      bool newEnt, QWidget *parent)
     : AbstractNomNewModifForm(bdd,labelNom,newEnt,parent) {
     m_ncLabel = new QLabel(labelNc);
@@ -59,7 +59,7 @@ void Abstractnc_nomNewModifForm::connexion() {
 }
 
 //AbstractTypenc_nomForm
-AbstractTypenc_nomNewModifForm::AbstractTypenc_nomNewModifForm(bddMPS::BddPredef &bdd, const QString &refRoot, idt id_entity,
+AbstractTypenc_nomNewModifForm::AbstractTypenc_nomNewModifForm(b2d::bdd_predef &bdd, const QString &refRoot, idt id_entity,
                                                              const QString &labelType, const QString &labelNc, const QString &labelNom,
                                                              bool newEnt, QWidget *parent)
     : Abstractnc_nomNewModifForm(bdd,labelNc,labelNom,newEnt,parent), m_cible(bdd.cible(id_entity)), m_valide(!m_new)
@@ -73,13 +73,13 @@ AbstractTypenc_nomNewModifForm::AbstractTypenc_nomNewModifForm(bddMPS::BddPredef
     m_typeTree->setColumnCount(nbrColumn);
     m_typeTree->setHeaderLabels(QStringList({"nom","nom abrégé"}));
     m_typeTree->setSelectionModel(new QItemSelectionModel(m_typeTree->model()));
-    m_typeTree->setTreeRef(m_bdd.getarbre<Type>(m_bdd.refToId<Type>(refRoot)),
+    m_typeTree->setTreeRef(m_bdd.get_arbre<Type>(m_bdd.ref_to_id<Type>(refRoot)),
                         [this](const Type &tp)->QTreeWidgetItem *{
         auto item = new QTreeWidgetItem({tp.nom(),tp.nc()});
         item->set_data(widgetMPS::TreeWidget::IdColonne,widgetMPS::TreeWidget::IdRole,tp.id());
         Permission perm(item->data(nom_type,widgetMPS::TreeWidget::IdRole).toUInt(),m_cible);
-        m_bdd.getUnique(perm);
-        if(perm.test(bddMPS::code::Attribuable))
+        m_bdd.get_unique(perm);
+        if(perm.test(b2d::code::Attribuable))
             item->setFlags(Qt::ItemIsEnabled|Qt::ItemIsSelectable);
         else
             item->setFlags(Qt::ItemIsEnabled);
@@ -93,14 +93,14 @@ void AbstractTypenc_nomNewModifForm::connexion() {
     Abstractnc_nomNewModifForm::connexion();
     connect(m_typeTree->selectionModel(),&QItemSelectionModel::selectionChanged,this,[this](){
         Permission perm(id_type(),m_cible);
-        m_bdd.getUnique(perm);
-        m_valide = perm.test(bddMPS::code::Attribuable);
+        m_bdd.get_unique(perm);
+        m_valide = perm.test(b2d::code::Attribuable);
         emit savePermis(valide());
     });
 }
 
 //AbstractParentnc_nomForm
-AbstractParentnc_nomNewModifForm::AbstractParentnc_nomNewModifForm(bddMPS::Bdd &bdd, const QStringList &header,
+AbstractParentnc_nomNewModifForm::AbstractParentnc_nomNewModifForm(b2d::Bdd &bdd, const QStringList &header,
                                                              const QString &labelParent, const QString &labelNc, const QString &labelNom,
                                                              bool newEnt, QWidget *parent)
     : Abstractnc_nomNewModifForm(bdd,labelNc,labelNom,newEnt,parent)

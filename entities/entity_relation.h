@@ -1,8 +1,8 @@
 /*Auteur: PERCIE DU SERT Maxime
  *Date: 04/08/2016
  */
-#ifndef ENTITYRELATION
-#define ENTITYRELATION
+#ifndef ENTITY_RELATION
+#define ENTITY_RELATION
 
 #include "entity_divers.h"
 
@@ -19,32 +19,32 @@
 
 //! \ingroup groupe_macro_entity
 //! Macro implémentant une classe ayant 2 clés.
-#define RELATION_ENTITY(ENTITY,TYPE,IDT,ID1,ID2) \
+#define RELATION_ENTITY(ENTITY,TYPE,IDT,ID1,id1,ID2,id2) \
     ENTITY_ALIAS_DEBUT(ENTITY,TYPE,IDT)\
     ENUM_##TYPE(ID1,ID2) \
-    ALIAS_CLE(ID1,1)\
-    ALIAS_CLE(ID2,2)};
+    ALIAS_CLE(id1,1)\
+    ALIAS_CLE(id2,2)};
 
 //! \ingroup groupe_macro_entity
 //! Macro implémentant une classe ayant 2 clés dont la seconde négative.
-#define RELATION_ENTITY_NEG(ENTITY,TYPE,IDT,ID1,ID2) \
+#define RELATION_ENTITY_NEG(ENTITY,TYPE,IDT,ID1,id1,ID2,id2) \
     ENTITY_ALIAS_DEBUT(ENTITY,TYPE,IDT,ID1,ID2)\
     ENUM_##TYPE(ID1,ID2) \
-    ALIAS_CLE_NEG(ID1,1)\
-    ALIAS_CLE(ID2,2)};
+    ALIAS_CLE_NEG(id1,1)\
+    ALIAS_CLE(id2,2)};
 
 //! \ingroup groupe_macro_entity
 //! Macro implémentant une classe ayant 2 clés négatives.
-#define RELATION_ENTITY_NEG_NEG(ENTITY,TYPE,IDT,ID1,ID2) \
+#define RELATION_ENTITY_NEG_NEG(ENTITY,TYPE,IDT,ID1,id1,ID2,id2) \
     ENTITY_ALIAS_DEBUT(ENTITY,TYPE,IDT,ID1,ID2)\
     ENUM_##TYPE(ID1,ID2) \
-    ALIAS_CLE_NEG(ID1,1)\
-    ALIAS_CLE_NEG(ID2,2)};
+    ALIAS_CLE_NEG(id1,1)\
+    ALIAS_CLE_NEG(id2,2)};
 
 //! \ingroup groupe_macro_entity
 //! Macro définissant les positions des attributs pour une relation simple.
 #define ENUM_relation(ID1,ID2) /*! \brief positions des attributs */ \
-    enum position:post {Id, Id_1 = mere::Id_1, Id_2 = mere::Id_2, Nbr_Att = mere::Nbr_Att, Id ## ID1 = Id_1, Id ## ID2 = Id_2};
+    enum position:post {Id, Id_1 = mere::Id_1, Id_2 = mere::Id_2, Nbr_Att = mere::Nbr_Att, Id_ ## ID1 = Id_1, Id_ ## ID2 = Id_2};
 
 namespace mps {
 namespace entities_base {
@@ -110,7 +110,7 @@ template<entidt IDM > relation_exact_one_not_null_entity<IDM>::~relation_exact_o
 //! Macro définissant les positions des attributs pour une relation simple.
 #define ENUM_relation_cible_temp(ID1,ID2) /*! \brief positions des attributs */ \
     enum position:post {Id, Id_1 = mere::Id_1, Id_2 = mere::Id_2, Id_Cible = mere::Id_Cible, Cible = mere::Cible,\
-    Nbr_Att = mere::Nbr_Att, Id ## ID1 = Id_1, Id ## ID2 = Id_2};
+    Nbr_Att = mere::Nbr_Att, Id_ ## ID1 = Id_1, Id_ ## ID2 = Id_2};
 
 /*! \ingroup groupe_base_entity
  *\brief Classe de base des entités ayant pour attribut deux clés.
@@ -182,7 +182,7 @@ template<entidt IDM > using relation_cible_neg_neg_entity
 //! Macro définissant les positions des attributs pour une relation simple.
 #define ENUM_relation_cible_att_code_temp(ID1,ID2) /*! \brief positions des attributs */ \
     enum position:post {Id, Id_1 = mere::Id_1, Id_2 = mere::Id_2, Cible = mere::Cible, Code = mere::Code,\
-    Nbr_Att = mere::Nbr_Att, Id ## ID1 = Id_1, Id ## ID2 = Id_2};
+    Nbr_Att = mere::Nbr_Att, Id_ ## ID1 = Id_1, Id_ ## ID2 = Id_2};
 
 /*! \ingroup groupe_base_entity
  *\brief Classe de base des entités ayant pour attribut deux clés.
@@ -254,7 +254,7 @@ template<entidt IDM > using relation_cible_att_code_neg_negentity
 //! Macro définissant les positions des attributs pour une relation avec un attribut date_time.
 #define ENUM_relation_date_time_temp(ID1,ID2) /*! \brief positions des attributs */ \
     enum position:post {Id, Id_1 = mere::Id_1, Id_2 = mere::Id_2, Date_Time = mere::Date_Time, \
-    Nbr_Att = mere::Nbr_Att, Id ## ID1 = Id_1, Id ## ID2 = Id_2};
+    Nbr_Att = mere::Nbr_Att, Id_ ## ID1 = Id_1, Id_ ## ID2 = Id_2};
 
 /*! \ingroup groupe_base_entity
  *\brief Classe de base des entités ayant pour attribut deux clés et une date_time.
@@ -301,7 +301,7 @@ template<entidt IDM > using relation_date_time_valide_entity = relation_date_tim
 //! Macro définissant les positions des attributs pour une relation avec un attribut num.
 #define ENUM_relation_num(ID1,ID2) /*! \brief positions des attributs */ \
     enum position:post {Id, Id_1 = mere::Id_1, Id_2 = mere::Id_2, Num = mere::Num, \
-    Nbr_Att = mere::Nbr_Att, Id ## ID1 = Id_1, Id ## ID2 = Id_2};
+    Nbr_Att = mere::Nbr_Att, Id_ ## ID1 = Id_1, Id_ ## ID2 = Id_2};
 
 /*! \ingroup groupe_base_entity
  *\brief Classe de base des entités ayant pour attribut deux clés et un numero.
@@ -336,7 +336,7 @@ template<entidt IDM > relation_num_entity<IDM>::~relation_num_entity() {}
 //! \ingroup groupe_macro_entity
 //! Macro définissant les positions des attributs pour une relation avec un attribut type.
 #define ENUM_relation_type(ID1,ID2) /*! \brief positions des attributs */ \
-    enum position:post {Id, Id_1 = mere::Id_1, Id_2 = mere::Id_2, Type = mere::Type, Nbr_Att = mere::Nbr_Att, Id ## ID1 = Id_1, Id ## ID2 = Id_2};
+    enum position:post {Id, Id_1 = mere::Id_1, Id_2 = mere::Id_2, Type = mere::Type, Nbr_Att = mere::Nbr_Att, Id_ ## ID1 = Id_1, Id_ ## ID2 = Id_2};
 
 /*! \ingroup groupe_base_entity
  *\brief Classe de base des entités ayant pour attribut deux clés et un numero.
@@ -372,7 +372,7 @@ template<entidt IDM > relation_type_entity<IDM>::~relation_type_entity() {}
 //! Macro définissant les positions des attributs pour une relation avec un attribut date_time et num.
 #define ENUM_relation_date_time_num_temp(ID1,ID2) /*! \brief positions des attributs */ \
     enum position:post {Id, Id_1 = mere::Id_1, Id_2 = mere::Id_2, Date_Time = mere::Date_Time, Num = mere::Num,\
-                    Nbr_Att = mere::Nbr_Att, Id ## ID1 = Id_1, Id ## ID2 = Id_2};
+                    Nbr_Att = mere::Nbr_Att, Id_ ## ID1 = Id_1, Id_ ## ID2 = Id_2};
 
 /*! \ingroup groupe_base_entity
  *\brief Classe de base des entités ayant pour attribut deux clés, une date_time et un numero.
@@ -425,7 +425,7 @@ template<entidt IDM > using relation_date_time_valide_num_entity
 //! Macro définissant les positions des attributs pour une relation avec un attribut date_time, num et Valeur.
 #define ENUM_relation_date_time_valeur_temp(ID1,ID2) /*! \brief positions des attributs */ \
     enum position:post {Id, Id_1 = mere::Id_1, Id_2 = mere::Id_2, Date_Time = mere::Date_Time, Valeur = mere::Valeur, \
-                Nbr_Att = mere::Nbr_Att, Id ## ID1 = Id_1, Id ## ID2 = Id_2};
+                Nbr_Att = mere::Nbr_Att, Id_ ## ID1 = Id_1, Id_ ## ID2 = Id_2};
 
 /*! \ingroup groupe_base_entity
  *\brief Classe de base des entités ayant pour attribut deux clés, une date_time et un numero.
@@ -499,7 +499,7 @@ template<entidt IDM > using relation_date_time_valide_valeur_variant_entity
 //! Macro définissant les positions des attributs pour une relation avec un attribut date_time, num et Valeur.
 #define ENUM_relation_date_time_num_valeur_temp(ID1,ID2) /*! \brief positions des attributs */ \
     enum position:post {Id, Id_1 = mere::Id_1, Id_2 = mere::Id_2, Date_Time = mere::Date_Time, Num = mere::Num, \
-    Valeur = mere::Valeur, Nbr_Att = mere::Nbr_Att, Id ## ID1 = Id_1, Id ## ID2 = Id_2};
+    Valeur = mere::Valeur, Nbr_Att = mere::Nbr_Att, Id_ ## ID1 = Id_1, Id_ ## ID2 = Id_2};
 
 /*! \ingroup groupe_base_entity
  *\brief Classe de base des entités ayant pour attribut deux clés, une date_time, un numero et une valeur.
@@ -576,7 +576,7 @@ template<entidt IDM > using relation_date_time_valide_num_valeur_variant_entity
 //! Macro définissant les positions des attributs pour une relation avec un attribut code, date_time et Valeur.
 #define ENUM_relation_code_date_time_valeur_temp(ID1,ID2) /*! \brief positions des attributs */ \
     enum position:post {Id, Id_1 = mere::Id_1, Id_2 = mere::Id_2, Code = mere::Code, Date_Time = mere::Date_Time,\
-                        Valeur = mere::Valeur, Nbr_Att = mere::Nbr_Att, Id ## ID1 = Id_1, Id ## ID2 = Id_2};
+                        Valeur = mere::Valeur, Nbr_Att = mere::Nbr_Att, Id_ ## ID1 = Id_1, Id_ ## ID2 = Id_2};
 
 /*! \ingroup groupe_base_entity
  *\brief Classe de base des entités ayant pour attribut deux clés, un code, une date_time et une valeur.
@@ -653,7 +653,7 @@ template<entidt IDM > using relation_code_date_time_valide_valeur_int_entity
 //! Macro définissant les positions des attributs pour une relation avec un attribut code, date_time et Valeur.
 #define ENUM_relation_date_time_saisie_valeur_temp(ID1,ID2) /*! \brief positions des attributs */ \
     enum position:post {Id, Id_1 = mere::Id_1, Id_2 = mere::Id_2, Date_Time = mere::Date_Time, Saisie = mere::Saisie,\
-                        Valeur = mere::Valeur,nNbr_Att = mere::Nbr_Att, Id ## ID1 = Id_1, Id ## ID2 = Id_2};
+                        Valeur = mere::Valeur,nNbr_Att = mere::Nbr_Att, Id_ ## ID1 = Id_1, Id_ ## ID2 = Id_2};
 
 /*! \ingroup groupe_base_entity
  *\brief Classe de base des entités ayant pour attribut deux clés, un code, une date_time et une valeur.
@@ -738,7 +738,7 @@ template<entidt IDM > using relation_code_date_time_valide_saisie_valeur_variant
 //! Macro définissant les positions des attributs pour une relation avec un attribut code, date_time, num et valeur.
 #define ENUM_relation_code_date_time_num_valeur_temp(ID1,ID2) /*! \brief positions des attributs */ \
     enum position:post {Id, Id_1 = mere::Id_1, Id_2 = mere::Id_2, Code = mere::Code, Date_Time = mere::Date_Time, Num = mere::Num,\
-                    Valeur = mere::Valeur,nNbr_Att = mere::Nbr_Att, Id ## ID1 = Id_1, Id ## ID2 = Id_2};
+                    Valeur = mere::Valeur,nNbr_Att = mere::Nbr_Att, Id_ ## ID1 = Id_1, Id_ ## ID2 = Id_2};
 
 /*! \ingroup groupe_base_entity
  *\brief Classe de base des entités ayant pour attribut deux clés, un code, une date_time, un numero et une valeur.
@@ -846,7 +846,7 @@ template<entidt IDM > using relation_code_date_time_valide_num_saisie_valeur_var
 //! Macro définissant les positions des attributs pour une relation avec un attribut date_time, num et Valeur.
 #define ENUM_relation_num_type_valeur_temp(ID1,ID2) /*! \brief positions des attributs */ \
     enum position:post {Id, Id_1 = mere::Id_1, Id_2 = mere::Id_2, Num = mere::Num, Type = mere::Type, Valeur = mere::Valeur, Nbr_Att = mere::Nbr_Att,\
-            Id ## ID1 = Id_1, Id ## ID2 = Id_2};
+            Id_ ## ID1 = Id_1, Id_ ## ID2 = Id_2};
 
 /*! \ingroup groupe_base_entity
  *\brief Classe de base des entités ayant pour attribut deux clés, un numero, un type et une valeur.
@@ -903,4 +903,4 @@ template<entidt IDM > using relation_num_type_valeur_variant_entity
         = relation_num_type_valeur_entity_temp<IDM,valeur_variant_attribut>;
 #define ENUM_relation_num_type_valeur_variant(ID1,ID2) ENUM_relation_num_type_valeur_temp(ID1,ID2)
 }}
-#endif // ENTITYRELATION
+#endif // ENTITY_RELATION

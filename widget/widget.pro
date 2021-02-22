@@ -41,9 +41,9 @@ SOURCES += \
     SelectInListBox.cpp \
     SpinBox.cpp \
     TableentityView.cpp \
-    #TreeModelEditentity.cpp \
+    #TreeModelEditent.cpp \
     #TreeModelmot_cle.cpp \
-    #TreeModelReadentity.cpp \
+    #TreeModelReadent.cpp \
     #TreeModelRead_temp.cpp \
     #TreeModel_temp.cpp \
     TreeWidget.cpp \

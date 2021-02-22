@@ -107,7 +107,7 @@ public:
     //! Mutateur de l'attribut de nom attr.
     virtual bool hydrate(std::vector<std::pair<QString,QVariant>> &values);
 
-    //! Modifient les valeurs des attributs de l'entité avec celles des attributs de entity.
+    //! Modifient les valeurs des attributs de l'entité avec celles des attributs de ent.
     virtual void operator << (const entity &ent) = 0;
 
     //! Opérateur testant l'égalité de deux entités, c'est-à-dire l'égalité de tous les attributs.
@@ -231,7 +231,7 @@ public:
             set_data_v(i, value);
     }
 
-    //! Modifient les valeurs des attributs de l'entité avec celles des attributs de entity.
+    //! Modifient les valeurs des attributs de l'entité avec celles des attributs de ent.
     void operator << (const entity_attributs<Attribut> &ent)
         {set(ent);}
 

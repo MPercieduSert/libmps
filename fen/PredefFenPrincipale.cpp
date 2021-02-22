@@ -2,7 +2,7 @@
 
 using namespace fenMPS;
 
-PredefFenPrincipale::PredefFenPrincipale(AbstractNoyau *noyau, std::unique_ptr<bddMPS::Bdd> &&bdd, PredefZoneCentrale *centralZone,
+PredefFenPrincipale::PredefFenPrincipale(AbstractNoyau *noyau, std::unique_ptr<b2d::Bdd> &&bdd, PredefZoneCentrale *centralZone,
                                          const QString &bddPathXML, const QString &configPath, QWidget *parent)
     :   FenPrincipale (noyau,std::move(bdd),centralZone,bddPathXML,configPath,parent)
 {
@@ -45,8 +45,8 @@ void PredefFenPrincipale::export_xml() {
         if(!name.isEmpty()){
             conteneurMPS::vector_ptr<entities::entity> vec;
             for (auto iter = dialog.set().cbegin(); iter != dialog.set().cend(); ++iter)
-                vec<<noyau()->bdd().getList(*iter);
-            m_noyau->exportXml(name,std::move(vec),dialog.option());
+                vec<<noyau()->bdd().get_list(*iter);
+            m_noyau->export_xml(name,std::move(vec),dialog.option());
         }
     }
 }
@@ -57,7 +57,7 @@ void PredefFenPrincipale::import_xml() {
                                              m_noyau->config().default_directory(),
                                              tr("Fichier XML (*.xml)"));
     if(!name.isEmpty())
-        m_noyau->importXml(name);
+        m_noyau->import_xml(name);
 }
 
 void PredefFenPrincipale::schemaXml() {

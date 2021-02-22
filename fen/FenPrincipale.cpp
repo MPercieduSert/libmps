@@ -2,7 +2,7 @@
 
 using namespace fenMPS;
 
-FenPrincipale::FenPrincipale(AbstractNoyau *noyau, std::unique_ptr<bmps::Bdd> &&bdd, AbstractZoneCentrale *zoneCentrale,
+FenPrincipale::FenPrincipale(AbstractNoyau *noyau, std::unique_ptr<b2d::Bdd> &&bdd, AbstractZoneCentrale *zoneCentrale,
                              const QString &bddPathXML, const QString &configPath, QWidget *parent) :
     QMainWindow(parent), m_zoneCentrale(zoneCentrale), m_noyau(noyau) {
     m_noyau->set_parent(this);

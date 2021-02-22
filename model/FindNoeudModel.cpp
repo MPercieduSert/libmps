@@ -265,9 +265,9 @@ bool DateNoeud::testValue(const QVariant &value) const {
         return m_date > value.toDate();
     case Superieure:
         return m_date < value.toDate();
-    case InfEgal:
+    case Inf_Egal:
         return m_date >= value.toDate();
-    case SupEgal:
+    case Sup_Egal:
         return m_date <= value.toDate();
     default:
         return false;

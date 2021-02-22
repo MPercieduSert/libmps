@@ -17,7 +17,7 @@ namespace fenMPS {
 class PredefTab : public AbstractTab {
     Q_OBJECT
 protected:
-    bmps::BddPredef &m_bdd;          //!< Référence à la base de donnée.
+    b2d::bdd_predef &m_bdd;          //!< Référence à la base de donnée.
 
 public:
     enum tabName{GestionBddTabId,
@@ -26,7 +26,7 @@ public:
 
 
     //! Constructeur.
-    explicit PredefTab(bmps::BddPredef &bdd, QWidget *parent = nullptr)
+    explicit PredefTab(b2d::bdd_predef &bdd, QWidget *parent = nullptr)
         : AbstractTab(parent), m_bdd(bdd) {}
 
     //! Destructeur par default.

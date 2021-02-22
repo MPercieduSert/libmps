@@ -4,7 +4,7 @@
 #ifndef DIALOG_PREDEF_H
 #define DIALOG_PREDEF_H
 
-#include <Bdd.h>
+#include <bdd.h>
 #include <QCheckBox>
 #include <QDialog>
 #include <QHBoxLayout>
@@ -36,7 +36,7 @@ protected:
     QVBoxLayout *m_main_layout;         //!< Calque principale
 public:
     //! Constructeur.
-    SelectTableDialog(bddMPS::Bdd::vector_id_name &&vec, QWidget *parent = nullptr);
+    SelectTableDialog(b2d::Bdd::vector_id_name &&vec, QWidget *parent = nullptr);
 
     //! Acceseur de l'ensemble des identifiants.
     const std::set<entidt> &set() const

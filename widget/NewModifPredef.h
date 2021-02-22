@@ -13,7 +13,7 @@
 #include <QGroupBox>
 #include <QHBoxLayout>
 #include <QTimeEdit>
-#include "BddPredef.h"
+#include "bdd_predef.h"
 #include "NewModifDialog.h"
 
 
@@ -48,7 +48,7 @@ protected:
 
 public:
     //! Constructeur.
-    EvenementNewModifForm(bddMPS::Bdd &bdd, bool newEnt, QWidget *parent = nullptr);
+    EvenementNewModifForm(b2d::Bdd &bdd, bool newEnt, QWidget *parent = nullptr);
 
     //! Destructeur.
     ~EvenementNewModifForm() override = default;
@@ -130,7 +130,7 @@ protected:
     QHBoxLayout *m_titreLayout;            //!< Calque du groupe titre
 public:
     //! Constructeur.
-    evenement_styleNewModifForm(bddMPS::Bdd &bdd, bool newEnt, QWidget *parent = nullptr);
+    evenement_styleNewModifForm(b2d::Bdd &bdd, bool newEnt, QWidget *parent = nullptr);
 
     //! Destructeur.
     ~evenement_styleNewModifForm() override = default;
@@ -164,8 +164,8 @@ protected:
     using Source = entities::Source;
 public:
     //! Constructeur.
-    SourceNewModifForm(bddMPS::Bdd &bdd, bool newEnt, QWidget *parent = nullptr)
-        : AbstractTypenc_nomNewModifForm(static_cast<bddMPS::BddPredef &>(bdd),"source_root_tp",Source::ID,
+    SourceNewModifForm(b2d::Bdd &bdd, bool newEnt, QWidget *parent = nullptr)
+        : AbstractTypenc_nomNewModifForm(static_cast<b2d::bdd_predef &>(bdd),"source_root_tp",Source::ID,
                                         "Type de la source :","Nom abrégé de la source :","Nom de la source :",
                                                                      newEnt,parent) {}
 

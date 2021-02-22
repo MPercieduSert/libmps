@@ -139,7 +139,7 @@ public:
         {return childCount(parent);}
 
     //! Modifie l'arbre de donnée.
-    void setTree(const cmps::tree<T> &tree) {
+    void setTree(const cmps::tree<T> &tr) {
         if(m_racine){
             m_tree.clear();
             m_tree.push_back(m_tree.begin(),tree.cbegin());
@@ -149,13 +149,13 @@ public:
     }
 
     //! Modifie l'arbre de donnée.
-    void setTree(cmps::tree<T> &&tree){
+    void setTree(cmps::tree<T> &&tr){
         if(m_racine){
             m_tree.clear();
-            m_tree.push_back(m_tree.begin(),std::move(tree));
+            m_tree.push_back(m_tree.begin(),std::move(tr));
         }
         else
-            m_tree = std::move(tree);
+            m_tree = std::move(tr);
     }
 
     //! Accesseur de l'arbre.

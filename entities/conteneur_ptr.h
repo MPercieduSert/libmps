@@ -55,13 +55,13 @@ public:
     //! Affectation par déplacement
     list_ptr<T> &operator = (list_ptr<T> &&liste) = default;
 
-    //! Ajoute un pointeur au début de la liste de donnée entity.
-    void push_front(const T &entity)
-        {push_front(new T(entity));}
+    //! Ajoute un pointeur au début de la liste de donnée ent.
+    void push_front(const T &ent)
+        {push_front(new T(ent));}
 
-    //! Ajoute un pointeur au début de la liste de donnée entity.
-    void push_front(T &&entity)
-        {push_front(new T(std::move(entity)));}
+    //! Ajoute un pointeur au début de la liste de donnée ent.
+    void push_front(T &&ent)
+        {push_front(new T(std::move(ent)));}
 
     //! Renvoie le nombre d'élément de la liste.
     size_type size() const noexcept {
@@ -476,4 +476,4 @@ template<class T> vector_ptr<T> &vector_ptr<T>::operator <<(vector_ptr<T> &&vec)
     return *this;
 }
 }
-#endif // CONTENEURPTR_H
+#endif // CONTENEUR_PTR_H

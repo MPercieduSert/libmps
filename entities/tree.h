@@ -1818,10 +1818,10 @@ template<class T> void tree<T>::item::erase(item *last) noexcept {
         }
         auto *ptr = this;
         while (ptr) {
-            auto *delPtr = ptr;
-            delPtr->m_parent = nullptr;
+            auto *del_vtr = ptr;
+            del_vtr->m_parent = nullptr;
             ptr = ptr->m_next;
-            delete delPtr;
+            delete del_vtr;
         }
     }
 }

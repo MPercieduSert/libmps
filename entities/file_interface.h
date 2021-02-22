@@ -8,17 +8,17 @@
 #include <QFile>
 #include <QString>
 
-/*! \defgroup groupeFile Gestionnaire de fichier
+/*! \defgroup groupe_file Gestionnaire de fichier
  *\brief Ensemble des gestionnaires de fichier.
  */
 
 namespace mps {
-/*! \ingroup groupeFile
+/*! \ingroup groupe_file
  *\brief Espace de noms de gestion des fichiers.
  */
 namespace fichier {
 
-/*! \ingroup groupeFile
+/*! \ingroup groupe_file
  *\brief Interface pour la gestion des fichiers.
  *
  *Interface pour la gestion des fichiers, cette interface est utilisée par la classe FenFoundFile
@@ -70,4 +70,4 @@ public:
         {m_name = name;}
 };
 }}
-#endif // FILEINTERFACE_H
+#endif // FILE_INTERFACE_H

@@ -14,7 +14,7 @@
 #include "file_interface.h"
 
 namespace fenMPS {
-namespace fimps = fichierMPS;
+namespace fimps = fichier;
 /*! \ingroup groupeFen
  *\brief Cette classe est chargée de la vérifiaction des chemins des fichiers et de leur création s'il sont introuvables.
  */
@@ -22,7 +22,7 @@ namespace fimps = fichierMPS;
 class FenFoundFile : QObject {
 protected:
     QWidget *m_modal;
-    fichierMPS::file_interface &m_file; //!< Pointeur sur le gestionnaire du fichier que l'on souhaite ouvrrir.
+    fichier::file_interface &m_file; //!< Pointeur sur le gestionnaire du fichier que l'on souhaite ouvrrir.
 
 public:
     //! Constructeur. Donner en argument un pointeur sur le gestonnaire de fichier que l'on souhaite ouvrir.

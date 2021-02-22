@@ -2,15 +2,15 @@
 
 using namespace fenMPS;
 
-TabGestionType::TabGestionType(bmps::Bdd &bdd, const std::pair<int, int> &pairIndex, QWidget *parent)
+TabGestionType::TabGestionType(b2d::Bdd &bdd, const std::pair<int, int> &pairIndex, QWidget *parent)
     : AbstractTabModuleWithBdd (bdd, pairIndex, parent) {
     widgetMPS::CodeWidget::Cases cases(NbrCase);
-    cases.at(Attribuable) = widgetMPS::CodeWidget::caseStyle(widgetMPS::CodeWidget::Attribuable, bddMPS::code::Attribuable);
-    cases.at(Visible) = widgetMPS::CodeWidget::caseStyle(widgetMPS::CodeWidget::Visible, bddMPS::code::Visible);
+    cases.at(Attribuable) = widgetMPS::CodeWidget::caseStyle(widgetMPS::CodeWidget::Attribuable, b2d::code::Attribuable);
+    cases.at(Visible) = widgetMPS::CodeWidget::caseStyle(widgetMPS::CodeWidget::Visible, b2d::code::Visible);
     // Widget
     m_saveButton = new QPushButton(tr("Sauvegarder"));
     m_view = new widgetMPS::NodeView(std::make_unique<widgetMPS::RoundedArcPainter>());
-    m_model = new modelMPS::type_permissionModel(static_cast<bddMPS::BddPredef &>(bdd),this);
+    m_model = new modelMPS::type_permissionModel(static_cast<b2d::bdd_predef &>(bdd),this);
     m_view->setModel(m_model);
     m_view->setDelegate(new delegateMPS::CodeStandardNodeDelegate(cases,this));
     m_cibleListWidget = new QListWidget;

@@ -141,5 +141,4 @@ public:
         {return m_value;}
 };
 }
-
 #endif // TYPE_MPS_H

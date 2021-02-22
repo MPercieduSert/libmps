@@ -31,7 +31,7 @@ public:
                    OperationNodeType,
                    ChoiceNodeType,
                    ConditionNodeType,
-                   NbrType};
+                   Nbr_Type};
 
     //! Cible des données.
     enum dataCible {ComparaisonCible,
@@ -56,8 +56,8 @@ public:
                      Different,
                      Inferieure,
                      Superieure,
-                     InfEgal,
-                     SupEgal,
+                     Inf_Egal,
+                     Sup_Egal,
                      NbrComparaison};
 
    //! Structure d'informations sur une colonne du model.

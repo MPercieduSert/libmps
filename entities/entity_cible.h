@@ -1,18 +1,18 @@
 /*Auteur: PERCIE DU SERT Maxime
  *Date: 03/08/2018
  */
-#ifndef ENTITYCIBLE_H
-#define ENTITYCIBLE_H
+#ifndef ENTITY_CIBLE_H
+#define ENTITY_CIBLE_H
 
 #include "entity_relation.h"
 
 //! \ingroup groupe_macro_entity
 //! Macro implémentant une classe ayant une clé positive.
-#define ID1_ENTITY(ENTITY,TYPE,IDT,ID1) ENTITY_ALIAS_DEBUT(ENTITY,TYPE,IDT) ENUM_##TYPE(ID1) ALIAS_CLE(ID1,1)};
+#define ID1_ENTITY(ENTITY,TYPE,IDT,ID1,id1) ENTITY_ALIAS_DEBUT(ENTITY,TYPE,IDT) ENUM_##TYPE(ID1) ALIAS_CLE(id1,1)};
 
 //! \ingroup groupe_macro_entity
 //! Macro implémentant une classe ayant une clé négative.
-#define ID1_ENTITY_NEG(ENTITY,TYPE,IDT,ID1) ENTITY_ALIAS_DEBUT(ENTITY,TYPE,IDT) ENUM_##TYPE(ID1) ALIAS_CLE_NEG(ID1,1)};
+#define ID1_ENTITY_NEG(ENTITY,TYPE,IDT,ID1,id1) ENTITY_ALIAS_DEBUT(ENTITY,TYPE,IDT) ENUM_##TYPE(ID1) ALIAS_CLE_NEG(id1,1)};
 
 namespace mps {
 namespace entities_base {
@@ -20,7 +20,7 @@ namespace entities_base {
 //! Macro définissant les positions des attributs pour une clé étrangère, un nom cours, un nom et un type.
 #define ENUM_id_nc_nom_temp(ID1) /*! \brief positions des attributs */ \
     enum position:post {Id = mere::Id, Id_1 = mere::Id_1,  Nc = mere::Nc, Nom = mere::Nom, Nbr_Att = mere::Nbr_Att,\
-    Id ## ID1 = Id_1};
+    Id_ ## ID1 = Id_1};
 
 /*! \ingroup groupe_base_entity
  *\brief Classe de base des entités ayant un attribut clé, nom cours, nom et type.
@@ -77,7 +77,7 @@ template<entidt IDM > using id_neg_nc_nom_entity = id_nc_nom_entity_temp<IDM,id_
 //! Macro définissant les positions des attributs pour une clé étrangère, un nom cours, un nom et un type.
 #define ENUM_id_nc_nom_type_temp(ID1) /*! \brief positions des attributs */ \
     enum position:post {Id = mere::Id, Id_1 = mere::Id_1,  Nc = mere::Nc, Nom = mere::Nom, Type = mere::Type, \
-    Nbr_Att = mere::Nbr_Att, Id ## ID1 = Id_1};
+    Nbr_Att = mere::Nbr_Att, Id_ ## ID1 = Id_1};
 
 /*! \ingroup groupe_base_entity
  *\brief Classe de base des entités ayant un attribut clé, nom cours, nom et type.
@@ -137,7 +137,7 @@ template<entidt IDM > using id_neg_nc_nom_type_entity = id_nc_nom_type_entity_te
 //! Macro définissant les positions des attributs pour une clé étrangère, un type et une version.
 #define ENUM_id_type_version_temp(ID1) /*! \brief positions des attributs */ \
     enum position:post {Id = mere::Id, Id_1 = mere::Id_1, Type = mere::Type, Version = mere::Version, \
-    Nbr_Att = mere::Nbr_Att, Id ## ID1 = Id_1};
+    Nbr_Att = mere::Nbr_Att, Id_ ## ID1 = Id_1};
 
 /*! \ingroup groupe_base_entity
  *\brief Classe de base des entités ayant un attribut clé, nom cours, nom et type.
@@ -192,7 +192,7 @@ template<entidt IDM > using id_neg_type_version_entity = id_type_version_entity_
 //! Macro définissant les positions des attributs pour une clé étrangère, un parent, un nom cours et un nom.
 #define ENUM_id_arbre_simple_nc_nom_temp(ID1) /*! \brief positions des attributs */ \
     enum position:post {Id = mere::Id, Id_1 = mere::Id_1, Parent = mere::Parent, Nc = mere::Nc, Nom = mere::Nom, \
-    Nbr_Att = mere::Nbr_Att, Id ## ID1 = Id_1, Ordre = mere::Ordre};
+    Nbr_Att = mere::Nbr_Att, Id_ ## ID1 = Id_1, Ordre = mere::Ordre};
 
 /*! \ingroup groupe_base_entity
  *\brief Classe de base des entités ayant un attribut clé étrangère, nom cours, nom et parent.
@@ -252,7 +252,7 @@ template<entidt IDM > using id_neg_arbre_simple_nc_nom_entity = id_arbre_simple_
 //! Macro définissant les positions des attributs pour une clé étrangère, un parent, un Id_Prog, un nom cours et un nom.
 #define ENUM_id_arbre_simple_id_prog_nc_nom_temp(ID1) /*! \brief positions des attributs */ \
     enum position:post {Id = mere::Id, Id_1 = mere::Id_1, Parent = mere::Parent, Id_Prog = mere::Id_Prog, Nc = mere::Nc,\
-    Nom = mere::Nom, Nbr_Att = mere::Nbr_Att, Id ## ID1 = Id_1, Ordre = mere::Ordre};
+    Nom = mere::Nom, Nbr_Att = mere::Nbr_Att, Id_ ## ID1 = Id_1, Ordre = mere::Ordre};
 
 /*! \ingroup groupe_base_entity
  *\brief Classe de base des entités ayant un attribut clé étrangère, parent, Id_Prog, nom cours et nom.
@@ -320,7 +320,7 @@ template<entidt IDM > using id_neg_arbre_simple_id_prog_nc_nom_entity
 //! Macro définissant les positions des attributs pour une clé étrangère, une creation, une modification et un numéro.
 #define ENUM_id_creation_modif_num_temp(ID1) /*! \brief positions des attributs */ \
     enum position:post {Id = mere::Id, Id_1 = mere::Id_1, Creation = mere::Creation, Modification = mere::Modification,\
-    Num = mere::Num, Nbr_Att = mere::Nbr_Att, Id ## ID1 = Id_1};
+    Num = mere::Num, Nbr_Att = mere::Nbr_Att, Id_ ## ID1 = Id_1};
 
 /*! \ingroup groupe_base_entity
  *\brief Classe de base des entités ayant un attribut clé étrangère, creation, modification, et num.
@@ -375,7 +375,7 @@ template<entidt IDM > using id_neg_creation_modif_num_entity = id_creation_modif
 //! Macro définissant les positions des attributs pour une clé, une clé de cible et une cible.
 #define ENUM_id_date_time_type_valeur_temp(ID1) /*! \brief positions des attributs */ \
     enum position:post {Id = mere::Id, Id_1 = mere::Id_1, Date_Time = mere::Datetime, Type = mere::Type,\
-    Valeur::mere::Valeur, Nbr_Att = mere::Nbr_Att, Id ## ID1 = Id_1};
+    Valeur::mere::Valeur, Nbr_Att = mere::Nbr_Att, Id_ ## ID1 = Id_1};
 
 /*! \ingroup groupe_base_entity
  *\brief Classe de base des entités ayant un attribut date_time et Num.
@@ -495,7 +495,7 @@ template<entidt IDM > using id_neg_date_time_valide_type_valeur_variant_entity
 //! Macro définissant les positions des attributs pour une clé, une clé de cible et une cible.
 #define ENUM_cible_temp(ID1) /*! \brief positions des attributs */ \
     enum position:post {Id = mere::Id, Id_1 = mere::Id_1, Id_Cible = mere::Id_Cible, Cible = mere::Cible, \
-    Nbr_Att = mere::Nbr_Att, Id ## ID1 = Id_1};
+    Nbr_Att = mere::Nbr_Att, Id_ ## ID1 = Id_1};
 
 /*! \ingroup groupe_base_entity
  *\brief Classe de base des entités ayant un attribut clé étrangère, id_cible et Cible.
@@ -541,7 +541,7 @@ template<entidt IDM > using cible_negentity = cible_entity_temp<IDM,id_1_neg_att
 //! Macro définissant les positions des attributs pour une clé, une clé de cible, une cible et une ref.
 #define ENUM_cible_ref_temp(ID1) /*! \brief positions des attributs */ \
     enum position:post {Id = mere::Id, Id_1 = mere::Id_1, Id_Cible = mere::Id_Cible, Cible = mere::Cible, Ref = mere::Ref, \
-    Nbr_Att = mere::Nbr_Att, Id ## ID1 = Id_1};
+    Nbr_Att = mere::Nbr_Att, Id_ ## ID1 = Id_1};
 
 /*! \ingroup groupe_base_entity
  *\brief Classe de base des entités ayant un attribut clé étrangère, id_cible, cible et ref.
@@ -598,7 +598,7 @@ template<entidt IDM > using cible_neg_ref_entity = cible_ref_entity_temp<IDM,id_
 //! Macro définissant les positions des attributs pour une clé, une clé de cible, une cible, un numéro et un type.
 #define ENUM_cible_num_type_temp(ID1) /*! \brief positions des attributs */ \
     enum position:post {Id = mere::Id, Id_1 = mere::Id_1, Id_Cible = mere::Id_Cible, Cible = mere::Cible, Num = mere::Num,\
-    Type = mere::Type, Nbr_Att = mere::Nbr_Att, Id ## ID1 = Id_1};
+    Type = mere::Type, Nbr_Att = mere::Nbr_Att, Id_ ## ID1 = Id_1};
 
 /*! \ingroup groupe_base_entity
  *\brief Classe de base des entités ayant un attribut clé étrangère, id_cible, Cible, Num et Type.
@@ -658,7 +658,7 @@ template<entidt IDM > using cible_neg_num_type_entity = cible_num_type_entity_te
 //! Macro définissant les positions des attributs pour une clé, une clé de cible, une cible, une Date_Time et Valeur.
 #define ENUM_cible_num_valeur_temp(ID1) /*! \brief positions des attributs */ \
     enum position:post {Id = mere::Id, Id_1 = mere::Id_1, Id_Cible = mere::Id_Cible, Cible = mere::Cible,\
-    Num = mere::Num, Valeur = mere::Valeur, Nbr_Att = mere::Nbr_Att, Id ## ID1 = Id_1};
+    Num = mere::Num, Valeur = mere::Valeur, Nbr_Att = mere::Nbr_Att, Id_ ## ID1 = Id_1};
 
 /*! \ingroup groupe_base_entity
  *\brief Classe de base des entités ayant un attribut Id_Cible, cible, num et valeur.
@@ -746,7 +746,7 @@ template<entidt IDM > using cible_neg_num_valeur_variant_entity
 //! Macro définissant les positions des attributs pour une clé, une clé de cible, une cible et une Date_Time.
 #define ENUM_cible_date_time_temp(ID1) /*! \brief positions des attributs */ \
     enum position:post {Id = mere::Id, Id_1 = mere::Id_1, Id_Cible = mere::Id_Cible, Cible = mere::Cible,\
-    Date_Time = mere::Date_Time, Nbr_Att = mere::Nbr_Att, Id ## ID1 = Id_1};
+    Date_Time = mere::Date_Time, Nbr_Att = mere::Nbr_Att, Id_ ## ID1 = Id_1};
 
 /*! \ingroup groupe_base_entity
  *\brief Classe de base des entités ayant un attribut clé étrangère, id_cible, Cible et Date_Time.
@@ -816,7 +816,7 @@ template<entidt IDM > using cible_neg_date_time_valide_entity
 //! Macro définissant les positions des attributs pour une clé, une clé de cible, une cible, num et une Date_Time.
 #define ENUM_cible_date_time_num_temp(ID1) /*! \brief positions des attributs */ \
     enum position:post {Id = mere::Id, Id_1 = mere::Id_1, Id_Cible = mere::Id_Cible, Cible = mere::Cible, \
-    Date_Time = mere::Date_Time, Num = mere::Num, Nbr_Att = mere::Nbr_Att, Id ## ID1 = Id_1};
+    Date_Time = mere::Date_Time, Num = mere::Num, Nbr_Att = mere::Nbr_Att, Id_ ## ID1 = Id_1};
 
 /*! \ingroup groupe_base_entity
  *\brief Classe de base des entités ayant un attribut clé étrangère, id_cible, Cible, Date_Time et Num.
@@ -889,7 +889,7 @@ template<entidt IDM > using cible_neg_date_time_valide_num_entity
 //! Macro définissant les positions des attributs pour une clé, une clé de cible, une cible, num, type et une Date_Time.
 #define ENUM_cible_date_time_num_type_temp(ID1) /*! \brief positions des attributs */ \
     enum position:post {Id = mere::Id, Id_1 = mere::Id_1, Id_Cible = mere::Id_Cible, Cible = mere::Cible, \
-    Date_Time = mere::Date_Time, Num = mere::Num, Type= mere::Type, Nbr_Att = mere::Nbr_Att, Id ## ID1 = Id_1};
+    Date_Time = mere::Date_Time, Num = mere::Num, Type= mere::Type, Nbr_Att = mere::Nbr_Att, Id_ ## ID1 = Id_1};
 
 /*! \ingroup groupe_base_entity
  *\brief Classe de base des entités ayant un attribut clé étrangère, id_cible, Cible, Date_Time et Num.
@@ -966,7 +966,7 @@ template<entidt IDM > using cible_neg_date_time_valide_num_type_entity
 //! Macro définissant les positions des attributs pour une clé, une clé de cible, une cible, une Date_Time et Valeur.
 #define ENUM_cible_date_time_num_valeur_temp(ID1) /*! \brief positions des attributs */ \
     enum position:post {Id = mere::Id, Id_1 = mere::Id_1, Id_Cible = mere::Id_Cible, Cible = mere::Cible,\
-    Date_Time = mere::Date_Time, Num = mere::Num, Valeur = mere::Valeur, Nbr_Att = mere::Nbr_Att, Id ## ID1 = Id_1};
+    Date_Time = mere::Date_Time, Num = mere::Num, Valeur = mere::Valeur, Nbr_Att = mere::Nbr_Att, Id_ ## ID1 = Id_1};
 
 /*! \ingroup groupe_base_entity
  *\brief Classe de base des entités ayant un attribut une clé, Id_Cible, cible, datetime, num et valeur.
@@ -1100,7 +1100,7 @@ template<entidt IDM > using cible_neg_date_time_valide_num_valeur_variant_entity
 #define ENUM_cible_date_time_num_tp_val_valeur_temp(ID1) /*! \brief positions des attributs */ \
     enum position:post {Id = mere::Id, Id_1 = mere::Id_1, Id_Cible = mere::Id_Cible, Cible = mere::Cible,\
     Date_Time = mere::Date_Time, Num = mere::Num, Tp_Val = mere::Tp_Val, Valeur = mere::Valeur, \
-    Nbr_Att = mere::Nbr_Att, Id ## ID1 = Id_1};
+    Nbr_Att = mere::Nbr_Att, Id_ ## ID1 = Id_1};
 
 /*! \ingroup groupe_base_entity
  *\brief Classe de base des entités ayant un attribut une clé, Id_Cible, cible, datetime, num, typeVal et valeur.
@@ -1237,7 +1237,7 @@ template<entidt IDM > using cible_neg_date_time_valide_num_tp_val_valeur_variant
 //! Macro définissant les positions des attributs pour une clé, num et Valeur.
 #define ENUM_id_num_valeur_temp(ID1) /*! \brief positions des attributs */ \
     enum position:post {Id = mere::Id, Id_1 = mere::Id_1, Num = mere::Num, Valeur = mere::Valeur, \
-    Nbr_Att = mere::Nbr_Att, Id ## ID1 = Id_1};
+    Nbr_Att = mere::Nbr_Att, Id_ ## ID1 = Id_1};
 
 /*! \ingroup groupe_base_entity
  *\brief Classe de base des entités ayant un attribut clé, num et valeur.
@@ -1318,7 +1318,7 @@ template<entidt IDM > using id_neg_num_valeur_variant_entity
 //! Macro définissant les positions des attributs pour une clé, type et Valeur.
 #define ENUM_id_type_valeur_temp(ID1) /*! \brief positions des attributs */ \
     enum position:post {Id = mere::Id, Id_1 = mere::Id_1, Type = mere::Type, Valeur = mere::Valeur, \
-    Nbr_Att = mere::Nbr_Att, Id ## ID1 = Id_1};
+    Nbr_Att = mere::Nbr_Att, Id_ ## ID1 = Id_1};
 
 /*! \ingroup groupe_base_entity
  *\brief Classe de base des entités ayant un attribut clé, type et valeur.
@@ -1399,7 +1399,7 @@ template<entidt IDM > using id_neg_type_valeur_variant_entity
 //! Macro définissant les positions des attributs pour une clé, num, type, valeur et version.
 #define ENUM_id_num_type_versionValeur_temp(ID1) /*! \brief positions des attributs */ \
 enum position:post {Id = mere::Id, Id_1 = mere::Id_1, Type = mere::Type, Valeur = mere::Valeur, \
-    Nbr_Att = mere::Nbr_Att, Id ## ID1 = Id_1};
+    Nbr_Att = mere::Nbr_Att, Id_ ## ID1 = Id_1};
 
 /*! \ingroup groupe_base_entity
  *\brief Classe de base des entités ayant un attribut clé, num, type, version et valeur.
@@ -1486,7 +1486,7 @@ template<entidt IDM > using id_neg_num_type_versionvaleur_variant_entity
 //! Macro définissant les positions des attributs pour une clé, une cible et un code.
 #define ENUM_id_cible_code_temp(ID1) /*! \brief positions des attributs */ \
     enum position:post {Id = mere::Id, Id_1 = mere::Id_1, Cible = mere::Cible, Code = mere::Code, \
-    Nbr_Att = mere::Nbr_Att, Id ## ID1 = Id_1};
+    Nbr_Att = mere::Nbr_Att, Id_ ## ID1 = Id_1};
 
 /*! \ingroup groupe_base_entity
  *\brief Classe de base des entités ayant un attribut clé étrangère, id_cible et Cible.
@@ -1533,7 +1533,7 @@ template<entidt IDM > using id_neg_cible_code_entity = id_cible_code_entity_temp
 //! Macro définissant les positions des attributs pour une clé, une cible, un code et une ref.
 #define ENUM_id_cible_code_ref_temp(ID1) /*! \brief positions des attributs */ \
 enum position:post {Id = mere::Id, Id_1 = mere::Id_1, Cible = mere::Cible, Code = mere::Code, Ref = mere::Ref, \
-    Nbr_Att = mere::Nbr_Att, Id ## ID1 = Id_1};
+    Nbr_Att = mere::Nbr_Att, Id_ ## ID1 = Id_1};
 
 /*! \ingroup groupe_base_entity
  *\brief Classe de base des entités ayant un attribut clé étrangère, id_cible et Cible.
@@ -1591,7 +1591,7 @@ template<entidt IDM > using id_neg_cible_code_ref_entity = id_cible_code_ref_ent
 //! Macro définissant les positions des attributs pour une clé, une cible et un num.
 #define ENUM_id_cible_num_temp(ID1) /*! \brief positions des attributs */ \
     enum position:post {Id = mere::Id, Id_1 = mere::Id_1, Cible = mere::Cible, Num = mere::Num, \
-    Nbr_Att = mere::Nbr_Att, Id ## ID1 = Id_1};
+    Nbr_Att = mere::Nbr_Att, Id_ ## ID1 = Id_1};
 
 /*! \ingroup groupe_base_entity
  *\brief Classe de base des entités ayant un attribut clé étrangère, id_cible et Cible.
@@ -1737,7 +1737,7 @@ public:
 
     //! Constructeur à partir d'un jeux de valeurs attributs unique.
     historique_entity(idt id_cible, int cible, int num = 0, idt id = 0)
-        :eaid(id) {
+        : eaid(id) {
         set_id_cible(id_cible);
         set_cible(cible);
         set_num(num);
@@ -1879,7 +1879,7 @@ template<entidt IDM > using cible_simple_date_time_valide_num_type_valeur_varian
 #define ENUM_utilisation_temp(ID1) /*! \brief positions des attributs */ \
     enum position:post {Id = mere::Id, Id_1 = mere::Id_1, Id_Cible = mere::Id_Cible, Id_Etat = mere::Id_Etat, \
     Cible = mere::Cible, Date_Time = mere::Date_Time, Etat = mere::Etat, Num = mere::Num, \
-    Nbr_Att = mere::Nbr_Att, Id ## ID1 = Id_1};
+    Nbr_Att = mere::Nbr_Att, Id_ ## ID1 = Id_1};
 
 /*! \ingroup groupe_base_entity
  *\brief Représentation de l'entité Utilisation.
@@ -1946,4 +1946,4 @@ template<entidt IDM > using utilisation_null_entity = utilisation_entity_temp<ID
 template<entidt IDM > using utilisation_neg_entity = utilisation_entity_temp<IDM,id_1_neg_attribut>;
 #define ENUM_utilisation_neg(ID1) ENUM_utilisation_temp(ID1)
 }}
-#endif // ENTITYCIBLE_H
+#endif // ENTITY_CIBLE_H

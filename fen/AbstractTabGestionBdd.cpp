@@ -2,11 +2,11 @@
 
 using namespace fenMPS;
 
-AbstractTabGestionBdd::AbstractTabGestionBdd(QSqlDatabase &bdd, entidt nbrentity,
+AbstractTabGestionBdd::AbstractTabGestionBdd(QSqlDatabase &bdd, entidt nbr_entity,
                                              const std::pair<int, int> &pairIndex, QWidget *parent)
     : AbstractTabModule(pairIndex, parent),
-      m_nbrentity(nbrentity),
-      m_tables(nbrentity) {
+      m_nbr_entity(nbr_entity),
+      m_tables(nbr_entity) {
     m_listName = new QListWidget();
     m_stack = new QStackedWidget();
     //m_stack = new QStackedLayout();

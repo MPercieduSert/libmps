@@ -15,7 +15,7 @@
 
 namespace mps {
 namespace fichier {
-/*! \ingroup groupeFile
+/*! \ingroup groupe_file
  *\brief Gestionnaire du fichier de configuration.
  *
  *Gestionnaire du fichier de configuration enregistré sous la forme d'un document XML. Tous les noeuds ont des chemins uniques.

@@ -22,7 +22,7 @@ protected:
     arbre m_tree;           //! arbre de correspondance des lignes visibles.
     tree<szt> m_fullTree;   //! arbre de correspondance de toutes les lignes.
 public:
-    TREE_FOR_MODEL_INDEX_PARENT_ROWCOUNT(m_tree)    // Implémentation des méthodes virtuelles index, parent, rowCount.
+    TREE_FOR_MODEL_INDEX_PARENT_ROWCOUNT(m_tr)    // Implémentation des méthodes virtuelles index, parent, rowCount.
 
     //! Constructeur.
     TreeColonnesModel(bool racine, QObject *parent);

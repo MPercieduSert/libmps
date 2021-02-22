@@ -27,7 +27,7 @@ enum typeNoeud {NoType = -1,
                OperationNoeudType,
                ChoiceNoeudType,
                ConditionNoeudType,
-               NbrType};
+               Nbr_Type};
 
 //! Ensemble de noeuds
 enum setNoeud : unsigned {NoSet = 0,
@@ -61,8 +61,8 @@ enum comparaison {Egal,
                  Different,
                  Inferieure,
                  Superieure,
-                 InfEgal,
-                 SupEgal,
+                 Inf_Egal,
+                 Sup_Egal,
                  NbrComparaison};
 }
 

@@ -14,7 +14,7 @@
 #include <QTreeWidget>
 #include <QtGlobal>
 #include <QVBoxLayout>
-#include "BddPredef.h"
+#include "bdd_predef.h"
 #include "entityPredef.h"
 #include "IdComboBox.h"
 #include "TreeWidget.h"
@@ -36,11 +36,11 @@ class AbstractNewModifForm : public QWidget {
     Q_OBJECT
 protected:
     const bool m_new;                   //! true->création et false->modification ou suppression.
-    bddMPS::Bdd &m_bdd;                //! Base de données.
+    b2d::Bdd &m_bdd;                //! Base de données.
 
 public:
     //! Constructeur.
-    AbstractNewModifForm(bddMPS::Bdd &bdd, bool newEnt, QWidget *parent = nullptr)
+    AbstractNewModifForm(b2d::Bdd &bdd, bool newEnt, QWidget *parent = nullptr)
         : QWidget(parent),
           m_new(newEnt),
           m_bdd(bdd) {}
@@ -98,10 +98,10 @@ protected:
     QVBoxLayout *m_mainLayout;         //!< Calque principal du formulaire.
 public:
     //! Constructeur.
-    AbstractNomNewModifForm(bddMPS::Bdd &bdd, const QString &label, bool newEnt, QWidget *parent = nullptr);
+    AbstractNomNewModifForm(b2d::Bdd &bdd, const QString &label, bool newEnt, QWidget *parent = nullptr);
 
     //! Constructeur.
-    AbstractNomNewModifForm(bddMPS::Bdd &bdd, const QString &label, const std::vector<std::pair<idt,QString>> &noms,
+    AbstractNomNewModifForm(b2d::Bdd &bdd, const QString &label, const std::vector<std::pair<idt,QString>> &noms,
                             bool newEnt, QWidget *parent = nullptr)
         : AbstractNomNewModifForm (bdd,label,newEnt,parent)
         {set_noms(noms);}
@@ -132,7 +132,7 @@ public:
     template<class Ent> void set_noms(const conteneurMPS::vector_ptr<Ent> &vec) {
         if(!m_new){
             m_nameCB->clear();
-            m_nameCB->addText(vec,[](const Ent &ent)->const QString &{return entity.nom();});
+            m_nameCB->addText(vec,[](const Ent &ent)->const QString &{return ent.nom();});
         }
     }
 
@@ -140,7 +140,7 @@ public:
     template<class Ent> void set_noms(conteneurMPS::vector_ptr<Ent> &&vec) {
         if(!m_new){
             m_nameCB->clear();
-            m_nameCB->addText(std::move(vec),[](const Ent &ent)->const QString &{return entity.nom();});
+            m_nameCB->addText(std::move(vec),[](const Ent &ent)->const QString &{return ent.nom();});
         }
     }
 
@@ -165,7 +165,7 @@ protected:
     QHBoxLayout *m_ncLayout;         //!< Calque du nom court.
 public:
     //! Constructeur.
-    Abstractnc_nomNewModifForm(bddMPS::Bdd &bdd, const QString &lableNc, const QString &labelNom, bool newEnt, QWidget *parent = nullptr);
+    Abstractnc_nomNewModifForm(b2d::Bdd &bdd, const QString &lableNc, const QString &labelNom, bool newEnt, QWidget *parent = nullptr);
 
     //! Destructeur.
     ~Abstractnc_nomNewModifForm() override = default;
@@ -205,7 +205,7 @@ protected:
 public:
     enum {nom_type,ncType,nbrColumn};
     //! Constructeur.
-    AbstractTypenc_nomNewModifForm(bddMPS::BddPredef &bdd, const QString &refRoot, idt id_entity, const QString &labelType,
+    AbstractTypenc_nomNewModifForm(b2d::bdd_predef &bdd, const QString &refRoot, idt id_entity, const QString &labelType,
                                   const QString &labelNc, const QString &labelNom, bool newEnt, QWidget *parent = nullptr);
 
     //! Destructeur.
@@ -243,19 +243,19 @@ protected:
 public:
     enum {nomParent,ncParent,nbrColumn};
     //! Constructeur.
-    AbstractParentnc_nomNewModifForm(bddMPS::Bdd &bdd, const QStringList &header, const QString &parentType,
+    AbstractParentnc_nomNewModifForm(b2d::Bdd &bdd, const QStringList &header, const QString &parentType,
                                   const QString &labelNc, const QString &labelNom, bool newEnt, QWidget *parent = nullptr);
 
     //! Destructeur.
     ~AbstractParentnc_nomNewModifForm() override = default;
 
     //! Renvoie l'identifiant du parent sélectionné.
-    idt idParent() const
+    idt id_parent() const
         {return m_parentTree->id();}
 
     //! Mutateur du type.
-    void set_parent(idt idParent)
-        {m_parentTree->set_id(idParent);}
+    void set_parent(idt id_parent)
+        {m_parentTree->set_id(id_parent);}
 
 protected:
     //! Récupère l'entité en base de donné et met à jours les données du formulaire
@@ -288,7 +288,7 @@ public slots:
             m_form->save();
             QDialog::accept();
         }
-        catch(managerMPS::Uniqueentity_exception &e){
+        catch(manager::unique_entity_exception &e){
             QMessageBox box(QMessageBox::Critical,tr("Erreur d'enregistrement"),tr("Impossible d'enregistrer dans la base de données.\n"
                                                                                    "La nouvelle entrée entre en conflit avec une donnée"
                                                                                    " existante."),QMessageBox::Close,this);
@@ -305,26 +305,26 @@ public slots:
 };
 
 template<class Ent> void AbstractNomNewModifForm::update_temp(Ent &ent) {
-    entity.set_id(id());
-    m_bdd.get(entity);
-    m_nameCB->setEditable(m_bdd.testAutorisation(entity,bddMPS::Modif));
-    emit effacerPermis(m_bdd.testAutorisation(entity,bddMPS::Suppr));
+    ent.set_id(id());
+    m_bdd.get(ent);
+    m_nameCB->setEditable(m_bdd.test_autorisation(entity,b2d::Modif));
+    emit effacerPermis(m_bdd.test_autorisation(entity,b2d::Suppr));
 }
 
 template<class Ent> void Abstractnc_nomNewModifForm::update_temp(Ent &ent) {
-    AbstractNomNewModifForm::update_temp<Ent>(entity);
-    m_ncLine->setReadOnly(!m_bdd.testAutorisation(entity,bddMPS::Modif));
-    set_nc(entity.nc());
+    AbstractNomNewModifForm::update_temp<Ent>(ent);
+    m_ncLine->setReadOnly(!m_bdd.test_autorisation(entity,b2d::Modif));
+    set_nc(ent.nc());
 }
 
 template<class Ent> void AbstractTypenc_nomNewModifForm::update_temp(Ent &ent) {
-    Abstractnc_nomNewModifForm::update_temp<Ent>(entity);
-    set_type(entity.type());
+    Abstractnc_nomNewModifForm::update_temp<Ent>(ent);
+    set_type(ent.type());
 }
 
 template<class Ent> void AbstractParentnc_nomNewModifForm::update_temp(Ent &ent) {
-    Abstractnc_nomNewModifForm::update_temp<Ent>(entity);
-    set_parent(entity.parent());
+    Abstractnc_nomNewModifForm::update_temp<Ent>(ent);
+    set_parent(ent.parent());
 }
 }
 #endif // NEWMODIFDIALOG_H

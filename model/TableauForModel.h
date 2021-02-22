@@ -108,28 +108,28 @@ public:
 template<class Ent> class AbstractBddVectorEntTableau : public AbstractVectorEntTableau<Ent> {
 protected:
     using AbstractVectorEntTableau<Ent>::m_vec;
-    bddMPS::Bdd &m_bdd;        //! Lien avec la base de données.
+    b2d::Bdd &m_bdd;        //! Lien avec la base de données.
 public:
     //! Constructeur d'une colonne vide
-    AbstractBddVectorEntTableau(bddMPS::Bdd &bdd) : m_bdd(bdd) {}
+    AbstractBddVectorEntTableau(b2d::Bdd &bdd) : m_bdd(bdd) {}
     //! Constructeur d'un tableau d'une colonne de size value.
-    AbstractBddVectorEntTableau(bddMPS::Bdd &bdd, szt size, const Ent &value = Ent())
+    AbstractBddVectorEntTableau(b2d::Bdd &bdd, szt size, const Ent &value = Ent())
         : AbstractVectorEntTableau<Ent>(size,value), m_bdd(bdd) {}
     //! Constructeur d'un tableau constitué de vec.
-    AbstractBddVectorEntTableau(bddMPS::Bdd &bdd, const conteneurMPS::vector_ptr<Ent> &vec)
+    AbstractBddVectorEntTableau(b2d::Bdd &bdd, const conteneurMPS::vector_ptr<Ent> &vec)
         : AbstractVectorEntTableau<Ent>(vec), m_bdd(bdd) {}
     //! Constructeur d'un tableau constitué de vec.
-    AbstractBddVectorEntTableau(bddMPS::Bdd &bdd, conteneurMPS::vector_ptr<Ent> &&vec)
+    AbstractBddVectorEntTableau(b2d::Bdd &bdd, conteneurMPS::vector_ptr<Ent> &&vec)
         : AbstractVectorEntTableau<Ent>(std::move(vec)), m_bdd(bdd) {}
     //! Constructeur d'un tableau d'une colonne de size valeur fabriquée.(Factory: T(*factory)(szt)).
-    template<class Factory> AbstractBddVectorEntTableau(bddMPS::Bdd &bdd, szt size, Factory factory)
+    template<class Factory> AbstractBddVectorEntTableau(b2d::Bdd &bdd, szt size, Factory factory)
         : AbstractVectorEntTableau<Ent>(size,factory), m_bdd(bdd) {}
 
     //! Hydrate la donnée d'une ligne du tableau et retourne le succés de l'opération.
     void hydrate(szt ligne) override {m_bdd.get(m_vec[ligne]);}
 
     //! Teste si la ligne est nouvelle ou modifiée.
-    bool newOrModif(szt ligne) const override {return m_vec[ligne].is_new() || !m_bdd.sameInBdd(m_vec[ligne]);}
+    bool newOrModif(szt ligne) const override {return m_vec[ligne].is_new() || !m_bdd.same_in_bdd(m_vec[ligne]);}
 
     //! Supprime les données correspondant à la ligne dans la base de donnée.
     //! Ne doit pas supprimer de ligne de donnée du model.
@@ -211,15 +211,15 @@ public:
 template<class Ent> class AbstractBddVectorListTableau : public AbstractVectorListTableau<Ent> {
 protected:
     using AbstractVectorListTableau<Ent>::m_vec;
-    bddMPS::Bdd &m_bdd;        //! Lien avec la base de données.
+    b2d::Bdd &m_bdd;        //! Lien avec la base de données.
 public:
     //! Constructeur d'une colonne vide
-    AbstractBddVectorListTableau(bddMPS::Bdd &bdd) : m_bdd(bdd) {}
+    AbstractBddVectorListTableau(b2d::Bdd &bdd) : m_bdd(bdd) {}
     //! Constructeur d'un tableau d'une colonne de size value.
-    AbstractBddVectorListTableau(bddMPS::Bdd &bdd, szt size)
+    AbstractBddVectorListTableau(b2d::Bdd &bdd, szt size)
         : AbstractVectorListTableau<Ent>(size), m_bdd(bdd) {}
     //! Constructeur d'un tableau constitué de vec.
-    AbstractBddVectorListTableau(bddMPS::Bdd &bdd, const conteneurMPS::vector_ptr<Ent> &vec)
+    AbstractBddVectorListTableau(b2d::Bdd &bdd, const conteneurMPS::vector_ptr<Ent> &vec)
         : AbstractVectorEntTableau<Ent>(vec.size()), m_bdd(bdd) {
         auto iterVec = m_vec.begin();
         for(auto iter = vec.cbegin(); iter != vec.cend(); ++iter)
@@ -227,7 +227,7 @@ public:
     }
 
     //! Constructeur d'un tableau d'une colonne de size valeur fabriquée.(Factory: T(*factory)(szt)).
-    template<class Factory> AbstractBddVectorListTableau(bddMPS::Bdd &bdd, szt size, Factory factory)
+    template<class Factory> AbstractBddVectorListTableau(b2d::Bdd &bdd, szt size, Factory factory)
         : AbstractVectorListTableau<Ent>(size,factory), m_bdd(bdd) {}
 
     //! Teste si la ligne correspond à une donnée interne.

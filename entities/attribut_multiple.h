@@ -1,8 +1,8 @@
 /*Auteur: PERCIE DU SERT Maxime
  *Date: 23/07/2018
  */
-#ifndef ATTRIBUTMULTIPLE_H
-#define ATTRIBUTMULTIPLE_H
+#ifndef ATTRIBUT_MULTIPLE_H
+#define ATTRIBUT_MULTIPLE_H
 
 #include "attribut_simple.h"
 
@@ -173,4 +173,4 @@ public:
                 || (id_1() == 0 && id_2() == 0 && id_3_null_attribut::is_valid_attribut());}
 };
 }}
-#endif // ENTITYATTRIBUT_H
+#endif // ATTRIBUT_MULTIPLE_H

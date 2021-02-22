@@ -3,10 +3,10 @@
 using namespace modelMPS;
 
 ////////////////////////////////////////////// PermissionModel ////////////////////////////////////
-PermissionModel::PermissionModel(bddMPS::BddPredef &bdd, enumt offset, QObject *parent)
+PermissionModel::PermissionModel(b2d::bdd_predef &bdd, enumt offset, QObject *parent)
     : ItemNodeBddModel(bdd, parent), m_offset(offset) {
-    m_idNomVec.reserve(m_bdd.nbrentity());
-    for(entidt i = 0; i < m_bdd.nbrentity(); ++i) {
+    m_idNomVec.reserve(m_bdd.nbr_entity());
+    for(entidt i = 0; i < m_bdd.nbr_entity(); ++i) {
         if(m_bdd.managers().valide(i))
             m_idNomVec.emplace_back(bdd.cible(i),m_bdd.managers().info(i).name());
     }
@@ -49,21 +49,21 @@ void PermissionModel::set_cible(entidt num, bool visible){
 }
 
 //////////////////////////////////////////////////////// mot_cle_permissionModel ///////////////////////////////
-mot_cle_permissionModel::mot_cle_permissionModel(bddMPS::BddPredef &bdd, QObject *parent)
+mot_cle_permissionModel::mot_cle_permissionModel(b2d::bdd_predef &bdd, QObject *parent)
     : PermissionModel(bdd,nc_nom_refOffset,parent) {
-    m_data.setTree(bdd.getarbre<entities::mot_cle>(),[this](const entities::mot_cle &ent) {
+    m_data.setTree(bdd.get_arbre<entities::mot_cle>(),[this](const entities::mot_cle &ent) {
         auto node = std::make_unique<mot_cle_permissionNode>(this);
-        node->setEnt(entity);
+        node->setEnt(ent);
         return node;
     });
 }
 
 //////////////////////////////////////////////////////// type_permissionModel ///////////////////////////////
-type_permissionModel::type_permissionModel(bddMPS::BddPredef &bdd, QObject *parent)
+type_permissionModel::type_permissionModel(b2d::bdd_predef &bdd, QObject *parent)
     : PermissionModel(bdd,nc_nom_refOffset,parent) {
-    m_data.setTree(bdd.getarbre<entities::Type>(),[this](const entities::Type &ent) {
+    m_data.setTree(bdd.get_arbre<entities::Type>(),[this](const entities::Type &ent) {
         auto node = std::make_unique<type_permissionNode>(this);
-        node->setEnt(entity);
+        node->setEnt(ent);
         return node;
     });
 }

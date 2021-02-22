@@ -5,7 +5,7 @@
 #define CHECKLIST_H
 
 #include <QListWidget>
-#include "Bdd.h"
+#include "bdd.h"
 
 namespace widgetMPS {
 using namespace type_mps;
@@ -19,7 +19,7 @@ class Checklist : public QListWidget
 public:
     template<class Ent> class Save {
     public:
-        template<class Hydrate> static void save(bddMPS::Bdd &bdd, Checklist *list, const Hydrate &hydrate);
+        template<class Hydrate> static void save(b2d::Bdd &bdd, Checklist *list, const Hydrate &hydrate);
     };
 
     using QListWidget::QListWidget;
@@ -66,13 +66,13 @@ public:
         {setLabels(vec,F);}
 };
 
-template<class Ent> template<class Hydrate> void Checklist::Save<Ent>::save(bddMPS::Bdd &bdd, Checklist *list, const Hydrate &hydrate) {
+template<class Ent> template<class Hydrate> void Checklist::Save<Ent>::save(b2d::Bdd &bdd, Checklist *list, const Hydrate &hydrate) {
     for (auto i = 0; i != list->count(); ++i){
         Ent ent;
         hydrate(ent,list->id(i));
         if(list->item(i)->checkState() == Qt::Checked)
-            bdd.saveUnique(ent);
-        else if (bdd.existsUnique(ent))
+            bdd.save_unique(ent);
+        else if (bdd.exists_unique(ent))
             bdd.del(ent);
     }
 }

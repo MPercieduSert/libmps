@@ -2,11 +2,11 @@
 
 using namespace fenMPS;
 
-TabGestionBdd::TabGestionBdd(bmps::Bdd &bdd, const std::pair<int, int> &pairIndex, QWidget *parent)
+TabGestionBdd::TabGestionBdd(b2d::Bdd &bdd, const std::pair<int, int> &pairIndex, QWidget *parent)
     : AbstractTabModuleWithBdd (bdd, pairIndex, parent),
       m_info(m_pairIndex.second > 0 ? m_bdd.managers().info(static_cast<entidt>(m_pairIndex.second))
-                                  : m_bdd.managers().get(static_cast<entidt>(-m_pairIndex.second)).infoarbre()),
-      m_Names_attributs( m_pairIndex.second > 0 ? m_bdd.managers().get(static_cast<entidt>(m_pairIndex.second)).names_attributs()
+                                  : m_bdd.managers().get(static_cast<entidt>(-m_pairIndex.second)).info_arbre()),
+      m_Names_attributs( m_pairIndex.second > 0 ? m_bdd.managers().get(static_cast<entidt>(m_pairIndex.second)).names_attribut()
                                                : entities_base::arbre::Names_attribut())
 {
     m_model = new QSqlTableModel(this,m_bdd.db());

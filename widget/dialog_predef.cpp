@@ -2,7 +2,7 @@
 
 using namespace widgetMPS;
 
-SelectTableDialog::SelectTableDialog(bddMPS::Bdd::vector_id_name &&vec, QWidget *parent)
+SelectTableDialog::SelectTableDialog(b2d::Bdd::vector_id_name &&vec, QWidget *parent)
     :QDialog (parent) {
     // Widget
     m_label = new QLabel("Sélectionner la table à exporter.");
@@ -48,6 +48,6 @@ SelectTableDialog::SelectTableDialog(bddMPS::Bdd::vector_id_name &&vec, QWidget 
 flag SelectTableDialog::option() const {
     flag op;
     if(m_restriction_cb->isChecked())
-        op |= bddMPS::Bdd::RestrictionExportationXml;
+        op |= b2d::Bdd::Restriction_Exportation_Xml;
     return op;
 }

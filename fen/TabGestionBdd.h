@@ -17,7 +17,7 @@ namespace fenMPS {
 class TabGestionBdd : public AbstractTabModuleWithBdd
 {
 protected:
-    managerMPS::InfoBdd m_info;                 //!< Information sur la table.
+    manager::info_bdd m_info;                 //!< Information sur la table.
     std::vector<QString> m_Names_attributs;      //!< Noms des attributs.
     QSqlTableModel *m_model;                   //!< Model.
     QTableView *m_view;                        //!< Vue.
@@ -28,7 +28,7 @@ protected:
     QVBoxLayout *m_mainLayout;                 //!< Calque principal.
 
 public:
-    TabGestionBdd(bmps::Bdd &bdd, const std::pair<int, int> &pairIndex, QWidget *parent = nullptr);
+    TabGestionBdd(b2d::Bdd &bdd, const std::pair<int, int> &pairIndex, QWidget *parent = nullptr);
 
     //! Accesseur du titre.
     QString title() const

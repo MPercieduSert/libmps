@@ -8,7 +8,7 @@
 #include <QAbstractItemModel>
 #include <QBrush>
 #include "AbstractModel.h"
-#include "Bdd.h"
+#include "bdd.h"
 #include "conteneur_ptr.h"
 #include "entity.h"
 #include "type_mps.h"

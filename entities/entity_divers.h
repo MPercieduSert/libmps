@@ -1,8 +1,8 @@
 /*Auteur: PERCIE DU SERT Maxime
  *Date: 03/08/2018
  */
-#ifndef ENTITYDIVERS
-#define ENTITYDIVERS
+#ifndef ENTITY_DIVERS
+#define ENTITY_DIVERS
 
 #include "entity.h"
 
@@ -657,4 +657,4 @@ public:
         {set_date_time(dt);}
 };
 }}
-#endif // ENTITYDIVERS
+#endif // ENTITY_DIVERS

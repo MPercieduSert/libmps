@@ -8,7 +8,7 @@
 #include <QObject>
 #include <QVariant>
 #include <set>
-#include "Bdd.h"
+#include "bdd.h"
 #include "tree.h"
 #include "type_mps.h"
 
@@ -146,7 +146,7 @@ public:
         {return cible == NodeCible ? 1 : NoData;}
 
     //! Supprime les donnée du noeud.
-    virtual bool del(/*bddMPS::Bdd &*/) {return true;}
+    virtual bool del(/*b2d::Bdd &*/) {return true;}
 
     //! Accesseur des drapeaux associés à column.
     virtual flag flags(int cible, numt /*num*/ = 0) const {
@@ -568,10 +568,10 @@ public:
     NODE_COPIE(ItemBddNode)
 
     //! Enregistre les données du noeud.
-    virtual void save(bddMPS::Bdd &) {}
+    virtual void save(b2d::Bdd &) {}
 
     //! Insert un nouveau noeud dans la base de donnée.
-    virtual void insert(bddMPS::Bdd &) {}
+    virtual void insert(b2d::Bdd &) {}
 };
 
 /*! \ingroup groupeModel
@@ -580,14 +580,14 @@ public:
 class ItemNodeBddModel : public ItemNodeModel {
     Q_OBJECT
 protected:
-    bddMPS::Bdd &m_bdd;            //!< Référence à la base de donnée.
+    b2d::Bdd &m_bdd;            //!< Référence à la base de donnée.
 public:
     //! Constructeur.
-    ItemNodeBddModel(bddMPS::Bdd &bdd, QObject *parent)
+    ItemNodeBddModel(b2d::Bdd &bdd, QObject *parent)
         : ItemNodeModel(parent), m_bdd(bdd) {}
 
     //! Accesseur de la base de données.
-    bddMPS::Bdd &bdd() const
+    b2d::Bdd &bdd() const
         {return m_bdd;}
 
 public slots:

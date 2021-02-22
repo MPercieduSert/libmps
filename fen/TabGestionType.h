@@ -8,7 +8,7 @@
 #include <QListWidget>
 #include <QPushButton>
 #include "AbstractTabModuleWithBdd.h"
-#include "BddPredef.h"
+#include "bdd_predef.h"
 #include "CodeWidget.h"
 #include "PredefModel.h"
 #include "StandardNodeWidget.h"
@@ -35,7 +35,7 @@ public:
                       Attribuable,
                       NbrCase};
     //! Constructeur.
-    TabGestionType(bmps::Bdd &bdd, const std::pair<int, int> &pairIndex, QWidget *parent = nullptr);
+    TabGestionType(b2d::Bdd &bdd, const std::pair<int, int> &pairIndex, QWidget *parent = nullptr);
 
     //! Accesseur du titre.
     QString title() const override

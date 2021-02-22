@@ -2,13 +2,13 @@
 
 using namespace dialogMPS;
 //////////////////////////////////////////////// EvenementNewModifForm ////////////////////////////////////////
-EvenementNewModifForm::EvenementNewModifForm(bddMPS::Bdd &bdd, bool newEnt, QWidget *parent)
-    : AbstractTypenc_nomNewModifForm(static_cast<bddMPS::BddPredef &>(bdd),"evenement_root_tp",Evenement::ID,
+EvenementNewModifForm::EvenementNewModifForm(b2d::Bdd &bdd, bool newEnt, QWidget *parent)
+    : AbstractTypenc_nomNewModifForm(static_cast<b2d::bdd_predef &>(bdd),"evenement_root_tp",Evenement::ID,
                                     "Type de l'événement :","Nom abrégé de l'événement :","Nom de l'événement :",
                                     newEnt,parent){
     // Nom
     if(!m_new)
-        set_noms(bdd.getList<Evenement>(Evenement::Nom));
+        set_noms(bdd.get_list<Evenement>(Evenement::Nom));
     // Debut
     m_debutGroupe = new QGroupBox(tr("Début :"));
     m_debutDate = new QCalendarWidget;
@@ -27,7 +27,7 @@ EvenementNewModifForm::EvenementNewModifForm(bddMPS::Bdd &bdd, bool newEnt, QWid
     // Style
     m_styleLabel = new QLabel(tr("Style :"));
     m_styleICB = new widgetMPS::IdComboBox;
-    m_styleICB->addText(bdd.getList<evenement_style>(evenement_style::Nom),
+    m_styleICB->addText(bdd.get_list<evenement_style>(evenement_style::Nom),
                         [](const evenement_style &style){return style.nom();});
 
     // Titre
@@ -137,12 +137,12 @@ void EvenementNewModifForm::updateData() {
 }
 
 //////////////////////////////////////////////// evenement_styleNewModifForm ///////////////////////////////////
-evenement_styleNewModifForm::evenement_styleNewModifForm(bddMPS::Bdd &bdd, bool newEnt, QWidget *parent)
+evenement_styleNewModifForm::evenement_styleNewModifForm(b2d::Bdd &bdd, bool newEnt, QWidget *parent)
     : AbstractNomNewModifForm(bdd,
                               tr("Nom du style d'événements :"),
                               newEnt,parent) {
     if(!newEnt)
-        set_noms(bdd.getList<evenement_style>(evenement_style::Nom));
+        set_noms(bdd.get_list<evenement_style>(evenement_style::Nom));
     // Forme
     m_formGroupe = new QGroupBox(tr("Forme et bordure:"));
     m_formCB = new QComboBox;

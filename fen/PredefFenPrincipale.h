@@ -27,7 +27,7 @@ protected:
 
 public:
     //! Constructeur.
-    explicit PredefFenPrincipale(AbstractNoyau *noyau, std::unique_ptr<bddMPS::Bdd> &&bdd, PredefZoneCentrale *centralZone,
+    explicit PredefFenPrincipale(AbstractNoyau *noyau, std::unique_ptr<b2d::Bdd> &&bdd, PredefZoneCentrale *centralZone,
                            const QString &bddPathXML,
                            const QString &configPath = QDir::currentPath().append("/Config.xml"),
                            QWidget *parent = nullptr);

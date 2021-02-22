@@ -4,7 +4,7 @@
 #ifndef ABSTRACTNOYAU_H
 #define ABSTRACTNOYAU_H
 
-#include "Bdd.h"
+#include "bdd.h"
 /*#include "../Dialog/NewAnneeDialog.h"
 #include "../Dialog/NewClasseDialog.h"
 #include "../Dialog/NewEtablissementDialog.h"
@@ -17,7 +17,7 @@
  */
 
 namespace fenMPS {
-namespace bmps = bddMPS;
+namespace b2d = b2d;
 /*! \ingroup groupeNoyau
  *\brief Noyau de l'application.
  *
@@ -27,7 +27,7 @@ namespace bmps = bddMPS;
 class AbstractNoyau : public QObject {
     Q_OBJECT
 protected:
-     std::unique_ptr<bmps::Bdd> m_bdd;                 //!< Gestionnaire de la Base de donnée.
+     std::unique_ptr<b2d::Bdd> m_bdd;                 //!< Gestionnaire de la Base de donnée.
      std::unique_ptr<fimps::Config> m_config;           //!< Gestionnaire de la configuration.
 
 public:
@@ -41,7 +41,7 @@ public:
     //TabAbstractModule *activeTab() const;
 
     //! Renvoie un pointeur sur le gestionnaire de Base de donnée.
-    virtual bmps::Bdd &bdd()
+    virtual b2d::Bdd &bdd()
         {return *m_bdd;}
 
     //! Renvoie un pointeur sur le gestionnaire de configuration.
@@ -49,16 +49,16 @@ public:
         {return *m_config;}
 
     //! Importe des entités dans la base de données à partir du fichier xml de chemin path.
-    void importXml(const QString &path);
+    void import_xml(const QString &path);
 
     //! Exporte des entités dans un fichier xml.
-    void exportXml(const QString &path, conteneurMPS::vector_ptr<entities::entity> &&vec, flag option);
+    void export_xml(const QString &path, conteneurMPS::vector_ptr<entities::entity> &&vec, flag option);
 
     //! Écrit le schema xml des fichiers d'importation de données, dans le fichier de chemin path.
     void schemaXmlForimport(const QString &path);
 
     //!Ouvre le gestionnaire de Base de données.
-    void setBdd(std::unique_ptr<bmps::Bdd> &&bdd, const QString &pathXML, QWidget *modalParent = nullptr);
+    void setBdd(std::unique_ptr<b2d::Bdd> &&bdd, const QString &pathXML, QWidget *modalParent = nullptr);
 
     //!Ouvre le gestionnaire de configuration.
     void setConfig(std::unique_ptr<fimps::Config> &&config, QWidget *modalParent = nullptr);
@@ -68,7 +68,7 @@ public:
 
 protected:
     //! Hydrate l'entité à partire d'un itérateur sur un docXml.
-    bool hydrateXml(entities::entity &ent, fichierMPS::doc_xml::const_brother_iterator iter);
+    bool hydrateXml(entities::entity &ent, fichier::doc_xml::const_brother_iterator iter);
 };
 }
 #endif // ABSTRACTNOYAU_H

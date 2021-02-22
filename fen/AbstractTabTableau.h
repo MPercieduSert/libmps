@@ -24,7 +24,7 @@ protected:
     QPushButton *m_saveButton;             //!< Bouton save
 public:
     //! Constructeur.
-    explicit AbstractTabTableau(bmps::Bdd &bdd, const std::pair<int, int> &pairIndex, QWidget *parent = nullptr);
+    explicit AbstractTabTableau(b2d::Bdd &bdd, const std::pair<int, int> &pairIndex, QWidget *parent = nullptr);
 
     //! Destructeur.
     ~AbstractTabTableau() override = default;
