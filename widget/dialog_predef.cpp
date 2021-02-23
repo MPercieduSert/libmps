@@ -1,16 +1,17 @@
 #include "dialog_predef.h"
 
-using namespace widgetMPS;
+using namespace mps;
+using namespace dialogue;
 
-SelectTableDialog::SelectTableDialog(b2d::Bdd::vector_id_name &&vec, QWidget *parent)
+select_table_dialog::select_table_dialog(b2d::bdd::vector_id_name &&vec, QWidget *parent)
     :QDialog (parent) {
     // Widget
     m_label = new QLabel("Sélectionner la table à exporter.");
     m_list_widget = new QListWidget;
     for (auto iter = vec.cbegin(); iter != vec.cend(); ++iter) {
         auto item = new QListWidgetItem(iter->second);
-        item->set_data(Qt::UserRole,iter->first);
-        item->set_flags(Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
+        item->setData(Qt::UserRole,iter->first);
+        item->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
         item->setCheckState(Qt::Unchecked);
         m_list_widget->addItem(item);
     }
@@ -31,8 +32,8 @@ SelectTableDialog::SelectTableDialog(b2d::Bdd::vector_id_name &&vec, QWidget *pa
     m_valider_bouton = new QPushButton("Choisir un fichier");
     m_valider_bouton->setDefault(true);
     m_valider_bouton->setDisabled(true);
-    connect(m_annuler_bouton,&QPushButton::clicked,this,&SelectTableDialog::reject);
-    connect(m_valider_bouton,&QPushButton::clicked,this,&SelectTableDialog::accept);
+    connect(m_annuler_bouton,&QPushButton::clicked,this,&select_table_dialog::reject);
+    connect(m_valider_bouton,&QPushButton::clicked,this,&select_table_dialog::accept);
 
     // Calque
     m_bouton_layout = new QHBoxLayout;
@@ -45,9 +46,9 @@ SelectTableDialog::SelectTableDialog(b2d::Bdd::vector_id_name &&vec, QWidget *pa
     m_main_layout->addLayout(m_bouton_layout);
 }
 
-flag SelectTableDialog::option() const {
+flag select_table_dialog::option() const {
     flag op;
     if(m_restriction_cb->isChecked())
-        op |= b2d::Bdd::Restriction_Exportation_Xml;
+        op |= b2d::bdd::Restriction_Exportation_Xml;
     return op;
 }

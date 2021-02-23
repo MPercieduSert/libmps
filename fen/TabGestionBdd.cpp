@@ -20,24 +20,24 @@ TabGestionBdd::TabGestionBdd(b2d::Bdd &bdd, const std::pair<int, int> &pairIndex
     m_refreshButton = new QPushButton(tr("Actualiser"));
     m_insertButton = new QPushButton(tr("Ajouter"));
     m_saveButton = new QPushButton(tr("Sauvegarder"));
-    m_supprButton = new QPushButton(tr("Supprimer"));
+    m_suppr_bouton = new QPushButton(tr("Supprimer"));
     connect(m_insertButton,&QPushButton::clicked,[this](){m_model->insertRow(m_model->row_count());});
     connect(m_saveButton,&QPushButton::clicked,m_model,&QSqltable_model::submitAll);
-    connect(m_supprButton,&QPushButton::clicked,[this]()
+    connect(m_suppr_bouton,&QPushButton::clicked,[this]()
         {
             auto indexList = m_view->selectionModel()->selectedRows();
             for(auto j = indexList.cbegin(); j != indexList.cend(); ++j)
                 m_model->removeRow(j->row());
         });
     connect(m_refreshButton,&QPushButton::clicked,m_model,&QSqltable_model::submitAll);
-    auto *buttonLayout = new QHBoxLayout;
-    buttonLayout->addWidget(m_refreshButton);
-    buttonLayout->addWidget(m_insertButton);
-    buttonLayout->addWidget(m_saveButton);
-    buttonLayout->addWidget(m_supprButton);
-    m_mainLayout = new QVBoxLayout(this);
-    m_mainLayout->addWidget(m_view);
-    m_mainLayout->addLayout(buttonLayout);
+    auto *button_layout = new QHBoxLayout;
+    button_layout->addWidget(m_refreshButton);
+    button_layout->addWidget(m_insertButton);
+    button_layout->addWidget(m_saveButton);
+    button_layout->addWidget(m_suppr_bouton);
+    m_main_layout = new QVBoxLayout(this);
+    m_main_layout->addWidget(m_view);
+    m_main_layout->addLayout(button_layout);
 
     //vLayout->setContentsMargins(0,0,0,0);
 }

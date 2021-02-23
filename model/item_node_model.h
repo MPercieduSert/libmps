@@ -465,10 +465,10 @@ signals:
     void model_reset_data();
 
     //! Signal de début d'insertion de noeuds.
-    void nodes_about_to_be_Inserted(const node_index &parent, numt pos, numt count);
+    void nodes_about_to_be_inserted(const node_index &parent, numt pos, numt count);
 
     //! Signal de début de suppression de noeuds.
-    void nodes_about_to_be_Removed(const node_index &parent, numt pos, numt count);
+    void nodes_about_to_be_removed(const node_index &parent, numt pos, numt count);
 
     //! Signal de fin d'insertion de noeuds.
     void nodes_inserted(const node_index &parent, numt pos, numt count);
@@ -480,7 +480,7 @@ protected:
     //! Début d'insertions de noeuds.
     void begin_insert_nodes(const node_index &parent, numt pos, numt count) {
         m_insert_nodes_pile.push_front({parent,pos,count});
-        emit nodes_about_to_be_Inserted(parent,pos,count);
+        emit nodes_about_to_be_inserted(parent,pos,count);
     }
 
     //! Début de déplacement de lignes.
@@ -492,7 +492,7 @@ protected:
         auto pos = index.position();
         node_info info({index.parent(),pos,count});
         m_remove_nodes_pile.push_front(info);
-        emit nodes_about_to_be_Removed(info.parent,info.pos,info.count);
+        emit nodes_about_to_be_removed(info.parent,info.pos,info.count);
     }
 
     //! Début de réinitialisation des données du model.

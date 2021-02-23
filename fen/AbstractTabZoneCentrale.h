@@ -15,7 +15,7 @@ class AbstractTabZoneCentrale : public AbstractZoneCentrale {
     Q_OBJECT
 protected:
     AbstractTab *m_tab;            //!< Porte onglet.
-    QHBoxLayout *m_mainLayout;     //!< Calque Principale.
+    QHBoxLayout *m_main_layout;     //!< Calque Principale.
 
 public:
     //! Constructeur.

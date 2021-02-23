@@ -9,9 +9,9 @@
 #include <QPushButton>
 #include "AbstractTabModuleWithBdd.h"
 #include "bdd_predef.h"
-#include "CodeWidget.h"
+#include "code_widget.h"
 #include "predef_model.h"
-#include "Standardnode_ptrWidget.h"
+#include "Standardnode_widget.h"
 
 namespace fenMPS {
 /*! \ingroup groupeFen
@@ -21,13 +21,13 @@ class TabGestionType : public AbstractTabModuleWithBdd
 {
 protected:
     model_base::type_permission_model *m_model;    //!< Model.
-    widgetMPS::node_ptrView *m_view;               //!< Vue.
+    widget::node_view *m_view;               //!< Vue.
     QListWidget *m_cibleListWidget;            //!< Sélection des cibles.
     QPushButton *m_saveButton;                 //!< Bouton de sauvegarde.
 
     // Calque
-    QVBoxLayout *m_cibleLayout;                //!< Calque des cibles.
-    QHBoxLayout *m_mainLayout;                 //!< Calque principal.
+    QVBoxLayout *m_cible_layout;                //!< Calque des cibles.
+    QHBoxLayout *m_main_layout;                 //!< Calque principal.
 
 public:
     //! position des cases.

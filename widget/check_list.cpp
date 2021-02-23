@@ -1,11 +1,12 @@
-#include "Checklist.h"
+#include "check_list.h"
 
-using namespace widgetMPS;
+using namespace mps;
+using namespace widget;
 
-void Checklist::setLabels(const std::map<idt,QString> &map) {
+void check_list::set_labels(const std::map<idt,QString> &map) {
     for(auto i = map.cbegin(); i != map.cend(); ++i) {
         auto *item = new QListWidgetItem(i->second);
-        item->set_data(Qt::UserRole,i->first);
+        item->setData(Qt::UserRole,i->first);
         item->setCheckState(Qt::Unchecked);
         addItem(item);
     }

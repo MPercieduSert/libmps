@@ -15,12 +15,12 @@
 #include <type_mps.h>
 #include <set>
 
-namespace widgetMPS {
-using namespace type_mps;
-/*! \ingroup groupeWidget
+namespace mps {
+namespace dialogue {
+/*! \ingroup groupe_Widget
  *\brief Dialogue de selection d'une table.
  */
-class SelectTableDialog : public QDialog {
+class select_table_dialog : public QDialog {
     Q_OBJECT
 protected:
     std::set<entidt> m_set;       //!< Ensemble des identifiants séléctionnés.
@@ -36,7 +36,7 @@ protected:
     QVBoxLayout *m_main_layout;         //!< Calque principale
 public:
     //! Constructeur.
-    SelectTableDialog(b2d::Bdd::vector_id_name &&vec, QWidget *parent = nullptr);
+    select_table_dialog(b2d::bdd::vector_id_name &&vec, QWidget *parent = nullptr);
 
     //! Acceseur de l'ensemble des identifiants.
     const std::set<entidt> &set() const
@@ -45,5 +45,5 @@ public:
     //! Renvoie un drapeaux sur les options.
     flag option() const;
 };
-}
+}}
 #endif // DIALOG_PREDEF_H

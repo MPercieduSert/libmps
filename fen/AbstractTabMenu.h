@@ -26,7 +26,7 @@ protected:
     QSignalMapper *m_ButtonMapper;                  //!< Lie les boutons à leur actions.
 
     // Layout
-    QHBoxLayout *m_mainLayout;                    //!< Calque principal.
+    QHBoxLayout *m_main_layout;                    //!< Calque principal.
 
 public:
     //! Ordre de position dans le layout principal

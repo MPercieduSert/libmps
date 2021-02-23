@@ -1,77 +1,77 @@
 /*Auteur: PERCIE DU SERT Maxime
  *Date: 04/12/2020
  */
-#ifndef CODEWIDGET_H
-#define CODEWIDGET_H
+#ifndef CODE_WIDGET_H
+#define CODE_WIDGET_H
 
 #include <QGuiApplication>
 #include <QMouseEvent>
 #include <QPainter>
 #include <QWidget>
-#include <type_mps.h>
+#include "type_mps.h"
 
-namespace widgetMPS {
-using namespace type_mps;
-/*! \ingroup groupeWidget
+namespace mps {
+namespace widget {
+/*! \ingroup groupe_Widget
  *\brief Widget de visialisation et de modifiaction d'un code.
  */
-class CodeWidget : public QWidget {
+class code_widget : public QWidget {
     Q_OBJECT
 public:
     //! Options de représentation.
-    struct CaseOption {
+    struct option_case {
         flag code;
-        QBrush backgroundFalse;
-        QBrush backgroundTrue;
-        QBrush foregroundFalse;
-        QBrush foregroundTrue;
-        QBrush foregroundReadFalse;
-        QBrush foregroundReadTrue;
-        QFont fontFalse;
-        QFont fontTrue;
-        QString textFalse;
-        QString textTrue;};
+        QBrush background_false;
+        QBrush background_true;
+        QBrush foreground_false;
+        QBrush foreground_true;
+        QBrush foregroundRead_false;
+        QBrush foregroundRead_true;
+        QFont font_false;
+        QFont font_true;
+        QString text_false;
+        QString text_true;};
     //! Type de représentation d'un drapeaux.
-    using Cases = std::vector<CaseOption>;
+    using vec_option_case = std::vector<option_case>;
     //! Style des cases préconfigurer.
-    enum styleCase {
+    enum style_case {
         Visible,
         Attribuable};
 protected:
     int m_cote;                     //!< Taille des coté des carrés.
-    const Cases &m_cases;          //!< Référence au mode de représantation d'un code.
+    const vec_option_case &m_cases;          //!< Référence au mode de représantation d'un code.
     flag m_code;                    //!< Le code représenté.
-    bool m_readOnly = false;        //!< Le widget est-il en lecture seule.
+    bool m_read_only = false;        //!< Le widget est-il en lecture seule.
 
 public:
     //! Taille.
-    enum {CoteSize = 25, FontSize = 12};
+    enum {Cote_Size = 25, Font_Size = 12};
     //! Constructeur.
-    CodeWidget(const Cases &cases, int cote = CoteSize, QWidget *parent = nullptr);
+    code_widget(const vec_option_case &cases, int cote = Cote_Size, QWidget *parent = nullptr);
 
     //! Style d'une case.
-    static CaseOption caseStyle(styleCase sc, flag code);
+    static option_case case_style(style_case sc, flag code);
 
     //! Accesseur du code.
     flag code() const noexcept
         {return m_code;}
 
-    //! Accesseur de readOnly.
-    bool readOnly() const noexcept
-        {return  m_readOnly;}
+    //! Accesseur de read_only.
+    bool read_only() const noexcept
+        {return  m_read_only;}
 
     //! Mutateur du code.
     void set_code(flag code);
 
     //! Mutateur de la cote.
-    void setCote(int cote) {
+    void set_cote(int cote) {
         m_cote = cote;
         adjustSize();
     }
 
-    //! Accesseur de readOnly.
-    void setReadOnly(bool bb) noexcept {
-        m_readOnly = bb;
+    //! Accesseur de read_only.
+    void set_read_only(bool bb) noexcept {
+        m_read_only = bb;
         repaint();
     }
 
@@ -80,7 +80,7 @@ public:
         {return QSize(m_cote *static_cast<int>(m_cases.size()),m_cote);}
 signals:
     //! Signal emit lors du changment de code.
-    void codeChanged(flag code);
+    void code_changed(flag code);
 protected:
     //! Gestionnaire de click de souris.
     void mousePressEvent(QMouseEvent *event) override;
@@ -88,5 +88,5 @@ protected:
     //! Dessine le widget.
     void paintEvent(QPaintEvent *event) override;
 };
-}
-#endif // CodeWIDGET_H
+}}
+#endif // CODE_WIDGET_H

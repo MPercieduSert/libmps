@@ -24,8 +24,8 @@ protected:
     QPushButton *m_insertButton;               //!< Bouton d'insertion d'une ligne.
     QPushButton *m_refreshButton;              //!< Bouton rafraichisant l'affichage.
     QPushButton *m_saveButton;                 //!< Bouton de sauvegarde.
-    QPushButton *m_supprButton;                //!< Bouton de suppression d'une entité.
-    QVBoxLayout *m_mainLayout;                 //!< Calque principal.
+    QPushButton *m_suppr_bouton;                //!< Bouton de suppression d'une entité.
+    QVBoxLayout *m_main_layout;                 //!< Calque principal.
 
 public:
     TabGestionBdd(b2d::Bdd &bdd, const std::pair<int, int> &pairIndex, QWidget *parent = nullptr);

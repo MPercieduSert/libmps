@@ -36,7 +36,7 @@ void PredefFenPrincipale::connectActionToOpenTab(QAction *action, const std::pai
     {connect(action,&QAction::triggered,this,[this,pairIndex,vec](){centraleZone()->openTab(pairIndex,vec);});}
 
 void PredefFenPrincipale::export_xml() {
-    widgetMPS::SelectTableDialog dialog(noyau()->bdd().table_entity_names(),this);
+    widget::select_table_dialog dialog(noyau()->bdd().table_entity_names(),this);
     if(dialog.exec()){
         auto name = QFileDialog::getSaveFileName(this,
                                                      tr("Exporter des données dans un fichier XML"),

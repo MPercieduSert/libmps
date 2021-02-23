@@ -16,7 +16,7 @@
 #include "AbstractNoyau.h"
 #include "AbstractZoneCentrale.h"
 #include "FenFlags.h"
-#include "NewModifDialog.h"
+#include "new_modif_dialog.h"
 
 namespace fenMPS {
 /*! \ingroup groupeFen
@@ -74,7 +74,7 @@ protected:
     void addMenuBdd();
 
     //! Connecte une QAction à l'ouverture d'un dialogue de création et modification.
-    template<class From> void connectActionToNewModifDialog(QAction *action, bool newEnt);
+    template<class From> void connectActionTonew_modif_dialog(QAction *action, bool new_ent);
 
     //! Crée les différente action des menus et toolbars de la fenêtre principale.
     void createAction();
@@ -86,10 +86,10 @@ protected:
     void createToolBar();
 };
 
-template<class Form> void FenPrincipale::connectActionToNewModifDialog(QAction *action, bool newEnt) {
-    connect(action,&QAction::triggered,this, [this,newEnt](){
-                            auto *form = new Form(noyau()->bdd(), newEnt);
-                            dialogMPS::NewModifDialog diag(form,this);
+template<class Form> void FenPrincipale::connectActionTonew_modif_dialog(QAction *action, bool new_ent) {
+    connect(action,&QAction::triggered,this, [this,new_ent](){
+                            auto *form = new Form(noyau()->bdd(), new_ent);
+                            dialogue::new_modif_dialog diag(form,this);
                             diag.exec();
                         });
 }

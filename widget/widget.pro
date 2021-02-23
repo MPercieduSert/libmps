@@ -22,68 +22,68 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-    AbstractEntitySelectWidget.cpp \
     #BarPlotter.cpp \
-    Checklist.cpp \
-    #EditTreeWidget.cpp \
-    FindNoeudWidget.cpp \
+    #Edittree_widget.cpp \
+    #FindNoeudWidget.cpp \
     #Histogramme.cpp \
-    IdComboBox.cpp \
     #mot_cleDelegate.cpp \
     #mot_cleModel.cpp \
     #mot_cleWidget.cpp \
-    NewModifDialog.cpp \
-    NewModifPredef.cpp \
     #Newmot_cleDialog.cpp \
     #Plotter.cpp \
-    #ReadTreeWidget.cpp \
+    #Readtree_widget.cpp \
     #SelectdonneeDialog.cpp \
-    SelectInListBox.cpp \
-    SpinBox.cpp \
-    TableEntityView.cpp \
     #TreeModelEditent.cpp \
     #TreeModelmot_cle.cpp \
     #TreeModelReadent.cpp \
     #TreeModelRead_temp.cpp \
     #TreeModel_temp.cpp \
-    TreeWidget.cpp \
-    node_ptrView.cpp \
-    FindWidget.cpp \
-    Standardnode_ptrWidget.cpp \
-    CodeWidget.cpp \
-    dialog_predef.cpp
+    dialog_predef.cpp \
+    id_combo_box.cpp \
+    abstract_entity_select_widget.cpp \
+    check_list.cpp \
+    code_widget.cpp \
+    spin_box.cpp \
+    node_view.cpp \
+    standard_node_widget.cpp \
+    find_widget.cpp \
+    select_in_list_box.cpp \
+    table_entity_view.cpp \
+    new_modif_dialog.cpp \
+    tree_widget.cpp \
+    new_modif_predef.cpp
 
 HEADERS += \
-    AbstractEntitySelectWidget.h \
     #BarPlotter.h \
-    Checklist.h \
-    #EditTreeWidget.h \
-    FindNoeudWidget.h \
+    #Edittree_widget.h \
+    #FindNoeudWidget.h \
     #Histogramme.h \
-    IdComboBox.h \
     #mot_cleDelegate.h \
     #mot_cleModel.h \
     #mot_cleWidget.h \
-    NewModifDialog.h \
-    NewModifPredef.h \
     #Newmot_cleDialog.h \
     #Plotter.h \
-    #ReadTreeWidget.h \
+    #Readtree_widget.h \
     #SelectdonneeDialog.h \
-    SelectInListBox.h \
-    SpinBox.h \
-    TableEntityView.h \
     #TreeModelEditentity.h \
     #TreeModelmot_cle.h \
     #TreeModelReadentity.h \
     #TreeModelRead_temp.h \
     #TreeModel_temp.h \
-    TreeWidget.h \
-    node_ptrView.h \
-    FindWidget.h \
-    Standardnode_ptrWidget.h \
-    CodeWidget.h \
-    dialog_predef.h
+    dialog_predef.h \
+    id_combo_box.h \
+    abstract_entity_select_widget.h \
+    check_list.h \
+    code_widget.h \
+    spin_box.h \
+    node_view.h \
+    standard_node_widget.h \
+    find_widget.h \
+    select_in_list_box.h \
+    table_entity_view.h \
+    new_modif_dialog.h \
+    tree_widget.h \
+    new_modif_predef.h
 
 unix {
     target.path = /usr/lib

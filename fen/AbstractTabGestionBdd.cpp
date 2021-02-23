@@ -49,6 +49,6 @@ AbstractTabGestionBdd::AbstractTabGestionBdd(QSqlDatabase &bdd, entidt nbr_entit
     /*m_secondLayout = new QHBoxLayout();
     m_secondLayout->addWidget(m_listName);
     m_secondLayout->addWidget(m_stack);*/
-    m_mainLayout = new QHBoxLayout(this);
-    m_mainLayout->addWidget(m_splitter);
+    m_main_layout = new QHBoxLayout(this);
+    m_main_layout->addWidget(m_splitter);
 }

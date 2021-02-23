@@ -1,8 +1,8 @@
 /*Auteur: PERCIE DU SERT Maxime
  *Date: 05/02/2020
  */
-#ifndef NEWMODIFDIALOG_H
-#define NEWMODIFDIALOG_H
+#ifndef NEW_MODIF_DIALOG_H
+#define NEW_MODIF_DIALOG_H
 
 #include <QDialog>
 #include <QHBoxLayout>
@@ -15,48 +15,45 @@
 #include <QtGlobal>
 #include <QVBoxLayout>
 #include "bdd_predef.h"
-#include "entityPredef.h"
-#include "IdComboBox.h"
-#include "TreeWidget.h"
+#include "id_combo_box.h"
+#include "tree_widget.h"
 
-/*! \defgroup groupeDialogue Fenêtre de Dialogue
+/*! \defgroup groupe_dialogue Fenêtre de Dialogue
  *\brief Ensemble de classes représentant des fenêtres de dialogue.
  */
-
-/*! \ingroup groupeDialogue
+namespace mps {
+/*! \ingroup groupe_dialogue
  *\brief Espace de noms des fenêtres de dialogue.
  */
-namespace dialogMPS {
-using namespace type_mps;
-
-/*! \ingroup groupeDialogue
+namespace dialogue {
+/*! \ingroup groupe_dialogue
  *\brief Classe abstraite mère de formulaire pour les dialogues
  */
-class AbstractNewModifForm : public QWidget {
+class abstract_new_modif_form : public QWidget {
     Q_OBJECT
 protected:
     const bool m_new;                   //! true->création et false->modification ou suppression.
-    b2d::Bdd &m_bdd;                //! Base de données.
+    b2d::bdd &m_bdd;                //! Base de données.
 
 public:
     //! Constructeur.
-    AbstractNewModifForm(b2d::Bdd &bdd, bool newEnt, QWidget *parent = nullptr)
+    abstract_new_modif_form(b2d::bdd &bdd, bool new_ent, QWidget *parent = nullptr)
         : QWidget(parent),
-          m_new(newEnt),
+          m_new(new_ent),
           m_bdd(bdd) {}
 
     //! Destructeur par défaut.
-    virtual ~AbstractNewModifForm();
+    virtual ~abstract_new_modif_form();
 
     //! Connecte les signals et slots du formulaire.
     virtual void connexion() = 0;
 
     //! Paramètre l'absence du bouton supprimé.
-    virtual bool delDisable() const noexcept
+    virtual bool del_disable() const noexcept
         {return m_new;}
 
     //! Accesseur de m_new.
-    bool newEnt() const noexcept
+    bool new_ent() const noexcept
         {return m_new;}
 
     //! Titre de la fenêtre de dialogue.
@@ -75,211 +72,211 @@ public slots:
     virtual bool del() = 0;
 
     //! Met à jour le formulaire.
-    virtual void updateData() {}
+    virtual void update_data() {}
 
 signals:
     //! Signal d'activation/désactivation de l'action effacer.
-    void effacerPermis(bool);
+    void effacer_permis(bool);
 
     //! Signal d'activation/désactivation de l'action d'enrgistrer.
-    void savePermis(bool);
+    void save_permis(bool);
 };
 
-/*! \ingroup groupeDialogue
+/*! \ingroup groupe_dialogue
  *\brief Classe des formulaires pour les dialogues commençant par le choix du nom.
  */
-class AbstractNomNewModifForm : public AbstractNewModifForm {
+class abstract_nom_new_modif_form : public abstract_new_modif_form {
     Q_OBJECT
 protected:
-    QLabel *m_nameLabel;               //!< Label du nom.
-    QLineEdit *m_nameLine;             //!< Ligne d'édition du nom.
-    widgetMPS::IdComboBox *m_nameCB;   //!< Liste à choix du nom.
-    QHBoxLayout *m_nameLayout;         //!< Calque du nom.
-    QVBoxLayout *m_mainLayout;         //!< Calque principal du formulaire.
+    QLabel *m_name_label;               //!< Label du nom.
+    QLineEdit *m_name_line;             //!< Ligne d'édition du nom.
+    widget::id_combo_box *m_name_cb;   //!< Liste à choix du nom.
+    QHBoxLayout *m_name_layout;         //!< Calque du nom.
+    QVBoxLayout *m_main_layout;         //!< Calque principal du formulaire.
 public:
     //! Constructeur.
-    AbstractNomNewModifForm(b2d::Bdd &bdd, const QString &label, bool newEnt, QWidget *parent = nullptr);
+    abstract_nom_new_modif_form(b2d::bdd &bdd, const QString &label, bool new_ent, QWidget *parent = nullptr);
 
     //! Constructeur.
-    AbstractNomNewModifForm(b2d::Bdd &bdd, const QString &label, const std::vector<std::pair<idt,QString>> &noms,
-                            bool newEnt, QWidget *parent = nullptr)
-        : AbstractNomNewModifForm (bdd,label,newEnt,parent)
+    abstract_nom_new_modif_form(b2d::bdd &bdd, const QString &label, const std::vector<std::pair<idt,QString>> &noms,
+                            bool new_ent, QWidget *parent = nullptr)
+        : abstract_nom_new_modif_form (bdd,label,new_ent,parent)
         {set_noms(noms);}
 
     //! Destructeur par défaut.
-    ~AbstractNomNewModifForm() override = default;
+    ~abstract_nom_new_modif_form() override = default;
 
     //! Connecte les signals et slots du formulaire.
     void connexion() override;
 
     //! Renvoie l'identifiant du nom sélectionné.
     idt id() const
-        {return m_new ? 0 : m_nameCB->id();}
+        {return m_new ? 0 : m_name_cb->id();}
 
     //! Renvoie le nom selectionné.
     QString nom() const
-        {return m_new ? m_nameLine->text() : m_nameCB->currentText();}
+        {return m_new ? m_name_line->text() : m_name_cb->currentText();}
 
     //! Mutateur de la liste des noms.
     void set_noms(const std::vector<std::pair<idt,QString>> &noms) {
         if(!m_new){
-            m_nameCB->clear();
-            m_nameCB->addText(noms);
+            m_name_cb->clear();
+            m_name_cb->add_text(noms);
         }
     }
 
     //! Mutateur de la liste des noms.
     template<class Ent> void set_noms(const vector_ptr<Ent> &vec) {
         if(!m_new){
-            m_nameCB->clear();
-            m_nameCB->addText(vec,[](const Ent &ent)->const QString &{return ent.nom();});
+            m_name_cb->clear();
+            m_name_cb->add_text(vec,[](const Ent &ent)->const QString &{return ent.nom();});
         }
     }
 
     //! Mutateur de la liste des noms.
     template<class Ent> void set_noms(vector_ptr<Ent> &&vec) {
         if(!m_new){
-            m_nameCB->clear();
-            m_nameCB->addText(std::move(vec),[](const Ent &ent)->const QString &{return ent.nom();});
+            m_name_cb->clear();
+            m_name_cb->add_text(std::move(vec),[](const Ent &ent)->const QString &{return ent.nom();});
         }
     }
 
     //! Teste si le formulaire est valide.
     bool valide() const override
-        {return m_new ? !m_nameLine->text().isEmpty() : !m_nameCB->currentText().isEmpty();}
+        {return m_new ? !m_name_line->text().isEmpty() : !m_name_cb->currentText().isEmpty();}
 
 protected:
     //! Récupère l'entité en base de donné et met à jours les données du formulaire
     template<class Ent> void update_temp(Ent &ent);
 };
 
-/*! \ingroup groupeDialogue
+/*! \ingroup groupe_dialogue
  *\brief Classe des formulaires pour les dialogues commençant par le choix du nom et le nom cours.
  */
-class Abstractnc_nomNewModifForm : public AbstractNomNewModifForm {
+class abstract_nc_nom_new_modif_form : public abstract_nom_new_modif_form {
     Q_OBJECT
 protected:
-    using AbstractNomNewModifForm::m_mainLayout;
-    QLabel *m_ncLabel;               //!< Label du nom court.
-    QLineEdit *m_ncLine;             //!< Ligne d'édition du nom court.
-    QHBoxLayout *m_ncLayout;         //!< Calque du nom court.
+    using abstract_nom_new_modif_form::m_main_layout;
+    QLabel *m_nc_label;               //!< Label du nom court.
+    QLineEdit *m_nc_line;             //!< Ligne d'édition du nom court.
+    QHBoxLayout *m_nc_layout;         //!< Calque du nom court.
 public:
     //! Constructeur.
-    Abstractnc_nomNewModifForm(b2d::Bdd &bdd, const QString &lableNc, const QString &labelNom, bool newEnt, QWidget *parent = nullptr);
+    abstract_nc_nom_new_modif_form(b2d::bdd &bdd, const QString &lableNc, const QString &labelNom, bool new_ent, QWidget *parent = nullptr);
 
     //! Destructeur.
-    ~Abstractnc_nomNewModifForm() override = default;
+    ~abstract_nc_nom_new_modif_form() override = default;
 
     //! Connecte les signals et slots du formulaire.
     void connexion() override;
 
     //! Renvoie le nom court selectionné.
     QString nc() const
-        {return m_ncLine->text();}
+        {return m_nc_line->text();}
 
     //! Mutateur du nom cours.$
     void set_nc(const QString &nc)
-        {m_ncLine->set_text(nc);}
+        {m_nc_line->setText(nc);}
 
     //! Teste si le formulaire est valide.
     bool valide() const override
-        {return AbstractNomNewModifForm::valide() &&!m_ncLine->text().isEmpty();}
+        {return abstract_nom_new_modif_form::valide() &&!m_nc_line->text().isEmpty();}
 protected:
     //! Récupère l'entité en base de donné et met à jours les données du formulaire
     template<class Ent> void update_temp(Ent &ent);
 };
 
-/*! \ingroup groupeDialogue
+/*! \ingroup groupe_dialogue
  *\brief Classe des formulaires pour les dialogues commençant par le choix du nom, le nom court et le type.
  */
-class AbstractTypenc_nomNewModifForm : public Abstractnc_nomNewModifForm {
+class abstract_type_nc_nom_new_modif_form : public abstract_nc_nom_new_modif_form {
     Q_OBJECT
 protected:
-    using Type = entities::ensemble_type::Type;
+    using type = entities::ensemble_type::type;
     using Permission = entities::ensemble_type::type_permission;
-    using Abstractnc_nomNewModifForm::m_mainLayout;
+    using abstract_nc_nom_new_modif_form::m_main_layout;
     int m_cible;                        //!< Numero de cible de l'entité
     bool m_valide;                      //!< Controle de la validité du type
-    QLabel *m_typeLabel;               //!< Label du nom
-    widgetMPS::TreeWidget *m_typeTree; //!< Séléction du type
+    QLabel *m_type_label;               //!< Label du nom
+    widget::tree_widget *m_type_tree; //!< Séléction du type
 public:
     enum {nom_type,ncType,nbrColumn};
     //! Constructeur.
-    AbstractTypenc_nomNewModifForm(b2d::bdd_predef &bdd, const QString &refRoot, idt id_entity, const QString &labelType,
-                                  const QString &labelNc, const QString &labelNom, bool newEnt, QWidget *parent = nullptr);
+    abstract_type_nc_nom_new_modif_form(b2d::bdd_predef &bdd, const QString &ref_root, idt id_entity, const QString &labelType,
+                                  const QString &labelNc, const QString &labelNom, bool new_ent, QWidget *parent = nullptr);
 
     //! Destructeur.
-    ~AbstractTypenc_nomNewModifForm() override = default;
+    ~abstract_type_nc_nom_new_modif_form() override = default;
 
     //! Connecte les signals et slots du formulaire.
     void connexion() override;
 
     //! Renvoie l'identifiant du type sélectionné.
     idt id_type() const
-        {return m_typeTree->id();}
+        {return m_type_tree->id();}
 
     //! Mutateur du type.
     void set_type(idt id_type)
-        {m_typeTree->set_id(id_type);}
+        {m_type_tree->set_id(id_type);}
 
     //! Teste si le formulaire est valide.
     bool valide() const override
-        {return Abstractnc_nomNewModifForm::valide() &&m_valide;}
+        {return abstract_nc_nom_new_modif_form::valide() &&m_valide;}
 
 protected:
     //! Récupère l'entité en base de donné et met à jours les données du formulaire
     template<class Ent> void update_temp(Ent &ent);
 };
 
-/*! \ingroup groupeDialogue
+/*! \ingroup groupe_dialogue
  *\brief Classe des formulaires pour les dialogues commençant par le choix du nom, le nom court et du parent.
  */
-class AbstractParentnc_nomNewModifForm : public Abstractnc_nomNewModifForm {
+class abstract_parent_nc_nom_new_modif_form : public abstract_nc_nom_new_modif_form {
     Q_OBJECT
 protected:
-    using Abstractnc_nomNewModifForm::m_mainLayout;
-    QLabel *m_parentLabel;             //!< Label du parent
-    widgetMPS::TreeWidget *m_parentTree;         //!< Ligne d'édition du nom.
+    using abstract_nc_nom_new_modif_form::m_main_layout;
+    QLabel *m_parent_label;             //!< Label du parent
+    widget::tree_widget *m_parent_tree;         //!< Ligne d'édition du nom.
 public:
     enum {nomParent,ncParent,nbrColumn};
     //! Constructeur.
-    AbstractParentnc_nomNewModifForm(b2d::Bdd &bdd, const QStringList &header, const QString &parentType,
-                                  const QString &labelNc, const QString &labelNom, bool newEnt, QWidget *parent = nullptr);
+    abstract_parent_nc_nom_new_modif_form(b2d::bdd &bdd, const QStringList &header, const QString &parentType,
+                                  const QString &labelNc, const QString &labelNom, bool new_ent, QWidget *parent = nullptr);
 
     //! Destructeur.
-    ~AbstractParentnc_nomNewModifForm() override = default;
+    ~abstract_parent_nc_nom_new_modif_form() override = default;
 
     //! Renvoie l'identifiant du parent sélectionné.
     idt id_parent() const
-        {return m_parentTree->id();}
+        {return m_parent_tree->id();}
 
     //! Mutateur du type.
     void set_parent(idt id_parent)
-        {m_parentTree->set_id(id_parent);}
+        {m_parent_tree->set_id(id_parent);}
 
 protected:
     //! Récupère l'entité en base de donné et met à jours les données du formulaire
     template<class Ent> void update_temp(Ent &ent);
 };
 
-/*! \ingroup groupeDialogue
+/*! \ingroup groupe_dialogue
  *\brief Fenêtre de dialogue de création, modification ou suppression.
  */
-class NewModifDialog : public QDialog {
+class new_modif_dialog : public QDialog {
     Q_OBJECT
 protected:
-    QPushButton *m_annulButton;                //!< Bouton annuler.
-    QPushButton *m_okButton;                   //!< Bouton Ok.
-    QPushButton *m_supprButton;                //!< Bouton Suppr
-    QHBoxLayout *m_buttonLayout;               //!< Calque des boutons.
-    QVBoxLayout *m_mainLayout;               //!< Calque principal.
-    AbstractNewModifForm *m_form;                      //!< Formulaire.
+    QPushButton *m_annul_bouton;                //!< Bouton annuler.
+    QPushButton *m_ok_bouton;                   //!< Bouton Ok.
+    QPushButton *m_suppr_bouton;                //!< Bouton Suppr
+    QHBoxLayout *m_bouton_layout;               //!< Calque des boutons.
+    QVBoxLayout *m_main_layout;               //!< Calque principal.
+    abstract_new_modif_form *m_form;                      //!< Formulaire.
 public:
     //! Constructeur.
-    NewModifDialog(AbstractNewModifForm *form, QWidget *parent = nullptr);
+    new_modif_dialog(abstract_new_modif_form *form, QWidget *parent = nullptr);
 
     //! Destructeur.
-    ~NewModifDialog() override;
+    ~new_modif_dialog() override;
 
 public slots:
     //! Enregistre l'entitée.
@@ -304,27 +301,27 @@ public slots:
     }
 };
 
-template<class Ent> void AbstractNomNewModifForm::update_temp(Ent &ent) {
+template<class Ent> void abstract_nom_new_modif_form::update_temp(Ent &ent) {
     ent.set_id(id());
     m_bdd.get(ent);
-    m_nameCB->setEditable(m_bdd.test_autorisation(entity,b2d::Modif));
-    emit effacerPermis(m_bdd.test_autorisation(entity,b2d::Suppr));
+    m_name_cb->setEditable(m_bdd.test_autorisation(ent,b2d::Modif));
+    emit effacer_permis(m_bdd.test_autorisation(ent,b2d::Suppr));
 }
 
-template<class Ent> void Abstractnc_nomNewModifForm::update_temp(Ent &ent) {
-    AbstractNomNewModifForm::update_temp<Ent>(ent);
-    m_ncLine->setReadOnly(!m_bdd.test_autorisation(entity,b2d::Modif));
+template<class Ent> void abstract_nc_nom_new_modif_form::update_temp(Ent &ent) {
+    abstract_nom_new_modif_form::update_temp<Ent>(ent);
+    m_nc_line->setReadOnly(!m_bdd.test_autorisation(ent,b2d::Modif));
     set_nc(ent.nc());
 }
 
-template<class Ent> void AbstractTypenc_nomNewModifForm::update_temp(Ent &ent) {
-    Abstractnc_nomNewModifForm::update_temp<Ent>(ent);
+template<class Ent> void abstract_type_nc_nom_new_modif_form::update_temp(Ent &ent) {
+    abstract_nc_nom_new_modif_form::update_temp<Ent>(ent);
     set_type(ent.type());
 }
 
-template<class Ent> void AbstractParentnc_nomNewModifForm::update_temp(Ent &ent) {
-    Abstractnc_nomNewModifForm::update_temp<Ent>(ent);
+template<class Ent> void abstract_parent_nc_nom_new_modif_form::update_temp(Ent &ent) {
+    abstract_nc_nom_new_modif_form::update_temp<Ent>(ent);
     set_parent(ent.parent());
 }
-}
-#endif // NEWMODIFDIALOG_H
+}}
+#endif // NEW_MODIF_DIALOG_H
