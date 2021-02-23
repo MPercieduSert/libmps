@@ -14,19 +14,19 @@ AbstractTabGestionBdd::AbstractTabGestionBdd(QSqlDatabase &bdd, entidt nbr_entit
     QStringList nomarbre_attributs;
     nomarbre_attributs<<"Id"<<"Parent"<<"Feuille"<<"Num";
     for(auto i = m_tables.begin(); i != m_tables.end(); ++i) {
-        i->model = new QSqlTableModel(this,bdd);
+        i->model = new QSqltable_model(this,bdd);
         i->model->setTable(i->nomBdd);
-        i->model->setEditStrategy(QSqlTableModel::OnRowChange);
+        i->model->setEditStrategy(QSqltable_model::OnRowChange);
         i->model->select();
         for(int j = 0; j != i->nomAttributs.count(); ++j)
-            i->model->setHeaderData(j,Qt::Horizontal,i->nomAttributs.at(j));
+            i->model->set_headerData(j,Qt::Horizontal,i->nomAttributs.at(j));
         i->view = new QTableView();
         i->view->setModel(i->model);
         m_listName->addItem(i->nom);
         //m_stack->addWidget(i->view);
         QPushButton *insertButton = new QPushButton("Ajouter");
         QPushButton *supprButton = new QPushButton("Supprimer");
-        connect(insertButton,&QPushButton::clicked,[i](){i->model->insertRow(i->model->rowCount());});
+        connect(insertButton,&QPushButton::clicked,[i](){i->model->insertRow(i->model->row_count());});
         connect(supprButton,&QPushButton::clicked,[i]()
             {
                 auto indexList = i->view->selectionModel()->selectedRows();

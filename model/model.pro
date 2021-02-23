@@ -22,34 +22,34 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-    AbstractColonnesModel.cpp \
-    AbstractentityTableau.cpp \
-    AbstractModel.cpp \
-    ColonnesForModel.cpp \
-    FindNoeudModel.cpp \
-    TableauForModel.cpp \
-    TableModel.cpp \
-    TreeColonnesModel.cpp \
-    TreeNoeudModel.cpp \
-    FindModel.cpp \
-    NodeSelectionModel.cpp \
-    PredefModel.cpp \
-    ItemNodeModel.cpp
+    abstract_colonnes_model.cpp \
+    #FindNoeudModel.cpp \
+    abstract_model.cpp \
+    item_node_model.cpp \
+    find_model.cpp \
+    colonnes_for_model.cpp \
+    abstract_entity_tableau.cpp \
+    table_model.cpp \
+    tableau_for_model.cpp \
+    tree_colonnes_model.cpp \
+    node_selection_model.cpp \
+    predef_model.cpp \
+    tree_noeud_model.cpp
 
 HEADERS += \
-    AbstractColonnesModel.h \
-    AbstractentityTableau.h \
-    AbstractModel.h \
-    ColonnesForModel.h \
-    FindNoeudModel.h \
-    TableauForModel.h \
-    TableModel.h \
-    TreeColonnesModel.h \
-    TreeNoeudModel.h \
-    FindModel.h \
-    NodeSelectionModel.h \
-    PredefModel.h \
-    ItemNodeModel.h
+    #FindNoeudModel.h \
+    abstract_model.h \
+    item_node_model.h \
+    find_model.h \
+    abstract_colonnes_model.h \
+    colonnes_for_model.h \
+    abstract_entity_tableau.h \
+    table_model.h \
+    tableau_for_model.h \
+    tree_colonnes_model.h \
+    node_selection_model.h \
+    predef_model.h \
+    tree_noeud_model.h
 
 unix {
     target.path = /usr/lib

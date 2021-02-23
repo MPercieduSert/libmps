@@ -21,7 +21,7 @@ void AbstractTabTableau::effacer()
     {m_model->effacer(m_view->selectionModel()->selectedIndexes());}
 
 void AbstractTabTableau::supprimer() {
-    if(model()->removeRowsSelected(m_view->selectionModel()->selectedIndexes()))
+    if(model()->remove_rows_selected(m_view->selectionModel()->selectedIndexes()))
         m_view->selectionModel()->clear();
     else
         QMessageBox::warning(this,tr("Erreur de sélection"),

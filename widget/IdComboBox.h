@@ -31,13 +31,13 @@ public:
     }
 
     //! Mutateur de la liste des labels et identifiants.
-    template<class Ent, class ExtractText> void addText(const conteneurMPS::vector_ptr<Ent> &vec, ExtractText text) {
+    template<class Ent, class ExtractText> void addText(const vector_ptr<Ent> &vec, ExtractText text) {
         for(auto i = vec.cbegin(); i != vec.cend(); ++i)
                 addItem(text(*i),i->id());
     }
 
     //! Mutateur de la liste des labels et identifiants.
-    template<class Ent, class ExtractText> void addText(conteneurMPS::vector_ptr<Ent> &&vec, ExtractText text) {
+    template<class Ent, class ExtractText> void addText(vector_ptr<Ent> &&vec, ExtractText text) {
         for(auto i = vec.cbegin(); i != vec.cend(); ++i)
                 addItem(text(*i),i->id());
     }

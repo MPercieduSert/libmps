@@ -7,71 +7,66 @@
 #include <memory>
 #include <QAbstractItemModel>
 #include <QBrush>
-#include "AbstractModel.h"
+#include "abstract_model.h"
 #include "bdd.h"
-#include "conteneur_ptr.h"
-#include "entity.h"
-#include "type_mps.h"
 
-/*! \defgroup groupeModel Model
+/*! \defgroup groupe_model Model
  *\brief Ensemble de classes représentant les models.
  */
 
-/*! \ingroup groupeModel
+namespace mps {
+/*! \ingroup groupe_model
  *\brief Espace de noms des model.
  */
-namespace modelMPS {
-using namespace type_mps;
-
+namespace model_base {
 //! Type des colonnes du modèle.
-enum colonneType {NoType = -1,
-                  BoolColonneType,
-                  ConstanteColonneType,
-                  DateColonneType,
-                  Date_TimeColonneType,
-                  DoubleColonneType,
-                  IntColonneType,
-                  TexteColonneType,
-                  UIntColonneType};
+enum colonne_type {No_Type = -1,
+                  Bool_Colonne_Type,
+                  Constante_Colonne_Type,
+                  Date_Colonne_Type,
+                  Date_Time_Colonne_Type,
+                  Double_Colonne_Type,
+                  Int_Colonne_Type,
+                  Texte_Colonne_Type,
+                  UInt_Colonne_Type};
 
-/*! \ingroup groupeModel
+/*! \ingroup groupe_model
  *\brief Classe mère d'un modèle d'arbre de recherche.
  */
-class AbstractFindModel {
+class Abstract_Find_Model {
 public:
     //! Destructeur.
-    virtual ~AbstractFindModel() = default;
+    virtual ~Abstract_Find_Model() = default;
 
     //! Teste si l'arbre est réduit à sa racine.
     virtual bool root_leaf() const = 0;
 
     //! Teste si la ligne d'indice id vérifie la condition de la racine.
-    virtual bool testRoot(szt id) const = 0;
+    virtual bool test_root(szt id) const = 0;
 
     //! Teste si la ligne d'indice id vérifie l'arbre des conditions.
-    virtual bool testTree(szt id) const = 0;
+    virtual bool test_tree(szt id) const = 0;
 };
 
-
-/*! \ingroup groupeModel
+/*! \ingroup groupe_model
  *\brief Classe mère des models de colonnes homogènes.
  */
-class AbstractColonnesModel : public AbstractModel {
+class abstract_colonnes_model : public abstract_model {
     Q_OBJECT
 public:
     //! Role des donnés du model.
-    enum itemDataRole {IdRole = 0x0111};
+    enum item_data_role {Id_Role = 0x0111};
 
-    //! État des lignes.auto &e1 =static_cast<const Eleve &>(m_data.front()[row1]);
-    enum etat {Sauver,
-               _valide,
+    //! État des lignes.
+    enum ligne_etat {Sauver,
+               Valide,
                Invalide,
                Double,
                DoubleSauver,
                NbrEtat};
 
     //! Identifiant de fonctions statistiques à appliquer à une colonne.
-    enum fonctionStatistique {Max,
+    enum fonction_statistique {Max,
                               Min,
                               Etendue,
                               Moyenne,
@@ -79,30 +74,30 @@ public:
                               Q1,Q3,
                               D1,D9};
 
-    //////////////////////////////// AbstractColonne //////////////////////
+    //////////////////////////////// abstract_colonne //////////////////////
     //! Classe abstraite d'information et d'intéraction avec les colonnes.
-    class AbstractColonne {
+    class abstract_colonne {
     protected:
         Qt::ItemFlags m_flags;      //!< Drapeaux associés à la colonne.
         QString m_header;           //!< Entête de la colonne.
         const int m_type;           //!< Type de la colonne.
     public:
         //! Constructeur.
-        AbstractColonne(const QString &name, Qt::ItemFlags flags, int type = NoType)
+        abstract_colonne(const QString &name, Qt::ItemFlags flags, int type = No_Type)
             : m_flags(flags), m_header(name), m_type(type) {}
 
         //! Destructeur.
-        virtual ~AbstractColonne();
+        virtual ~abstract_colonne();
 
-        //! Compare entre deux lignes ( ligne1 < ligne2).
-        virtual bool compare(szt ligne1, szt ligne2) const
-            {return data(ligne1,Qt::DisplayRole) < data(ligne2,Qt::DisplayRole);}
+        //! Compare entre deux lignes ( ligne_1 < ligne_2).
+        virtual bool compare(szt ligne_1, szt ligne_2) const
+            {return data(ligne_1,Qt::DisplayRole) < data(ligne_2,Qt::DisplayRole);}
 
         //! Accesseur de la donnée d'indice id dans la colonne.
         virtual QVariant data(szt /*id*/, int /*role*/ = Qt::DisplayRole) const {return QVariant();}
 
         //! Accesseut de la donnée pour le test de recherche.
-        virtual QVariant dataTest(szt /*id*/) const {return QVariant();}
+        virtual QVariant data_test(szt /*id*/) const {return QVariant();}
 
         //! Accesseur des drapeaux associés à la donnée.
         virtual Qt::ItemFlags flags(szt /*id*/) const {return m_flags;}
@@ -114,21 +109,21 @@ public:
         virtual bool set_data(szt /*id*/, const QVariant &/*value*/, int /*role*/ = Qt::EditRole) {return true;}
 
         //! Accesseur drapeaux associés à la colonne.
-        void setFlags(const Qt::ItemFlags &flags)
+        void set_flags(const Qt::ItemFlags &flags)
             {m_flags = flags;}
 
         //! Mutateur de l'entête de la colonne.
-        void setHeader(const QString &name) {m_header = name;}
+        void set_header(const QString &name) {m_header = name;}
 
         //! Acceseur du type de la colonne.
         int type() const {return m_type;}
     };
 
     //! Ensemble des colonnes.
-    using Colonnes = std::vector<std::unique_ptr<AbstractColonne>>;
+    using colonnes = std::vector<std::unique_ptr<abstract_colonne>>;
 
     //! Information de création d'une nouvelle colonne.
-    struct NewColonneInfo {
+    struct new_colonne_info {
         Qt::ItemFlags flags;
         int id = 0;
         QString name = QString();
@@ -137,15 +132,15 @@ public:
         std::vector<QVariant> args = std::vector<QVariant>();
     };
 
-    /////////////////////////////////////// AbstractTableau ///////////////////////////////////
+    /////////////////////////////////////// abstract_tableau ///////////////////////////////////
     //! Classe Abstraite contenant les donnée du model.
-    class AbstractTableau {
+    class abstract_tableau {
     public:
         //! Constructeur.
-        AbstractTableau() = default;
+        abstract_tableau() = default;
 
         //!Destructeur.
-        virtual ~AbstractTableau() = default;
+        virtual ~abstract_tableau() = default;
 
         //! Ajoute count lignes au tableau.
         virtual void add(szt /*count*/) {}
@@ -154,7 +149,7 @@ public:
         virtual void clear() = 0;
 
         //! Comparaison d'égalité de deux ligne.
-        virtual bool egal(szt /*ligne1*/, szt /*ligne2*/) const {return false;}
+        virtual bool egal(szt /*ligne_1*/, szt /*ligne_2*/) const {return false;}
 
         //! Supprime une ligne des données du model.
         virtual void erase(szt /*ligne*/) {}
@@ -163,20 +158,20 @@ public:
         virtual void erase(szt /*first*/, szt /*last*/);
 
         //! Teste si la ligne correspond à une donnée interne.
-        virtual bool existsInternalData(szt /*ligne*/) const {return false;}
+        virtual bool exists_internal_data(szt /*ligne*/) const {return false;}
 
         //! Hydrate la donnée d'une ligne du tableau et retourne le succés de l'opération.
         virtual void hydrate(szt /*ligne*/) {}
 
         //! Fabrique une colonne lié aux données du tableau.
-        virtual std::unique_ptr<AbstractColonne> makeColonne(const NewColonneInfo &info) = 0;
+        virtual std::unique_ptr<abstract_colonne> make_colonne(const new_colonne_info &info) = 0;
 
         //! Teste si la ligne est nouvelle ou modifiée.
-        virtual bool newOrModif(szt /*ligne*/) const {return true;}
+        virtual bool new_or_modif(szt /*ligne*/) const {return true;}
 
         //! Supprime les données correspondant à la ligne dans la base de donnée.
         //! Ne doit pas supprimer de ligne de donnée du model.
-        virtual bool removeInternalData(szt /*ligne*/)  {return true;}
+        virtual bool remove_internal_data(szt /*ligne*/)  {return true;}
 
         //! Sauve la ligne dans la base de donnée.
         virtual void save(szt /*ligne*/) {}
@@ -189,13 +184,13 @@ public:
     };
 
 protected:
-    int m_colonneSorted = -1;       //! Colonne trié par défaut si positive.
-    Qt::SortOrder m_orderSort = Qt::AscendingOrder;
+    int m_colonne_sorted = -1;       //! Colonne trié par défaut si positive.
+    Qt::SortOrder m_order_sort = Qt::AscendingOrder;
     // Colonnes
-    Colonnes m_colonnes;     //!< Contient les informations d'une colonne.
+    colonnes m_colonnes;     //!< Contient les informations d'une colonne.
     // ByPass
-    bool m_uniqueLigne;                //!< Court-circuite l'unicité si false.
-    bool m_valideLigne;                //!< Court-circuite la validité si false.
+    bool m_unique_ligne;                //!< Court-circuite l'unicité si false.
+    bool m_valide_ligne;                //!< Court-circuite la validité si false.
 
     // Etats des lignes
     std::vector<enumt> m_etats;           //!< Vecteur des états de chaque ligne.
@@ -203,17 +198,17 @@ protected:
     std::map<szt,std::list<szt>> m_doubles;     //! Liste des identifiants des doubles.
 
     // Donnée
-    std::unique_ptr<AbstractTableau> m_data;    //! Donnée du model.
+    std::unique_ptr<abstract_tableau> m_data;    //! Donnée du model.
 
 public:
     //! Constructeur.
-    explicit AbstractColonnesModel(bool uniqueLigne = true, bool valideLigne = true, QObject *parent = nullptr);
+    explicit abstract_colonnes_model(bool unique_ligne = true, bool valide_ligne = true, QObject *parent = nullptr);
 
     //! Destructeur par defaut.
-    ~AbstractColonnesModel() override = default;
+    ~abstract_colonnes_model() override = default;
 
     //! Accesseur du vecteur des aspect des états.
-    const std::vector<QBrush> &brushEtat() const noexcept
+    const std::vector<QBrush> &brush_etat() const noexcept
         {return m_brush;}
 
     //! Efface les données du model.
@@ -221,21 +216,21 @@ public:
         beginResetModel();
             m_data->clear();
             m_etats.clear();
-            resetRowToLigne();
+            reset_row_to_ligne();
         endResetModel();
     }
 
     //! Accesseur de la colonne en position pos.
-    const AbstractColonne &colonne(szt pos) const
+    const abstract_colonne &colonne(szt pos) const
         {return *m_colonnes.at(pos);}
 
     //! Accesseur de la colonne en position pos.
-    AbstractColonne &colonne(szt pos)
+    abstract_colonne &colonne(szt pos)
         {return *m_colonnes.at(pos);}
 
     //! Accesseur de la colonne trié lors de réinitialisation (-1 pour aucune).
-    int colonneSorted() const
-        {return m_colonneSorted;}
+    int colonne_sorted() const
+        {return m_colonne_sorted;}
 
     //! Renvoie le nombre de colonnes.
     int columnCount(const QModelIndex &/*parent*/ = QModelIndex()) const override {return static_cast<int>(m_colonnes.size());}
@@ -244,7 +239,7 @@ public:
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
 
     //! Recherche les lignes de données vérifiant les conditions d'un modéle de recherche donné.
-    virtual void find(AbstractFindModel *findModel) = 0;
+    virtual void find(Abstract_Find_Model *find_model) = 0;
 
     //! Renvoie les drapeaux associés à un index.
     Qt::ItemFlags flags(const QModelIndex &index) const override;
@@ -256,50 +251,50 @@ public:
     void hydrate(int row, const QModelIndex &parent = QModelIndex());
 
     //! Insert une nouvelle colonne à la postion pos.
-    virtual bool insertColonne(int pos, const NewColonneInfo &info, bool allParent = false);
+    virtual bool insert_colonne(int pos, const new_colonne_info &info, bool all_parent = false);
 
     //! Nombre de colonne.
-    szt nbrColonne() const noexcept
+    szt nbr_colonne() const noexcept
         {return m_colonnes.size();}
 
     //! Ajoute une nouvelle colonne en dernière position.
-    virtual bool push_backColonne(const NewColonneInfo &info, bool allParent = false);
+    virtual bool push_back_colonne(const new_colonne_info &info, bool all_parent = false);
 
     //! Réinitialise l'affichage des lignes du model (pas les donnée).
-    virtual void resetRow() {
+    virtual void reset_row() {
         beginResetModel();
-            resetRowToLigne();
+            reset_row_to_ligne();
         endResetModel();
     }
 
     //! Mutateur du vecteur des QBrush des états.
-    void setBrushEtat(const std::vector<QBrush> &vecBrush)
+    void set_brush_etat(const std::vector<QBrush> &vecBrush)
         {m_brush = vecBrush;}
 
     //! Modifie la donnée d'index et de role spécifié.
-    bool set_data(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
+    bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
 
     //! Mutateur de la colonne trié lors de réinitialisation (-1 pour aucune).
-    void setColonneSorted(int col, Qt::SortOrder order = Qt::AscendingOrder) {
-        m_colonneSorted = col;
-        m_orderSort = order;
+    void set_colonne_sorted(int col, Qt::SortOrder order = Qt::AscendingOrder) {
+        m_colonne_sorted = col;
+        m_order_sort = order;
     }
 
     //! Mutateur du tableau de donnée.
-    void setTableau(std::unique_ptr<AbstractTableau> &&tableau);
+    void set_tableau(std::unique_ptr<abstract_tableau> &&tableau);
 
     //! Fonctions statistiques appliquées à une colonnes.
-    QVariant statistique(int pos, enumt fonction, bool lignesVisibles = true) const;
+    QVariant statistique(int pos, enumt fonction, bool lignes_visibles = true) const;
 
 signals:
     //! Signals du changement d'états d'une ligne.
-    void etatLigneChanged(szt ligne);
+    void etat_ligne_changed(szt ligne);
 
     //! Signals du changement d'états de groupe de row.
-    void etatRowsChanged(const QModelIndex &parent, int first, int last);
+    void etat_rows_changed(const QModelIndex &parent, int first, int last);
 
     //! Signals du changement d'états de toute les lignes.
-    void etatsChanged();
+    void etats_changed();
 
 public slots:
     //! Effectue l'action coller.
@@ -315,53 +310,53 @@ public slots:
     virtual void effacer(const QModelIndexList &/*selection*/) {}
 
     //! Supprime une selection de lignes entières.
-    virtual bool removeRowsSelected(const QModelIndexList &/*selection*/) {return false;}
+    virtual bool remove_rows_selected(const QModelIndexList &/*selection*/) {return false;}
 
     //! Enregistre les données du model dans la base de donnée.
     virtual void save();
 
     //! Mets à jour l'état de toutes les lignes.
-    virtual void updateAllEtats();
+    virtual void update_all_etats();
 
     //! Mets à jour l'état d'une ligne.
-    virtual void updateEtats(int first, int last, const QModelIndex &parent = QModelIndex());
+    virtual void update_etats(int first, int last, const QModelIndex &parent = QModelIndex());
 protected:
     //! Accesseur de la column.
-    const AbstractColonne &colonne(const QModelIndex &index) const
+    const abstract_colonne &colonne(const QModelIndex &index) const
         {return *m_colonnes[static_cast<szt>(index.column())];}
 
     //! Accesseur de la column.
-    AbstractColonne &colonne(const QModelIndex &index)
+    abstract_colonne &colonne(const QModelIndex &index)
         {return *m_colonnes[static_cast<szt>(index.column())];}
 
     //! Fait la correspondance entre l'index et la ligne de donnée.
     virtual szt ligne(const QModelIndex &index) const = 0;
 
     //! Nombre de ligne de données en szt.
-    szt nbrLignes() const {return m_data->size();}
+    szt nbr_lignes() const {return m_data->size();}
 
     //! Nombre de ligne afficher en szt.
-    virtual szt nbrRow() const = 0;
+    virtual szt nbr_row() const = 0;
 
     //! Met le vecteur des correspondance de ligne à l'identitée.
-    virtual void resetRowToLigne() = 0;
+    virtual void reset_row_to_ligne() = 0;
 
     //! Fait la correspondance entre la ligne d'index et la ligne de donnée.
-    virtual szt rowToLigne(int row, const QModelIndex &parent = QModelIndex()) const = 0;
+    virtual szt row_to_ligne(int row, const QModelIndex &parent = QModelIndex()) const = 0;
 
     //! Renvoie un vecteur contenant l'ensemble des identifiants des lignes visibles ou de toutes les lignes.
-    virtual std::vector<szt> statOnLignes(bool /*lignesVisibles*/ = true) const {return std::vector<szt>();}
+    virtual std::vector<szt> stat_on_lignes(bool /*lignes_visibles*/ = true) const {return std::vector<szt>();}
 
     //! Met à jour la validité d'une ligne.
-    void update_valideLigne(szt ligne);
+    void update_valide_ligne(szt ligne);
 
     //! Met à jour l'unicité d'une ligne.
-    void updateUniqueLigne(szt ligne, bool update = true);
+    void update_unique_ligne(szt ligne, bool update = true);
 
 protected slots:
     //! Mets à jour la tailles du vecteur d'états.
-    void resizeEtats()
-        {m_etats.resize(nbrLignes(),Sauver);}
+    void resize_etats()
+        {m_etats.resize(nbr_lignes(),Sauver);}
 };
-}//end modelmps
+}}
 #endif // ABSTRACTCOLONNESMODEL_H

@@ -10,7 +10,7 @@ SelectTableDialog::SelectTableDialog(b2d::Bdd::vector_id_name &&vec, QWidget *pa
     for (auto iter = vec.cbegin(); iter != vec.cend(); ++iter) {
         auto item = new QListWidgetItem(iter->second);
         item->set_data(Qt::UserRole,iter->first);
-        item->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
+        item->set_flags(Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
         item->setCheckState(Qt::Unchecked);
         m_list_widget->addItem(item);
     }

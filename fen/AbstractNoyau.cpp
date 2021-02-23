@@ -18,7 +18,7 @@ void AbstractNoyau::import_xml(const QString &path) {
                                  .append(controle));
 }
 
-void AbstractNoyau::export_xml(const QString &path, conteneurMPS::vector_ptr<entities::entity> &&vec, flag option) {
+void AbstractNoyau::export_xml(const QString &path, vector_ptr<entities::entity> &&vec, flag option) {
     QFile file(path);
     if(!file.open(QFile::WriteOnly | QFile::Text))
         throw std::runtime_error("Imposible d'ouvrir pour lecture le fichier :"+file.name().toStdString());

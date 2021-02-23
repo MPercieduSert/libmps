@@ -5,28 +5,31 @@
 #define TREENODEMODEL_H
 
 #include <memory>
-#include "AbstractModel.h"
+#include "abstract_model.h"
 
-namespace modelMPS {
-using namespace type_mps;
+namespace mps {
+namespace model_base {
 
-class TreeNoeudModel : public AbstractModel {
+/*! \ingroup groupe_model
+ *\brief Classe mère des model de type arbre à colonnes hétérogènes.
+ */
+class tree_noeud_model : public abstract_model {
     Q_OBJECT
 public:
-    enum {NoType = -1};
+    enum {No_Type = -1};
 
     //! Noeud abstré de l'arbre de recherche.
-    class AbstractNoeud {
+    class abstract_noeud {
     protected:
         int m_type;     //! type du noeud.
     public:
         //! Constructeur.
-        AbstractNoeud(int type = NoType) : m_type(type){}
+        abstract_noeud(int type = No_Type) : m_type(type){}
 
-        virtual ~AbstractNoeud();
+        virtual ~abstract_noeud();
 
         //! Nombre de colonne des descendants.
-        virtual int childColumnCount() const {return 0;}
+        virtual int child_column_count() const {return 0;}
 
         //! Accesseur de la donnée associé à column.
         virtual QVariant data(int /*column*/, int /*role*/ = Qt::DisplayRole) const {return QVariant();}
@@ -41,19 +44,17 @@ public:
         int type() const {return m_type;}
     };
     //! Classe des noeud de l'arbre de données
-    using Noeud = std::unique_ptr<AbstractNoeud>;
-    //! Classe structurant les données.
-    using Tree = conteneurMPS::tree<Noeud>;
+    using noeud_ptr = std::unique_ptr<abstract_noeud>;
     //! Classe du protomodel.
-    using Data = TreeForModel<Noeud>;
+    using Data = tree_for_model<noeud_ptr>;
 protected:
     Data m_data;                            //!< arbre de données du model.
     std::vector<QString> m_header;          //!< Entête des colonnes.      
 public:
-    TREE_FOR_MODEL_INDEX_PARENT_ROWCOUNT(m_data)    // Implémentation des méthodes virtuelles index, parent, rowCount.
+    TREE_FOR_MODEL_INDEX_PARENT_ROWCOUNT(m_data)    // Implémentation des méthodes virtuelles index, parent, row_count.
 
     //!Constructeur.
-    TreeNoeudModel(bool racine, QObject *parent);
+    tree_noeud_model(bool racine, QObject *parent);
 
     //! Accesseur du nombre de colonne des descendant.
     int columnCount(const QModelIndex &parent) const override;
@@ -65,12 +66,12 @@ public:
     Qt::ItemFlags flags(const QModelIndex &index) const override;
 
     //! Renvoie une référence sur la donné coorespondant à l'index (en supposant la validité).
-    const AbstractNoeud &getData(const QModelIndex &index) const
-        {return **m_data.getIter(index);}
+    const abstract_noeud &get_data(const QModelIndex &index) const
+        {return **m_data.get_iter(index);}
 
     //! Renvoie une référence sur la donné coorespondant à l'index (en supposant la validité).
-    AbstractNoeud &getData(const QModelIndex &index)
-        {return **m_data.getIter(index);}
+    abstract_noeud &get_data(const QModelIndex &index)
+        {return **m_data.get_iter(index);}
 
     //! Accesseur des entêtes des colonnes.
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override {
@@ -81,17 +82,17 @@ public:
     }
 
     //! Insert count noeuds de nature type avant la ligne row de parent.
-    bool insertNoeuds(int type, int row, int count, const QModelIndex &parent = QModelIndex());
+    bool insert_noeuds(int type, int row, int count, const QModelIndex &parent = QModelIndex());
 
     //! Supprimer count ligne en commençant par la ligne row.
     bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex()) override;
 
     //! Mutateur la donnée associé à un couple (index,role).
-    bool set_data(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
+    bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
 
 protected:
     //! Fabrique des noeuds.
-    virtual Noeud nodeFactory(int /*type*/, int /*row*/, const QModelIndex &/*parent*/) {return std::make_unique<AbstractNoeud>();}
+    virtual noeud_ptr node_factory(int /*type*/, int /*row*/, const QModelIndex &/*parent*/) {return std::make_unique<abstract_noeud>();}
 };
-}
-#endif // TREENODEMODEL_H
+}}
+#endif // TREE_NODE_MODEL_H

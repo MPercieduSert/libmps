@@ -30,14 +30,14 @@ public:
         {setLabels(map);}
     
     //! Constructeur.
-    template<class Ent> Checklist(const conteneurMPS::vector_ptr<Ent> &vec,
+    template<class Ent> Checklist(const vector_ptr<Ent> &vec,
                                   const QString &(*F)(const Ent &) = [](const Ent &ent)->const QString &{return ent.nom();},
                                   QWidget *parent = nullptr)
         : Checklist(parent)
         {setLabels(vec,F);}
 
     //! Constructeur.
-    template<class Ent> Checklist(conteneurMPS::vector_ptr<Ent> &&vec,
+    template<class Ent> Checklist(vector_ptr<Ent> &&vec,
                                   const QString &(*F)(const Ent &) = [](const Ent &ent)->const QString &{return ent.nom();},
                                   QWidget *parent = nullptr)
         : Checklist(vec,F,parent) {}
@@ -47,21 +47,21 @@ public:
         {return item(i)->data(Qt::UserRole).toUInt();}
 
     //! Mutateur des check de la liste.
-    template<class Ent> void setChecksById(const conteneurMPS::vector_ptr<Ent> &vec, idt (*F)(const Ent &));
+    template<class Ent> void setChecksById(const vector_ptr<Ent> &vec, idt (*F)(const Ent &));
 
     //! Mutateur des check de la liste.
-    template<class Ent> void setLChecksById(conteneurMPS::vector_ptr<Ent> &&vec, idt (*F)(const Ent &))
+    template<class Ent> void setLChecksById(vector_ptr<Ent> &&vec, idt (*F)(const Ent &))
         {setChecksById(vec,F);}
 
     //! Mutateur de la liste des labels.
     void setLabels(const std::map<idt,QString> &map);
 
     //! Mutateur de la liste des labels.
-    template<class Ent> void setLabels(const conteneurMPS::vector_ptr<Ent> &vec,
+    template<class Ent> void setLabels(const vector_ptr<Ent> &vec,
                                        const QString &(*F)(const Ent &) = [](const Ent &ent)->const QString &{return ent.nom();});
 
     //! Mutateur de la liste des labels.
-    template<class Ent> void setLabels(conteneurMPS::vector_ptr<Ent> &&vec,
+    template<class Ent> void setLabels(vector_ptr<Ent> &&vec,
                                        const QString &(*F)(const Ent &) = [](const Ent &ent)->const QString &{return ent.nom();})
         {setLabels(vec,F);}
 };
@@ -77,7 +77,7 @@ template<class Ent> template<class Hydrate> void Checklist::Save<Ent>::save(b2d:
     }
 }
 
-template<class Ent> void Checklist::setChecksById(const conteneurMPS::vector_ptr<Ent> &vec, idt (*F)(const Ent &)) {
+template<class Ent> void Checklist::setChecksById(const vector_ptr<Ent> &vec, idt (*F)(const Ent &)) {
     for(auto i = 0; i != count(); ++i) {
         auto *it = item(i);
         auto j = vec.cbegin();
@@ -90,7 +90,7 @@ template<class Ent> void Checklist::setChecksById(const conteneurMPS::vector_ptr
     }
 }
 
-template<class Ent> void Checklist::setLabels(const conteneurMPS::vector_ptr<Ent> &vec, const QString &(*F)(const Ent &)) {
+template<class Ent> void Checklist::setLabels(const vector_ptr<Ent> &vec, const QString &(*F)(const Ent &)) {
     for(auto i = vec.cbegin(); i != vec.cend(); ++i) {
         auto *item = new QListWidgetItem(F(*i));
         item->set_data(Qt::UserRole,i->id());

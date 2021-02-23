@@ -43,7 +43,7 @@ void PredefFenPrincipale::export_xml() {
                                                      m_noyau->config().default_directory(),
                                                      tr("Fichier XML (*.xml)"));
         if(!name.isEmpty()){
-            conteneurMPS::vector_ptr<entities::entity> vec;
+            vector_ptr<entities::entity> vec;
             for (auto iter = dialog.set().cbegin(); iter != dialog.set().cend(); ++iter)
                 vec<<noyau()->bdd().get_list(*iter);
             m_noyau->export_xml(name,std::move(vec),dialog.option());

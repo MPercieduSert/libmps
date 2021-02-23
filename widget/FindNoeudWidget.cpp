@@ -1,7 +1,7 @@
 #include "FindNoeudWidget.h"
 
 using namespace delegateMPS;
-using namespace modelMPS;
+using namespace model_base;
 using namespace findNoeudModel;
 using namespace widgetMPS;
 
@@ -10,20 +10,20 @@ QWidget *FindNoeudDelegate::createEditor(QWidget *parent, const QStyleOptionView
     if(index.is_valid()) {
         if(index.column() == OpColumn) {
             auto *comboBox = new QComboBox(parent);
-            for (uint i = 0; i != NbrOperation; ++i)
+            for (uint i = 0; i != Nbr_Operation; ++i)
                 comboBox->addItem(OperationNoeud::Strings[i],i);
             return comboBox;
         }
         if(index.column() == ColonneColumn) {
             auto *comboBox = new QComboBox(parent);
-            auto vec = static_cast<const modelMPS::FindNoeudModel *>(index.model())->nomColonnes();
+            auto vec = static_cast<const model_base::FindNoeudModel *>(index.model())->nom_colonnes();
             for (uint i = 0; i != vec.size(); ++i)
                 comboBox->addItem(vec[i],i);
             return comboBox;
         }
         if(index.column() == ComparaisonColumn &&index.model()->data(index,Qt::UserRole).toUInt() &ComparaisonSet) {
             auto *comboBox = new QComboBox(parent);
-            for (uint i = 0; i != NbrComparaison; ++i)
+            for (uint i = 0; i != Nbr_Comparaison; ++i)
                 comboBox->addItem(AbstractComparaisonNoeud::Strings[i],i);
             return comboBox;
         }
@@ -76,14 +76,14 @@ FindNoeudWidget::FindNoeudWidget(FindNoeudModel *model, QWidget *parent)
     m_findButton = new QPushButton(tr("Chercher"));
     m_resetButton = new QPushButton(tr("Réinitialiser"));
     m_view = new QTreeView;
-    set_findModel(model);
+    set_find_model(model);
     auto *delegateOld = m_view->itemDelegate();
     m_view->setItemDelegate(new Delegate(this));
     delete delegateOld;
     m_view->setSelectionBehavior(QAbstractItemView::SelectRows);
     m_view->setSelectionMode(QAbstractItemView::SingleSelection);
     m_view->setEditTriggers(QAbstractItemView::CurrentChanged | QAbstractItemView::DoubleClicked);
-    connect(m_model,&modelMPS::FindNoeudModel::rowsInserted,m_view,&QTreeView::expand);
+    connect(m_model,&model_base::FindNoeudModel::rowsInserted,m_view,&QTreeView::expand);
 
     // Calque
     m_buttonsLayout = new QHBoxLayout;
@@ -96,7 +96,7 @@ FindNoeudWidget::FindNoeudWidget(FindNoeudModel *model, QWidget *parent)
     m_mainLayout->addLayout(m_buttonsLayout);
 }
 
-void FindNoeudWidget::set_findModel(FindNoeudModel *model) {
+void FindNoeudWidget::set_find_model(FindNoeudModel *model) {
     m_view->setModel(model);
     if(m_model) {
         m_addButton->disconnect(this);

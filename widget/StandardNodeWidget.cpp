@@ -1,129 +1,129 @@
-#include "StandardNodeWidget.h"
+#include "Standardnode_ptrWidget.h"
 
 using namespace delegateMPS;
 using namespace widgetMPS;
 
-////////////////////////////////////////////////// CheckSubNodeWidget //////////////////////////////////////////
-CheckSubNodeWidget::CheckSubNodeWidget(const NodeIndex &index, QWidget *parent)
-    : SubNodeWidget(index,parent) {
+////////////////////////////////////////////////// CheckSubnode_ptrWidget //////////////////////////////////////////
+CheckSubnode_ptrWidget::CheckSubnode_ptrWidget(const node_ptrIndex &index, QWidget *parent)
+    : Subnode_ptrWidget(index,parent) {
     m_checkBox = new QCheckBox;
     m_mainLayout->addWidget(m_checkBox);
     connect(m_checkBox,&QCheckBox::stateChanged,[this]() {
         if(connexionEnable())
-            m_index.model()->set_data(m_index,m_checkBox->isChecked(),modelMPS::CheckStateRole);});
+            m_index.model()->set_data(m_index,m_checkBox->isChecked(),model_base::Check_State_Role);});
 }
 
-void CheckSubNodeWidget::updateDataSubNode(flag role) {
-    SubNodeWidget::updateDataSubNode(role);
-    if(role.test(modelMPS::LabelRole))
-        m_checkBox->set_text(m_index.data(modelMPS::LabelRole).to_string());
-    if(role.test(modelMPS::CheckStateRole))
-        m_checkBox->setChecked(m_index.data(modelMPS::CheckStateRole).toBool());
+void CheckSubnode_ptrWidget::updateDataSubnode_ptr(flag role) {
+    Subnode_ptrWidget::updateDataSubnode_ptr(role);
+    if(role.test(model_base::Label_Role))
+        m_checkBox->set_text(m_index.data(model_base::Label_Role).to_string());
+    if(role.test(model_base::Check_State_Role))
+        m_checkBox->setChecked(m_index.data(model_base::Check_State_Role).toBool());
 }
 
-////////////////////////////////////////////////// CodeSubNodeWidget //////////////////////////////////////////
-CodeSubNodeWidget::CodeSubNodeWidget(const CodeWidget::Cases &cases, const NodeIndex &index, QWidget *parent)
-    : LabelSubNodeWidget(index,parent) {
+////////////////////////////////////////////////// CodeSubnode_ptrWidget //////////////////////////////////////////
+CodeSubnode_ptrWidget::CodeSubnode_ptrWidget(const CodeWidget::Cases &cases, const node_ptrIndex &index, QWidget *parent)
+    : LabelSubnode_ptrWidget(index,parent) {
     m_codeWidget = new CodeWidget(cases);
     m_mainLayout->addWidget(m_codeWidget);
     connect(m_codeWidget,&CodeWidget::codeChanged,this,[this]() {
         if(connexionEnable())
-            m_index.model()->set_data(m_index,m_codeWidget->code().value(),modelMPS::NumRole);});
+            m_index.model()->set_data(m_index,m_codeWidget->code().value(),model_base::Num_Role);});
 }
 
-void CodeSubNodeWidget::updateDataSubNode(flag role) {
-    LabelSubNodeWidget::updateDataSubNode(role);
-    if(role.test(modelMPS::NumRole))
-        m_codeWidget->set_code(m_index.data(modelMPS::NumRole).toUInt());
+void CodeSubnode_ptrWidget::updateDataSubnode_ptr(flag role) {
+    LabelSubnode_ptrWidget::updateDataSubnode_ptr(role);
+    if(role.test(model_base::Num_Role))
+        m_codeWidget->set_code(m_index.data(model_base::Num_Role).toUInt());
 }
 
-////////////////////////////////////////////////// ComboBoxSubNodeWidget //////////////////////////////////////////
-ComboBoxSubNodeWidget::ComboBoxSubNodeWidget(const NodeIndex &index, QWidget *parent)
-    : LabelSubNodeWidget(index,parent) {
+////////////////////////////////////////////////// ComboBoxSubnode_ptrWidget //////////////////////////////////////////
+ComboBoxSubnode_ptrWidget::ComboBoxSubnode_ptrWidget(const node_ptrIndex &index, QWidget *parent)
+    : LabelSubnode_ptrWidget(index,parent) {
     m_comboBox = new QComboBox;
     m_comboBox->setSizeAdjustPolicy(QComboBox::AdjustToContents);
     m_mainLayout->addWidget(m_comboBox);
     connect(m_comboBox,qOverload<int>(&QComboBox::currentIndexChanged),this,[this]() {
         if(connexionEnable())
-            m_index.model()->set_data(m_index,m_comboBox->currentData(),modelMPS::IntRole);});
+            m_index.model()->set_data(m_index,m_comboBox->currentData(),model_base::Int_Role);});
 }
 
-void ComboBoxSubNodeWidget::updateDataSubNode(flag role) {
-    LabelSubNodeWidget::updateDataSubNode(role);
-    if(role.test(modelMPS::ListOfValues)){
+void ComboBoxSubnode_ptrWidget::updateDataSubnode_ptr(flag role) {
+    LabelSubnode_ptrWidget::updateDataSubnode_ptr(role);
+    if(role.test(model_base::List_Of_Values)){
         m_comboBox->clear();
-        auto map = m_index.data(modelMPS::ListOfValues).toMap();
+        auto map = m_index.data(model_base::List_Of_Values).toMap();
         for (auto iter = map.cbegin(); iter != map.cend(); ++iter)
             m_comboBox->addItem(iter.key(),iter.value());
     }
-    if(role.test(modelMPS::IntRole))
-        m_comboBox->setCurrentIndex(m_comboBox->findData(m_index.data(modelMPS::IntRole).toInt()));
+    if(role.test(model_base::Int_Role))
+        m_comboBox->setCurrentIndex(m_comboBox->findData(m_index.data(model_base::Int_Role).toInt()));
 }
 
-////////////////////////////////////////////////// LabelSubNodeWidget //////////////////////////////////////////
-LabelSubNodeWidget::LabelSubNodeWidget(const NodeIndex &index, QWidget *parent)
-    : SubNodeWidget(index,parent) {
+////////////////////////////////////////////////// LabelSubnode_ptrWidget //////////////////////////////////////////
+LabelSubnode_ptrWidget::LabelSubnode_ptrWidget(const node_ptrIndex &index, QWidget *parent)
+    : Subnode_ptrWidget(index,parent) {
     m_label = new QLabel;
     m_mainLayout->addWidget(m_label);
 }
 
-void LabelSubNodeWidget::updateDataSubNode(flag role) {
-    SubNodeWidget::updateDataSubNode(role);
-    if(role.test(modelMPS::LabelRole))
-        m_label->set_text(m_index.data(modelMPS::LabelRole).to_string());
+void LabelSubnode_ptrWidget::updateDataSubnode_ptr(flag role) {
+    Subnode_ptrWidget::updateDataSubnode_ptr(role);
+    if(role.test(model_base::Label_Role))
+        m_label->set_text(m_index.data(model_base::Label_Role).to_string());
 }
 
-////////////////////////////////////////////////// DateSubNodeWidget //////////////////////////////////////////
-DateSubNodeWidget::DateSubNodeWidget(const NodeIndex &index, QWidget *parent)
-    : LabelSubNodeWidget(index,parent) {
+////////////////////////////////////////////////// DateSubnode_ptrWidget //////////////////////////////////////////
+DateSubnode_ptrWidget::DateSubnode_ptrWidget(const node_ptrIndex &index, QWidget *parent)
+    : LabelSubnode_ptrWidget(index,parent) {
     m_dateEdit = new QDateEdit;
     m_dateEdit->setCalendarPopup(true);
     m_mainLayout->addWidget(m_dateEdit);
     connect(m_dateEdit,&QDateEdit::dateChanged,this,[this]() {
         if(connexionEnable())
-            m_index.model()->set_data(m_index,m_dateEdit->date(),modelMPS::DateRole);});
+            m_index.model()->set_data(m_index,m_dateEdit->date(),model_base::Date_Role);});
 }
 
-void DateSubNodeWidget::updateDataSubNode(flag role) {
-    LabelSubNodeWidget::updateDataSubNode(role);
-    if(role.test(modelMPS::DateRole))
-        m_dateEdit->setDate(m_index.data(modelMPS::DateRole).toDate());
+void DateSubnode_ptrWidget::updateDataSubnode_ptr(flag role) {
+    LabelSubnode_ptrWidget::updateDataSubnode_ptr(role);
+    if(role.test(model_base::Date_Role))
+        m_dateEdit->setDate(m_index.data(model_base::Date_Role).toDate());
 }
 
-////////////////////////////////////////////////// LineEditSubNodeWidget //////////////////////////////////////////
-LineEditSubNodeWidget::LineEditSubNodeWidget(const NodeIndex &index, QWidget *parent)
-    : LabelSubNodeWidget(index,parent) {
+////////////////////////////////////////////////// LineEditSubnode_ptrWidget //////////////////////////////////////////
+LineEditSubnode_ptrWidget::LineEditSubnode_ptrWidget(const node_ptrIndex &index, QWidget *parent)
+    : LabelSubnode_ptrWidget(index,parent) {
     m_lineEdit = new QLineEdit;
     m_mainLayout->addWidget(m_lineEdit);
     connect(m_lineEdit,&QLineEdit::textChanged,this,[this]() {
         if(connexionEnable())
-            m_index.model()->set_data(m_index,m_lineEdit->text(),modelMPS::StringRole);});
+            m_index.model()->set_data(m_index,m_lineEdit->text(),model_base::String_Role);});
 }
 
-void LineEditSubNodeWidget::updateDataSubNode(flag role) {
-    LabelSubNodeWidget::updateDataSubNode(role);
-    if(role.test(modelMPS::StringRole))
-        m_lineEdit->set_text(m_index.data(modelMPS::StringRole).to_string());
+void LineEditSubnode_ptrWidget::updateDataSubnode_ptr(flag role) {
+    LabelSubnode_ptrWidget::updateDataSubnode_ptr(role);
+    if(role.test(model_base::String_Role))
+        m_lineEdit->set_text(m_index.data(model_base::String_Role).to_string());
 }
 
-////////////////////////////////////////////////// TexteEditSubNodeWidget //////////////////////////////////////////
-TexteEditNodeWidget::TexteEditNodeWidget(const NodeIndex &index, QWidget *parent)
-    : SubNodeWidget(index,parent) {
+////////////////////////////////////////////////// TexteEditSubnode_ptrWidget //////////////////////////////////////////
+TexteEditnode_ptrWidget::TexteEditnode_ptrWidget(const node_ptrIndex &index, QWidget *parent)
+    : Subnode_ptrWidget(index,parent) {
     m_texteEdit = new QTextEdit;
     m_mainLayout->addWidget(m_texteEdit);
     connect(m_texteEdit,&QTextEdit::textChanged,[this]() {
         if(connexionEnable())
-            m_index.model()->set_data(m_index,m_texteEdit->toPlainText(),modelMPS::StringRole);});
+            m_index.model()->set_data(m_index,m_texteEdit->toPlainText(),model_base::String_Role);});
 }
 
-void TexteEditNodeWidget::updateDataSubNode(flag role) {
-    SubNodeWidget::updateDataSubNode(role);
-    if(role.test(modelMPS::StringRole))
-        m_texteEdit->setPlainText(m_index.data(modelMPS::StringRole).to_string());
+void TexteEditnode_ptrWidget::updateDataSubnode_ptr(flag role) {
+    Subnode_ptrWidget::updateDataSubnode_ptr(role);
+    if(role.test(model_base::String_Role))
+        m_texteEdit->setPlainText(m_index.data(model_base::String_Role).to_string());
 }
 
 ////////////////////////////////////////////////// RoundedArcPainter //////////////////////////////////////////
-void RoundedArcPainter::drawArc(ArcNodeViewWidget *arc) const{
+void RoundedArcPainter::drawArc(Arcnode_ptrViewWidget *arc) const{
     QPainter painter(arc);
     QPen pen(QGuiApplication::palette().color(QPalette::Active,QPalette::WindowText));
     pen.setWidth(WidthLine);
@@ -143,21 +143,21 @@ void RoundedArcPainter::drawArc(ArcNodeViewWidget *arc) const{
                      x ,y);
 }
 
-void RoundedArcPainter::drawToolZone(ArcNodeViewWidget *arc) const {
+void RoundedArcPainter::drawToolZone(Arcnode_ptrViewWidget *arc) const {
     QPainter painter(arc);
     QPen pen(QGuiApplication::palette().color(QPalette::Active,QPalette::WindowText));
     pen.setWidth(WidthLine);
     painter.setPen(pen);
-    auto top = arc->nodeWidget()->geometry().bottom() + bottomNodeMargin() + WidthLine / 2;
+    auto top = arc->nodeWidget()->geometry().bottom() + bottomnode_ptrMargin() + WidthLine / 2;
     auto height =  heightToolZone() - WidthLine;
-    auto xo = leftNodeMargin() + WidthLine / 2;
-    auto xEx = xo + widthToolZone(NodeView::ExpandTool);
-    auto xEl = xo + widthToolZone(NodeView::ElderTool);
-    auto xBr = xo + widthToolZone(NodeView::BrotherTool);
-    auto xEnd = xo + widthToolZone(NodeView::EndOfTool);
+    auto xo = leftnode_ptrMargin() + WidthLine / 2;
+    auto xEx = xo + widthToolZone(node_ptrView::ExpandTool);
+    auto xEl = xo + widthToolZone(node_ptrView::ElderTool);
+    auto xBr = xo + widthToolZone(node_ptrView::BrotherTool);
+    auto xEnd = xo + widthToolZone(node_ptrView::EndOfTool);
     // Rectangle
     painter.drawRoundedRect(xo,top,
-                            widthToolZone(NodeView::EndOfTool) - WidthLine / 2, height,
+                            widthToolZone(node_ptrView::EndOfTool) - WidthLine / 2, height,
                             RayonToolZone, RayonToolZone, Qt::AbsoluteSize);
     //Line
     painter.drawLine(xEx,top,xEx,top + height);
@@ -167,7 +167,7 @@ void RoundedArcPainter::drawToolZone(ArcNodeViewWidget *arc) const {
     QPen penDisabled(QGuiApplication::palette().color(QPalette::Disabled,QPalette::WindowText));
     painter.setFont(QFont("FontAwesome"));
     //Icon : Expand
-    if(!arc->nodeWidget()->index().flags().test(modelMPS::ExpendableFLagNode))
+    if(!arc->nodeWidget()->index().flags().test(model_base::ExpendableFLagnode_ptr))
         painter.setPen(penDisabled);
     QString strExpand;
     if(arc->leaf())
@@ -178,27 +178,27 @@ void RoundedArcPainter::drawToolZone(ArcNodeViewWidget *arc) const {
         strExpand = "\uf150";
     painter.drawText(xo,top,xEx-xo,height,Qt::AlignCenter,strExpand);
     //Icon : Elder
-    if(arc->nodeWidget()->index().flags().test(modelMPS::ElderEnableFlagNode))
+    if(arc->nodeWidget()->index().flags().test(model_base::ElderEnableFlagnode_ptr))
         painter.setPen(pen);
     else
         painter.setPen(penDisabled);
     painter.drawText(xEx,top,xEl-xEx,height,Qt::AlignCenter,"\uf149");
     //Icon : Brother
-    if(arc->nodeWidget()->index().flags().test(modelMPS::BrotherEnableFlagNode))
+    if(arc->nodeWidget()->index().flags().test(model_base::BrotherEnableFlagnode_ptr))
         painter.setPen(pen);
     else
         painter.setPen(penDisabled);
     painter.drawText(xEl,top,xBr-xEl,height,Qt::AlignCenter,"\uf07e");
     //Icon : Del
-    if(arc->nodeWidget()->index().flags().test(modelMPS::DelEnableFlagNode))
+    if(arc->nodeWidget()->index().flags().test(model_base::DelEnableFlagnode_ptr))
         painter.setPen(pen);
     else
         painter.setPen(penDisabled);
     painter.drawText(xBr,top,xEnd-xBr,height,Qt::AlignCenter,"\uf12d");
 }
 
-////////////////////////////////////////////////// RoundedNodePainter //////////////////////////////////////////
-void RoundedNodePainter::paint(QWidget *widget) {
+////////////////////////////////////////////////// Roundednode_ptrPainter //////////////////////////////////////////
+void Roundednode_ptrPainter::paint(QWidget *widget) {
     QPen pen(m_colorLine);
     pen.setWidth(m_widthLine);
     QPainter painter(widget);
@@ -208,61 +208,61 @@ void RoundedNodePainter::paint(QWidget *widget) {
                             Rayon, Rayon, Qt::AbsoluteSize);
 }
 
-void RoundedNodePainter::set_etatSelection(NodeWidget::EtatSelection etat) {
+void Roundednode_ptrPainter::set_etatSelection(node_ptrWidget::EtatSelection etat) {
     switch (etat) {
-    case NodeWidget::NoSelected:
+    case node_ptrWidget::NoSelected:
         m_widthLine = NoSelectedWidth;
         m_colorLine = QGuiApplication::palette().color(QPalette::Active,QPalette::WindowText);
         break;
-    case NodeWidget::Selected:
+    case node_ptrWidget::Selected:
         m_widthLine = SelectedWidth;
         m_colorLine = QGuiApplication::palette().color(QPalette::Active,QPalette::Highlight);
         break;
-    case NodeWidget::Current:
+    case node_ptrWidget::Current:
         m_widthLine = CurrentWidth;
         m_colorLine = QGuiApplication::palette().color(QPalette::Active,QPalette::Highlight);
         break;
-    case NodeWidget::Initial:
+    case node_ptrWidget::Initial:
         break;
     }
 }
 
-//////////////////////////////////////////////// StandardNodeDelegate /////////////////////////////////////
-NodeWidget *StandardNodeDelegate::createNode(const NodeIndex &index, QWidget *parent) const {
-    Q_ASSERT(index.cible() == modelMPS::NodeCible);
-    auto node = new NodeWidget(index,parent);
-    node->setPainter(std::make_unique<RoundedNodePainter>());
-    auto nbrSubNode = index.model()->dataCount(index.index(modelMPS::SubNodeCible));
-    for(numt num = 0; num != nbrSubNode; ++num)
-        node->addSubNodeWidget(createSubNode(index.index(modelMPS::SubNodeCible,num),node));
+//////////////////////////////////////////////// Standardnode_ptrDelegate /////////////////////////////////////
+node_ptrWidget *Standardnode_ptrDelegate::createnode_ptr(const node_ptrIndex &index, QWidget *parent) const {
+    Q_ASSERT(index.cible() == model_base::Node_Cible);
+    auto node = new node_ptrWidget(index,parent);
+    node->setPainter(std::make_unique<Roundednode_ptrPainter>());
+    auto nbrSubnode_ptr = index.model()->dataCount(index.index(model_base::Sub_Node_Cible));
+    for(numt num = 0; num != nbrSubnode_ptr; ++num)
+        node->addSubnode_ptrWidget(createSubnode_ptr(index.index(model_base::Sub_Node_Cible,num),node));
     return node;
 }
 
-SubNodeWidget *StandardNodeDelegate::createSubNode(const NodeIndex &index, QWidget *parent) const {
-    Q_ASSERT(index.cible() == modelMPS::SubNodeCible);
-    auto info = index.data(modelMPS::SubNodeRole).toList();
-    auto indexSubNode = index.index(info.at(modelMPS::CibleSubNode).toInt(),info.at(modelMPS::NumSubNode).toUInt());
-    switch (info.at(modelMPS::TypeSubNode).toUInt()) {
-    case modelMPS::CheckSubNode:
-        return new CheckSubNodeWidget(indexSubNode,parent);
-    case modelMPS::ComboBoxSubNode:
-        return new ComboBoxSubNodeWidget(indexSubNode,parent);
-    case modelMPS::DateSubNode:
-        return  new DateSubNodeWidget(indexSubNode,parent);
-    case modelMPS::LineEditSubNode:
-        return new LineEditSubNodeWidget(indexSubNode,parent);
-    case modelMPS::TexteEditSubNode:
-        return  new TexteEditNodeWidget(indexSubNode,parent);
+Subnode_ptrWidget *Standardnode_ptrDelegate::createSubnode_ptr(const node_ptrIndex &index, QWidget *parent) const {
+    Q_ASSERT(index.cible() == model_base::Sub_Node_Cible);
+    auto info = index.data(model_base::Sub_Node_Role).toList();
+    auto indexSubnode_ptr = index.index(info.at(model_base::CibleSubnode_ptr).toInt(),info.at(model_base::NumSubnode_ptr).toUInt());
+    switch (info.at(model_base::TypeSubnode_ptr).toUInt()) {
+    case model_base::CheckSubnode_ptr:
+        return new CheckSubnode_ptrWidget(indexSubnode_ptr,parent);
+    case model_base::ComboBoxSubnode_ptr:
+        return new ComboBoxSubnode_ptrWidget(indexSubnode_ptr,parent);
+    case model_base::DateSubnode_ptr:
+        return  new DateSubnode_ptrWidget(indexSubnode_ptr,parent);
+    case model_base::LineEditSubnode_ptr:
+        return new LineEditSubnode_ptrWidget(indexSubnode_ptr,parent);
+    case model_base::TexteEditSubnode_ptr:
+        return  new TexteEditnode_ptrWidget(indexSubnode_ptr,parent);
     }
-    return new SubNodeWidget(indexSubNode,parent);
+    return new Subnode_ptrWidget(indexSubnode_ptr,parent);
 }
 
-SubNodeWidget *CodeStandardNodeDelegate::createSubNode(const NodeIndex &index, QWidget *parent) const {
-    Q_ASSERT(index.cible() == modelMPS::SubNodeCible);
-    if(index.data(modelMPS::SubNodeRole).toList().at(modelMPS::TypeSubNode).toUInt() == modelMPS::CodeSubNode) {
-        auto info = index.data(modelMPS::SubNodeRole).toList();
-        auto indexSubNode = index.index(info.at(modelMPS::CibleSubNode).toInt(),info.at(modelMPS::NumSubNode).toUInt());
-        return new CodeSubNodeWidget(m_cases,indexSubNode,parent);
+Subnode_ptrWidget *CodeStandardnode_ptrDelegate::createSubnode_ptr(const node_ptrIndex &index, QWidget *parent) const {
+    Q_ASSERT(index.cible() == model_base::Sub_Node_Cible);
+    if(index.data(model_base::Sub_Node_Role).toList().at(model_base::TypeSubnode_ptr).toUInt() == model_base::CodeSubnode_ptr) {
+        auto info = index.data(model_base::Sub_Node_Role).toList();
+        auto indexSubnode_ptr = index.index(info.at(model_base::CibleSubnode_ptr).toInt(),info.at(model_base::NumSubnode_ptr).toUInt());
+        return new CodeSubnode_ptrWidget(m_cases,indexSubnode_ptr,parent);
     }
-    return StandardNodeDelegate::createSubNode(index,parent);
+    return Standardnode_ptrDelegate::createSubnode_ptr(index,parent);
 }

@@ -7,15 +7,15 @@
 #include <memory>
 #include <QDate>
 #include <QRegularExpression>
-#include "ColonnesForModel.h"
-#include "TreeNoeudModel.h"
+#include "colonnes_for_model.h"
+#include "tree_noeud_model.h"
 
-namespace modelMPS {
+namespace model_base {
 //! Déclaration anticipée.
-class AbstractColonnesModel;
+class abstract_colonnes_model;
 namespace findNoeudModel {
 //! Type des noeuds de l'arbre.
-enum typeNoeud {NoType = -1,
+enum typeNoeud {No_Type = -1,
                BoolNoeudType,
                ConstanteNoeudType,
                DateNoeudType,
@@ -53,8 +53,8 @@ enum column {NegColumn,
 //! Opérations binaire.
 enum nodeOperation {Et,
                     Ou,
-                    OuExclusif,
-                    NbrOperation};
+                    Ou_Exclusif,
+                    Nbr_Operation};
 
 //! Comparaison à une valeur.
 enum comparaison {Egal,
@@ -63,24 +63,24 @@ enum comparaison {Egal,
                  Superieure,
                  Inf_Egal,
                  Sup_Egal,
-                 NbrComparaison};
+                 Nbr_Comparaison};
 }
 
-/*! \ingroup groupeModel
+/*! \ingroup groupe_model
  *\brief Classe mère des model de recherche.
  */
-class FindNoeudModel : public TreeNoeudModel, public AbstractFindModel {
+class FindNoeudModel : public TreeNoeudModel, public Abstract_Find_Model {
     Q_OBJECT
 public:
    //! Structure d'informations sur une colonne du model.
     struct Colonne {
-        int type = findNoeudModel::NoType;      //!< Type de la colonne.
+        int type = findNoeudModel::No_Type;      //!< Type de la colonne.
         QString nom;      //!< Nom de la colonne.
     };
 
 protected:
     std::vector<Colonne> m_colonnes;        //!< Informations sur les colonnes.
-    AbstractColonnesModel *m_model = nullptr;        //!< Model filtré.
+    abstract_colonnes_model *m_model = nullptr;        //!< Model filtré.
     using QAbstractItemModel::createIndex;
 public:
     //! Constructeur.
@@ -97,7 +97,7 @@ public:
     void insertNoeud(int row, const QModelIndex &parent);
 
     //! Donne la liste des noms des colonnes du model associé.
-    std::vector<QString> nomColonnes() const;
+    std::vector<QString> nom_colonnes() const;
 
     //! Supprime le noeud de la ligne row de parent.
     void removeNoeud(int row, const QModelIndex &parent);
@@ -110,13 +110,13 @@ public:
     bool set_data(const QModelIndex &index, const QVariant &value, int role) override;
 
     //! Mutateur du model filtré.
-    void setModel(AbstractColonnesModel *model);
+    void setModel(abstract_colonnes_model *model);
 
     //! Teste si la ligne d'indice id vérifie la condition de la racine.
-    bool testRoot(szt id) const override;
+    bool test_root(szt id) const override;
 
     //! Teste si la ligne d'indice id vérifie l'arbre des conditions.
-    bool testTree(szt id) const override;
+    bool test_tree(szt id) const override;
 
 public slots:
     //! Applique la recherche au model à filtré.
@@ -124,16 +124,16 @@ public slots:
 
 protected:
     //! Fabrique des noeuds.
-    Noeud nodeFactory(int type, int row, const QModelIndex &parent) override;
+    Noeud node_factory(int type, int row, const QModelIndex &parent) override;
 
     //! Fabrique des noeuds de condition.
-    Noeud nodeConditionFactory(szt pos);
+    Noeud node_condition_factory(szt pos);
 };
 
 //////////////////////////////////// Noeud ///////////////////
 
 namespace findNoeudModel {
-/*! \ingroup groupeModel
+/*! \ingroup groupe_model
  *\brief Classe mère des feuilles de recherche (héritage multiple).
  */
 class AbstractFindNoeud : public TreeNoeudModel::AbstractNoeud {
@@ -150,7 +150,7 @@ public:
 };
 
 
-/*! \ingroup groupeModel
+/*! \ingroup groupe_model
  *\brief Classe mère des noeuds de recherche avec négation.
  */
 class AbstractNegationNoeud : public AbstractFindNoeud {
@@ -180,7 +180,7 @@ public:
     bool set_data(int column, const QVariant &value, int role = Qt::EditRole) override;
 };
 
-/*! \ingroup groupeModel
+/*! \ingroup groupe_model
  *\brief Classe mère des noeuds de recherche définissant une condition.
  */
 class AbstractConditionNoeud : public AbstractNegationNoeud {
@@ -192,7 +192,7 @@ public:
     AbstractConditionNoeud() = default;
 
     //!Constructeur.
-    AbstractConditionNoeud(uint pos, const QString &label, int type = NoType)
+    AbstractConditionNoeud(uint pos, const QString &label, int type = No_Type)
         : AbstractNegationNoeud(type), m_pos(pos), m_label(label) {}
 
     //! Accesseur de la donnée associé à column.
@@ -223,26 +223,26 @@ public:
         {m_label = label;}
 
     //! Mutateur de position.
-    void setPos(uint pos)
+    void set_pos(uint pos)
         {m_pos = pos;}
 
     //! Teste si la ligne d'indice id vérifie la condition du noeud.
-    bool test(szt id, AbstractColonnesModel *model) const;
+    bool test(szt id, abstract_colonnes_model *model) const;
 
     //! Teste si la ligne d'indice id vérifie la condition du noeud.
-    virtual bool testValue(const QVariant &value) const = 0;
+    virtual bool test_value(const QVariant &value) const = 0;
 };
 
-/*! \ingroup groupeModel
+/*! \ingroup groupe_model
  *\brief Classe mère des noeuds de recherche définissant une condition de comparaison.
  */
 class AbstractComparaisonNoeud : public AbstractConditionNoeud {
 protected:
     uint m_comp;            //!< Indice de la comparaison.
 public:
-    static const std::array<QString, NbrComparaison> Strings;        //!< Labels des comparaisons.
+    static const std::array<QString, Nbr_Comparaison> Strings;        //!< Labels des comparaisons.
     //! Constructeur.
-    AbstractComparaisonNoeud(uint pos, const QString &label, uint comp = Egal,int type = NoType)
+    AbstractComparaisonNoeud(uint pos, const QString &label, uint comp = Egal,int type = No_Type)
         : AbstractConditionNoeud(pos,label,type), m_comp(comp) {}
 
     //! Accesseur de la donnée associé à column.
@@ -259,23 +259,23 @@ public:
     bool set_data(int column, const QVariant &value, int role = Qt::EditRole) override;
 };
 
-/*! \ingroup groupeModel
+/*! \ingroup groupe_model
  *\brief Classe des noeuds de filtrage sur les textes.
  */
 class BoolNoeud : public AbstractConditionNoeud {
 protected:
-    QString m_trueLabel;    //!< Label du booléen vraie.
-    QString m_falseLabel;   //!< Label du booléen faux.
+    QString m_true_label;    //!< Label du booléen vraie.
+    QString m_false_label;   //!< Label du booléen faux.
     bool m_true;            //!< Filtre contenant les vraies.
     bool m_false;            //!< Filtre contenant les faux.
 public:
     //! Constructeur.
     BoolNoeud(uint pos, const QString &label,
-             const QString &trueLabel = QString(), const QString &falseLabel = QString(),
-             bool trueChecked = true, bool falseChecked = true)
+             const QString &true_label = QString(), const QString &false_label = QString(),
+             bool true_checked = true, bool false_checked = true)
         : AbstractConditionNoeud(pos,label,BoolNoeudType),
-          m_trueLabel(trueLabel), m_falseLabel(falseLabel),
-          m_true(trueChecked), m_false(falseChecked){}
+          m_true_label(true_label), m_false_label(false_label),
+          m_true(true_checked), m_false(false_checked){}
 
     //! Destructeur.
     ~BoolNoeud() override = default;
@@ -298,11 +298,11 @@ public:
     bool set_data(int column, const QVariant &value, int role = Qt::EditRole) override;
 
     //! Teste si la ligne d'indice id vérifie la condition du noeud.
-    bool testValue(const QVariant &value) const override
+    bool test_value(const QVariant &value) const override
         {return value.toBool() ? m_true : m_false;}
 };
 
-/*! \ingroup groupeModel
+/*! \ingroup groupe_model
  *\brief Classe des noeuds de recherche indéterminé.
  */
 class ChoiceNoeud : public AbstractFindNoeud {
@@ -325,7 +325,7 @@ public:
     }
 };
 
-/*! \ingroup groupeModel
+/*! \ingroup groupe_model
  *\brief Classe des noeuds de filtrage sur les dates.
  */
 class DateNoeud : public AbstractComparaisonNoeud {
@@ -357,17 +357,17 @@ public:
     bool set_data(int column, const QVariant &value, int role = Qt::EditRole) override;
 
     //! Teste si la ligne d'indice id vérifie la condition du noeud.
-    bool testValue(const QVariant &value) const override;
+    bool test_value(const QVariant &value) const override;
 };
 
-/*! \ingroup groupeModel
+/*! \ingroup groupe_model
  *\brief Classe des noeuds de type opération.
  */
 class OperationNoeud : public AbstractNegationNoeud {
 protected:
     uint m_operation;        //!< Identifiant de l'opération
 public:
-    static const std::array<QString, NbrOperation> Strings;        //!< Labels des opération.
+    static const std::array<QString, Nbr_Operation> Strings;        //!< Labels des opération.
     //! Constructeur.
     OperationNoeud(uint op = Et) : AbstractNegationNoeud(OperationNoeudType), m_operation(op) {}
 
@@ -392,7 +392,7 @@ public:
     bool set_data(int column, const QVariant &value, int role = Qt::EditRole) override;
 };
 
-/*! \ingroup groupeModel
+/*! \ingroup groupe_model
  *\brief Classe des noeuds de filtrage sur les textes.
  */
 class TexteNoeud : public AbstractConditionNoeud {
@@ -435,8 +435,8 @@ public:
     bool set_data(int column, const QVariant &value, int role = Qt::EditRole) override;
 
     //! Teste si la ligne d'indice id vérifie la condition du noeud.
-    bool testValue(const QVariant &value) const override;
+    bool test_value(const QVariant &value) const override;
 };
 }// end namespace findNoeudModel
-}// end namespace modelMPS
+}// end namespace model_base
 #endif // FINDMODEL_H

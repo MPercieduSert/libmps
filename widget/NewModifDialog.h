@@ -129,7 +129,7 @@ public:
     }
 
     //! Mutateur de la liste des noms.
-    template<class Ent> void set_noms(const conteneurMPS::vector_ptr<Ent> &vec) {
+    template<class Ent> void set_noms(const vector_ptr<Ent> &vec) {
         if(!m_new){
             m_nameCB->clear();
             m_nameCB->addText(vec,[](const Ent &ent)->const QString &{return ent.nom();});
@@ -137,7 +137,7 @@ public:
     }
 
     //! Mutateur de la liste des noms.
-    template<class Ent> void set_noms(conteneurMPS::vector_ptr<Ent> &&vec) {
+    template<class Ent> void set_noms(vector_ptr<Ent> &&vec) {
         if(!m_new){
             m_nameCB->clear();
             m_nameCB->addText(std::move(vec),[](const Ent &ent)->const QString &{return ent.nom();});

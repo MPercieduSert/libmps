@@ -29,7 +29,7 @@
      *positionne l'itérateur sur le n ieme frère suivant.
      *Si n est trop grand, l'itérateur est positionné sur le dernier des frères.
      */ \
-    ITER &to_brotherU(size_type n) noexcept {const_abstract_iterator::to_brotherU(n); return *this;} \
+    ITER &to_brother_u(size_type n) noexcept {const_abstract_iterator::to_brother_u(n); return *this;} \
     /*! \brief Place l'itérateur sur le descendant direct d'indice n.
      *
      *Place un pointeur sur le descendant direct d'indice n. Les indices négatifs sont permis.
@@ -43,7 +43,7 @@
      *Si n > nombre de fils-1],
      *l'itérateur sera placé sur le fils ainé.
      */ \
-    ITER &to_childU(size_type n) noexcept {const_abstract_iterator::to_childU(n); return *this;} \
+    ITER &to_child_u(size_type n) noexcept {const_abstract_iterator::to_child_u(n); return *this;} \
     /*! Place l'itérateur sur l'ainé des frères du noeud courant.*/ \
     ITER &to_first_brother() noexcept {const_abstract_iterator::to_first_brother(); return *this;} \
     /*! Place l'itérateur sur l'ainé des fils du noeud courant.*/ \
@@ -508,7 +508,7 @@ public:
          *positionne l'itérateur sur le n ieme frère suivant.
          *Si n est trop grand, l'itérateur est positionné sur le dernier des frères.
          */
-        void to_brotherU(size_type n) noexcept {
+        void to_brother_u(size_type n) noexcept {
             while(n &&m_ptr) {
                 v_to_next();
                 --n;
@@ -529,7 +529,7 @@ public:
          *Si position > nombre de fils-1],
          *l'itérateur sera placé sur le fils ainé.
          */
-        void to_childU(size_type n) noexcept {
+        void to_child_u(size_type n) noexcept {
             to_first();
             to_brother(n);
         }
@@ -1720,11 +1720,11 @@ template<class T> template<class iter_tree> void tree<T>::swap(iter_tree it_1, i
         std::swap(it_1.m_ptr->m_next,it_2.m_ptr->m_next);
         if(it_1.m_ptr->m_prev)
             it_1.m_ptr->m_prev->m_next = it_1.m_ptr;
-        if(it_1.m_ptr->nextBrother)
+        if(it_1.m_ptr->next)
             it_1.m_ptr->m_next->m_prev = it_1.m_ptr;
         if(it_2.m_ptr->m_prev)
             it_2.m_ptr->m_prev->m_next = it_2.m_ptr;
-        if(it_2.m_ptr->nextBrother)
+        if(it_2.m_ptr->next)
             it_2.m_ptr->m_next->m_prev = it_2.m_ptr;
     }
 }

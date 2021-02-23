@@ -7,7 +7,7 @@
 #include <QListWidget>
 #include <QPushButton>
 #include <QSqlDatabase>
-#include <QSqlTableModel>
+#include <QSqltable_model>
 #include <QSplitter>
 #include <QStackedWidget>
 #include <QTableView>
@@ -40,7 +40,7 @@ protected:
     //! Structure contenant les donnée et variable associé à chaque table.
     struct table{
         QStringList nomAttributs;  //!< Liste des noms des attributs.
-        QSqlTableModel *model = nullptr;   //!< Model.
+        QSqltable_model *model = nullptr;   //!< Model.
         QString nom;        //!< Nom de la table.
         QString nomBdd;     //!< Nom de la table dans la base de donnée.
         QTableView *view = nullptr;       //!< Vue.

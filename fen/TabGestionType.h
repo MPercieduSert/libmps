@@ -10,8 +10,8 @@
 #include "AbstractTabModuleWithBdd.h"
 #include "bdd_predef.h"
 #include "CodeWidget.h"
-#include "PredefModel.h"
-#include "StandardNodeWidget.h"
+#include "predef_model.h"
+#include "Standardnode_ptrWidget.h"
 
 namespace fenMPS {
 /*! \ingroup groupeFen
@@ -20,8 +20,8 @@ namespace fenMPS {
 class TabGestionType : public AbstractTabModuleWithBdd
 {
 protected:
-    modelMPS::type_permissionModel *m_model;    //!< Model.
-    widgetMPS::NodeView *m_view;               //!< Vue.
+    model_base::type_permission_model *m_model;    //!< Model.
+    widgetMPS::node_ptrView *m_view;               //!< Vue.
     QListWidget *m_cibleListWidget;            //!< Sélection des cibles.
     QPushButton *m_saveButton;                 //!< Bouton de sauvegarde.
 

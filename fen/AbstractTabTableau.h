@@ -8,7 +8,7 @@
 #include <QTableView>
 
 #include "AbstractTabModuleWithBdd.h"
-#include "TableModel.h"
+#include "table_model.h"
 
 namespace fenMPS {
 /*! \ingroup groupeFen
@@ -19,7 +19,7 @@ class AbstractTabTableau : public AbstractTabModuleWithBdd {
 protected:
     QPushButton *m_addColumnButton;        //!< Bouton pour ajouter une colonne
     QStyledItemDelegate *m_delegate;       //!< Déleguer
-    modelMPS::TableModel *m_model;          //!< Model
+    model_base::table_model *m_model;          //!< Model
     QTableView *m_view;                    //!< Vue
     QPushButton *m_saveButton;             //!< Bouton save
 public:
@@ -33,7 +33,7 @@ public:
     void become_current() override;
 
     //! Renvoie un pointeur sur le model.
-    virtual modelMPS::TableModel *model() const
+    virtual model_base::table_model *model() const
         {return m_model;}
 
 signals:

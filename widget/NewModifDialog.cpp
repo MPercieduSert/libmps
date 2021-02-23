@@ -71,18 +71,18 @@ AbstractTypenc_nomNewModifForm::AbstractTypenc_nomNewModifForm(b2d::bdd_predef &
     m_mainLayout->addWidget(m_typeTree);
 
     m_typeTree->setColumnCount(nbrColumn);
-    m_typeTree->setHeaderLabels(QStringList({"nom","nom abrégé"}));
+    m_typeTree->set_headerLabels(QStringList({"nom","nom abrégé"}));
     m_typeTree->setSelectionModel(new QItemSelectionModel(m_typeTree->model()));
-    m_typeTree->setTreeRef(m_bdd.get_arbre<Type>(m_bdd.ref_to_id<Type>(refRoot)),
+    m_typeTree->set_treeRef(m_bdd.get_arbre<Type>(m_bdd.ref_to_id<Type>(refRoot)),
                         [this](const Type &tp)->QTreeWidgetItem *{
         auto item = new QTreeWidgetItem({tp.nom(),tp.nc()});
-        item->set_data(widgetMPS::TreeWidget::IdColonne,widgetMPS::TreeWidget::IdRole,tp.id());
-        Permission perm(item->data(nom_type,widgetMPS::TreeWidget::IdRole).toUInt(),m_cible);
+        item->set_data(widgetMPS::TreeWidget::IdColonne,widgetMPS::TreeWidget::Id_Role,tp.id());
+        Permission perm(item->data(nom_type,widgetMPS::TreeWidget::Id_Role).toUInt(),m_cible);
         m_bdd.get_unique(perm);
         if(perm.test(b2d::code::Attribuable))
-            item->setFlags(Qt::ItemIsEnabled|Qt::ItemIsSelectable);
+            item->set_flags(Qt::ItemIsEnabled|Qt::ItemIsSelectable);
         else
-            item->setFlags(Qt::ItemIsEnabled);
+            item->set_flags(Qt::ItemIsEnabled);
         return item;
     });
     m_typeTree->setSelectionMode(QAbstractItemView::SingleSelection);
@@ -112,7 +112,7 @@ AbstractParentnc_nomNewModifForm::AbstractParentnc_nomNewModifForm(b2d::Bdd &bdd
     m_mainLayout->addWidget(m_parentTree);
 
     m_parentTree->setColumnCount(nbrColumn);
-    m_parentTree->setHeaderLabels(header);
+    m_parentTree->set_headerLabels(header);
     m_parentTree->setSelectionModel(new QItemSelectionModel(m_parentTree->model()));
 }
 

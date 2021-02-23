@@ -5,7 +5,7 @@
 #define TABGESTIONBDD_H
 
 #include <QPushButton>
-#include <QSqlTableModel>
+#include <QSqltable_model>
 #include <QTableView>
 #include "AbstractTabModuleWithBdd.h"
 
@@ -19,7 +19,7 @@ class TabGestionBdd : public AbstractTabModuleWithBdd
 protected:
     manager::info_bdd m_info;                 //!< Information sur la table.
     std::vector<QString> m_Names_attributs;      //!< Noms des attributs.
-    QSqlTableModel *m_model;                   //!< Model.
+    QSqltable_model *m_model;                   //!< Model.
     QTableView *m_view;                        //!< Vue.
     QPushButton *m_insertButton;               //!< Bouton d'insertion d'une ligne.
     QPushButton *m_refreshButton;              //!< Bouton rafraichisant l'affichage.

@@ -5,7 +5,7 @@
 #define TABLEENTITYVIEW_H
 
 #include <QTableView>
-#include "AbstractentityTableau.h"
+#include "abstract_entity_tableau.h"
 
 namespace widgetMPS {
 /*! \ingroup groupeWidget

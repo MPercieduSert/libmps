@@ -52,7 +52,7 @@ public:
     void import_xml(const QString &path);
 
     //! Exporte des entités dans un fichier xml.
-    void export_xml(const QString &path, conteneurMPS::vector_ptr<entities::entity> &&vec, flag option);
+    void export_xml(const QString &path, vector_ptr<entities::entity> &&vec, flag option);
 
     //! Écrit le schema xml des fichiers d'importation de données, dans le fichier de chemin path.
     void schemaXmlForimport(const QString &path);

@@ -22,7 +22,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-    AbstractentitySelectWidget.cpp \
+    AbstractEntitySelectWidget.cpp \
     #BarPlotter.cpp \
     Checklist.cpp \
     #EditTreeWidget.cpp \
@@ -40,21 +40,21 @@ SOURCES += \
     #SelectdonneeDialog.cpp \
     SelectInListBox.cpp \
     SpinBox.cpp \
-    TableentityView.cpp \
+    TableEntityView.cpp \
     #TreeModelEditent.cpp \
     #TreeModelmot_cle.cpp \
     #TreeModelReadent.cpp \
     #TreeModelRead_temp.cpp \
     #TreeModel_temp.cpp \
     TreeWidget.cpp \
-    NodeView.cpp \
+    node_ptrView.cpp \
     FindWidget.cpp \
-    StandardNodeWidget.cpp \
+    Standardnode_ptrWidget.cpp \
     CodeWidget.cpp \
     dialog_predef.cpp
 
 HEADERS += \
-    AbstractentitySelectWidget.h \
+    AbstractEntitySelectWidget.h \
     #BarPlotter.h \
     Checklist.h \
     #EditTreeWidget.h \
@@ -72,16 +72,16 @@ HEADERS += \
     #SelectdonneeDialog.h \
     SelectInListBox.h \
     SpinBox.h \
-    TableentityView.h \
+    TableEntityView.h \
     #TreeModelEditentity.h \
     #TreeModelmot_cle.h \
     #TreeModelReadentity.h \
     #TreeModelRead_temp.h \
     #TreeModel_temp.h \
     TreeWidget.h \
-    NodeView.h \
+    node_ptrView.h \
     FindWidget.h \
-    StandardNodeWidget.h \
+    Standardnode_ptrWidget.h \
     CodeWidget.h \
     dialog_predef.h
 

@@ -43,15 +43,15 @@ public:
 //////////////////////////////////////////////// FindNoeudWidget /////////////////////////////////////
 namespace widgetMPS {
 /*! \ingroup groupeWidget
- *\brief Widget de recherche définissant un arbre de filtres à appliquer à un model de type AbstractColonnesModel.
+ *\brief Widget de recherche définissant un arbre de filtres à appliquer à un model de type abstract_colonnes_model.
  */
 class FindNoeudWidget : public QWidget {
     Q_OBJECT
 protected:
     // Model &delegate
     using Delegate = delegateMPS::FindNoeudDelegate;
-    using FindModel = modelMPS::FindNoeudModel;
-    FindModel *m_model = nullptr;                //!< Model de recherche.
+    using find_model = model_base::FindNoeudModel;
+    find_model *m_model = nullptr;                //!< Model de recherche.
     // Widget
     QPushButton *m_addButton;      //!< Bouton d'ajout d'une condition de recherche.
     QPushButton *m_delButton;      //!< Bouton de suppresion d'une condition.
@@ -64,17 +64,17 @@ protected:
     QHBoxLayout *m_buttonsLayout;  //!< Claque des boutton.
 public:
     //! Constructeur.
-    FindNoeudWidget(modelMPS::FindNoeudModel *model = new FindModel(), QWidget *parent = nullptr);
+    FindNoeudWidget(model_base::FindNoeudModel *model = new find_model(), QWidget *parent = nullptr);
 
     //! Accesseur du Model.
-    FindModel *findModel() const
+    find_model *find_model() const
         {return m_model;}
 
     //! Mutateur du model de recheche.
-    void set_findModel(modelMPS::FindNoeudModel *model);
+    void set_find_model(model_base::FindNoeudModel *model);
 
     //! Mutateur du model filtré.
-    void setModel(modelMPS::AbstractColonnesModel *model) {
+    void setModel(model_base::abstract_colonnes_model *model) {
         if(m_model)
             m_model->setModel(model);
     }

@@ -20,111 +20,108 @@
     /*! Renvoie le nombre de d'enfants.*/ \
     int rowCount(const QModelIndex &parent = QModelIndex()) const override { \
     if(parent.column() != 0) return 0; \
-    return TREE.rowCount(parent);}
+    return TREE.row_count(parent);}
 
-namespace modelMPS {
-namespace cmps = conteneurMPS;
-using namespace type_mps;
-template<class T> class TreeForModel;
-/*! \ingroup groupeModel
+namespace mps {
+namespace model_base {
+template<class T> class tree_for_model;
+/*! \ingroup groupe_model
  *\brief Classe Abstraite mère des models à colonnes et à nodes de type arbre utilisant le contenant treeFroModel.
  */
-class AbstractModel : public QAbstractItemModel {
+class abstract_model : public QAbstractItemModel {
     Q_OBJECT
-    template<class T> friend class TreeForModel;
+    template<class T> friend class tree_for_model;
 public:
     using QAbstractItemModel::QAbstractItemModel;
 };
 
-/*! \ingroup groupeModel
+/*! \ingroup groupe_model
  *\brief Classe template des données des models de type arbre de structure non-modifiable.
  */
-template<class T, class Model, class Index> class _tempTreeForModel {
+template<class T, class Model, class Index> class tree_for_model_temp {
 protected:
-    //! Classe de la structure de donnée.
-    using Tree = cmps::tree<T>;
     //! Poiteur constant sur les noeuds de l'arbre.
-    using const_iterator = typename Tree::const_iterator;
+    using const_iterator = typename tree<T>::const_iterator;
     //! Poiteur sur les noeuds de l'arbre.
-    using iterator = typename Tree::iterator;
-    Model *m_model;            //!< Model contenant l'arbre.
-    const bool m_racine;        //!< Racine permise.
-    Tree m_tree;                //!< arbre de donnée.
+    using iterator = typename tree<T>::iterator;
+    Model *m_model;         //!< Model contenant l'arbre.
+    const bool m_racine;    //!< Racine permise.
+    tree<T> m_tree;         //!< arbre de donnée.
 public:
     //! Constructeur.
-    _tempTreeForModel(Model *model, bool racine = false)
+    tree_for_model_temp(Model *model, bool racine = false)
         : m_model(model), m_racine(racine) {}
 
     //! Renvoie le nombre de d'enfants.
-    szt childCount(const Index &parent = Index()) const {
-        if(!parent.is_valid())
+    szt child_count(const Index &parent = Index()) const {
+        if(!parent.isValid())
                 return m_tree.cbegin().size_child();
-        return getIter(parent).size_child();
+        return get_iter(parent).size_child();
     }
 
     //! Renvoie une référence sur la donné coorespondant à l'index (en supposant la validité).
-    const T &getData(const Index &index) const
-        {return *getIter(index);}
+    const T &get_data(const Index &index) const
+        {return *get_iter(index);}
 
     //! Renvoie une référence sur la donné coorespondant à l'index (en supposant la validité).
-    T &getData(const Index &index)
-        {return *getIter(index);}
+    T &get_data(const Index &index)
+        {return *get_iter(index);}
 
     //! Renvoie un itérateur pointant sur le noeud d'index.
-    const_iterator getIter(const Index &index) const
-        {return index.is_valid() ? getValidIter(index)
+    const_iterator get_iter(const Index &index) const
+        {return index.isValid() ? get_valid_iter(index)
                                 : m_tree.cbegin();}
 
     //! Renvoie un itérateur pointant sur le noeud d'index.
-    iterator getIter(const Index &index)
-        {return index.is_valid() ? getValidIter(index)
+    iterator get_iter(const Index &index)
+        {return index.isValid() ? get_valid_iter(index)
                                 : m_tree.cbegin();}
 
     //! Renvoie une référence sur la donnée de la racine.
-    const T &getRootData() const
+    const T &get_root_data() const
         {return *m_tree.cbegin();}
 
     //! Renvoie une référence sur la donnée de la racine.
-    T &getRootData()
+    T &get_root_data()
         {return *m_tree.begin();}
 
     //! Renvoie un itérateur sur la racine.
-    const_iterator getRootIter() const
+    const_iterator get_root_iter() const
         {return m_tree.cbegin();}
 
     //! Renvoie un itérateur sur la racine.
-    iterator getRootIter()
+    iterator get_root_iter()
         {return m_tree.begin();}
 
     //! Renvoie une référence sur la donné coorespondant à l'index (en supposant la validité).
-    const T &getValidData(const Index &index) const
-        {return *getValidIter(index);}
+    const T &get_valid_data(const Index &index) const
+        {return *get_valid_iter(index);}
 
     //! Renvoie une référence sur la donné coorespondant à l'index (en supposant la validité).
-    T &getValidData(const Index &index)
-        {return *getValidIter(index);}
+    T &get_valid_data(const Index &index)
+        {return *get_valid_iter(index);}
 
     //! Renvoie un itérateur pointant sur le noeud d'index.
-    const_iterator getValidIter(const Index &index) const
+    const_iterator get_valid_iter(const Index &index) const
         {return index.internalPointer();}
 
     //! Renvoie un itérateur pointant sur le noeud d'index.
-    iterator getValidIter(const Index &index)
+    iterator get_valid_iter(const Index &index)
         {return index.internalPointer();}
 
     //! Teste si le noeud associé à un index valide est une feuille.
     bool leaf(const Index &index) const
-        {return  getValidIter(index).leaf();}
+        {return  get_valid_iter(index).leaf();}
 
     //! Insert des lignes dans le model, ne vérifie pas les arguments.
-    template<class Factory> bool insertNodes(Factory factory, szt row, szt count, const Index &parent = Index());
+    template<class Factory> bool insert_nodes(Factory factory, szt row, szt count, const Index &parent = Index());
 
     //! Insert des lignes dans le model, ne vérifie pas les arguments.
-    template<class Factory> bool insertRows(Factory factory,int row, int count, const Index &parent = Index());
+    template<class Factory> bool insert_rows(Factory factory,int row, int count, const Index &parent = Index());
 
     //! position du noeud dans la fratrie.
     szt position(const Index &index) const
-        {return index.is_valid() ? getValidIter(index).position()
+        {return index.is_valid() ? get_valid_iter(index).position()
                                 : 0;}
 
     //! Acceseur de la racine.
@@ -132,24 +129,24 @@ public:
         {return m_racine;}
 
     //! Supprime des lignes dans le model.
-    template<class Deleter> bool removeRows(Deleter del, int row, int count, const Index &parent = Index());
+    template<class Deleter> bool remove_rows(Deleter del, int row, int count, const Index &parent = Index());
 
     //! Renvoie le nombre de d'enfants.
-    int rowCount(const Index &parent = Index()) const
-        {return childCount(parent);}
+    int row_count(const Index &parent = Index()) const
+        {return child_count(parent);}
 
     //! Modifie l'arbre de donnée.
-    void setTree(const cmps::tree<T> &tr) {
+    void set_tree(const tree<T> &tr) {
         if(m_racine){
             m_tree.clear();
-            m_tree.push_back(m_tree.begin(),tree.cbegin());
+            m_tree.push_back(m_tree.begin(),tr.cbegin());
         }
         else
-            m_tree = tree;
+            m_tree = tr;
     }
 
     //! Modifie l'arbre de donnée.
-    void setTree(cmps::tree<T> &&tr){
+    void set_tree(tree<T> &&tr){
         if(m_racine){
             m_tree.clear();
             m_tree.push_back(m_tree.begin(),std::move(tr));
@@ -159,27 +156,27 @@ public:
     }
 
     //! Accesseur de l'arbre.
-    const cmps::tree<T> &tree() const
+    const tree<T> &tree_data() const
         {return m_tree;}
 
     //! Accesseur de l'arbre.
-    cmps::tree<T> &tree()
+    tree<T> &tree_data()
         {return m_tree;}
 };
 
-/*! \ingroup groupeModel
+/*! \ingroup groupe_model
  *\brief Classe template des données des models de type arbre de structure non-modifiable.
  */
-template<class T> class TreeForModel : public _tempTreeForModel<T,AbstractModel,QModelIndex> {
+template<class T> class tree_for_model : public tree_for_model_temp<T,abstract_model,QModelIndex> {
 protected:
-    using TFM = _tempTreeForModel<T,AbstractModel,QModelIndex>;
-    using TFM::m_model;
-    using TFM::m_racine;
-    using TFM::m_tree;
+    using tfm = tree_for_model_temp<T,abstract_model,QModelIndex>;
+    using tfm::m_model;
+    using tfm::m_racine;
+    using tfm::m_tree;
 public:
-    using TFM::getIter;
+    using tfm::get_iter;
     //! Constructeur.
-    using _tempTreeForModel<T,AbstractModel,QModelIndex>::_tempTreeForModel;
+    using tree_for_model_temp<T,abstract_model,QModelIndex>::tree_for_model_temp;
 
     //! Renvoie l'index correxpondant à la ligne et colonne de parent.
     QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const;
@@ -188,15 +185,15 @@ public:
     QModelIndex parent(const QModelIndex &index) const;
 };
 
-///////////////////////////////////// _tempTreeForModel /////////////////////////////
+///////////////////////////////////// tree_for_model_temp /////////////////////////////
 template<class T, class Model, class Index> template<class Factory>
-bool _tempTreeForModel<T,Model,Index>::insertNodes(Factory factory, szt row, szt count,const Index &parent) {
-    auto iter = getIter(parent);
-    if(row == childCount(parent))
+bool tree_for_model_temp<T,Model,Index>::insert_nodes(Factory factory, szt row, szt count,const Index &parent) {
+    auto iter = get_iter(parent);
+    if(row == child_count(parent))
         for(szt i = 0; i != count; ++i)
             m_tree.push_back(iter,factory(row + i, parent));
     else {
-        iter.to_childU(row);
+        iter.to_child_u(row);
         for(szt i = count; i != 0; --i)
             m_tree.insert(iter,factory(row + i, parent));
     }
@@ -204,9 +201,9 @@ bool _tempTreeForModel<T,Model,Index>::insertNodes(Factory factory, szt row, szt
 }
 
 template<class T, class Model, class Index> template<class Factory>
-bool _tempTreeForModel<T,Model,Index>::insertRows(Factory factory, int row, int count,const Index &parent) {
-    auto iter = getIter(parent);
-    if(row == rowCount(parent))
+bool tree_for_model_temp<T,Model,Index>::insert_rows(Factory factory, int row, int count,const Index &parent) {
+    auto iter = get_iter(parent);
+    if(row == row_count(parent))
         for(int i = 0; i != count; ++i)
             m_tree.push_back(iter,factory(row + i, parent));
     else {
@@ -218,13 +215,13 @@ bool _tempTreeForModel<T,Model,Index>::insertRows(Factory factory, int row, int 
 }
 
 template<class T, class Model, class Index> template<class Deleter>
-bool _tempTreeForModel<T,Model,Index>::removeRows(Deleter del, int row, int count, const Index &parent) {
-    if(m_racine &&!parent.is_valid())
+bool tree_for_model_temp<T,Model,Index>::remove_rows(Deleter del, int row, int count, const Index &parent) {
+    if(m_racine && !parent.isValid())
         return false;
     int comp = 0;
     for(int i = 0; i != count; ++i) {
         std::forward_list<iterator> pile;
-        pile.push_front(getIter(parent).to_child(row));
+        pile.push_front(get_iter(parent).to_child(row));
         bool remove = true;
         while(!pile.empty() &&remove) {
             if(!pile.front().leaf())
@@ -245,11 +242,11 @@ bool _tempTreeForModel<T,Model,Index>::removeRows(Deleter del, int row, int coun
     return comp == count;
 }
 
-///////////////////////////////////// TreeForModel //////////////////////////////////
-template<class T> QModelIndex TreeForModel<T>::index(int row, int column, const QModelIndex &parent) const {
-    if(parent.is_valid()) {
+///////////////////////////////////// tree_for_model //////////////////////////////////
+template<class T> QModelIndex tree_for_model<T>::index(int row, int column, const QModelIndex &parent) const {
+    if(parent.isValid()) {
         if(parent.column() == 0) {
-            auto iter = getIter(parent);
+            auto iter = get_iter(parent);
             iter.to_child(row);
             if (iter)
                 return m_model->createIndex(row, column, iter.ptr());
@@ -263,14 +260,14 @@ template<class T> QModelIndex TreeForModel<T>::index(int row, int column, const 
     return QModelIndex();
 }
 
-template<class T> QModelIndex TreeForModel<T>::parent(const QModelIndex &index) const {
-    if (index.is_valid()) {
-        auto iter = getIter(index);
+template<class T> QModelIndex tree_for_model<T>::parent(const QModelIndex &index) const {
+    if (index.isValid()) {
+        auto iter = get_iter(index);
         iter.to_parent();
-        if(iter &&!iter.root())
+        if(iter && !iter.root())
             return m_model->createIndex(iter.index_brother(), 0, iter.ptr());
     }
     return QModelIndex();
 }
-}
+}}
 #endif // ABSTRACTMODEL_H

@@ -1,54 +1,53 @@
 /*Auteur: PERCIE DU SERT Maxime
  *Date: 03/04/2019
  */
-#ifndef TABLEMODEL_H
-#define TABLEMODEL_H
+#ifndef TABLE_MODEL_H
+#define TABLE_MODEL_H
 
 #include <QApplication>
 #include <QClipboard>
 #include <QMessageBox>
 #include <QPushButton>
-#include "AbstractColonnesModel.h"
-#include "type_mps.h"
+#include "abstract_colonnes_model.h"
 
-namespace modelMPS {
-using namespace type_mps;
-/*! \ingroup groupeModel
+namespace mps {
+namespace model_base {
+/*! \ingroup groupe_model
  *\brief Classe mère des model de type tableau.
  */
-class TableModel : public AbstractColonnesModel {
+class table_model : public abstract_colonnes_model {
     Q_OBJECT
 protected:
-    enum DialogSelection{NoDialog,
+    enum dialog_selection{No_Dialog,
                          Annuler,
-                         InsertIn,
-                         InsertOut};
+                         Insert_In,
+                         Insert_Out};
 public:
-    /*! \ingroup groupeModel
+    /*! \ingroup groupe_model
      *\brief Classe d'information sur la selection d'un tableau.
      */
-    class SelectedRange {
+    class selected_range {
     protected:
-        bool m_cornersFound;    //!< Vraie si les bornes ont été cherchées.
+        bool m_corners_found;    //!< Vraie si les bornes ont été cherchées.
         int m_bottom;           //!< Indice de ligne de la selection plus basse.
-        std::vector<int> m_columnList;   //!< Liste des colonnes selectionnées dans la première ligne séléctionné, vide si la séléction est rectangulaire.
-        bool m_isRect;          //!< Vraie si la selection est un rectangle.
+        std::vector<int> m_column_list;   //!< Liste des colonnes selectionnées dans la première ligne séléctionné, vide si la séléction est rectangulaire.
+        bool m_is_rect;          //!< Vraie si la selection est un rectangle.
         bool m_is_valid;         //!< Vraie si la selection est valide c'est-à-dire si chaque ligne séléctionnée posséde les mêmes colonnes séléctionner.
         int m_left;             //!< Indice de la colonne la plus à gauche.
         int m_right;            //!< Indice de la colonne la plus à droite.
-        std::vector<int> m_rowList;    //!< Liste des lignes selectionnées (même partiellement), vide si la séléction est rectangulaire.
+        std::vector<int> m_row_list;    //!< Liste des lignes selectionnées (même partiellement), vide si la séléction est rectangulaire.
         QModelIndexList m_selection; //! Sélection.
         int m_top;              //!< Indice de la ligne la plus haute.
-        bool m_validitySet;     //!< Vraie si la validité à été testée.
+        bool m_validity_set;     //!< Vraie si la validité à été testée.
 
 
     public:
         //! Constructeur.
-        SelectedRange(const QModelIndexList &range);
+        selected_range(const QModelIndexList &range);
 
         //! Accesseur de bottom.
         int bottom() {
-            findCorners();
+            find_corners();
             return m_bottom;}
 
         //! Accesseur de la i-ème colonne de la sélection si séléction est valide.
@@ -56,32 +55,33 @@ public:
             {return columns().at(static_cast<szt>(i));}
 
         //! Renvoie une liste de paire début et nombre de colonnes par bloc.
-        std::list<std::pair<int,int>> columnBloc();
+        std::list<std::pair<int,int>> column_bloc();
 
         //! Renvoie le nombre de colonnes de la selection.
-        int columnCount() {return m_isRect ? m_right - m_left +1 : static_cast<int>(columns().size());}
+        int column_count()
+            {return m_is_rect ? m_right - m_left +1 : static_cast<int>(columns().size());}
 
         //! Renvoie les colonnes séléctionnées dans la première ligne de la séléction.
         const std::vector<int> &columns();
 
         //! Test si la selection est un rectangle.
-        bool isRect() {
-            findCorners();
-            return m_isRect;}
+        bool is_rect() {
+            find_corners();
+            return m_is_rect;}
 
         //! Test si la selection est valide.
         bool is_valid() {
-            setValidity();
+            set_validity();
             return m_is_valid;}
 
         //! Accesseur de left.
         int left() {
-            findCorners();
+            find_corners();
             return m_left;}
 
         //! Accesseur de right.
         int right() {
-            findCorners();
+            find_corners();
             return m_right;}
 
         //! Accesseur de la i-ème ligne de la sélection.
@@ -89,37 +89,37 @@ public:
             {return rows().at(static_cast<szt>(i));}
 
         //! Renvoie une liste de paire début et nombre de lignes par bloc.
-        std::list<std::pair<int,int>> rowBloc();
+        std::list<std::pair<int,int>> row_bloc();
 
         //! Renvoie le nombre de lignes de la selection.
-        int rowCount() {return m_isRect ? m_bottom - m_top +1: static_cast<int>(rows().size());}
+        int row_count() {return m_is_rect ? m_bottom - m_top +1: static_cast<int>(rows().size());}
 
         //! Renvoie l'ensemble des lignes contenant au moins une case séléctionnée.
         const std::vector<int> &rows();
 
         //! Accesseur de tom.
         int top() {
-            findCorners();
+            find_corners();
             return m_top;}
 
     protected:
         //! Recherche les coins du plus petit rectangle contenant la selection.
-        void findCorners();
+        void find_corners();
 
         //! Recherche les coins du plus petit rectangle contenant la selection.
-        void setValidity();
+        void set_validity();
     };
 protected:
-    std::vector<szt> m_rowToLigne;       //!< Correspondances de index.row <-> lignes.
+    std::vector<szt> m_row_to_ligne;       //!< Correspondances de index.row <-> lignes.
 public:
     //! Constructeur.
-    explicit TableModel(bool uniqueLigne = true, bool valideLigne = true, QObject *parent = nullptr);
+    explicit table_model(bool unique_ligne = true, bool valide_ligne = true, QObject *parent = nullptr);
 
     //! Destructeur par defaut.
-    ~TableModel() override = default;
+    ~table_model() override = default;
 
     //! Recherche les lignes de données vérifiant les conditions d'un modéle de recherche donné.
-    void find(AbstractFindModel *findModel) override;
+    void find(Abstract_Find_Model *find_model) override;
 
     //! Drapeaux d'un item
     Qt::ItemFlags flags(const QModelIndex &index) const override;
@@ -144,11 +144,11 @@ public:
     bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex()) override;
 
     //! Supprime une selection de lignes entières.
-    bool removeRowsSelected(const QModelIndexList &selection) override;
+    bool remove_rows_selected(const QModelIndexList &selection) override;
 
     //! Renvoie le nombre de lignes.
     int rowCount(const QModelIndex &parent = QModelIndex()) const override
-        {return parent.is_valid() ? 0 : static_cast<int>(m_rowToLigne.size());}
+        {return parent.isValid() ? 0 : static_cast<int>(m_row_to_ligne.size());}
 
     QModelIndex sibling(int row, int column, const QModelIndex &) const override
         {return index(row, column);}
@@ -173,35 +173,35 @@ public slots:
     void save() override;
 
     //! Mets à jour l'état de toutes les lignes.
-    void updateAllEtats() override;
+    void update_all_etats() override;
 
     //! Mets à jour l'état d'une ligne.
-    void updateEtats(int first, int last, const QModelIndex &parent = QModelIndex()) override;
+    void update_etats(int first, int last, const QModelIndex &parent = QModelIndex()) override;
 
 protected:
     //! Ouvre une fenêtre de dialogue pour demander si l'insertion doit être faite à l'intérieur de la selection ou non.
-    DialogSelection dialogColler() const;
+    dialog_selection dialog_coller() const;
 
     //! Fait la correspondance entre l'index et la ligne de donnée.
     szt ligne(const QModelIndex &index) const override
-        {return rowToLigne(index.row());}
+        {return row_to_ligne(index.row());}
 
     //! Fait la correspondance entre la ligne de donnée et la ligne d'index.
-    int ligneToRow(szt ligne) const;
+    int ligne_to_row(szt ligne) const;
 
     //! Nombre de ligne afficher en szt.
-    szt nbrRow() const override
-        {return static_cast<szt>(m_rowToLigne.size());}
+    szt nbr_row() const override
+        {return static_cast<szt>(m_row_to_ligne.size());}
 
     //! Met le vecteur des correspondance de ligne à l'identitée.
-    void resetRowToLigne() override;
+    void reset_row_to_ligne() override;
 
     //! Fait la correspondance entre la ligne d'index et la ligne de donnée.
-    szt rowToLigne(int row, const QModelIndex &/*parent*/ = QModelIndex()) const override
-        {return m_rowToLigne[static_cast<szt>(row)];}
+    szt row_to_ligne(int row, const QModelIndex &/*parent*/ = QModelIndex()) const override
+        {return m_row_to_ligne[static_cast<szt>(row)];}
 
     //! Renvoie un vecteur contenant l'ensemble des identifiants des lignes visibles ou de toutes les lignes.
-    std::vector<szt> statOnLignes(bool lignesVisibles = true) const override;
+    std::vector<szt> stat_on_lignes(bool lignes_visibles = true) const override;
 };
-}
-#endif // TABLEMODEL_H
+}}
+#endif // TABLE_MODEL_H

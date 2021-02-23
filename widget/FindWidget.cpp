@@ -1,18 +1,18 @@
 #include "FindWidget.h"
 
 using namespace delegateMPS;
-using namespace modelMPS;
-using namespace findNodeModel;
+using namespace model_base;
+using namespace find_node_model;
 using namespace widgetMPS;
 
 /////////////////////////////////////////// FindWidget //////////////////////////////////////
-FindWidget::FindWidget(FindModel *model, QWidget *parent)
+FindWidget::FindWidget(find_model *model, QWidget *parent)
  : QWidget (parent){
     // Widget
     m_findButton = new QPushButton(tr("Chercher"));
     m_resetButton = new QPushButton(tr("Réinitialiser"));
-    m_view = new NodeView(std::make_unique<widgetMPS::RoundedArcPainter>());
-    set_findModel(model);
+    m_view = new node_ptrView(std::make_unique<widgetMPS::RoundedArcPainter>());
+    set_find_model(model);
     m_view->setDelegate(new Delegate(this));
 
     // Calque
@@ -24,7 +24,7 @@ FindWidget::FindWidget(FindModel *model, QWidget *parent)
     m_mainLayout->addLayout(m_buttonsLayout);
 }
 
-void FindWidget::set_findModel(FindModel *model) {
+void FindWidget::set_find_model(find_model *model) {
     m_view->setModel(model);
     if(m_model) {
         m_findButton->disconnect(this);
@@ -33,8 +33,8 @@ void FindWidget::set_findModel(FindModel *model) {
     }
     m_model = model;
     if(m_model) {
-        connect(m_resetButton,&QPushButton::clicked,m_model,&FindModel::reset);
-        connect(m_findButton,&QPushButton::clicked,m_model,&FindModel::find);
+        connect(m_resetButton,&QPushButton::clicked,m_model,&find_model::reset);
+        connect(m_findButton,&QPushButton::clicked,m_model,&find_model::find);
     }
     m_model->set_parent(this);
 }

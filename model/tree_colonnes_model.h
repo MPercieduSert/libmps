@@ -1,37 +1,34 @@
 /*Auteur: PERCIE DU SERT Maxime
  *Date: 22/05/2019
  */
-#ifndef TREECOLONNESMODEL_H
-#define TREECOLONNESMODEL_H
+#ifndef TREE_COLONNES_MODEL_H
+#define TREE_COLONNES_MODEL_H
 
-#include "AbstractColonnesModel.h"
-#include "tree.h"
-#include "type_mps.h"
+#include "abstract_colonnes_model.h"
 
-namespace modelMPS {
-using namespace type_mps;
-/*! \ingroup groupeModel
+namespace mps {
+namespace model_base {
+/*! \ingroup groupe_model
  *\brief Classe mère des model de type arbre à colonnes homogènes.
  */
-class TreeColonnesModel : public AbstractColonnesModel {
+class tree_colonnes_model : public abstract_colonnes_model {
     Q_OBJECT
 public:
-    template<class T> using tree = conteneurMPS::tree<T>;
-    using arbre = TreeForModel<szt>;
+    using arbre = tree_for_model<szt>;
 protected:
     arbre m_tree;           //! arbre de correspondance des lignes visibles.
-    tree<szt> m_fullTree;   //! arbre de correspondance de toutes les lignes.
+    tree<szt> m_full_tree;   //! arbre de correspondance de toutes les lignes.
 public:
-    TREE_FOR_MODEL_INDEX_PARENT_ROWCOUNT(m_tr)    // Implémentation des méthodes virtuelles index, parent, rowCount.
+    TREE_FOR_MODEL_INDEX_PARENT_ROWCOUNT(m_tree)    // Implémentation des méthodes virtuelles index, parent, row_count.
 
     //! Constructeur.
-    TreeColonnesModel(bool racine, QObject *parent);
+    tree_colonnes_model(bool racine, QObject *parent);
 
     //! Destructeur.
-    ~TreeColonnesModel() override = default;
+    ~tree_colonnes_model() override = default;
 
     //! Recherche les lignes de données vérifiant les conditions d'un modéle de recherche donné.
-    void find(AbstractFindModel *findModel) override;
+    void find(Abstract_Find_Model *find_model) override;
 
     //! Insert count lignes dans le model juste avant la ligne row.
     bool insertRows(int row, int count, const QModelIndex &parent = QModelIndex()) override;
@@ -42,15 +39,15 @@ public:
 protected:
     //! Fait la correspondance entre l'index et la ligne de donnée.
     szt ligne(const QModelIndex &index) const override
-        {return m_tree.getData(index);}
+        {return m_tree.get_data(index);}
 
     //! Nombre de ligne afficher en szt.
-    szt nbrRow() const override
-        {return static_cast<szt>(m_tree.tree().size());}
+    szt nbr_row() const override
+        {return static_cast<szt>(m_tree.tree_data().size());}
 
     //! Met le vecteur des correspondance de ligne à l'identitée.
-    void resetRowToLigne() override
-        {m_tree.setTree(m_fullTree);}
+    void reset_row_to_ligne() override
+        {m_tree.set_tree(m_full_tree);}
 };
-}
-#endif // TREECOLONNESMODEL_H
+}}
+#endif // TREE_COLONNES_MODEL_H
