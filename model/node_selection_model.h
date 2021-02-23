@@ -64,10 +64,10 @@ public:
     void set_model(item_node_model *model)
         {m_model = model;}
 public slots:
-    //! Efface la sélection et l'index courant (émet selectionChanged et currentChanged).
+    //! Efface la sélection et l'index courant (émet selectionChanged et current_changed).
     void clear() {}
 
-    //! Efface l'index courant (émet currentChanged)
+    //! Efface l'index courant (émet current_changed)
     void clear_current_index() {}
 
     //! Efface la sélection (émet selectionChanged).

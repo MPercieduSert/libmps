@@ -21,7 +21,7 @@ namespace fichier {
 /*! \ingroup groupe_file
  *\brief Interface pour la gestion des fichiers.
  *
- *Interface pour la gestion des fichiers, cette interface est utilisée par la classe FenFoundFile
+ *Interface pour la gestion des fichiers, cette interface est utilisée par la classe fen_found_file
  *pour la vérifiaction des chemins des fichiers et leur création s'il sont introuvables.
  */
 class file_interface {

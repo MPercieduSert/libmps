@@ -61,8 +61,8 @@ template<class Factory> abstract_entity_tableau::Tableau::iterator
     if(count == 0)
         count = size();
     else if(!m_data.empty() && size() != count)
-        throw std::invalid_argument("AbstractTableentityModel::Tableau::iterator "
-                                    "AbstractTableentityModel::push_back_data(szt):"
+        throw std::invalid_argument("abstract_table_entity_model::Tableau::iterator "
+                                    "abstract_table_entity_model::push_back_data(szt):"
                                     "Taille de la nouvelle donnée ne coorespond pas au nombre des ligne du model.");
     auto col = vector_ptr<entities::entity>(count,nullptr);
     for (szt i = 0; i < col.size(); ++i)
@@ -73,8 +73,8 @@ template<class Factory> abstract_entity_tableau::Tableau::iterator
 template<class Ent> abstract_entity_tableau::Tableau::iterator
         abstract_entity_tableau::push_back_data(const vector_ptr<Ent> &vec) {
     if(!m_data.empty() &&vec.size() != size())
-        throw std::invalid_argument("AbstractTableentityModel::Tableau::iterator "
-                                    "AbstractTableentityModel::push_back_data(const vector_ptr<Ent> &):"
+        throw std::invalid_argument("abstract_table_entity_model::Tableau::iterator "
+                                    "abstract_table_entity_model::push_back_data(const vector_ptr<Ent> &):"
                                     "Taille de la nouvelle donnée ne coorespond pas au nombre des ligne du model.");
     return m_data.insert(m_data.end(),vec);
 }
@@ -82,8 +82,8 @@ template<class Ent> abstract_entity_tableau::Tableau::iterator
 template<class Ent> abstract_entity_tableau::Tableau::iterator
         abstract_entity_tableau::push_back_data(vector_ptr<Ent> &&vec) {
     if(!m_data.empty() &&vec.size() != size())
-        throw std::invalid_argument("AbstractTableentityModel::Tableau::iterator "
-                                    "AbstractTableentityModel::push_back_data(vector_ptr<Ent> &&):"
+        throw std::invalid_argument("abstract_table_entity_model::Tableau::iterator "
+                                    "abstract_table_entity_model::push_back_data(vector_ptr<Ent> &&):"
                                     "Taille de la nouvelle donnée ne coorespond pas au nombre de lignes du model.");
     return m_data.insert(m_data.end(),std::move(vec));
 }

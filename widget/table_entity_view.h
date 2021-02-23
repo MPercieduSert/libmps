@@ -10,7 +10,7 @@
 namespace mps {
 namespace widget {
 /*! \ingroup groupe_Widget
- *\brief Vue en tableau des donnée d'un model de type AbstractTableentityModel.
+ *\brief Vue en tableau des donnée d'un model de type abstract_table_entity_model.
  */
 class table_entity_view : public QTableView {
     Q_OBJECT

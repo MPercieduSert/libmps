@@ -32,12 +32,12 @@ public:
     void set_id(idt id);
 
     /*! Mutateur des donnés affichés.
-     *QTreeWidgetItem *childItem(tree<T>::brother_iterator)
+     * QTreeWidgetItem *childItem(tree<T>::brother_iterator)
      */
     template<class T, class ChildFactory> void set_tree(const tree<T> &tree, ChildFactory child);
 
     //! Mutateur des donnés affichés (Nom, Nc) avec id.
-    template<class Ent> void set_treenc_nomId(const tree<Ent> &tr) {
+    template<class Ent> void set_tree_nc_nomId(const tree<Ent> &tr) {
         set_tree_ref(tr, [](const Ent &ent)->QTreeWidgetItem *{
                 auto item = new QTreeWidgetItem({ent.nom(),ent.nc()});
                 item->setData(widget::tree_widget::Id_Colonne,widget::tree_widget::Id_Role,ent.id());

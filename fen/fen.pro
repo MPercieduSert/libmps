@@ -22,46 +22,42 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-    AbstractNoyau.cpp \
-    AbstractTab.cpp \
-    AbstractTabGestionBdd.cpp \
-    AbstractTabMenu.cpp \
-    AbstractTabModule.cpp \
-    AbstractTabModuleWithBdd.cpp \
-    AbstractTabTableau.cpp \
-    AbstractTabZoneCentrale.cpp \
-    AbstractZoneCentrale.cpp \
-    Fen.cpp \
-    FenFoundFile.cpp \
-    FenPrincipale.cpp \
-    PredefTab.cpp \
-    Tabmot_cle.cpp \
-    TabGestionBdd.cpp \
-    PredefZoneCentrale.cpp \
-    PredefFenPrincipale.cpp \
-    FenFlags.cpp \
-    TabGestionType.cpp
+    fen_flags.cpp \
+    abstract_tab_module.cpp \
+    abstract_tab.cpp \
+    fen_found_file.cpp \
+    abstract_noyau.cpp \
+    abstract_tab_gestion_bdd.cpp \
+    abstract_tab_menu.cpp \
+    abstract_tab_tableau.cpp \
+    abstract_zone_centrale.cpp \
+    abstract_tab_zone_centrale.cpp \
+    fen.cpp \
+    fen_principale.cpp \
+    predef_fen_principale.cpp \
+    tab_mot_cle.cpp \
+    tab_gestion_predef.cpp \
+    predef_tab.cpp \
+    predef_zone_centrale.cpp
 
 HEADERS += \
-    AbstractNoyau.h \
-    AbstractTab.h \
-    AbstractTabGestionBdd.h \
-    AbstractTabMenu.h \
-    AbstractTabModule.h \
-    AbstractTabModuleWithBdd.h \
-    AbstractTabTableau.h \
-    AbstractTabZoneCentrale.h \
-    AbstractZoneCentrale.h \
-    Fen.h \
-    FenFoundFile.h \
-    FenPrincipale.h \
-    PredefTab.h \
-    Tabmot_cle.h \
-    TabGestionBdd.h \
-    PredefZoneCentrale.h \
-    PredefFenPrincipale.h \
-    FenFlags.h \
-    TabGestionType.h
+    fen_flags.h \
+    abstract_tab_module.h \
+    abstract_tab.h \
+    fen_found_file.h \
+    abstract_noyau.h \
+    abstract_tab_gestion_bdd.h \
+    abstract_tab_menu.h \
+    abstract_tab_tableau.h \
+    abstract_zone_centrale.h \
+    abstract_tab_zone_centrale.h \
+    fen.h \
+    fen_principale.h \
+    predef_fen_principale.h \
+    tab_mot_cle.h \
+    tab_gestion_predef.h \
+    predef_tab.h \
+    predef_zone_centrale.h
 unix {
     target.path = /usr/lib
     INSTALLS += target
