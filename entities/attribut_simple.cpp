@@ -6,7 +6,7 @@ constexpr std::array<int, attribut_decimale::Nbr_Values> attribut_decimale::Deci
 constexpr std::array<int, attribut_decimale::Nbr_Values> attribut_decimale::Precision{{0,1,2,2,1,2,3,3,3,1,2,3,2,2,3,4,3,3}};
 const QRegularExpression Attribut_ref::Reg {"^[a-z][a-z0-9_]*$"};
 QString attribut_entity::affiche() const
-        {return name_attribut().append(" : ").append(name_classe_attribut())
+        {return attribut_nom().append(" : ").append(classe_nom())
                                             .append(" (").append(valid_to_string())
                                             .append("): ").append(to_string_attribut());}
 

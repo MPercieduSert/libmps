@@ -45,7 +45,7 @@ namespace info_entity {
                     Type_Permission,
                     Utilisation,
                     Usage,
-                    NbrentityPredefinie};
+                    Nbr_Entity_Predef};
 
     enum decimale{Nbr_Decimales = 18};
 }}

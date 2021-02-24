@@ -159,7 +159,7 @@ void bdd_predef::hydrate_attribut_associated_xml(entity &ent_ass, const std::pai
         if(i == nbr_entity())
             controle.append("-> La valeur de l'attribut cible est inconnue : ").append(pair.second);
         else{
-            auto pos = position_xml(ent_ass,"Cible",controle);
+            auto pos = position_xml(ent_ass,"cible",controle);
             if(controle.isEmpty())
                 ent_ass.set_data(pos, cible(i));
         }
@@ -173,10 +173,10 @@ void bdd_predef::hydrate_attribut_associated_xml(entity &ent_ass, const std::pai
         }
     }
     else if (pair.first == "id_cible_id_1") {
-        auto pos = position_xml(ent_ass,"Id_Cible",controle);
+        auto pos = position_xml(ent_ass,"id_cible",controle);
         if(controle.isEmpty()) {
             ent_ass.set_data(pos,ent.id());
-            pos = position_xml(ent_ass,"Cible",controle);
+            pos = position_xml(ent_ass,"cible",controle);
             if(controle.isEmpty()){
                 ent_ass.set_data(pos,cible(ent.id_entity()));
                 if(info(ent_ass).foreign_key_name().size() != 1)
@@ -186,7 +186,7 @@ void bdd_predef::hydrate_attribut_associated_xml(entity &ent_ass, const std::pai
                 else {
                     auto fkey_iter = info(ent_ass).foreign_key_name().cbegin();
                     auto fkey_entity = make_entity(fkey_iter->second);
-                    pos = position_xml(*fkey_entity,"Ref",controle);
+                    pos = position_xml(*fkey_entity,"ref",controle);
                     if(controle.isEmpty()) {
                         fkey_entity->set_data(pos,pair.second);
                         if(exists_unique(*fkey_entity))
@@ -346,11 +346,11 @@ bool bdd_predef::test_autorisation_v(idt id, entidt id_entity, flag autoris) {
 
 enumt bdd_predef::str_categorie_to_enum(const QString &str, flag categorie, QString &controle) const noexcept {
     if(categorie &Permission_Code){
-        if(str == "Interdit")
+        if(str == "interdit")
             return code::Interdit;
-        if(str == "Visible")
+        if(str == "visible")
             return code::Visible;
-        if(str== "Attribuable")
+        if(str == "attribuable")
             return code::Attribuable;
     }
     return bdd::str_categorie_to_enum(str,categorie,controle);
@@ -359,33 +359,33 @@ enumt bdd_predef::str_categorie_to_enum(const QString &str, flag categorie, QStr
 enumt bdd_predef::str_id_to_enum(const QString &str, idt id_entity, QString &controle) const noexcept {
     switch (id_entity) {
     case donnee::ID:
-        if(str == "No_Donnee")
+        if(str == "no_donnee")
             return donnee_info::No_Donnee;
-        if(str == "Int")
+        if(str == "int")
             return donnee_info::Int;
-        if(str == "String")
+        if(str == "string")
             return donnee_info::String;
-        if(str == "Bool")
+        if(str == "bool")
             return donnee_info::Bool;
-        if(str == "Float")
+        if(str == "float")
             return donnee_info::Float;
-        if(str == "Double")
+        if(str == "double")
             return donnee_info::Double;
-        if(str == "Date")
+        if(str == "date")
             return donnee_info::Date;
-        if(str == "Date_Time")
+        if(str == "date_time")
             return donnee_info::Date_Time;
         break;
     case donnee_card::ID:
-        if(str == "Exact")
+        if(str == "exact")
             return donnee_info::Exact;
-        if(str == "Au plus")
+        if(str == "au_plus")
             return donnee_info::AuPlus;
-        if(str == "Au moins")
+        if(str == "au_moins")
             return donnee_info::AuMoins;
         break;
     case evenement_style::ID:
-        if(str == "Rectangle")
+        if(str == "rectangle")
             return evenement_style::Rectangle;
         return str_categorie_to_enum(str,Line_Style|Brush_Style,controle);
     case mot_cle_permission::ID:

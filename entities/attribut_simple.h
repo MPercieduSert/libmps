@@ -29,7 +29,7 @@
     /*! \brief Alias du mutateurs de id ## NUM. */ \
     void set_id_ ## NOM (idt n) {set_id_ ## NUM (n);} \
     /*! \brief Nom de identifiant*/ \
-    QString name_id_ ## NUM() const override {return "id_"#NOM;}
+    QString id_ ## NUM ## _nom() const override {return "id_"#NOM;}
 
 //! \ingroup groupe_attribut_entity
 //! Macro définisant les alias de l'accesseur et du mutateurs d'une clé numéroté.
@@ -40,12 +40,12 @@
     /*! \brief Alias du mutateurs de id ## NUM. */ \
     void set_id_ ## NOM (idt n) {set_id_ ## NUM (static_cast<int>(n));} \
     /*! \brief Nom de identifiant*/ \
-    QString name_id_ ## NUM() const override {return "id_"#NOM;}
+    QString id_ ## NUM ## _nom() const override {return "id_"#NOM;}
 
 /*! \ingroup groupe_attribut_entity
  *\brief Début des macros de déclaration d'un attribut dans les entités.
  */
-#define SINGLE_ATTRIBUT_DEBUT(ATTRIBUT,MERE,NOM,nom) /*! \ingroup groupe_attribut_entity \brief Classe de l'attribut ATTRIBUT.*/ \
+#define SINGLE_ATTRIBUT_DEBUT(ATTRIBUT,MERE,NOM,Nom) /*! \ingroup groupe_attribut_entity \brief Classe de l'attribut ATTRIBUT.*/ \
     class ATTRIBUT: public MERE { \
     public: \
     using MERE::get; \
@@ -57,25 +57,25 @@
     /*! positions des attributs.*/ \
     enum position {NOM, Nbr_Att}; \
     /*! Nom de l'attribut.*/ \
-    static QString Name_attribut(post /*pos*/=0) {return #nom;} \
+    static QString Name(post /*pos*/=0) {return #Nom;} \
     /*! Nom de la classe de l'attribut.*/ \
-    QString name_classe_attribut() const override {return #ATTRIBUT;} \
+    QString classe_nom() const override {return #ATTRIBUT;} \
     /*! Accesseur de l'attribut nom.*/ \
-    ATTRIBUT::att_trans nom() const {return get();} \
+    ATTRIBUT::att_trans Nom() const {return get();} \
     /*! Mutateur de l'attribut.*/ \
     void set(const ATTRIBUT &ent) {set(ent.get());}\
     /*! Mutateur de l'attribut nom.*/ \
-    void set_ ## nom(ATTRIBUT::att_trans valeur) {set(valeur);} \
+    void set_ ## Nom(ATTRIBUT::att_trans valeur) {set(valeur);} \
     /*! Opérateur égalité */ \
     bool operator ==(const ATTRIBUT &ent) const {return MERE::operator ==(ent);}
 
 /*! \ingroup groupe_attribut_entity
  *\brief Macro de déclaration d'un attribut dans les entités.
  */
-#define SINGLE_ATTRIBUT(ATTRIBUT,MERE,NOM,nom) /*! \ingroup groupe_attribut_entity \brief Classe de l'attribut ATTRIBUT.*/ \
-    SINGLE_ATTRIBUT_DEBUT(ATTRIBUT,MERE,NOM,nom) \
+#define SINGLE_ATTRIBUT(ATTRIBUT,MERE,NOM,Nom) /*! \ingroup groupe_attribut_entity \brief Classe de l'attribut ATTRIBUT.*/ \
+    SINGLE_ATTRIBUT_DEBUT(ATTRIBUT,MERE,NOM,Nom) \
     /*! Nom de l'attribut.*/ \
-    QString name_attribut() const override {return #nom;}};
+    QString attribut_nom() const override {return #Nom;}};
 
 /*! \ingroup groupe_attribut_entity
  *\brief Macro de déclaration d'un attribut de type clé dans les entités.
@@ -83,9 +83,9 @@
 #define SINGLE_ATTRIBUT_ID(ATTRIBUT,MERE,NUM) /*! \ingroup groupe_attribut_entity \brief Classe de l'attribut ATTRIBUT.*/ \
     SINGLE_ATTRIBUT_DEBUT(ATTRIBUT,MERE,Id_ ## NUM,id_ ## NUM) \
     /*! Nom de l'attribut.*/ \
-    QString name_attribut() const override {return name_id_ ## NUM();}\
+    QString attribut_nom() const override {return id_ ## NUM ## _nom();}\
     /*! Nom de identifiant*/ \
-    virtual QString name_id_ ## NUM() const {return "Id"#NUM;}};
+    virtual QString id_ ## NUM ## _nom() const {return "Id"#NUM;}};
 
 namespace mps {
 /*! \ingroup groupe_attribut_entity
@@ -127,14 +127,10 @@ public:
         {return true;}
 
     //! Renvoie le nom de l'attribut.
-    virtual QString name_attribut() const = 0;
+    virtual QString attribut_nom() const = 0;
 
     //! Renvoie le nom de l'attribut.
-    QString attribut_name(post /*Pos*/) const
-        {return name_attribut();}
-
-    //! Renvoie le nom de l'attribut.
-    virtual QString name_classe_attribut() const = 0;
+    virtual QString classe_nom() const = 0;
 
     //! Modifie la donnée à partir d'un QVariant.
     virtual void set_data_v(post /*pos*/, const QVariant &value) = 0;
@@ -149,6 +145,11 @@ public:
     //! Renvoie la chaine "valide" si l'attribut est valide et "invalide" sinon.
     QString valid_to_string() const
         {return is_valid_attribut() ? "valide" : "invalide";}
+
+protected:
+    //! Renvoie le nom de l'attribut.
+    QString multiple_nom(post /*Pos*/) const
+        {return attribut_nom();}
 };
 
 /*! \ingroup groupe_attribut_entity

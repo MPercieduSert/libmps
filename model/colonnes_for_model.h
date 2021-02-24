@@ -333,7 +333,7 @@ template<class T> using vector_list_heterogene_taille_colonne = heterogene_taill
 template<class T> using vector_ptr_heterogene_taille_colonne = heterogene_taille_adapt_colonne<vector_ptr_colonne<T>>;
 template<class T> using vector_ref_heterogene_taille_colonne = heterogene_taille_adapt_colonne<vector_ref_colonne<T>>;
 template<class T> using vector_val_heterogene_taille_colonne = heterogene_taille_adapt_colonne<vector_val_colonne<T>>;
-// HeterogeneTailleId
+// HeterogeneTaille_Id
 template<class Read, class Find, class Write, class Vec> using base_heterogene_taille_id_colonne_temp
     = heterogene_taille_adapt_colonne<base_id_colonne_temp<Read, Find, Write, Vec>>;
 template<class Read, class Write, class Vec> using base_heterogene_taille_id_colonne
@@ -371,7 +371,7 @@ template<class T> using vector_list_bool_heterogene_taille_colonne = heterogene_
 template<class T> using vector_ptr_bool_heterogene_taille_colonne = heterogene_taille_adapt_colonne<vector_ptr_bool_colonne<T>>;
 template<class T> using vector_ref_bool_heterogene_taille_colonne = heterogene_taille_adapt_colonne<vector_ref_bool_colonne<T>>;
 template<class T> using vector_val_bool_heterogene_taille_colonne = heterogene_taille_adapt_colonne<vector_val_bool_colonne<T>>;
-// BoolHeterogeneTailleId
+// BoolHeterogeneTaille_Id
 template<class Read, class Write, class Vec> using bool_heterogene_taille_id_colonne_temp
     = heterogene_taille_adapt_colonne<bool_id_colonne_temp<Read, Write, Vec>>;
 template<class Read, class Write, class Vec> using bool_heterogene_taille_id_colonne

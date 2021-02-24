@@ -165,7 +165,7 @@ protected:
 public:
     //! Constructeur.
     source_new_modif_form(b2d::bdd &bdd, bool new_ent, QWidget *parent = nullptr)
-        : abstract_type_nc_nom_new_modif_form(static_cast<b2d::bdd_predef &>(bdd),"source_root_tp",source::ID,
+        : abstract_type_nc_nom_new_modif_form(static_cast<b2d::bdd_predef &>(bdd),"source_root",source::ID,
                                         "Type de la source :","Nom abrégé de la source :","Nom de la source :",
                                                                      new_ent,parent) {}
 

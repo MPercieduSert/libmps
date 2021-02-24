@@ -313,7 +313,7 @@ void managers_predef::enable_texte(const QString &table, const QString &cible_ta
 
     //Source
     using unique_source = nom_unique_sql<source>;
-    info_bdd info_source("Source",source_table,source::Nbr_Att,{unique_source::Nbr_Unique});
+    info_bdd info_source("source",source_table,source::Nbr_Att,{unique_source::Nbr_Unique});
     info_source.set_attribut(source::Nc,"nc",b2d::type_attribut_bdd::Text);
     info_source.set_attribut(source::Nom,"nm",b2d::type_attribut_bdd::Text);
     info_source.set_attribut(source::Type,"tp");

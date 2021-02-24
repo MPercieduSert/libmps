@@ -8,8 +8,8 @@ tab_gestion_bdd::tab_gestion_bdd(b2d::bdd &bdd, const tab_index &index, QWidget 
     : abstract_tab_module_with_bdd (bdd, index, parent),
       m_info(m_index.second > 0 ? m_bdd.managers().info(static_cast<entidt>(m_index.second))
                                   : m_bdd.managers().get(static_cast<entidt>(-m_index.second)).info_arbre()),
-      m_attribut_names( m_index.second > 0 ? m_bdd.managers().get(static_cast<entidt>(m_index.second)).names_attribut()
-                                               : entities_base::arbre::Names_attribut())
+      m_attribut_names( m_index.second > 0 ? m_bdd.managers().get(static_cast<entidt>(m_index.second)).attribut_names()
+                                               : entities_base::arbre::Names())
 {
     m_model = new QSqlTableModel(this,m_bdd.db());
     m_model->setTable(m_info.table());

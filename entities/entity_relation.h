@@ -10,10 +10,10 @@
 //! Macro implémentant le début d'une classe ayant 2 clés.
 #define ENTITY_ALIAS_DEBUT(ENTITY,TYPE,IDT) \
     /*! \ingroup groupe_entity \brief Représentation de l'entité ENTITY.*/ \
-    class ENTITY : public entities_base::TYPE##_entity<IDT> \
+    class ENTITY : public mps::entities_base::TYPE##_entity<IDT> \
     {public: \
-    using mere = entities_base::TYPE##_entity<IDT>; \
-    using entities_base::TYPE##_entity<IDT>::TYPE##_entity; \
+    using mere = mps::entities_base::TYPE##_entity<IDT>; \
+    using mps::entities_base::TYPE##_entity<IDT>::TYPE##_entity; \
     using mere::operator ==; \
     BASE_ENTITY(ENTITY)
 

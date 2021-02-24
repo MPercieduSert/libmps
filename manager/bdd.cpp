@@ -309,7 +309,7 @@ void bdd::hydrate_attribut_associated_xml(entity &entity_ass, const std::pair<co
     else if(pair.first == "code") {
         auto code = code_from_string(pair.second,entity_ass.id_entity(),true,controle);
         if(controle.isEmpty()) {
-            auto pos = position_xml(entity_ass,"Code",controle);
+            auto pos = position_xml(entity_ass,"code",controle);
             if(controle.isEmpty())
                 entity_ass.set_data(pos,code.value());
         }
@@ -372,6 +372,18 @@ QString bdd::import_xml(const fichier::doc_xml &doc){
                 if(controle.isEmpty())
                     for (auto iter_list = associated.cbegin(); iter_list != associated.cend() &&controle.isEmpty(); ++iter_list)
                         associated_controled_xml(*ent,*iter_list,controle);
+                else {
+                    if(!associated.empty()) {
+                        controle.append("\n+ Entité associé non traitée : ");
+                        for (auto iter_list = associated.cbegin(); iter_list != associated.cend(); ++iter_list) {
+                            controle.append("\n++ ").append((*iter_list)->name());
+                            if((**iter_list).has_attributes())
+                                for (auto iter_att = (**iter_list).attributes().cbegin();
+                                     iter_att != (**iter_list).attributes().cend(); ++iter_att)
+                                    controle.append("\n+++ ").append(iter_att->first).append(" = ").append(iter_att->second);
+                        }
+                    }
+                }
             }
             if(!controle.isEmpty())
                 controle.prepend(QString("-> Dans l'entité : ").append(info(*ent).name())
@@ -506,7 +518,7 @@ fichier::doc_xml bdd::schema_xml_for_import() const{
             ent_it->set_attribut("name",managers().info(i).name());
             ent_it = schema.emplace_back(ent_it,"xs:complexType");
             ent_it = schema.emplace_back(ent_it,"xs:all");
-            auto namesAtt = managers().get(i).names_attribut();
+            auto namesAtt = managers().get(i).attribut_names();
             for (szt j = 1; j != namesAtt.size(); ++j) {
                 auto att_it = schema.emplace_back(ent_it,"xs:element");
                 att_it->set_attribut("name",namesAtt.at(j));
@@ -557,13 +569,13 @@ fichier::doc_xml bdd::schema_xml_for_import() const{
                 auto att_unique = managers().info(i).attribut_unique(j);
                 if(att_unique.size() == 1){
                     unique_it = schema.emplace_back(unique_it,"xs:element");
-                    unique_it->set_attribut("name",managers().get(i).names_attribut().at(att_unique.at(0)));
+                    unique_it->set_attribut("name",managers().get(i).attribut_names().at(att_unique.at(0)));
                 }
                 else {
                     unique_it = schema.emplace_back(unique_it,"xs:all");
                     for (auto iter_num = att_unique.cbegin(); iter_num != att_unique.cend(); ++iter_num) {
                         auto att_it = schema.emplace_back(unique_it,"xs:element");
-                        att_it->set_attribut("name",managers().get(i).names_attribut().at(*iter_num));
+                        att_it->set_attribut("name",managers().get(i).attribut_names().at(*iter_num));
                     }
                 }
             }
@@ -591,83 +603,83 @@ void bdd::set_name(const QString &name) {
 
 enumt bdd::str_categorie_to_enum(const QString &str, flag categorie, QString &controle) const noexcept {
     if(categorie &Restriction_Code) {
-        if(str == "Aucune")
+        if(str == "aucune")
             return b2d::Aucune;
-        if(str == QString("Modification"))
+        if(str == QString("modification"))
             return b2d::Modif;
-        if(str == QString("Suppression"))
+        if(str == QString("suppression"))
             return b2d::Suppr;
     }
     if(categorie &Line_Style) {
-        if(str == "Solid_Line")
+        if(str == "solid_line")
             return Qt::SolidLine;
-        if(str == "Dash_Line")
+        if(str == "dash_line")
             return Qt::DashLine;
-        if(str == "Dot_Line")
+        if(str == "dot_line")
             return Qt::DotLine;
-        if(str == "Dash_Dot_Line")
+        if(str == "dash_dot_line")
             return Qt::DashDotLine;
-        if(str == "Dash_Dot_Dot_Line")
+        if(str == "dash_dot_dot_line")
             return Qt::DashDotDotLine;
     }
     if(categorie &Brush_Style) {
-        if(str == "No_Brush")
+        if(str == "no_brush")
             return Qt::NoBrush;
-        if(str == "Solid_Pattern")
+        if(str == "solid_pattern")
             return Qt::SolidPattern;
-        if(str == "Dense_1_Pattern")
+        if(str == "dense_1_pattern")
             return Qt::Dense1Pattern;
-        if(str == "Dense_2_Pattern")
+        if(str == "dense_2_pattern")
             return Qt::Dense2Pattern;
-        if(str == "Dense_3_Pattern")
+        if(str == "dense_3_pattern")
             return Qt::Dense3Pattern;
-        if(str == "Dense_4_Pattern")
+        if(str == "dense_4_pattern")
             return Qt::Dense4Pattern;
-        if(str == "Dense_5_Pattern")
+        if(str == "dense_5_pattern")
             return Qt::Dense5Pattern;
-        if(str == "Dense_6_Pattern")
+        if(str == "dense_6_pattern")
             return Qt::Dense6Pattern;
-        if(str == "Dense_7_Pattern")
+        if(str == "dense_7_pattern")
             return Qt::Dense7Pattern;
-        if(str == "Hor_Pattern")
+        if(str == "hor_pattern")
             return Qt::HorPattern;
-        if(str == "Ver_Pattern")
+        if(str == "ver_pattern")
             return Qt::VerPattern;
-        if(str == "Cross_Pattern")
+        if(str == "cross_pattern")
             return Qt::CrossPattern;
-        if(str == "B_Diag_Pattern")
+        if(str == "b_diag_pattern")
             return Qt::BDiagPattern;
-        if(str == "F_Diag_Pattern")
+        if(str == "f_diag_pattern")
             return Qt::FDiagPattern;
-        if(str == "Diag_Cross_Pattern")
+        if(str == "diag_cross_pattern")
             return Qt::DiagCrossPattern;
-        if(str == "Linear_Gradient_Pattern")
+        if(str == "linear_gradient_pattern")
             return Qt::LinearGradientPattern;
-        if(str == "Radial_Gradient_Pattern")
+        if(str == "radial_gradient_pattern")
             return Qt::RadialGradientPattern;
-        if(str == "Conical_Gradient_Pattern")
+        if(str == "conical_gradient_pattern")
             return Qt::ConicalGradientPattern;
-        if(str == "Texture_Pattern")
+        if(str == "texture_pattern")
             return Qt::TexturePattern;
     }
     if(categorie &Font_Weight) {
-        if(str == "Thin")
+        if(str == "thin")
             return QFont::Thin;
-        if(str == "Extra_Light")
+        if(str == "extra_light")
             return QFont::ExtraLight;
-        if(str == "Light")
+        if(str == "light")
             return QFont::Light;
-        if(str == "Normal")
+        if(str == "normal")
             return QFont::Normal;
-        if(str == "Medium")
+        if(str == "medium")
             return QFont::Medium;
-        if(str == "Demi_Bold")
+        if(str == "demi_bold")
             return QFont::DemiBold;
-        if(str == "Bold")
+        if(str == "bold")
             return QFont::Bold;
-        if(str == "Extra_Bold")
+        if(str == "extra_bold")
             return QFont::ExtraBold;
-        if(str == "Black")
+        if(str == "black")
             return QFont::Black;
 
     }

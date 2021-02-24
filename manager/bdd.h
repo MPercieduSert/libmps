@@ -134,13 +134,15 @@ public:
                     std::vector<condition> cond = std::vector<condition>({condition::Egal}));
 
     //! Teste s'il existe une entité ayant les mêmes valeurs qu'un des ensemble d'attributs uniques d'entity en base de donnée.
-    //! De plus, si l'identifiant de entity est nul et qu'il existe en base de donnée exactement une entité possédant des ensembles
+    //! De plus, si l'identifiant de entity est nul
+    //! et qu'il existe en base de donnée exactement une entité possédant des ensembles
     //! d'attributs uniques avec les mêmes valeurs qu'entity,
     //! alors l'identifiant d'entity est remplacé par l'identifiant de cette entité.
     bool exists_unique(entity &ent);
 
     //! Teste s'il existe une entité ayant les mêmes valeurs qu'un des ensemble d'attributs uniques d'entity en base de donnée.
-    //! De plus, si l'identifiant de entity est nul et qu'il existe en base de donnée exactement une entité possédant des ensembles
+    //! De plus, si l'identifiant de entity est nul
+    //! et qu'il existe en base de donnée exactement une entité possédant des ensembles
     //! d'attributs uniques avec les mêmes valeurs qu'entity,
     //! alors l'identifiant d'entity est remplacé par l'identifiant de cette entité.
     template<class Ent> bool exists_unique(Ent &ent);
@@ -277,7 +279,8 @@ public:
     //! valeur de la colonne d'identifiant cle[i] condition[i] value[i],
     //! ordonnée suivant les colonnes d'identifiant contenue dans ordre,
     //! croissante (crois[i]=true) ou décroissante (croiss[i]=false).
-    template<class Ent> vector_ptr<Ent> get_list(const std::vector<typename Ent::position> &cle, const std::vector<QVariant> &value,
+    template<class Ent> vector_ptr<Ent> get_list(const std::vector<typename Ent::position> &cle,
+                         const std::vector<QVariant> &value,
                          const std::vector<typename Ent::position> &ordre = std::vector<typename Ent::position>(),
                          const std::vector<condition> &cond = std::vector<condition>(),
                          const std::vector<bool> &crois = std::vector<bool>());
@@ -288,36 +291,36 @@ public:
     //! ordonnée suivant les colonnes de la table Ent d'identifiants key et d'ordre value de std::map order_map_table
     //! (true -> croissant, false -> décroissant).
     template<class Ent, class Join> vector_ptr<Ent> get_list(typename Ent::position colonne_table,
-                                                   typename Join::Position colonne_join,
+                                                   typename Join::position colonne_join,
                                                    const std::map<typename Ent::position,QVariant> &where_map_table,
-                                                   const std::map<typename Join::Position,QVariant> &where_map_join,
+                                                   const std::map<typename Join::position,QVariant> &where_map_join,
                                                    const std::vector<std::pair<typename Ent::position,bool>> &order_map_table);
 
     //! Renvoie la liste des entités de la table vérifiant une condition sur une jointure (Ent.ID = join.cleJoin),
     //! valeur de la colonne de la jointure d'identifiant cleWhere = value_where,
     //! ordonnée suivant la colonne de l'entité d'identifiant ordre.
-    template<class Ent, class Join> vector_ptr<Ent> get_list(typename Join::Position cleJoin, typename Join::Position cleWhere,
+    template<class Ent, class Join> vector_ptr<Ent> get_list(typename Join::position cleJoin, typename Join::position cleWhere,
                                                          const QVariant &value_where, typename Ent::position ordre = Ent::Id,
                                                          condition cond = condition::Egal, bool crois = true);
 
     //! Renvoie la liste des entités de la table vérifiant deux conditions sur une jointure (Ent.ID = join.cleJoin),
     //! valeur de la colonne de la jointure d'identifiant cleWhere1 = value_where1 et cleWhere2 = value_where2,
     //! ordonnée suivant la colonne de l'entité d'identifiant ordre.
-    template<class Ent, class Join> vector_ptr<Ent> get_list(typename Join::Position cleJoin,
-                                                           typename Join::Position cleWhere1, const QVariant &value_where1,
-                                                           typename Join::Position cleWhere2, const QVariant &value_where2,
+    template<class Ent, class Join> vector_ptr<Ent> get_list(typename Join::position cleJoin,
+                                                           typename Join::position cleWhere1, const QVariant &value_where1,
+                                                           typename Join::position cleWhere2, const QVariant &value_where2,
                                                            typename Ent::position ordre = Ent::Id, bool crois = true);
 
     //! Renvoie la liste des entités de la table vérifiant une condition sur une jointure
     //! (table.ID = join_1.colonne_1, join_2.ID = join_1.colonne_2),
     //! valeur de la colonne de la jointure d'identifiant cleWhere = value_where sur la seconde jointure,
     //! ordonnée suivant la colonne de l'entité d'identifiant ordre.
-    template<class Ent , class Join1, class Join2> vector_ptr<Ent> get_list(typename Join1::Position cle_1,
-                                                                              typename Join1::Position cle_2,
-                                                                              typename Join2::Position cleWhere,
-                                                                              const QVariant &value_where,
-                                                                              typename Ent::position ordre = Ent::Id,
-                                                                              condition cond = condition::Egal, bool crois = true);
+    template<class Ent , class Join1, class Join2> vector_ptr<Ent> get_list(typename Join1::position cle_1,
+                                                                            typename Join1::position cle_2,
+                                                                            typename Join2::position cleWhere,
+                                                                            const QVariant &value_where,
+                                                                            typename Ent::position ordre = Ent::Id,
+                                                                            condition cond = condition::Egal, bool crois = true);
 
     //! Renvoie le liste des descendant direct d'ent.
     template<class Ent> vector_ptr<Ent> get_list_childs(const Ent &ent);
@@ -382,8 +385,10 @@ public:
 
     //! Renvoie la liste des identifiants de la table vérifiant les conditions, pour tout i,
     //! valeur de la colonne d'identifiant cle[i] condition[i] value[i],
-    //! ordonnée suivant les colonnes d'identifiant contenue dans ordre, croissante (crois[i]=true) ou décroissante (croiss[i]=false).
-    template<class Ent> std::list<idt> get_list_id(const std::vector<typename Ent::position> &cle, const std::vector<QVariant> &value,
+    //! ordonnée suivant les colonnes d'identifiant contenue dans ordre,
+    //! croissante (crois[i]=true) ou décroissante (croiss[i]=false).
+    template<class Ent> std::list<idt> get_list_id(const std::vector<typename Ent::position> &cle,
+                         const std::vector<QVariant> &value,
                          const std::vector<typename Ent::position> &ordre = std::vector<typename Ent::position>(),
                          const std::vector<condition> &cond = std::vector<condition>(),
                          const std::vector<bool> &crois = std::vector<bool>());
@@ -415,7 +420,8 @@ public:
 
     //! Renvoie la liste des entités de la table vérifiant les conditions, pour tout i,
     //! valeur de la colonne d'identifiant cle[i] condition[i] value[i],
-    //! ordonnée suivant les colonnes d'identifiant contenue dans ordre, croissante (crois[i]=true) ou décroissante (croiss[i]=false).
+    //! ordonnée suivant les colonnes d'identifiant contenue dans ordre,
+    //! croissante (crois[i]=true) ou décroissante (croiss[i]=false).
     template<class Ent> map_id<Ent> get_map(const std::vector<typename Ent::position> &cle, const std::vector<QVariant> &value,
                          typename Ent::position cle_map = Ent::Id,
                          const std::vector<typename Ent::position> &ordre = std::vector<typename Ent::position>(),
@@ -426,14 +432,14 @@ public:
     //! valeur des colonnes de la table Ent d'identifiant key = value de std::map where_map_table,
     //! valeur des colonnes de la table Join d'identifiant key = value de std::map where_map_join.
     template<class Ent, class Join> map_id<Ent> get_map(typename Ent::position colonne_table,
-                                                       typename Join::Position colonne_join,
+                                                       typename Join::position colonne_join,
                                                        const std::map<typename Ent::position,QVariant> &where_map_table,
-                                                       const std::map<typename Join::Position,QVariant> &where_map_join,
+                                                       const std::map<typename Join::position,QVariant> &where_map_join,
                                                        typename Ent::position cle_map = Ent::Id);
 
     //! Renvoie la liste des entités de la table vérifiant une condition sur une jointure (Ent.ID = Join.cleJoin),
     //! valeur de la colonne de la jointure d'identifiant cleWhere = value_where.
-    template<class Ent, class Join> map_id<Ent> get_map(typename Join::Position cleJoin, typename Join::Position cleWhere,
+    template<class Ent, class Join> map_id<Ent> get_map(typename Join::position cleJoin, typename Join::position cleWhere,
                                                        const QVariant &value_where, typename Ent::position cle_map = Ent::Id,
                                                        condition cond = condition::Egal);
 
@@ -924,9 +930,9 @@ template<class Ent> vector_ptr<Ent> bdd::get_list(const std::vector<typename Ent
     {return m_manager->get<Ent>().get_list(cle,value,ordre,condition,crois);}
 
 template<class Ent, class Join> vector_ptr<Ent> bdd::get_list(typename Ent::position colonne_table,
-                                    typename Join::Position colonne_join,
+                                    typename Join::position colonne_join,
                                     const std::map<typename Ent::position, QVariant> &where_map_table,
-                                    const std::map<typename Join::Position, QVariant> &where_map_join,
+                                    const std::map<typename Join::position, QVariant> &where_map_join,
                                     const std::vector<std::pair<typename Ent::position, bool>> &order_map_table) {
     std::map<QString,QVariant> where_map_joinString;
     for(auto i = where_map_join.cbegin(); i != where_map_join.cend(); i++)
@@ -937,7 +943,7 @@ template<class Ent, class Join> vector_ptr<Ent> bdd::get_list(typename Ent::posi
                                              where_map_table, where_map_joinString, order_map_table);
 }
 
-template<class Ent, class Join> vector_ptr<Ent> bdd::get_list(typename Join::Position cleJoin, typename Join::Position cleWhere,
+template<class Ent, class Join> vector_ptr<Ent> bdd::get_list(typename Join::position cleJoin, typename Join::position cleWhere,
                                                             const QVariant &value_where, typename Ent::position ordre,
                                                             condition cond, bool crois) {
     return m_manager->get<Ent>().get_list_join(m_manager->get<Join>().info().table(),
@@ -946,11 +952,11 @@ template<class Ent, class Join> vector_ptr<Ent> bdd::get_list(typename Join::Pos
                                              value_where, ordre, cond, crois);
 }
 
-template<class Ent, class Join> vector_ptr<Ent> bdd::get_list(typename Join::Position cleJoin,
-                                                       typename Join::Position cleWhere1, const QVariant &value_where1,
-                                                       typename Join::Position cleWhere2, const QVariant &value_where2,
+template<class Ent, class Join> vector_ptr<Ent> bdd::get_list(typename Join::position cleJoin,
+                                                       typename Join::position cleWhere1, const QVariant &value_where1,
+                                                       typename Join::position cleWhere2, const QVariant &value_where2,
                                                        typename Ent::position ordre, bool crois){
-    std::map<typename Join::Position, QVariant> mapWhere;
+    std::map<typename Join::position, QVariant> mapWhere;
     mapWhere[cleWhere1] = value_where1;
     mapWhere[cleWhere2] = value_where2;
     return get_list<Ent,Join>(Ent::Id,cleJoin,std::map<typename Ent::position, QVariant>(),mapWhere,
@@ -958,9 +964,9 @@ template<class Ent, class Join> vector_ptr<Ent> bdd::get_list(typename Join::Pos
                              ({std::pair<typename Ent::position, bool>(ordre,crois)}));
 }
 
-template<class Ent , class Join1, class Join2> vector_ptr<Ent> bdd::get_list(typename Join1::Position cle_1,
-                                                          typename Join1::Position cle_2,
-                                                          typename Join2::Position cleWhere,
+template<class Ent , class Join1, class Join2> vector_ptr<Ent> bdd::get_list(typename Join1::position cle_1,
+                                                          typename Join1::position cle_2,
+                                                          typename Join2::position cleWhere,
                                                           const QVariant &value_where,
                                                           typename Ent::position ordre,
                                                           condition cond, bool crois) {
@@ -1051,9 +1057,9 @@ template<class Ent> map_id<Ent> bdd::get_map(const std::vector<typename Ent::pos
     {return m_manager->get<Ent>().get_map(cle,value,cle_map,ordre,cond,crois);}
 
 template<class Ent, class Join> map_id<Ent> bdd::get_map(typename Ent::position colonne_table,
-                                                        typename Join::Position colonne_join,
+                                                        typename Join::position colonne_join,
                                                         const std::map<typename Ent::position,QVariant> &where_map_table,
-                                                        const std::map<typename Join::Position,QVariant> &where_map_join,
+                                                        const std::map<typename Join::position,QVariant> &where_map_join,
                                                         typename Ent::position cle_map) {
     std::map<QString,QVariant> where_map_joinString;
     for(auto i = where_map_join.cbegin(); i != where_map_join.cend(); i++)
@@ -1063,8 +1069,8 @@ template<class Ent, class Join> map_id<Ent> bdd::get_map(typename Ent::position 
                                             where_map_table, where_map_joinString, cle_map);
 }
 
-template<class Ent, class Join> map_id<Ent> bdd::get_map(typename Join::Position cleJoin,
-                                                                typename Join::Position cleWhere, const QVariant &value_where,
+template<class Ent, class Join> map_id<Ent> bdd::get_map(typename Join::position cleJoin,
+                                                                typename Join::position cleWhere, const QVariant &value_where,
                                                                 typename Ent::position cle_map, condition cond) {
     return m_manager->get<Ent>().get_map_join(m_manager->get<Join>().table(),m_manager->get<Join>().attribut(cleJoin),
                                              m_manager->get<Join>().attribut(cleWhere),

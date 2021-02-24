@@ -1,78 +1,78 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <entities>
-<!--  Type -->
- <Type>
-<Nom>Configuration</Nom>
-<Nc>config</Nc>
-<Ref>config_root</Ref> 
-<Restriction code="modification|suppression"/>
-<TypePermission id1_cible="Donnee" code="Visible" restriction="modification|suppression"/>
- </Type>
-<Type>
-<Parent Ref="config_root"/>
-<Nom>Valeur par defaut</Nom>
-<Nc>defaut</Nc>
-<Ref>valeur_defaut</Ref>
-<Restriction code="modification|suppression"/>
-<TypePermission id1_cible="Donnee" code="Visible|Attribuable" restriction="modification|suppression"/>
-</Type> 
- <Type>
-<Nom>Source</Nom>
-<Nc>source</Nc>
-<Ref>source_root</Ref> 
-<Restriction code="modification|suppression"/>
- </Type>
- <Type>
- <Nom>Événement</Nom>
- <Nc>Événement</Nc>
- <Ref>even_root</Ref>
- <Restriction code="modification|suppression"/>
- <TypePermission id1_cible="Evenement" code="Visible" restriction="modification|suppression"/>
- </Type>
+<!--  type -->
+ <type>
+<nom>Configuration</nom>
+<nc>config</nc>
+<ref>config_root</ref> 
+<restriction code="modification|suppression"/>
+<type_permission id_1_cible="donnee" code="visible" restriction="modification|suppression"/>
+ </type>
+<type>
+<parent ref="config_root"/>
+<nom>Valeur par defaut</nom>
+<nc>defaut</nc>
+<ref>valeur_defaut</ref>
+<restriction code="modification|suppression"/>
+<type_permission id_1_cible="donnee" code="visible|attribuable" restriction="modification|suppression"/>
+</type> 
+ <type>
+<nom>source</nom>
+<nc>source</nc>
+<ref>source_root</ref> 
+<restriction code="modification|suppression"/>
+ </type>
+ <type>
+ <nom>Événement</nom>
+ <nc>Événement</nc>
+ <ref>evenement_root</ref>
+ <restriction code="modification|suppression"/>
+ <type_permission id_1_cible="evenement" code="visible" restriction="modification|suppression"/>
+ </type>
  
- <!-- Donnee -->
- <Donnee>
- <Nom>Configuration</Nom>
- <Ref>config_root</Ref>
- <Type Ref="config_root"/> 
- <TpVal>NoDonnee</TpVal>
- <Restriction code="modification|suppression"/>
- </Donnee>
- <Donnee>
- <Arbre ref_parent="config_root"/>
- <Nom>Valeur par defaut</Nom>
- <Ref>valeur_defaut</Ref>
- <Type Ref="config_root"/> 
- <TpVal>NoDonnee</TpVal>
- <Restriction code="modification|suppression"/>
- </Donnee>
- <Donnee>
-   <Arbre ref_parent="valeur_defaut"/>
-  <Nom>Date par defaut</Nom>
-  <Ref>date_defaut</Ref>
- <Type Ref="valeur_defaut"/>
- <TpVal>Date</TpVal>
-  <Restriction code="modification|suppression"/>
- </Donnee>
+ <!-- donnee -->
+ <donnee>
+ <nom>Configuration</nom>
+ <ref>config_root</ref>
+ <type ref="config_root"/> 
+ <tp_val>no_donnee</tp_val>
+ <restriction code="modification|suppression"/>
+ </donnee>
+ <donnee>
+ <arbre ref_parent="config_root"/>
+ <nom>Valeur par defaut</nom>
+ <ref>valeur_defaut</ref>
+ <type ref="config_root"/> 
+ <tp_val>no_donnee</tp_val>
+ <restriction code="modification|suppression"/>
+ </donnee>
+ <donnee>
+   <arbre ref_parent="valeur_defaut"/>
+  <nom>Date par defaut</nom>
+  <ref>date_defaut</ref>
+ <type ref="valeur_defaut"/>
+ <tp_val>Date</tp_val>
+  <restriction code="modification|suppression"/>
+ </donnee>
  
- <!-- Evenement -->
- <EvenementStyle>
- <Nom>Style par défaut</Nom>
- <Bordure type="enum">SolidLine</Bordure>
- <CouleurBordure type="couleur">black</CouleurBordure>
- <CouleurFond type="couleur">gray</CouleurFond>
- <CouleurTexte type="couleur">black</CouleurTexte>
- <CouleurTitre type="couleur">Black</CouleurTitre>
- <Forme type="enum">Rectangle</Forme>
- <PoliceTexte type="police">
- <Famille>Times</Famille>
- <Taille>10</Taille>
- </PoliceTexte>
- <PoliceTitre type="police">
-<Famille>Times</Famille>
-<Taille>14</Taille>
-<Poids>Bold</Poids> 
- </PoliceTitre>
- <Texture>SolidPattern</Texture>
- </EvenementStyle>
+ <!-- evenement -->
+ <evenement_style>
+ <nom>Style par défaut</nom>
+ <bordure type="enum">solid_line</bordure>
+ <couleur_bordure type="couleur">black</couleur_bordure>
+ <couleur_fond type="couleur">gray</couleur_fond>
+ <couleur_texte type="couleur">black</couleur_texte>
+ <couleur_titre type="couleur">black</couleur_titre>
+ <forme type="enum">rectangle</forme>
+ <police_texte type="police">
+ <famille>Times</famille>
+ <taille>10</taille>
+ </police_texte>
+ <police_titre type="police">
+<famille>Times</famille>
+<taille>14</taille>
+<poids>bold</poids> 
+ </police_titre>
+ <texture>solid_pattern</texture>
+ </evenement_style>
 </entities>

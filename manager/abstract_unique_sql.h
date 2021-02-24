@@ -487,8 +487,8 @@ protected:
     using double_unique_sql<Ent>::exec_unique_id;
     using double_unique_sql<Ent>::finish;
     using double_unique_sql<Ent>::id;
-    using double_unique_sql<Ent>::Id_Unique;
-    using double_unique_sql<Ent>::id_2Unique;
+    using double_unique_sql<Ent>::id_unique;
+    using double_unique_sql<Ent>::id_2_unique;
     using double_unique_sql<Ent>::next;
     using double_unique_sql<Ent>::prepare;
     using double_unique_sql<Ent>::unique_creer_string;
@@ -611,7 +611,7 @@ protected:
     using double_unique_sql<Ent>::m_unique;
     using double_unique_sql<Ent>::m_unique_2;
     using triple_unique_sql<Ent>::m_unique_3;
-    using double_unique_sql<Ent>::bindValue;
+    using double_unique_sql<Ent>::bind_value;
     using double_unique_sql<Ent>::exec;
     using double_unique_sql<Ent>::exec_unique;
     using double_unique_sql<Ent>::exec_unique_id;
@@ -623,10 +623,13 @@ protected:
 public:
     enum {Id_1_Unique = 0, Nbr_Unique_1,
           Id_2_Unique = 0, Nbr_Unique_2,
-          id_3_Unique = 0, Nbr_Unique_3,
-          Id_1_Unique_Set = triple_unique_sql<Ent>::Unique_Set_1,
-          Id_2_Unique_Set = triple_unique_sql<Ent>::Unique_Set_2,
-          Id_3_Unique_Set = triple_unique_sql<Ent>::Unique_Set_3
+          Id_3_Unique = 0, Nbr_Unique_3,
+          Unique_Set_1 = triple_unique_sql<Ent>::Unique_Set_1,
+          Unique_Set_2 = triple_unique_sql<Ent>::Unique_Set_2,
+          Unique_Set_3 = triple_unique_sql<Ent>::Unique_Set_3,
+          Id_1_Unique_Set = Unique_Set_1,
+          Id_2_Unique_Set = Unique_Set_2,
+          Id_3_Unique_Set = Unique_Set_3
          };
     CONSTR_DEFAUT(triple_exact_one_not_null_unique_sql)
 
@@ -655,7 +658,7 @@ protected:
 
     //! Transmet les valeurs des attributs uniques à la requète SQL préparée 2.
     void bind_values_unique_3(const Ent &ent) override
-        {bind_value(id_3_Unique,ent.id_3());}
+        {bind_value(Id_3_Unique,ent.id_3());}
 };
 
 template<class Ent> b2d::existe_uni triple_exact_one_not_null_unique_sql<Ent>::exists_unique(Ent &ent)

@@ -26,17 +26,17 @@
     /*! Convertit la référence entity en une référence de type ENTITY, aprés vérification.*/ \
     static ENTITY *Convert(entity *ent) { \
         if(Verif_entity(ent)) return static_cast<ENTITY*>(ent); \
-        else throw entities::convert_entity_exception(QString("static ").append(Name()) \
+        else throw mps::entities::convert_entity_exception(QString("static ").append(Name()) \
                                                        .append(" *Convert(entity *)"),*ent,Name());} \
     /*! Convertit la référence constante entity en une référence constante de type ENTITY, aprés vérification.*/ \
     static ENTITY &Convert(entity &ent) { \
         if(Verif_entity(ent)) return static_cast<ENTITY &>(ent); \
-        else throw entities::convert_entity_exception(QString("static ").append(Name()) \
+        else throw mps::entities::convert_entity_exception(QString("static ").append(Name()) \
                                                        .append(" &Convert(entity &)"),ent,Name());} \
     /*! Convertit le pointeur entity en un pointeur de type ENTITY, aprés vérification.*/ \
     static const ENTITY &Convert(const entity &ent) { \
         if(Verif_entity(ent)) return  static_cast<const ENTITY &>(ent); \
-        else throw entities::convert_entity_exception(QString("static const ").append(Name()) \
+        else throw mps::entities::convert_entity_exception(QString("static const ").append(Name()) \
                                                        .append(" &Convert(const entity &)"),ent,Name());}
 
 /*! \ingroup groupe_macro_entity
@@ -201,9 +201,9 @@ public:
     post nbr_att() const override
         {return Nbr_Att;}
 
-    //! Retourne un le nom de l'attribut d'indice num.
+    //! Retourne le nom de l'attribut d'indice num.
     QString attribut_name(post pos) const override
-        {return pos < Nbr_Att ? attributs<entity,Attribut>::attribut_name(pos) : QString();}
+        {return pos < Nbr_Att ? attributs<entity,Attribut>::multiple_nom(pos) : QString();}
 
     //! Retourne un vecteur contenant les noms des attributs.
     static std::vector<QString> Attribut_names() {
@@ -214,14 +214,14 @@ public:
     }
 
     //! Retourne un le nom de l'attribut d'indice num.
-    static QString Name_attribut(post pos)
-        {return pos < Nbr_Att ? attributs<entity,Attribut>::Name_attribut(pos) : QString();}
+    static QString Name(post pos)
+        {return pos < Nbr_Att ? attributs<entity,Attribut>::Name(pos) : QString();}
 
     //! Retourne un vecteur contenant les noms des attributs.
-    static std::vector<QString> Names_attribut() {
+    static std::vector<QString> Names() {
         std::vector<QString> vect(Nbr_Att);
         for (post i =0; i < Nbr_Att; ++i)
-            vect[i] = attributs<entity,Attribut>::Name_attribut(i);
+            vect[i] = attributs<entity,Attribut>::Name(i);
         return vect;
     }
 

@@ -4,7 +4,7 @@ using namespace mps;
 using namespace dialogue;
 //////////////////////////////////////////////// evenement_new_modif_form ////////////////////////////////////////
 evenement_new_modif_form::evenement_new_modif_form(b2d::bdd &bdd, bool new_ent, QWidget *parent)
-    : abstract_type_nc_nom_new_modif_form(static_cast<b2d::bdd_predef &>(bdd),"evenement_root_tp",evenement::ID,
+    : abstract_type_nc_nom_new_modif_form(static_cast<b2d::bdd_predef &>(bdd),"evenement_root",evenement::ID,
                                     "Type de l'événement :","Nom abrégé de l'événement :","Nom de l'événement :",
                                     new_ent,parent){
     // Nom

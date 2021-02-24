@@ -51,14 +51,9 @@ public:
         {return Attribut_Premier::is_valid() &&attributs<Attribut_Suivant...>::is_valid();}
 
     //! Retourne le nom de l'attribut donnée souhaitée, pos doit être valide.
-    QString attribut_name(numt pos) const
-        {return pos < Attribut_Premier::Nbr_Att ? Attribut_Premier::attribut_name(pos)
-                                              : attributs<Attribut_Suivant...>::attribut_name(pos - Attribut_Premier::Nbr_Att);}
-
-    //! Retourne le nom de l'attribut donnée souhaitée, pos doit être valide.
-    static QString Name_attribut(numt pos)
-        {return pos < Attribut_Premier::Nbr_Att ? Attribut_Premier::Name_attribut(pos)
-                                              : attributs<Attribut_Suivant...>::Name_attribut(pos - Attribut_Premier::Nbr_Att);}
+    static QString Name(numt pos)
+        {return pos < Attribut_Premier::Nbr_Att ? Attribut_Premier::Name(pos)
+                                                : attributs<Attribut_Suivant...>::Name(pos - Attribut_Premier::Nbr_Att);}
 
     //! Renvoie une chaine de caractère contenant les valeurs de l'attribut.
     QString to_string() const override
@@ -66,13 +61,18 @@ public:
 
     //! Test d'égalité entre cette entité et celle transmise en argument.
     bool operator ==(const attributs<Attribut_Premier, Attribut_Suivant...> &ent) const
-        {return Attribut_Premier::operator ==(ent) &&attributs<Attribut_Suivant...>::operator ==(ent);}
+        {return Attribut_Premier::operator ==(ent) && attributs<Attribut_Suivant...>::operator ==(ent);}
 
 protected:
+    //! Retourne le nom de l'attribut donnée souhaitée, pos doit être valide.
+    QString multiple_nom(numt pos) const
+        {return pos < Attribut_Premier::Nbr_Att ? Attribut_Premier::multiple_nom(pos)
+                                                : attributs<Attribut_Suivant...>::multiple_nom(pos - Attribut_Premier::Nbr_Att);}
+
     //! Retourne un QVariant contenant la donnée souhaitée, pos doit être valide.
     QVariant data_v(numt pos) const override
         {return pos < Attribut_Premier::Nbr_Att ? Attribut_Premier::data_v(pos)
-                                              : attributs<Attribut_Suivant...>::data_v(pos - Attribut_Premier::Nbr_Att);}
+                                                : attributs<Attribut_Suivant...>::data_v(pos - Attribut_Premier::Nbr_Att);}
 
     //! Remplace les attributs de l'entité par celle de l'entité transmise.
     void set(const  attributs<Attribut_Premier, Attribut_Suivant...> &ent) {
