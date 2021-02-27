@@ -85,6 +85,7 @@ enum sub_node_type {
     Code_Sub_Node,
     Combo_Box_Sub_Node,
     Date_Sub_Node,
+    Label_Sub_Node,
     Line_Edit_Sub_Node,
     Texte_Edit_Sub_Node
 };
@@ -395,6 +396,8 @@ protected:
     tree_for_node_model m_data;                         //!< arbre de données.
 
 public:
+    using node_index = model_base::node_index;
+    using node_iter = model_base::node_iter;
     enum {Default_Type = -2};
     using QObject::parent;
     //! Constructeur.

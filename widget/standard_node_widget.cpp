@@ -251,6 +251,8 @@ sub_node_widget *standard_node_delegate::create_sub_node(const node_index &index
         return new combo_box_sub_node_widget(index_sub_node,parent);
     case model_base::Date_Sub_Node:
         return  new date_sub_node_widget(index_sub_node,parent);
+    case model_base::Label_Sub_Node:
+        return  new label_sub_node_widget(index_sub_node,parent);
     case model_base::Line_Edit_Sub_Node:
         return new line_edit_sub_node_widget(index_sub_node,parent);
     case model_base::Texte_Edit_Sub_Node:
