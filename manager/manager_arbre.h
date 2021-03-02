@@ -77,6 +77,25 @@ public:
     template<class Fct> bool foreach_node(idt id, const Fct &fct, bool ordre = true)
         {return m_manager_arbre.foreach_node(id,fct,ordre);}
 
+    //! Renvoie le descendant direct du parent d'identifiant id_parent de position pos dans la fratrie.
+    Ent get_child(idt id_parent, int num) override {
+        arbre node(num, id_parent);
+        if(m_manager_arbre.exists_unique(node)){
+            Ent ent(node.id());
+            get(ent);
+            return ent;
+        }
+        else
+            return Ent();
+    }
+
+    //! Renvoie l'identifiant du descendant direct du parent d'identifiant id_parent de position pos dans la fratrie.
+    idt get_id_child(idt id_parent, int num) override {
+        arbre node(num, id_parent);
+        m_manager_arbre.exists_unique(node);
+        return node.id();
+    }
+
     //! Renvoie l'identifiant du parent (si le manager est de type arbre).
     idt get_id_parent(idt id) override
         {return m_manager_arbre.get_parent(id);}
@@ -145,8 +164,9 @@ protected:
         exec_finish();
     }
 
-    //! Teste si le noeud d'identifiant id est une feuille dans la base de donnée en vue d'optimisation.
-    bool opti_leaf(idt id) override {
+    //! Teste si le noeud d'identifiant id est une feuille dans la base de donnée.
+    //! Retourne vrai s'il n'existe pas.
+    bool is_leaf(idt id) override {
         arbre node(id);
         return !get(node) || node.feuille();
     }

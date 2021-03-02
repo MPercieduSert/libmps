@@ -57,7 +57,7 @@ void combo_box_sub_node_widget::update_data_sub_node(flag role) {
         for (auto it = map.cbegin(); it != map.cend(); ++it)
             m_combo_box->addItem(it.key(),it.value());
     }
-    if(role.test(model_base::Int_Role))
+    if(role.test(model_base::Int_Role | model_base::List_Of_Values))
         m_combo_box->setCurrentIndex(m_combo_box->findData(m_index.data(model_base::Int_Role).toInt()));
 }
 

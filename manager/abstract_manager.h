@@ -109,6 +109,9 @@ public:
     //! Retourne True si l'opération s'est correctement déroulée.
     virtual bool get(entity &ent) = 0;
 
+    //! Renvoie l'identifiant du descendant direct du parent d'identifiant id_parent de position pos dans la fratrie.
+    virtual idt get_id_child(idt id_parent, int num) = 0;
+
     //! Renvoie l'identifiant du parent (si le manager est de type arbre).
     virtual idt get_id_parent(idt id) = 0;
 
@@ -139,6 +142,11 @@ public:
 
     //! Enregistre l'entité entity en base avec le parent et la position spécifiés.
     virtual void insert(const entity &ent, idt id_parent, int num = 0) = 0;
+
+    //! Teste si une entité d'identifiant id est une feuille
+    //! Retourne true si l'entité n'est pas de type arbre ou n'existe pas.
+    virtual bool is_leaf(idt /*id*/)
+        {return true;}
 
     //! Renvoie un pointeur sur une entité du type géré par le manager.
     virtual std::unique_ptr<entity> make_entity() const = 0;
@@ -300,6 +308,12 @@ public:
 
     //! Renvoie l'arbre de racine d'identifiant id pour une entité de type arbre.
     virtual tree<Ent> get_arbre(idt id);
+
+    //! Renvoie le descendant direct du parent d'identifiant id_parent de position pos dans la fratrie.
+    virtual Ent get_child(idt id_parent, int num);
+
+    //! Renvoie l'identifiant du descendant direct du parent d'identifiant id_parent de position pos dans la fratrie.
+    idt get_id_child(idt id_parent, int num) override;
 
     //! Renvoie l'identifiant du parent (si le manager est de type arbre).
     idt get_id_parent(idt id) override;
@@ -677,6 +691,14 @@ template<class Ent> tree<Ent> abstract_manager_temp<Ent>::get_arbre(const Ent &/
 
 template<class Ent> tree<Ent> abstract_manager_temp<Ent>::get_arbre(idt /*id*/)
     {throw std::invalid_argument(QString("La méthode 'get_arbre' n'est pas définie pour le manager des : ")
+                                 .append(Ent::Name()).append(".").toStdString());}
+
+template<class Ent> Ent abstract_manager_temp<Ent>::get_child(idt /*id_parent*/, int /*num*/)
+    {throw std::invalid_argument(QString("La méthode 'get_child' n'est pas définie pour le manager des : ")
+                                 .append(Ent::Name()).append(".").toStdString());}
+
+template<class Ent> idt abstract_manager_temp<Ent>::get_id_child(idt /*id_parent*/, int /*num*/)
+    {throw std::invalid_argument(QString("La méthode 'get_id_child' n'est pas définie pour le manager des : ")
                                  .append(Ent::Name()).append(".").toStdString());}
 
 template<class Ent> idt abstract_manager_temp<Ent>::get_id_parent(idt /*id*/)

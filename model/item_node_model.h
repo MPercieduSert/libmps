@@ -145,7 +145,7 @@ public:
     //! Supprime les donnée du noeud.
     virtual bool del(/*b2d::bdd &*/) {return true;}
 
-    //! Accesseur des drapeaux associés à column.
+    //! Accesseur des drapeaux associés.
     virtual flag flags(int cible, numt /*num*/ = 0) const {
         if(cible == Node_Cible){
             if(m_iter.root())
@@ -155,7 +155,7 @@ public:
         return Default_Falg_Node;
     }
 
-    //! Mutateur de la donnée associé à column.
+    //! Mutateur de la donnée associé.
     virtual flag set_data(int /*cible*/, const QVariant &/*value*/, int /*role*/, numt /*num*/ = 0) {return No_Role;}
 
     //! Accesseur du type du noeud.
@@ -194,8 +194,11 @@ public:
     //! Accesseur des données associées à l'index.
     QVariant data(int role) const;
 
-    //! Retourne un index sur le frère ainé.
+    //! Retourne un index sur le fils ainé.
     node_index first() const noexcept;
+
+    //! Retourne un index sur le frère ainé.
+    node_index first_brother() const noexcept;
 
     //! Drapeaux assossiés à une donnée.
     flag flags() const;
@@ -220,8 +223,11 @@ public:
     bool is_valid() const noexcept
         {return m_iter;}
 
-    //! Retourne un index sur le frère benjamin.
+    //! Retourne un index sur le fils benjamin.
     node_index last() const noexcept;
+
+    //! Retourne un index sur le frère benjamin.
+    node_index last_brother() const noexcept;
 
     //! Teste si dans le model le noeud associé à l'index est une feuille.
     bool leaf() const
@@ -232,7 +238,7 @@ public:
         {return m_model;}
 
     //! Retourne un index sur le frère suivant.
-    node_index next_brother() const noexcept;
+    node_index next() const noexcept;
 
     //! Accesseur du numéro.
     numt num() const noexcept
@@ -250,7 +256,7 @@ public:
         {return m_iter.position() ;}
 
     //! Retourne un index sur le frère précédent.
-    node_index prev_brother() const noexcept;
+    node_index prev() const noexcept;
 
     //! Mutateur de la cible.
     void set_cible(int cb) noexcept
@@ -263,6 +269,24 @@ public:
     //! Retourne le sous index.
     sub_index sub() const noexcept
         {return {m_cible,m_num};}
+
+    //! Déplace l'index sur le frère suivant.
+    node_index & to_next() noexcept {
+        m_iter.to_next();
+        return *this;
+    }
+
+    //! Déplace l'index sur le parent.
+    node_index & to_parent() noexcept {
+        m_iter.to_parent();
+        return *this;
+    }
+
+    //! Déplace l'index sur le frère précédent.
+    node_index & to_prev() noexcept {
+        m_iter.to_prev();
+        return *this;
+    }
 
 protected:
     //! Accesseur (par valeur) de l'itérateur.

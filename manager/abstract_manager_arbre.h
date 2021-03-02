@@ -20,6 +20,7 @@ public:
     using ma_sql::manager_sql;
     using ma_sql::get_list_childs_id;
     using ma_sql::get;
+    using ma_sql::is_leaf;
     using ma_sql::save;
 
     //! Renvoie l'arbre de toutes les entités.
@@ -30,7 +31,7 @@ public:
         for(auto it_racine = racines.cbegin(); it_racine != racines.cend(); ++it_racine)
             get(*tree.emplace_back(it,*it_racine));
         while(it){
-            if(!opti_leaf(it->id())){
+            if(!is_leaf(it->id())){
                 auto listChilds = get_list_childs_id(it->id());
                 for(auto it_child = listChilds.cbegin(); it_child != listChilds.cend(); ++it_child)
                     get(*tree.emplace_back(it,*it_child));
@@ -51,7 +52,7 @@ public:
             tree<Ent> tree(ent);
             auto it = tree.begin();
             while(it){
-                if(!opti_leaf(it->id())){
+                if(!is_leaf(it->id())){
                     auto listChilds = get_list_childs_id(it->id());
                     for(auto it_child = listChilds.cbegin(); it_child != listChilds.cend(); ++it_child)
                         get(*tree.emplace_back(it,*it_child));
@@ -73,10 +74,6 @@ public:
 protected:
     //! Supprime de la Base de données les noeuds hors de l'arbre.
     virtual void delete_leaf_out_of(typename tree<Ent>::iterator it);
-
-    //! Teste si le noeud d'identifiant id est une feuille dans la base de donnée en vue d'optimisation.
-    virtual bool opti_leaf(idt /*id*/)
-        {return false;}
 
     //! Sauve un arbre où le changement de structure consite seulement l'ajout de nouveaux noeuds.
     virtual void save_add_leaf(typename tree<Ent>::iterator it)

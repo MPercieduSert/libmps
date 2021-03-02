@@ -59,7 +59,7 @@ void arc_node_view_widget::insert_nodes(numt pos, numt count){
                 *it = new arc_node_view_widget(child,m_view,this);
                 --count;
                 ++it;
-                child = child.next_brother();
+                child.to_next();
             }
             (*first_it)->draw_node();
         }
@@ -72,20 +72,19 @@ void arc_node_view_widget::mousePressEvent(QMouseEvent *event) {
                 && event->y() <= m_node->geometry().bottom() + m_view->m_arc_painter->bottom_node_margin() + m_view->m_arc_painter->height_tool_zone()
                 && event->x() < m_view->m_arc_painter->width_tool_zone(node_view::End_Of_Tool)){
             if(event->x() < m_view->m_arc_painter->width_tool_zone(node_view::Expand_Tool)) {
-                if(!m_leaf && m_node->index().flags().test(Expendable_FLag_Node))
+                if(!m_leaf && m_node->flags().test(Expendable_FLag_Node))
                     set_expanded(!m_expanded);
             }
             else if (event->x() < m_view->m_arc_painter->width_tool_zone(node_view::Elder_Tool)) {
-                if(m_node->index().flags().test(Elder_Enable_Flag_Node))
+                if(m_node->flags().test(Elder_Enable_Flag_Node))
                     m_node->index().model()->insert_nodes(m_node->index(),0,1);
             }
             else if (event->x() < m_view->m_arc_painter->width_tool_zone(node_view::Brother_Tool)) {
-                if(m_node->index().flags().test(Brother_Enable_Flag_Node))
+                if(m_node->flags().test(Brother_Enable_Flag_Node))
                     m_node->index().model()->insert_nodes(m_node->index().parent(),m_node->index().position() + 1,1);
-
             }
             else if (event->x() < m_view->m_arc_painter->width_tool_zone(node_view::Del_Tool)) {
-                if(m_node->index().flags().test(Del_Enable_Flag_Node))
+                if(m_node->flags().test(Del_Enable_Flag_Node))
                     m_node->index().model()->remove_nodes(m_node->index());
             }
         }
@@ -140,7 +139,7 @@ void arc_node_view_widget::set_expanded(bool bb){
             auto child = index.model()->index(index,0);
             for (auto vec_it = m_arc_child.begin(); vec_it != m_arc_child.end(); ++vec_it) {
                 *vec_it = new arc_node_view_widget(child,m_view,this);
-                child = child.next_brother();
+                child.to_next();
             }
             m_arc_child.front()->draw_node();
         }
@@ -283,7 +282,7 @@ void node_view::set_delegate(node_delegate *delegate) {
 }
 
 void node_view::set_model(node_model *model) {
-    if(m_model &&static_cast<QObject*>(m_model->parent()) == static_cast<QObject*>(this))
+    if(m_model && static_cast<QObject*>(m_model->parent()) == static_cast<QObject*>(this))
         m_model->deleteLater();
     m_model = model;
     if(!m_model->parent())

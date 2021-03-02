@@ -216,6 +216,12 @@ public:
     //! Renvoie l'arbre de racine d'entité entity pour une entité de type arbre.
     template<class Ent> tree<Ent> get_arbre(const Ent &ent);
 
+    //! Renvoie le descendant direct du parent d'identifiant id_parent de position pos dans la fratrie.
+    template<class Ent> Ent get_child(idt id_parent, int num);
+
+    //! Renvoie l'identifiant du descendant direct du parent d'identifiant id_parent de position pos dans la fratrie.
+    template<class Ent> idt get_id_child(idt id_parent, int num);
+
     //! Renvoie l'identifiant du parent (si le manager est de type arbre).
     idt get_id_parent(const entity &ent);
 
@@ -500,6 +506,10 @@ public:
     //! Enregistre l'entité entity en base avec le parent et la position spécifiés.
     template<class Ent> void insert(const Ent &ent, idt id_parent, numt num = 0)
         {insert(ent,id_parent,static_cast<int>(num));}
+
+    //! Teste si une entité d'identifiant id est une feuille
+    //! Retourne true si l'entité n'est pas de type arbre ou n'existe pas.
+    template<class Ent> bool is_leaf(idt id);
 
     //! Teste si la base de donnée est valide.
     bool is_valid() noexcept override
@@ -884,6 +894,12 @@ template<class Ent> tree<Ent> bdd::get_arbre(idt id)
 template<class Ent> tree<Ent> bdd::get_arbre(const Ent &ent)
     {return m_manager->get<Ent>().get_arbre(ent.id());}
 
+template<class Ent> Ent bdd::get_child(idt id_parent, int num)
+    {return m_manager->get<Ent>().get_child(id_parent,num);}
+
+template<class Ent> idt bdd::get_id_child(idt id_parent, int num)
+    {return m_manager->get<Ent>().get_id_child(id_parent,num);}
+
 template<class Ent> vector_ptr<Ent> bdd::get_list(typename Ent::position ordre, bool croissant)
     {return m_manager->get<Ent>().get_list(ordre, croissant);}
 
@@ -1088,6 +1104,9 @@ template<class Ent> void bdd::insert(Ent &ent, idt id_parent, int num)
 
 template<class Ent> void bdd::insert(const Ent &ent, idt id_parent, int num)
     {m_manager->get<Ent>().insert(ent,id_parent,num);}
+
+template<class Ent> bool bdd::is_leaf(idt id)
+    {return m_manager->get<Ent>().is_leaf(id);}
 
 template<class Ent> bool bdd::same_in_bdd(const Ent &ent)
     {return m_manager->get<Ent>().same_in_bdd(ent);}

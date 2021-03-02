@@ -73,11 +73,11 @@ bool find_model::remove(const node_index &node, numt count){
     if(check_index(node) &&!node.is_root()){
         if(node.parent().child_count() == count + 1) {
             if(index_to_iterator(node).first())
-                m_data.move(node.last(),node.parent());
+                m_data.move(node.last_brother(),node.parent());
             else
-                m_data.move(node.first(),node.parent());
+                m_data.move(node.first_brother(),node.parent());
             emit data_changed(node.parent(),Type_Role);
-            return item_node_model::remove(node.first(),count + 1);
+            return item_node_model::remove(node.first_brother(),count + 1);
         }
         else
             return item_node_model::remove(node,count);

@@ -58,7 +58,7 @@ node_index item_node_model::index(const node_index &parent, numt pos, int cible,
 }
 
 std::list<node_iter> item_node_model::insert(const node_index &parent, numt pos, numt count, int type) {
-    if (check_index(parent) &&pos <= parent.child_count()) {
+    if (check_index(parent) && pos <= parent.child_count()) {
         begin_insert_nodes(parent,pos,count);
             auto r = m_data.insert_nodes(parent,pos,count,
                                [this,type](const node_index &parentArg, numt posArg){return node_factory(parentArg,posArg,type);});
@@ -83,9 +83,10 @@ bool item_node_model::remove(const node_index &index, numt count) {
 bool item_node_model::set(const node_index &index, const QVariant &value, int role) {
     if(check_index(index)){
         auto changeRole = m_data.get_node(index).set_data(index.cible(),value,role,index.num());
-        if(changeRole)
-            data_changed(index,changeRole);
-        return true;
+        if(changeRole) {
+            emit data_changed(index,changeRole);
+            return true;
+        }
     }
     return false;
 }
@@ -94,6 +95,15 @@ QVariant node_index::data(int role) const
     {return m_model ? m_model->data(*this, role) : QVariant();}
 
 node_index node_index::first() const noexcept {
+    if(is_valid()) {
+        auto ind = *this;
+        ind.m_iter.to_first();
+        return ind;
+    }
+    return node_index();
+}
+
+node_index node_index::first_brother() const noexcept {
     if(is_valid()) {
         auto ind = *this;
         ind.m_iter.to_first_brother();
@@ -109,13 +119,22 @@ flag node_index::flags() const
 node_index node_index::last() const noexcept {
     if(is_valid()) {
         auto ind = *this;
+        ind.m_iter.to_last();
+        return ind;
+    }
+    return node_index();
+}
+
+node_index node_index::last_brother() const noexcept {
+    if(is_valid()) {
+        auto ind = *this;
         ind.m_iter.to_last_brother();
         return ind;
     }
     return node_index();
 }
 
-node_index node_index::next_brother() const noexcept {
+node_index node_index::next() const noexcept {
     if(is_valid()) {
         auto ind = *this;
         ind.m_iter.to_next();
@@ -133,7 +152,7 @@ node_index node_index::parent() const noexcept {
     return node_index();
 }
 
-node_index node_index::prev_brother() const noexcept {
+node_index node_index::prev() const noexcept {
     if(is_valid()) {
         auto ind = *this;
         ind.m_iter.to_prev();

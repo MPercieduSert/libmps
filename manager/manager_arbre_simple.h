@@ -17,6 +17,7 @@ protected:
 public:
     using abstract_manager_arbre<Ent>::abstract_manager_arbre;
     using ma_sql::exists;
+    using ma_sql::get;
     using ma_sql::get_list;
     using ma_sql::get_list_id;
     using ma_sql::name;
@@ -26,6 +27,47 @@ public:
 
     //! Supprime de la base de donnée le noeud d'identifiant id ainsi que tous ses déscendants (opération stable).
     bool del(idt id) override;
+
+    //! Renvoie le descendant direct du parent d'identifiant id_parent de position pos dans la fratrie.
+    Ent get_child(idt id_parent, int num) override {
+        auto ids = get_list_childs_id(id_parent);
+        Ent ent;
+        if(!ids.empty()) {
+            if(num == 0)
+                ent.set_id(ids.front());
+            if(num >= 0 && static_cast<szt>(num) < ids.size()) {
+                auto it = std::next(ids.cbegin(),num);
+                ent.set_id(*it);
+            }
+            else if(num < 0 && static_cast<szt>(-num) <= ids.size()) {
+                auto it = std::next(ids.crbegin(),-num);
+                ent.set_id(*it);
+            }
+            if(ent.id())
+                get(ent);
+        }
+        return ent;
+    }
+
+    //! Renvoie l'identifiant du descendant direct du parent d'identifiant id_parent de position pos dans la fratrie.
+    idt get_id_child(idt id_parent, int num) override {
+        auto ids = get_list_childs_id(id_parent);
+        if(!ids.empty()) {
+            if(num == 0)
+                return ids.front();
+            if(num == -1)
+                return ids.back();
+            if(num >= 0 && static_cast<szt>(num) < ids.size()) {
+                auto it = std::next(ids.cbegin(),num);
+                return *it;
+            }
+            else if(num < 0 && static_cast<szt>(-num) <= ids.size()) {
+                auto it = std::next(ids.crbegin(),-num);
+                return *it;
+            }
+        }
+        return 0;
+    }
 
     //! Renvoie le liste des descendant direct d'entity.
     vector_ptr<Ent> get_list_childs(const Ent &ent) override
@@ -51,6 +93,11 @@ public:
     //! Renvoie la liste des identifiants des racines.
     std::list<idt> get_list_racines_id() override
         {return get_list_id(Ent::Parent,QVariant(QVariant::Int),Ent::Ordre,b2d::condition::Is);}
+
+    //! Teste si le noeud d'identifiant id est une feuille dans la base de donnée.
+    //! Retourne vrai s'il n'existe pas.
+    bool is_leaf(idt id) override
+        {return !exists(Ent::Parent,id);}
 
     //! Test la validité de la paternité.
     bool is_valid_parent(const Ent &ent)
