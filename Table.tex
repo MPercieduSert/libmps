@@ -143,7 +143,7 @@
 		creation & dateTime&dtValide&crea & \\
 		modification & dateTime&dtCurrent& modif  & \\
 		texte & text &string& text & NULL
-	}{ }[\bdd]	
+	}{\unique{texte}}[\bdd]	
 	\&	
 	\tableEntity{CibleCommentaire}{
 		idCommentaire & uint&idSup1 & idCm &\\
@@ -428,7 +428,7 @@
 			ref&text&ref&ref&NULL
 		}{
 			\fkey{id}{ArbreMotCle}\\
-			\unique{ref}
+			\unique{ref}\\
 			ArbreModifControle*
 		}[\bdd]
 		\&
@@ -484,7 +484,7 @@
 			type&uint&idSup0&tp&\\
 			num&int&intSup0&num&
 		}{
-			\unique{num}
+			\unique{type,num}
 		}[\bdd]\\
 		\hline\\
 	};
@@ -529,7 +529,7 @@
 			creation&dateTime&dtValide&crea&\\
 			modification&dateTime&dtCurrent&modif&\\
 			texte&text&string&txt&NULL
-		}{}[\bdd]
+		}{\unique{texte}}[\bdd]
 		\&
 		\tableEntity{TexteCible}{
 			idTexte&uint&idSup1&idTxt&\\

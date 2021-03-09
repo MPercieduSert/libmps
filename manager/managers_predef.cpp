@@ -5,11 +5,13 @@ using namespace  mps::entities;
 
 void managers_predef::enable_commentaire(const QString &table, const QString &cible_table) {
     //Commentaire
-    info_bdd info_commentaire("commentaire",table,commentaire::Nbr_Att);
+    using unique_commentaire = texte_unique_sql<commentaire>;
+    info_bdd info_commentaire("commentaire",table,commentaire::Nbr_Att,{unique_commentaire::Nbr_Unique});
     info_commentaire.set_attribut(commentaire::Creation,"crea",b2d::type_attribut_bdd::Date_Time);
     info_commentaire.set_attribut(commentaire::Modification,"modif",b2d::type_attribut_bdd::Date_Time);
     info_commentaire.set_attribut(commentaire::Texte,"txt",b2d::type_attribut_bdd::Text,false);
-    set_manager<commentaire>(std::make_unique<manager_sql<commentaire>>(info_commentaire));
+    info_commentaire.set_unique(commentaire::Texte,unique_commentaire::Texte_Unique);
+    set_manager<commentaire>(std::make_unique<manager_sql<commentaire>>(info_commentaire, std::make_unique<unique_commentaire>()));
     set_cible<commentaire>(b2d::cible_id::Commentaire);
 
     //commentaire_cible
@@ -286,11 +288,13 @@ void managers_predef::enable_restriction(const QString &table) {
 void managers_predef::enable_texte(const QString &table, const QString &cible_table,
                                    const QString &source_table, const QString &texte_source_table) {
     //Texte
-    info_bdd info_texte("texte",table,texte::Nbr_Att);
+    using unique_texte = texte_unique_sql<texte>;
+    info_bdd info_texte("texte",table,texte::Nbr_Att,{unique_texte::Nbr_Unique});
     info_texte.set_attribut(texte::Creation,"crea",b2d::type_attribut_bdd::Date_Time);
     info_texte.set_attribut(texte::Modification,"modif",b2d::type_attribut_bdd::Date_Time);
     info_texte.set_attribut(texte::Texte,"txt",b2d::type_attribut_bdd::Text,false);
-    set_manager<texte>(std::make_unique<manager_sql<texte>>(info_texte));
+    info_texte.set_unique(texte::Texte,unique_texte::Texte_Unique);
+    set_manager<texte>(std::make_unique<manager_sql<texte>>(info_texte,std::make_unique<unique_texte>()));
     set_cible<texte>(b2d::cible_id::Texte);
 
     //texte_cible
