@@ -67,32 +67,13 @@ public:
         QString nom;      //!< Nom de la colonne.
     };
 
-    //! position des sous-noeud.
-    enum position_node {Zero_Position,
-                      Un_Position,
-                      Deux_Position,
-                      Trois_Position,
-                      Quatre_Position,
-                      Cinq_Position,
-                      Negation_Position = Zero_Position,
-                      Colonne_Position = Un_Position,
-                      Comparaison_Position = Deux_Position,
-                      Operation_Choice_Position = Zero_Position,
-                      Operation_Operation_Position = Un_Position,
-                      True_Position = Deux_Position,
-                      False_Position = Trois_Position,
-                      Date_Position = Trois_Position,
-                      Texte_Position = Deux_Position,
-                      Case_Position = Trois_Position,
-                      Regex_Position = Quatre_Position};
-
     //! Nombre de sous-noueds.
-    enum data_count_node {
-        Bool_Data_Count = 4,
-        Date_Data_Count = 4,
-        Choice_Data_Count = 1,
-        Operation_Data_Count = 2,
-        Texte_Data_Count = 5};
+    enum nombre_sub_node {
+        Bool_Nombre = 4,
+        Date_Nombre = 4,
+        Choice_Nombre = 1,
+        Operation_Nombre = 2,
+        Texte_Nombre = 5};
 
 protected:
     std::vector<colonne_info> m_colonnes;   //!< Informations sur les colonnes.
@@ -164,6 +145,11 @@ protected:
 public:
     enum {Vide = -1,
           No_Colonne = 0};
+
+    //! position des sous-noeud.
+    enum position_node {Negation_Position = Un_Sub_Node,
+                      Colonne_Operation_Position = Deux_Sub_Node};
+
     //! Constructeur.
     find_node(find_model *model, numt pos, int type = No_Type)
         : item_node(type), m_model(model), m_pos(pos) {}
@@ -172,9 +158,6 @@ public:
 
     //! Accesseur des données du noeud.
     QVariant data(int cible, int role, numt num = 0) const override;
-
-    //! Nombre de donnée associé au noeud pour une cible donnée.
-    post data_count(int cible) const override;
 
     //! Test si le noeud n'intervient pas dans la recherche.
     virtual bool empty() const
@@ -210,6 +193,8 @@ class comparaison_node : public find_node {
 protected:
     numt m_comp;    //!< Indice de la comparaison.
 public:
+    //! position des sous-noeud.
+    enum position_node {Comparaison_Position = Trois_Sub_Node};
     static const std::array<QString, find_model::Nbr_Comparaison> Strings;        //!< Labels des comparaisons.
     //! Constructeur.
     comparaison_node(find_model *model, numt pos, numt comp = find_model::Egal,int type = No_Type)
@@ -234,6 +219,9 @@ protected:
     QString m_false_label;  //!< Label du filtre faux.
     QString m_true_label;   //!< Label du filtre faux.
 public:
+    //! position des sous-noeud.
+    enum position_node {True_Position = Trois_Sub_Node,
+                      False_Position = Quatre_Sub_Node};
     //! Constructeur.
     bool_node(find_model *model, numt pos, const QString &false_label = QString(), const QString true_label = QString(),
              bool true_checked = true, bool false_checked = true)
@@ -248,9 +236,6 @@ public:
 
     //! Accesseur de la donnée associé à column.
     QVariant data(int type, int role, numt num = 0) const override;
-
-    //! Nombre de donnée associé au noeud pour une cible donnée.
-    numt data_count(int cible) const override;
 
     //! Test si le noeud n'intervient pas dans la recherche.
     bool empty() const override
@@ -271,6 +256,9 @@ class date_node : public comparaison_node {
 protected:
     QDate m_date;       //!< Date de filtrage.
 public:
+    //! position des sous-noeud.
+    enum position_node {Date_Position = Quatre_Sub_Node};
+
     //! Constructeur.
     date_node(find_model *model, numt pos,const QDate &date = QDate(), numt comp = find_model::Egal)
         : comparaison_node(model,pos,comp,find_model::Date_Node_Type), m_date(date) {}
@@ -282,9 +270,6 @@ public:
 
     //! Accesseur de la donnée associé à column.
     QVariant data(int type, int role, numt num = 0) const override;
-
-    //! Nombre de donnée associé au noeud pour une cible donnée.
-    numt data_count(int cible) const override;
 
     //! Test si le noeud n'intervient pas dans la recherche.
     bool empty() const override
@@ -307,6 +292,10 @@ protected:
     bool m_case;                    //!< Recherche sensible à la case.
     bool m_regex;                   //!< La recherche est une expression régulière.
 public:
+    //! position des sous-noeud.
+    enum position_node {Texte_Position = Trois_Sub_Node,
+                      Case_Position = Quatre_Sub_Node,
+                      Regex_Position = Cinq_Sub_Node};
     //! Constructeur.
     texte_node(find_model *model, numt pos,const QString &texte = QString(), bool c = false,bool regex = false)
         : find_node(model,pos,find_model::Texte_Node_Type), m_texte(texte), m_case(c), m_regex(regex) {
@@ -324,9 +313,6 @@ public:
 
     //! Accesseur de la donnée associé à column.
     QVariant data(int type, int role, numt num = 0) const override;
-
-    //! Nombre de donnée associé au noeud pour une cible donnée.
-    numt data_count(int cible) const override;
 
     //! Test si le noeud n'intervient pas dans la recherche.
     bool empty() const override

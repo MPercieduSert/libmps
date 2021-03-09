@@ -15,18 +15,25 @@ permission_model::permission_model(b2d::bdd_predef &bdd, enumt offset, QObject *
               [](const std::pair<int, QString> &p1, const std::pair<int, QString> &p2)->bool {return p1.second < p2.second;});
 }
 
-numt permission_model::data_count(const node_index &index) const {
-    switch (index.cible()) {
-    case permission_model::Nc_Cible:
-    case permission_model::Nom_Cible:
-    case permission_model::Ref_Cible:
-        return 1;
-    case permission_model::Permission_Cible:
-        return static_cast<numt>(m_cible_vec.size());
-    case Sub_Node_Cible:
-        return static_cast<numt>(m_cible_vec.size()) + m_offset;
+QVariant permission_model::data(const node_index &index, int role) const {
+    if(index.cible() == Node_Cible) {
+        if(index.num() == Node_Num) {
+            if(role == Nombre_Role)
+                return static_cast<numt>(m_cible_vec.size()) + m_offset;
+        }
+        else if (role == Cible_Role)
+            switch (index.num()) {
+            case Nc_Position:
+                return Nc_Cible;
+            case Nom_Position:
+                return Nom_Cible;
+            case Ref_Cible:
+                return Ref_Cible;
+            default:
+                return Permission_Cible;
+            }
     }
-    return item_node_model::data_count(index);
+    return item_node_bdd_model::data(index,role);
 }
 
 void permission_model::set_cible(entidt num, bool visible){

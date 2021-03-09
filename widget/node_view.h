@@ -125,8 +125,8 @@ public:
 protected:
     using sub_index = model_base::node_index::sub_index;
     std::multimap<sub_index,sub_node_widget*> m_cible_map;      //!< Association des sous-index et des sous-noeuds.
-    etat_selection m_etat_selection = Initial;                //!< État de sélection.
-    std::unique_ptr<node_painter> m_painter;                 //!< Dessineur du noeud
+    etat_selection m_etat_selection = Initial;                  //!< État de sélection.
+    std::unique_ptr<node_painter> m_painter;                    //!< Dessineur du noeud
 public:
     //! Constructeur.
     node_widget(const node_index &index, QWidget *parent = nullptr)
@@ -276,12 +276,12 @@ protected:
     using node_model = model_base::item_node_model;
     using node_index = model_base::node_index;
     using select_model = model_base::node_selection_model;
-    bool m_connexion_update_data = true;                  //!< Etat de connexion de la mise à jour des données.
-    std::unique_ptr<arc_painter> m_arc_painter;           //!< Dessine les arc.
+    bool m_connexion_update_data = true;                    //!< Etat de connexion de la mise à jour des données.
+    std::unique_ptr<arc_painter> m_arc_painter;             //!< Dessine les arc.
     node_delegate *m_delegate = nullptr;                    //!< Délégate de la vue.
     node_model *m_model = nullptr;                          //!< Model associé à la vue.
-    mode_selection m_selection_mode = Single_Selection;    //!< Mode de sélection.
-    select_model *m_selection_model = nullptr;        //!< Model de sélection.
+    mode_selection m_selection_mode = Single_Selection;     //!< Mode de sélection.
+    select_model *m_selection_model = nullptr;              //!< Model de sélection.
     std::map<void*,arc_node_view_widget *> m_arc_map;       //!< Map des arc.
 public:
 
@@ -364,13 +364,13 @@ protected slots:
 class arc_node_view_widget : public QWidget {
     Q_OBJECT
 protected:
-    bool m_draw_node = true;                         //!< Verrou de dessin des noeuds.
-    bool m_expanded = false;                        //!< Etat de la branche.
-    bool m_leaf = true;                             //!< Le noeud est une feuille.
-    const bool m_root;                              //!< Le noeud est la racine.
-    const bool m_node_arc_visible;                    //!< Le noeud et l'arc sont visible
-    node_view *m_view;                              //!< Vue contenant le widget.
-    node_widget *m_node = nullptr;            //!< Widget de noeud.
+    bool m_draw_node = true;                            //!< Verrou de dessin des noeuds.
+    bool m_expanded = false;                            //!< Etat de la branche.
+    bool m_leaf = true;                                 //!< Le noeud est une feuille.
+    const bool m_root;                                  //!< Le noeud est la racine.
+    const bool m_node_arc_visible;                      //!< Le noeud et l'arc sont visible
+    node_view *m_view;                                  //!< Vue contenant le widget.
+    node_widget *m_node = nullptr;                      //!< Widget de noeud.
     std::vector<arc_node_view_widget *> m_arc_child;    //!< Vecteur des arcs fils.
 public:
     //! Constructeur.

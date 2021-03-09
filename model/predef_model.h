@@ -42,12 +42,8 @@ public:
     b2d::bdd_predef &bdd() const
         {return static_cast<b2d::bdd_predef &>(m_bdd);}
 
-    //! Nombre de donné associé à une cible.
-    numt data_count(const node_index &index) const override;
-
-    //! Nom d'une cible.
-    const QString &nom_cible(entidt num) const
-        {return m_id_nom_vec.at(m_cible_vec.at(num)).second;}
+    //! Accesseur des données du model.
+    QVariant data(const node_index &index, int role) const override;
 
     //! Numero de cible.
     int cible(entidt num) const
@@ -56,6 +52,10 @@ public:
     //! Accesseur de la liste des cibles.
     const std::vector<std::pair<int,QString>> &id_nom_vec() const noexcept
         {return m_id_nom_vec;}
+
+    //! Nom d'une cible.
+    const QString &nom_cible(entidt num) const
+        {return m_id_nom_vec.at(m_cible_vec.at(num)).second;}
 
     //! Accesseur de l'offset de postion des cibles
     enumt offset() const noexcept
@@ -216,56 +216,45 @@ template<class Ent, class Permission> void permission_node<Ent,Permission>::add_
 template<class Ent, class Permission> QVariant permission_node<Ent,Permission>::data(int cible, int role, numt num) const {
     switch (cible) {
     case permission_model::Nc_Cible:
-        if(role == Label_Role)
+        switch (role) {
+        case Label_Role:
             return "Nom abrégé :";
-        if(role == String_Role)
+        case String_Role:
             return m_ent.nc();
+        case Type_Role:
+            return Line_Edit_Sub_Node;
+        }
         break;
     case permission_model::Nom_Cible:
-        if(role == Label_Role)
+        switch (role) {
+        case Label_Role:
             return "Nom :";
-        if(role == String_Role)
+        case String_Role:
             return m_ent.nom();
+        case Type_Role:
+            return Line_Edit_Sub_Node;
+        }
         break;
     case permission_model::Ref_Cible:
-        if(role == Label_Role)
+        switch (role) {
+        case Label_Role:
             return "Référence :";
-        if(role == String_Role)
+        case String_Role:
             return m_ent.ref();
+        case Type_Role:
+            return Line_Edit_Sub_Node;
+        }
         break;
     case permission_model::Permission_Cible:
-        if(role == Label_Role)
+        switch (role) {
+        case Label_Role:
             return m_model->nom_cible(num);
-        if(role == Num_Role)
+        case Num_Role:
             return m_permission_map.at(m_model->cible(num)).value();
-        break;
-    case Sub_Node_Cible:
-        if(role == Sub_Node_Role){
-            QList<QVariant> init;
-            if(num >= m_model->offset()) {
-                init.append(permission_model::Permission_Cible);
-                init.append(num - m_model->offset());
-                init.append(Code_Sub_Node);
-                return init;
-            }
-            switch (num) {
-            case permission_model::Nom_Position:
-                init.append(permission_model::Nom_Cible);
-                init.append(0);
-                init.append(Line_Edit_Sub_Node);
-                return init;
-            case permission_model::Nc_Position:
-                init.append(permission_model::Nc_Cible);
-                init.append(0);
-                init.append(Line_Edit_Sub_Node);
-                return init;
-            case permission_model::Ref_Position:
-                init.append(permission_model::Ref_Cible);
-                init.append(0);
-                init.append(Line_Edit_Sub_Node);
-                return init;
-            }
+        case Type_Role:
+            return Code_Sub_Node;
         }
+        break;
     }
     return item_node::data(cible,role,num);
 }

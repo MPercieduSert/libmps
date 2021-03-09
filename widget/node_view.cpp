@@ -67,9 +67,10 @@ void arc_node_view_widget::insert_nodes(numt pos, numt count){
 }
 
 void arc_node_view_widget::mousePressEvent(QMouseEvent *event) {
-    if(m_node_arc_visible &&event->button() == Qt::LeftButton) {
+    if(m_node_arc_visible && event->button() == Qt::LeftButton) {
         if(event->y() > m_node->geometry().bottom() + m_view->m_arc_painter->bottom_node_margin()
-                && event->y() <= m_node->geometry().bottom() + m_view->m_arc_painter->bottom_node_margin() + m_view->m_arc_painter->height_tool_zone()
+                && event->y() <= m_node->geometry().bottom() + m_view->m_arc_painter->bottom_node_margin()
+                                                             + m_view->m_arc_painter->height_tool_zone()
                 && event->x() < m_view->m_arc_painter->width_tool_zone(node_view::End_Of_Tool)){
             if(event->x() < m_view->m_arc_painter->width_tool_zone(node_view::Expand_Tool)) {
                 if(!m_leaf && m_node->flags().test(Expendable_FLag_Node))
@@ -97,12 +98,12 @@ void arc_node_view_widget::mousePressEvent(QMouseEvent *event) {
 void arc_node_view_widget::paintEvent(QPaintEvent */*event*/) {
     if(m_node_arc_visible)
         m_view->m_arc_painter->draw_tool_zone(this);
-    if(!m_leaf && m_node_arc_visible &&m_expanded)
+    if(!m_leaf && m_node_arc_visible && m_expanded)
         m_view->m_arc_painter->draw_arc(this);
 }
 
 void arc_node_view_widget::remove_nodes(numt pos, numt count) {
-    if(count &&pos < m_arc_child.size()) {
+    if(count && pos < m_arc_child.size()) {
         auto it = std::next(m_arc_child.begin(), pos);
         if(count == 1) {
             (*it)->deleteLater();
@@ -327,10 +328,10 @@ void node_view::update_data(const node_index &index, flag role) {
     if(m_connexion_update_data) {
         auto it = m_arc_map.find(index.internal_pointer());
         if(it != m_arc_map.end()){
-            if(index.cible() != Node_Cible)
-                it->second->node()->update_data(index,role);
-            else
+            if(index.cible() == Node_Cible && index.num() == model_base::Node_Num && role & Type_Role)
                 it->second->set_node_widget(index);
+            else
+                it->second->node()->update_data(index,role);  
         }
     }
 }
@@ -355,7 +356,7 @@ void node_widget::update_data() {
 }
 
 void node_widget::update_data(const model_base::node_index &index, flag role) {
-    if(index.cible() == model_base::Node_Cible)
+    if(index.cible() == model_base::Node_Cible && index.num() == model_base::Node_Num)
         indexed_widget::update_data(role);
     else {
         auto cible_it = m_cible_map.equal_range(index.sub());

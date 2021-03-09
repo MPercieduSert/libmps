@@ -15,7 +15,6 @@
 
 namespace mps {
 namespace widget {
-
 /*! \ingroup groupe_Widget
  *\brief Classe des sous-noeuds composés d'une case à cocher.
  */
@@ -76,7 +75,6 @@ protected:
     //! Met à jour les données du label à partir des données du model.
     void update_data_sub_node(flag role) override;
 };
-
 
 /*! \ingroup groupe_Widget
  *\brief Classe des sous-noeuds composés d'un label et d'une liste de choix.
@@ -159,6 +157,7 @@ protected:
     //! Met à jour les données du label à partir des données du model.
     void update_data_sub_node(flag role) override;
 };
+
 /*! \ingroup groupe_Widget
  *\brief Classe dessinant les nodes widgets à angles arrondis.
  */
@@ -215,6 +214,7 @@ public:
     void set_etat_selection(node_widget::etat_selection etat) override;
 };
 }
+
 namespace delegate {
 /*! \ingroup groupe_delegate
  *\brief Delegate standard à un node_view.

@@ -46,19 +46,19 @@ combo_box_sub_node_widget::combo_box_sub_node_widget(const node_index &index, QW
     m_main_layout->addWidget(m_combo_box);
     connect(m_combo_box,qOverload<int>(&QComboBox::currentIndexChanged),this,[this]() {
         if(connexion_enable())
-            m_index.model()->set_data(m_index,m_combo_box->currentData(),model_base::Int_Role);});
+            m_index.model()->set_data(m_index,m_combo_box->currentData(),model_base::Variant_Role);});
 }
 
 void combo_box_sub_node_widget::update_data_sub_node(flag role) {
     label_sub_node_widget::update_data_sub_node(role);
-    if(role.test(model_base::List_Of_Values)){
+    if(role.test(model_base::Map_Role)){
         m_combo_box->clear();
-        auto map = m_index.data(model_base::List_Of_Values).toMap();
+        auto map = m_index.data(model_base::Map_Role).toMap();
         for (auto it = map.cbegin(); it != map.cend(); ++it)
             m_combo_box->addItem(it.key(),it.value());
     }
-    if(role.test(model_base::Int_Role | model_base::List_Of_Values))
-        m_combo_box->setCurrentIndex(m_combo_box->findData(m_index.data(model_base::Int_Role).toInt()));
+    if(role.test(model_base::Variant_Role | model_base::Map_Role))
+        m_combo_box->setCurrentIndex(m_combo_box->findData(m_index.data(model_base::Variant_Role)));
 }
 
 ////////////////////////////////////////////////// label_sub_node_widget //////////////////////////////////////////
@@ -169,7 +169,7 @@ void rounded_arc_painter::draw_tool_zone(arc_node_view_widget *arc) const {
     QPen pen_disabled(QGuiApplication::palette().color(QPalette::Disabled,QPalette::WindowText));
     painter.setFont(QFont("FontAwesome"));
     //Icon : Expand
-    if(!arc->node()->index().flags().test(model_base::Expendable_FLag_Node))
+    if(!arc->node()->flags().test(model_base::Expendable_FLag_Node))
         painter.setPen(pen_disabled);
     QString str_expand;
     if(arc->leaf())
@@ -180,19 +180,19 @@ void rounded_arc_painter::draw_tool_zone(arc_node_view_widget *arc) const {
         str_expand = "\uf150";
     painter.drawText(xo,top,xEx-xo,height,Qt::AlignCenter,str_expand);
     //Icon : Elder
-    if(arc->node()->index().flags().test(model_base::Elder_Enable_Flag_Node))
+    if(arc->node()->flags().test(model_base::Elder_Enable_Flag_Node))
         painter.setPen(pen);
     else
         painter.setPen(pen_disabled);
     painter.drawText(xEx,top,xEl-xEx,height,Qt::AlignCenter,"\uf149");
     //Icon : Brother
-    if(arc->node()->index().flags().test(model_base::Brother_Enable_Flag_Node))
+    if(arc->node()->flags().test(model_base::Brother_Enable_Flag_Node))
         painter.setPen(pen);
     else
         painter.setPen(pen_disabled);
     painter.drawText(xEl,top,xBr-xEl,height,Qt::AlignCenter,"\uf07e");
     //Icon : Del
-    if(arc->node()->index().flags().test(model_base::Del_Enable_Flag_Node))
+    if(arc->node()->flags().test(model_base::Del_Enable_Flag_Node))
         painter.setPen(pen);
     else
         painter.setPen(pen_disabled);
@@ -234,40 +234,36 @@ node_widget *standard_node_delegate::create_node(const node_index &index, QWidge
     Q_ASSERT(index.cible() == model_base::Node_Cible);
     auto node = new node_widget(index,parent);
     node->set_painter(std::make_unique<rounded_node_painter>());
-    auto nbr_sub_node = index.model()->data_count(index.index(model_base::Sub_Node_Cible));
-    for(numt num = 0; num != nbr_sub_node; ++num)
-        node->add_sub_node_widget(create_sub_node(index.index(model_base::Sub_Node_Cible,num),node));
+    auto nbr_sub_node = index.data(model_base::Nombre_Role).toUInt() + model_base::Off_Set_Sub_Node;
+    auto ind = index;
+    for(numt num = model_base::Off_Set_Sub_Node; num != nbr_sub_node; ++num) {
+        ind.set_num(num);
+        node->add_sub_node_widget(create_sub_node(index.index(ind.data(model_base::Cible_Role).toInt(),
+                                                              ind.data(model_base::Num_Role).toUInt()),node));
+    }
     return node;
 }
 
 sub_node_widget *standard_node_delegate::create_sub_node(const node_index &index, QWidget *parent) const {
-    Q_ASSERT(index.cible() == model_base::Sub_Node_Cible);
-    auto info = index.data(model_base::Sub_Node_Role).toList();
-    auto index_sub_node = index.index(info.at(model_base::Cible_Sub_Node).toInt(),info.at(model_base::Num_Sub_Node).toUInt());
-    switch (info.at(model_base::Type_Sub_Node).toUInt()) {
+    switch (index.data(model_base::Type_Role).toInt()) {
     case model_base::Check_Sub_Node:
-        return new check_sub_node_widget(index_sub_node,parent);
+        return new check_sub_node_widget(index,parent);
     case model_base::Combo_Box_Sub_Node:
-        return new combo_box_sub_node_widget(index_sub_node,parent);
+        return new combo_box_sub_node_widget(index,parent);
     case model_base::Date_Sub_Node:
-        return  new date_sub_node_widget(index_sub_node,parent);
+        return  new date_sub_node_widget(index,parent);
     case model_base::Label_Sub_Node:
-        return  new label_sub_node_widget(index_sub_node,parent);
+        return  new label_sub_node_widget(index,parent);
     case model_base::Line_Edit_Sub_Node:
-        return new line_edit_sub_node_widget(index_sub_node,parent);
+        return new line_edit_sub_node_widget(index,parent);
     case model_base::Texte_Edit_Sub_Node:
-        return  new texte_edit_node_widget(index_sub_node,parent);
+        return  new texte_edit_node_widget(index,parent);
     }
-    return new sub_node_widget(index_sub_node,parent);
+    return new sub_node_widget(index,parent);
 }
 
 sub_node_widget *code_standard_node_delegate::create_sub_node(const node_index &index, QWidget *parent) const {
-    Q_ASSERT(index.cible() == model_base::Sub_Node_Cible);
-    if(index.data(model_base::Sub_Node_Role).toList().at(model_base::Type_Sub_Node).toUInt() == model_base::Code_Sub_Node) {
-        auto info = index.data(model_base::Sub_Node_Role).toList();
-        auto index_sub_node = index.index(info.at(model_base::Cible_Sub_Node).toInt(),
-                                            info.at(model_base::Num_Sub_Node).toUInt());
-        return new code_sub_node_widget(m_cases,index_sub_node,parent);
-    }
+    if(index.data(model_base::Type_Role).toInt() == model_base::Code_Sub_Node)
+        return new code_sub_node_widget(m_cases,index,parent);
     return standard_node_delegate::create_sub_node(index,parent);
 }

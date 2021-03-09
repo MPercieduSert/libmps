@@ -6,13 +6,23 @@ using namespace model_base;
 //////////////////////////////////// item_node ////////////////////////////////
 item_node::~item_node() = default;
 
-QVariant item_node::data(int cible, int role, numt /*num*/) const {
+QVariant item_node::data(int cible, int role, numt num) const {
     if(cible == Node_Cible){
         switch (role) {
         case Type_Role:
-            return type();
+            if(num == Node_Num)
+                return type();
+            else
+                return item_node_model::Default_Type;
+        case Num_Role:
+            if(num != Node_Num)
+                return 0;
+            break;
         case Orientation_Role:
-            return Qt::Horizontal;
+            if(num == Node_Num)
+                return Qt::Horizontal;
+            else
+                return Qt::Vertical;
         }
     }
     return QVariant();
@@ -23,12 +33,6 @@ QVariant item_node_model::data(const node_index &index, int role) const {
     if(check_index(index))
         return m_data.get_node(index).data(index.cible(), role, index.num());
     return QVariant();
-}
-
-numt item_node_model::data_count(const node_index &index) const {
-    if(check_index(index))
-        return m_data.get_node(index).data_count(index.cible());
-    return item_node::No_Data;
 }
 
 flag item_node_model::flags(const node_index &index) const {

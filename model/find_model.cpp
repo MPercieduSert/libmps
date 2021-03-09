@@ -144,11 +144,13 @@ QVariant find_node::data(int cible, int role, numt num) const {
     switch (cible) {
     case find_model::Colonne_Cible:
         switch (role) {
-        case Int_Role:
+        case Variant_Role:
             return type() == find_model::Choice_Node_Type ? QVariant(Vide) : m_pos;
         case Label_Role:
             return "Colonne :";
-        case List_Of_Values:
+        case Type_Role:
+            return Combo_Box_Sub_Node;
+        case Map_Role:
             auto map = m_model->nom_colonnes();
             if(type() == find_model::Choice_Node_Type)
                 map.insert("",Vide);
@@ -161,15 +163,19 @@ QVariant find_node::data(int cible, int role, numt num) const {
             return m_negation ? Qt::Checked : Qt::Unchecked;
         case Label_Role:
             return "Négation";
+        case Type_Role:
+            return Check_Sub_Node;
         }
         break;
     case find_model::Op_Cible:
         switch (role) {
-        case Int_Role:
+        case Variant_Role:
             return type() == find_model::Choice_Node_Type ? QVariant(Vide) : m_pos;
         case Label_Role:
             return "Opération :";
-        case List_Of_Values:
+        case Type_Role:
+            return Combo_Box_Sub_Node;
+        case Map_Role:
             QMap<QString,QVariant> map;
             map.insert("Et",find_model::Et);
             map.insert("Ou",find_model::Ou);
@@ -179,46 +185,37 @@ QVariant find_node::data(int cible, int role, numt num) const {
             return map;
         }
         break;
-    case Sub_Node_Cible:
-        if(role == Sub_Node_Role) {
-            if(num == find_model::Negation_Position &&type() != find_model::Choice_Node_Type) {
-                QList<QVariant> init;
-                init.append(find_model::Neg_Cible);
-                init.append(0);
-                init.append(Check_Sub_Node);
-                return init;
+    case Node_Cible:
+        switch (num) {
+        case Node_Num:
+            if(role == Nombre_Role) {
+                switch (type()) {
+                case find_model::Choice_Node_Type:
+                    return find_model::Choice_Nombre;
+                case find_model::Operation_Node_Type:
+                    return find_model::Operation_Nombre;
+                }
             }
-            if(num == find_model::Negation_Position
-                    || (num == find_model::Colonne_Position &&type() != find_model::Operation_Node_Type)) {
-                QList<QVariant> init;
-                init.append(find_model::Colonne_Cible);
-                init.append(0);
-                init.append(Combo_Box_Sub_Node);
-                return init;
+            break;
+        case Negation_Position:
+            if(type() != find_model::Choice_Node_Type) {
+                if(role == Cible_Role)
+                    return find_model::Neg_Cible;
+                break;
             }
-            if(num == find_model::Operation_Operation_Position &&type() == find_model::Operation_Node_Type) {
-                QList<QVariant> init;
-                init.append(find_model::Op_Cible);
-                init.append(0);
-                init.append(Combo_Box_Sub_Node);
-                return init;
+        [[clang::fallthrough]];
+        case Colonne_Operation_Position:
+            if(role == Cible_Role) {
+                if(type() == find_model::Operation_Node_Type)
+                    return find_model::Op_Cible;
+                else
+                    return find_model::Colonne_Cible;
             }
+            break;
         }
         break;
     }
     return item_node::data(cible,role,num);
-}
-
-numt find_node::data_count(int cible) const {
-    if(cible == Sub_Node_Cible){
-        switch (type()) {
-        case find_model::Choice_Node_Type:
-            return find_model::Choice_Data_Count;
-        case find_model::Operation_Node_Type:
-            return find_model::Operation_Data_Count;
-        }
-    }
-    return item_node::data_count(cible);
 }
 
 flag find_node::set_data(int cible, const QVariant &value, int role, numt num) {
@@ -231,9 +228,9 @@ flag find_node::set_data(int cible, const QVariant &value, int role, numt num) {
         break;
     case find_model::Colonne_Cible:
     case find_model::Op_Cible:
-        if(role == Int_Role){
+        if(role == Variant_Role){
             m_pos = value.toUInt();
-            return Int_Role;
+            return Variant_Role;
         }
         break;
     }
@@ -243,11 +240,13 @@ flag find_node::set_data(int cible, const QVariant &value, int role, numt num) {
 QVariant comparaison_node::data(int cible, int role, numt num) const{
     if(cible == find_model::Comparaison_Cible){
         switch (role) {
-        case Int_Role:
+        case Variant_Role:
             return m_comp;
         case Label_Role:
             return "Comparaison :";
-        case List_Of_Values:{
+        case Type_Role:
+            return Combo_Box_Sub_Node;
+        case Map_Role:{
             QMap<QString,QVariant> map;
             map.insert("=",find_model::Egal);
             map.insert("\u2260",find_model::Different);
@@ -258,20 +257,15 @@ QVariant comparaison_node::data(int cible, int role, numt num) const{
             return map;
         }}
     }
-    else if (cible == Sub_Node_Cible &&num == find_model::Comparaison_Position) {
-        QList<QVariant> init;
-        init.append(find_model::Comparaison_Cible);
-        init.append(0);
-        init.append(Combo_Box_Sub_Node);
-        return init;
-    }
+    else if (cible == Node_Cible && num == Comparaison_Position && role == Cible_Role)
+        return find_model::Comparaison_Cible;
     return find_node::data(cible,role,num);
 }
 
 flag comparaison_node::set_data(int cible, const QVariant &value, int role, numt num) {
-    if(cible == find_model::Comparaison_Cible &&role == Num_Role) {
+    if(cible == find_model::Comparaison_Cible && role == Variant_Role) {
         m_comp = value.toUInt();
-        return Int_Role;
+        return Variant_Role;
     }
     return find_node::set_data(cible,value,role,num);
 }
@@ -279,43 +273,43 @@ flag comparaison_node::set_data(int cible, const QVariant &value, int role, numt
 QVariant bool_node::data(int cible, int role, numt num) const {
     switch (cible) {
     case find_model::True_Cible:
-        if(role == Check_State_Role)
+        switch (role) {
+        case Check_State_Role:
             return m_true ? Qt::Checked : Qt::Unchecked;
-        if(role == Label_Role)
+        case Label_Role:
             return m_true_label;
+        case Type_Role:
+            return Check_Sub_Node;
+        }
         break;
     case find_model::False_Cible:
-        if(role == Check_State_Role)
+        switch (role) {
+        case Check_State_Role:
             return m_false ? Qt::Checked : Qt::Unchecked;
-        if(role == Label_Role)
+        case Label_Role:
             return m_false_label;
+        case Type_Role:
+            return Check_Sub_Node;
+        }
         break;
-    case Sub_Node_Cible:
-        if(role == Sub_Node_Role){
-            if(num == find_model::True_Position) {
-                QList<QVariant> init;
-                init.append(find_model::True_Cible);
-                init.append(0);
-                init.append(Check_Sub_Node);
-                return init;
-            }
-            if(num == find_model::False_Position) {
-                QList<QVariant> init;
-                init.append(find_model::False_Cible);
-                init.append(0);
-                init.append(Check_Sub_Node);
-                return init;
-            }
+    case Node_Cible:
+        switch (num) {
+        case Node_Num:
+            if (role == Nombre_Role)
+                return find_model::Bool_Nombre;
+            break;
+        case True_Position:
+            if(role == Cible_Role)
+                return find_model::True_Cible;
+            break;
+        case False_Position:
+            if(role == Cible_Role)
+                return find_model::False_Cible;
+            break;
         }
         break;
     }
     return find_node::data(cible,role,num);
-}
-
-numt bool_node::data_count(int cible) const {
-    if(cible == Sub_Node_Cible)
-        return find_model::Bool_Data_Count;
-    return  find_node::data_count(cible);
 }
 
 flag bool_node::set_data(int cible, const QVariant &value, int role, numt num) {
@@ -333,27 +327,29 @@ flag bool_node::set_data(int cible, const QVariant &value, int role, numt num) {
 }
 ///////////////////////////// date_node ///////////////////////////
 QVariant date_node::data(int cible, int role, numt num) const {
-    if(cible == find_model::Date_Cible) {
-        if(role == Label_Role)
+    switch (cible) {
+    case find_model::Date_Cible:
+        switch (role) {
+        case Label_Role:
             return "Date :";
-        if(role == Date_Role)
+        case Date_Role:
             return m_date;
-    }
-    if(cible == Sub_Node_Cible &&role == Sub_Node_Role &&num == find_model::Date_Position) {
-        QList<QVariant> init;
-        init.append(find_model::Date_Cible);
-        init.append(0);
-        init.append(Date_Sub_Node);
-        return init;
+        case Type_Role:
+            return Date_Sub_Node;
+        }
+        break;
+    case Node_Cible:
+        if(num == Node_Num) {
+            if(role == Nombre_Role)
+                return find_model::Date_Nombre;
+        }
+        else if (num == Date_Position && role == Cible_Role)
+                return find_model::Date_Cible;
+        break;
     }
     return comparaison_node::data(cible,role,num);
 }
 
-numt date_node::data_count(int cible) const {
-    if(cible == Sub_Node_Cible)
-        return find_model::Date_Data_Count;
-    return  comparaison_node::data_count(cible);
-}
 
 flag date_node::set_data(int cible, const QVariant &value, int role, numt num) {
     if(cible == find_model::Date_Cible &&role == Date_Role) {
@@ -385,57 +381,52 @@ bool date_node::test_value(const QVariant &value) const {
 QVariant texte_node::data(int cible, int role, numt num) const {
     switch (cible) {
     case find_model::Texte_Cible:
-        if(role == String_Role)
+        switch (role ) {
+        case String_Role:
             return m_texte;
-        if(role == Label_Role)
+        case Label_Role:
             return "Texte :";
-        break;
-    case find_model::Case_Cible:
-        if(role == Check_State_Role)
-            return m_case ? Qt::Checked : Qt::Unchecked;
-        if(role == Label_Role)
-            return "Case";
-        break;
-    case find_model::Regex_Cible:
-        if(role == Check_State_Role)
-            return m_regex ? Qt::Checked : Qt::Unchecked;
-        if(role == Label_Role)
-            return "Expression régulière";
-        break;
-    case Sub_Node_Cible:
-        if(role == Sub_Node_Role){
-            switch (num) {
-            case find_model::Texte_Position: {
-                QList<QVariant> init;
-                init.append(find_model::Texte_Cible);
-                init.append(0);
-                init.append(Line_Edit_Sub_Node);
-                return init;
-            }
-            case find_model::Case_Position: {
-                QList<QVariant> init;
-                init.append(find_model::Case_Cible);
-                init.append(0);
-                init.append(Check_Sub_Node);
-                return init;
-            }
-            case find_model::Regex_Position: {
-                QList<QVariant> init;
-                init.append(find_model::Regex_Cible);
-                init.append(0);
-                init.append(Check_Sub_Node);
-                return init;
-            }}
+        case Type_Role:
+            return Line_Edit_Sub_Node;
         }
         break;
+    case find_model::Case_Cible:
+        switch (role) {
+        case Check_State_Role:
+            return m_case ? Qt::Checked : Qt::Unchecked;
+        case Label_Role:
+            return "Case";
+        case Type_Role:
+            return Check_Sub_Node;
+        }
+        break;
+    case find_model::Regex_Cible:
+        switch (role) {
+        case Check_State_Role:
+            return m_regex ? Qt::Checked : Qt::Unchecked;
+        case Label_Role:
+            return "Expression régulière";
+        case Type_Role:
+            return Check_Sub_Node;
+        }
+        break;
+    case Node_Cible:
+        if(num == Node_Num) {
+            if(role == Nombre_Role)
+                return find_model::Texte_Nombre;
+        }
+        else if (role == Cible_Role) {
+            switch (num) {
+            case Texte_Position:
+                return find_model::Texte_Cible;
+            case Case_Position:
+                return find_model::Case_Cible;
+            case Regex_Position:
+                return find_model::Regex_Cible;
+            }
+        }
     }
     return find_node::data(cible,role,num);
-}
-
-numt texte_node::data_count(int cible) const {
-    if(cible == Sub_Node_Cible)
-        return find_model::Texte_Data_Count;
-    return  find_node::data_count(cible);
 }
 
 flag texte_node::set_data(int cible, const QVariant &value, int role, numt num) {

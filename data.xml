@@ -1,78 +1,84 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <entities>
-<!--  type -->
- <type>
-<nom>Configuration</nom>
-<nc>config</nc>
-<ref>config_root</ref> 
-<restriction code="modification|suppression"/>
-<type_permission id_1_cible="donnee" code="visible" restriction="modification|suppression"/>
- </type>
-<type>
-<parent ref="config_root"/>
-<nom>Valeur par defaut</nom>
-<nc>defaut</nc>
-<ref>valeur_defaut</ref>
-<restriction code="modification|suppression"/>
-<type_permission id_1_cible="donnee" code="visible|attribuable" restriction="modification|suppression"/>
-</type> 
- <type>
-<nom>source</nom>
-<nc>source</nc>
-<ref>source_root</ref> 
-<restriction code="modification|suppression"/>
- </type>
- <type>
- <nom>Événement</nom>
- <nc>Événement</nc>
- <ref>evenement_root</ref>
- <restriction code="modification|suppression"/>
- <type_permission id_1_cible="evenement" code="visible" restriction="modification|suppression"/>
- </type>
- 
- <!-- donnee -->
- <donnee>
- <nom>Configuration</nom>
- <ref>config_root</ref>
- <type ref="config_root"/> 
- <tp_val>no_donnee</tp_val>
- <restriction code="modification|suppression"/>
- </donnee>
- <donnee>
- <arbre ref_parent="config_root"/>
- <nom>Valeur par defaut</nom>
- <ref>valeur_defaut</ref>
- <type ref="config_root"/> 
- <tp_val>no_donnee</tp_val>
- <restriction code="modification|suppression"/>
- </donnee>
- <donnee>
-   <arbre ref_parent="valeur_defaut"/>
-  <nom>Date par defaut</nom>
-  <ref>date_defaut</ref>
- <type ref="valeur_defaut"/>
- <tp_val>Date</tp_val>
-  <restriction code="modification|suppression"/>
- </donnee>
- 
- <!-- evenement -->
- <evenement_style>
- <nom>Style par défaut</nom>
- <bordure type="enum">solid_line</bordure>
- <couleur_bordure type="couleur">black</couleur_bordure>
- <couleur_fond type="couleur">gray</couleur_fond>
- <couleur_texte type="couleur">black</couleur_texte>
- <couleur_titre type="couleur">black</couleur_titre>
- <forme type="enum">rectangle</forme>
- <police_texte type="police">
- <famille>Times</famille>
- <taille>10</taille>
- </police_texte>
- <police_titre type="police">
-<famille>Times</famille>
-<taille>14</taille>
-<poids>bold</poids> 
- </police_titre>
- <texture>solid_pattern</texture>
- </evenement_style>
+  <!--  type -->
+  <type>
+    <nom>Configuration</nom>
+    <nc>config</nc>
+    <ref>config_root</ref>
+    <restriction code="modification|suppression"/>
+    <type_permission id_1_cible="donnee" code="visible" restriction="modification|suppression"/>
+  </type>
+  <type>
+    <parent ref="config_root"/>
+    <nom>Valeur par defaut</nom>
+    <nc>defaut</nc>
+    <ref>valeur_defaut</ref>
+    <restriction code="modification|suppression"/>
+    <type_permission id_1_cible="donnee" code="visible|attribuable" restriction="modification|suppression"/>
+  </type>
+  <type>
+    <nom>Événement</nom>
+    <nc>Événement</nc>
+    <ref>evenement_root</ref>
+    <restriction code="modification|suppression"/>
+    <type_permission id_1_cible="evenement" code="visible" restriction="modification|suppression"/>
+  </type>
+  <type>
+    <nom>source</nom>
+    <nc>source</nc>
+    <ref>source_root</ref>
+    <restriction code="modification|suppression"/>
+    <type_permission id_1_cible="source" code="visible" restriction="modification|suppression"/>
+  </type>
+  <type>
+    <nom>Texte</nom>
+    <nc>Texte</nc>
+    <ref>texte_root</ref>
+    <restriction code="modification|suppression"/>
+    <type_permission id_1_cible="texte_cible" code="visible" restriction="modification|suppression"/>
+  </type>
+  <!-- donnee -->
+  <donnee>
+    <nom>Configuration</nom>
+    <ref>config_root</ref>
+    <type ref="config_root"/>
+    <tp_val>no_donnee</tp_val>
+    <restriction code="modification|suppression"/>
+  </donnee>
+  <donnee>
+    <arbre ref_parent="config_root"/>
+    <nom>Valeur par defaut</nom>
+    <ref>valeur_defaut</ref>
+    <type ref="config_root"/>
+    <tp_val>no_donnee</tp_val>
+    <restriction code="modification|suppression"/>
+  </donnee>
+  <donnee>
+    <arbre ref_parent="valeur_defaut"/>
+    <nom>Date par defaut</nom>
+    <ref>date_defaut</ref>
+    <type ref="valeur_defaut"/>
+    <tp_val>Date</tp_val>
+    <restriction code="modification|suppression"/>
+  </donnee>
+  <!-- evenement -->
+  <evenement_style>
+    <nom>Style par défaut</nom>
+    <bordure type="enum">solid_line</bordure>
+    <couleur_bordure type="couleur">black</couleur_bordure>
+    <couleur_fond type="couleur">gray</couleur_fond>
+    <couleur_texte type="couleur">black</couleur_texte>
+    <couleur_titre type="couleur">black</couleur_titre>
+    <forme type="enum">rectangle</forme>
+    <police_texte type="police">
+      <famille>Times</famille>
+      <taille>10</taille>
+    </police_texte>
+    <police_titre type="police">
+      <famille>Times</famille>
+      <taille>14</taille>
+      <poids>bold</poids>
+    </police_titre>
+    <texture>solid_pattern</texture>
+  </evenement_style>
 </entities>
