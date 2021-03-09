@@ -119,7 +119,7 @@ public:
     ~table_model() override = default;
 
     //! Recherche les lignes de données vérifiant les conditions d'un modéle de recherche donné.
-    void find(Abstract_Find_Model *find_model) override;
+    void find(abstract_find_model *find_model) override;
 
     //! Drapeaux d'un item
     Qt::ItemFlags flags(const QModelIndex &index) const override;

@@ -132,8 +132,8 @@ void arc_node_view_widget::remove_nodes(numt pos, numt count) {
 }
 
 void arc_node_view_widget::set_expanded(bool bb){
-    if(m_expanded != bb) {
-        m_expanded = bb;
+    if(m_expanded != bb && !m_leaf) {
+        m_expanded = bb && !m_leaf;
         if(m_expanded) {
             auto index = m_node->index();
             m_arc_child.resize(index.child_count());
@@ -154,7 +154,7 @@ void arc_node_view_widget::set_expanded(bool bb){
 }
 
 void arc_node_view_widget::set_leaf(bool bb) {
-    if((bb &&!m_leaf) || (m_leaf &&!bb)){
+    if((bb && !m_leaf) || (m_leaf && !bb)){
         m_leaf = bb;
         m_expanded = false;
         repaint();

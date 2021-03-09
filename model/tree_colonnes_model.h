@@ -28,7 +28,7 @@ public:
     ~tree_colonnes_model() override = default;
 
     //! Recherche les lignes de données vérifiant les conditions d'un modéle de recherche donné.
-    void find(Abstract_Find_Model *find_model) override;
+    void find(abstract_find_model *find_model) override;
 
     //! Insert count lignes dans le model juste avant la ligne row.
     bool insertRows(int row, int count, const QModelIndex &parent = QModelIndex()) override;

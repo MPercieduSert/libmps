@@ -693,7 +693,7 @@ bdd::vector_id_name bdd::table_entity_names(bool arbre) const {
     for(entidt i = 0; i < nbr_entity(); ++i) {
         if(managers().valide(i)) {
             vec.emplace_back(i,managers().info(i).name());
-            if(arbre &&!managers().get(i).info_arbre().name().isEmpty())
+            if(arbre && !managers().get(i).info_arbre().name().isEmpty())
                 vec.emplace_back(-i,managers().get(i).info_arbre().name());
         }
     }

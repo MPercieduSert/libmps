@@ -70,12 +70,16 @@ public:
     }
 
     //! Renvoie le liste des descendant direct d'entity.
-    vector_ptr<Ent> get_list_childs(const Ent &ent) override
-        {return get_list(Ent::Parent,ent.id(),Ent::Ordre);}
+    vector_ptr<Ent> get_list_childs(const Ent &ent, typename Ent::position ordre = Ent::Ordre) override {
+        return ent.id() ? get_list(Ent::Parent,ent.id(),ordre)
+                        : get_list(Ent::Parent,QVariant(QVariant::Int),ordre,mps::b2d::Is);
+    }
 
     //! Renvoie le liste des identifiants des descendant direct de l'entité d'identifiant id.
-    std::list<idt> get_list_childs_id(idt id) override
-        {return get_list_id(Ent::Parent,id,Ent::Ordre);}
+    std::list<idt> get_list_childs_id(idt id,typename Ent::position ordre = Ent::Ordre) override{
+        return id ? get_list_id(Ent::Parent,id,ordre)
+                  : get_list_id(Ent::Parent,QVariant(QVariant::Int),ordre,mps::b2d::Is);
+    }
 
     //! Renvoie le liste des identifiants des descendant direct de l'entité d'identifiant id
     //! ainsi que si ce descendant est une feuille ou non.
@@ -89,10 +93,6 @@ public:
         }
         return liste;
     }
-
-    //! Renvoie la liste des identifiants des racines.
-    std::list<idt> get_list_racines_id() override
-        {return get_list_id(Ent::Parent,QVariant(QVariant::Int),Ent::Ordre,b2d::condition::Is);}
 
     //! Teste si le noeud d'identifiant id est une feuille dans la base de donnée.
     //! Retourne vrai s'il n'existe pas.

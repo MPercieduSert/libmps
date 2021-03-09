@@ -101,30 +101,24 @@ public:
         {return m_manager_arbre.get_parent(id);}
 
     //! Renvoie le liste des descendant direct d'entity.
-    vector_ptr<Ent> get_list_childs(const Ent &ent) override {
-        auto node_childs = get_list_childs_id(ent.id());
-        vector_ptr<Ent> ent_childs(node_childs.size());
-        auto it_vec = ent_childs.begin();
-        for(auto it = node_childs.cbegin(); it != node_childs.cend(); ++it) {
-            it_vec->set_id(*it);
-            get(*it_vec);
-         }
-        return ent_childs;
+    vector_ptr<Ent> get_list_childs(const Ent &ent, typename Ent::position ordre = Ent::Id) override {
+        return ent.id() ? ma_sql::get_list_join(m_manager_arbre.table(),m_manager_arbre.attribut(arbre::Id),
+                                     m_manager_arbre.attribut(arbre::Parent),ent.id(),ordre)
+                        : ma_sql::get_list_join(m_manager_arbre.table(),m_manager_arbre.attribut(arbre::Id),
+                                                m_manager_arbre.attribut(arbre::Parent),QVariant(QVariant::Int),ordre,b2d::Is);
     }
 
-    //! Renvoie le liste des identifiants des descendant direct de l'entité d'identifiant id.
-    std::list<idt> get_list_childs_id(idt id) override
-        {return m_manager_arbre.get_list_id(arbre::Parent,id,arbre::Num);}
+    //! Renvoie le liste des identifiants des descendant direct de l'entité d'identifiant id (ordre inactif) .
+    std::list<idt> get_list_childs_id(idt id,typename Ent::position /*ordre*/ = Ent::Id) override {
+        return id ? m_manager_arbre.get_list_id(arbre::Parent,id,arbre::Num)
+                  : m_manager_arbre.get_list_id(arbre::Parent,QVariant(QVariant::Int),arbre::Id,mps::b2d::Is);
+    }
 
     //! Renvoie le liste des identifiants des descendant direct de l'entité d'identifiant id
     //! ainsi que si ce descendant est une feuille ou non.
     std::vector<std::pair<idt,bool>> get_list_childs_id_leaf(idt id) override
-        {return m_manager_arbre.get_list(arbre::Parent,id,arbre::Num)
+        {return m_manager_arbre.get_list(arbre::Parent,id,arbre::Num,id ? b2d::Egal : b2d::Is)
                 .vector_of([](const arbre &node){return std::pair<idt,bool>(node.id(),node.feuille());});}
-
-    //! Renvoie la liste des identifiants des racines.
-    std::list<idt> get_list_racines_id() override
-        {return m_manager_arbre.get_list_id(arbre::Parent,QVariant(QVariant::Int),arbre::Id,b2d::condition::Is);}
 
     //! Renvoie les informations de la table arbre associée au manager.
     virtual info_bdd info_arbre() const

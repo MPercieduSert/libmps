@@ -25,7 +25,7 @@ public:
 
     //! Renvoie l'arbre de toutes les entités.
     tree<Ent> get_arbre() override {
-        auto racines = get_list_racines_id();
+        auto racines = get_list_childs_id(0);
         tree<Ent> tree;
         auto it = tree.begin();
         for(auto it_racine = racines.cbegin(); it_racine != racines.cend(); ++it_racine)
@@ -64,9 +64,6 @@ public:
         else
             throw std::invalid_argument("L'identifiant transmise en argument de get_arbre ne correspond à aucune entité.");
     }
-
-    //! Renvoie la liste des identifiants des racines.
-    virtual std::list<idt> get_list_racines_id() = 0;
 
     //! Enregistre l'arbre d'entités.
     void save(tree<Ent> &tree, b2d::tree_save n = b2d::tree_save::External_Change) override;

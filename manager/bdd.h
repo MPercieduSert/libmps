@@ -329,10 +329,10 @@ public:
                                                                             condition cond = condition::Egal, bool crois = true);
 
     //! Renvoie le liste des descendant direct d'ent.
-    template<class Ent> vector_ptr<Ent> get_list_childs(const Ent &ent);
+    template<class Ent> vector_ptr<Ent> get_list_childs(const Ent &ent, typename Ent::position ordre = Ent::Id);
 
     //! Renvoie le liste des identifiants des descendant direct de l'entité d'identifiant id.
-    template<class Ent> std::list<idt> get_list_childs_id(idt id);
+    template<class Ent> std::list<idt> get_list_childs_id(idt id, typename Ent::position ordre = Ent::Id);
 
     //! Renvoie le liste des identifiants des descendant direct de l'entité d'identifiant id
     //! ainsi que si ce descendant est une feuille ou non.
@@ -994,11 +994,11 @@ template<class Ent , class Join1, class Join2> vector_ptr<Ent> bdd::get_list(typ
                                              value_where, ordre, cond, crois);
 }
 
-template<class Ent> vector_ptr<Ent> bdd::get_list_childs(const Ent &ent)
-    {return m_manager->get<Ent>().get_list_childs(ent);}
+template<class Ent> vector_ptr<Ent> bdd::get_list_childs(const Ent &ent, typename Ent::position ordre)
+    {return m_manager->get<Ent>().get_list_childs(ent,ordre);}
 
-template<class Ent> std::list<idt> bdd::get_list_childs_id(idt id)
-    {return m_manager->get<Ent>().get_list_childs_id(id);}
+template<class Ent> std::list<idt> bdd::get_list_childs_id(idt id, typename Ent::position ordre)
+    {return m_manager->get<Ent>().get_list_childs_id(id,ordre);}
 
 template<class Ent> std::vector<std::pair<idt,bool>> bdd::get_list_childs_id_leaf(int id)
     {return m_manager->get<Ent>().get_list_childs_id_leaf(id);}

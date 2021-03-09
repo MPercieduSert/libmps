@@ -16,7 +16,7 @@ namespace model_base {
 /*! \ingroup groupe_model
  *\brief Classe mère des model de recherche.
  */
-class find_model : public item_node_model, public Abstract_Find_Model {
+class find_model : public item_node_model, public abstract_find_model {
     Q_OBJECT
 public:
     //! Type des noeuds de l'arbre.
@@ -112,7 +112,7 @@ public slots:
 
 protected:
     //! Insert un nouveau noeud.
-    //! Si le noeuds parent est un operationnode_ptr un noeud choicenode_ptr est ajouté avant pos.
+    //! Si le noeuds parent est un operation_node un noeud choice_node est ajouté avant pos.
     //! Si le noeuds parent n'est pas un operationnode_ptr, un nouveau operationnode_ptr prend sa place
     //! et le noeud parent devient l'ainé de ce nouveau et un noeud Choicenode_ptr est ajouté en cadet.
     //! Insert count noeuds de nature type avant la position pos de parent.

@@ -33,10 +33,10 @@ enum colonne_type {No_Type = -1,
 /*! \ingroup groupe_model
  *\brief Classe mère d'un modèle d'arbre de recherche.
  */
-class Abstract_Find_Model {
+class abstract_find_model {
 public:
     //! Destructeur.
-    virtual ~Abstract_Find_Model() = default;
+    virtual ~abstract_find_model() = default;
 
     //! Teste si l'arbre est réduit à sa racine.
     virtual bool root_leaf() const = 0;
@@ -239,7 +239,7 @@ public:
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
 
     //! Recherche les lignes de données vérifiant les conditions d'un modéle de recherche donné.
-    virtual void find(Abstract_Find_Model *find_model) = 0;
+    virtual void find(abstract_find_model *find_model) = 0;
 
     //! Renvoie les drapeaux associés à un index.
     Qt::ItemFlags flags(const QModelIndex &index) const override;

@@ -14,7 +14,7 @@ void predef_fen_principale::add_menu_bdd(){
 
     // Table
     m_bdd_table_menu = m_bdd_menu->addMenu("Tables");
-    auto vec = noyau()->bdd().table_entity_names();
+    auto vec = noyau()->bdd().table_entity_names(true);
     for(auto iter = vec.cbegin(); iter != vec.cend(); ++iter) {
         auto action = m_bdd_table_menu->addAction(iter->second);
         auto i =iter->first;

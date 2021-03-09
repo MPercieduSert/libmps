@@ -389,11 +389,11 @@ public:
     virtual list_ptr<Ent> get_list(const QString &condition) = 0;
 
     //! Renvoie le liste des descendant direct d'ent.
-    virtual vector_ptr<Ent> get_list_childs(const Ent &/*ent*/)
+    virtual vector_ptr<Ent> get_list_childs(const Ent &/*ent*/, typename Ent::position /*ordre*/ = Ent::Id)
         {return vector_ptr<Ent>();}
 
     //! Renvoie le liste des identifiants des descendant direct de l'entité d'identifiant id.
-    virtual std::list<idt> get_list_childs_id(idt /*id*/)
+    virtual std::list<idt> get_list_childs_id(idt /*id*/, typename Ent::position /*ordre*/ = Ent::Id)
         {return std::list<idt>();}
 
     //! Renvoie le liste des identifiants des descendant direct de l'entité d'identifiant id

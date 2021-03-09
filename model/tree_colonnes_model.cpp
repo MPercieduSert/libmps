@@ -5,7 +5,7 @@ using namespace model_base;
 
 tree_colonnes_model::tree_colonnes_model(bool racine, QObject *parent) : abstract_colonnes_model (parent), m_tree(this,racine){}
 
-void tree_colonnes_model::find(Abstract_Find_Model *find_model) {
+void tree_colonnes_model::find(abstract_find_model *find_model) {
     if(find_model) {
         beginResetModel();
             m_tree.set_tree(m_full_tree);
