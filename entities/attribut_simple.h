@@ -340,6 +340,30 @@ public:
 };
 
 /*! \ingroup groupe_attribut_entity
+ *\brief Classe mère des attributs de type datetime valide.
+ */
+class attribut_date_time_valide_or_current : public attribut_date_time {
+public:
+    CONSTR_DEFAUT(attribut_date_time_valide_or_current)
+    CONSTR_AFFECT_DEFAUT(attribut_date_time_valide_or_current)
+
+    //! Destructeur.
+    ~attribut_date_time_valide_or_current() override;
+
+    //! Accesseur de l'attribut pour la base de données.
+    QVariant get_to_bdd() const override
+        {return m_valeur.isValid() ? m_valeur : QDateTime::currentDateTime();}
+
+    //! Accesseur de l'attribut pour la base de données.
+    const QDateTime &get_to_bdd() {
+        if(m_valeur.isValid())
+            return m_valeur;
+        else
+            return m_valeur = QDateTime::currentDateTime();
+    }
+};
+
+/*! \ingroup groupe_attribut_entity
  *\brief Classe mère des attributs de type entier positif renvoyant _null pour zéro dans la base de données.
  */
 template<class T> class Attribut_zero_null : public attribut_entity_val<T> {
@@ -629,7 +653,7 @@ SINGLE_ATTRIBUT(couleur_bordure_attribut,attribut_couleur,Couleur_Bordure,couleu
 SINGLE_ATTRIBUT(couleur_fond_attribut,attribut_couleur,Couleur_Fond,couleur_fond)
 SINGLE_ATTRIBUT(couleur_texte_attribut,attribut_couleur,Couleur_Texte,couleur_texte)
 SINGLE_ATTRIBUT(couleur_titre_attribut,attribut_couleur,Couleur_Titre,couleur_titre)
-SINGLE_ATTRIBUT(creation_attribut,attribut_date_time_valide,Creation,creation)
+SINGLE_ATTRIBUT(creation_attribut,attribut_date_time_valide_or_current,Creation,creation)
 SINGLE_ATTRIBUT(date_valide_attribut,attribut_date_valide,Date,date)
 SINGLE_ATTRIBUT(date_time_current_attribut,attribut_date_time_current,Date_Time,date_time)
 SINGLE_ATTRIBUT(date_time_valide_attribut,attribut_date_time_valide,Date_Time,date_time)

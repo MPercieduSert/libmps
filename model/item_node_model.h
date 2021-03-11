@@ -63,8 +63,9 @@ enum role_node : flag::flag_type {
     Date_Role = String_Role * 0x4,                      //!< Donnée principale sous forme de date (QDate)
     Date_Time_Role = String_Role * 0x8,                 //!< Donnée principale sous forme de date et horaire (QDateTime)
     Time_Role = String_Role * 0x10,                     //!< Donnée principale sous forme d'horraire (QTime)
-    Int_Role = String_Role * 0x20,                      //!< Donnée principale sous forme d'un entier (int)
-    Num_Role = Int_Role * 0x2,                          //!< Donnée principale sous forme d'un numéro (numt)
+    Id_Role = String_Role * 0x20,                       //!< Donnée principale sous forme d'identifiant (uint)
+    Int_Role = String_Role * 0x40,                      //!< Donnée principale sous forme d'un entier (int)
+    Num_Role = Int_Role * 0x2,                          //!< Donnée principale sous forme d'un numéro (uint)
     Variant_Role = Int_Role * 0x4,                      //!< Donnée principale sous forme d'un variant (QVariant)
     Bool_Role = Int_Role * 0x8,                         //!< Donnée principale sous forme d'un booléen (bool)
     Double_Role = Int_Role * 0x10,                      //!< Donnée principale sous forme d'un double (double)
@@ -100,9 +101,9 @@ enum flag_node : flag::flag_type {
     Elder_Enable_Flag_Node = 0x20,
     Brother_Enable_Flag_Node = 0x40,
     Del_Enable_Flag_Node = 0x80,
-    Default_Falg_Node = Visible_Flag_Node | Enable_Flag_Node | Left_Clickable_Flag_Node | Selectable_Flag_Node,
-    Default_Root_Flag_Node = Default_Falg_Node | Expendable_FLag_Node | Elder_Enable_Flag_Node,
-    Default_Flag_Node = Default_Root_Flag_Node | Brother_Enable_Flag_Node | Del_Enable_Flag_Node
+    Default_Flag_Node = Visible_Flag_Node | Enable_Flag_Node | Left_Clickable_Flag_Node | Selectable_Flag_Node,
+    Default_Root_Flag_Node = Default_Flag_Node | Expendable_FLag_Node | Elder_Enable_Flag_Node,
+    Default_Node_Flag_Node = Default_Root_Flag_Node | Brother_Enable_Flag_Node | Del_Enable_Flag_Node
 };
 
 //! Numéro du noeud et des sous-noeuds.
@@ -153,9 +154,9 @@ public:
         if(cible == Node_Cible){
             if(m_iter.root())
                 return Default_Root_Flag_Node;
-            return Default_Flag_Node;
+            return Default_Node_Flag_Node;
         }
-        return Default_Falg_Node;
+        return Default_Flag_Node;
     }
 
     //! Mutateur de la donnée associé.
@@ -370,8 +371,11 @@ public:
         update_iter(index.m_iter);
     }
 
-    //! Modifie l'arbre de donnée avec F de signature node_ptr (const U &).
+    //! Modifie l'arbre de donnée avec F de signature node_ptr (tree<U>::const_abstrac_iterator).
     template<class U, class F>  void set_tree(const tree<U> &tr, F usine);
+
+    template<class U, class F>  void set_tree_ref(const tree<U> &tr, F usine)
+        {set_tree(tr,[&usine](typename tree<U>::const_abstract_iterator iter)->node_ptr{return usine(*iter);});}
 
     //! Modifie l'arbre de donnée.
     void set_root(node_ptr &&node) {
@@ -635,12 +639,12 @@ template<class Factory> std::list<node_iter> tree_for_node_model::insert_nodes(c
 
 template<class U, class F>  void tree_for_node_model::set_tree(const tree<U> &tr, F usine) {
     auto u_it = tr.cbegin();
-    set_root(usine(*u_it));
+    set_root(usine(u_it));
     auto iterT = m_tree.begin();
     while (u_it) {
         if(!u_it.leaf())
             for (auto i = u_it.cbegin_child(); i; ++i)
-                update_iter(m_tree.push_back(iterT, usine(*i)));
+                update_iter(m_tree.push_back(iterT, usine(i)));
         ++u_it;
         ++iterT;
     }

@@ -140,7 +140,7 @@ public:
 
     //! Gestionnaire de click de souris.
     void mousePressEvent(QMouseEvent *event) override {
-        if(event->button() == Qt::LeftButton &&m_flags.test(model_base::Left_Clickable_Flag_Node))
+        if(event->button() == Qt::LeftButton && m_flags.test(model_base::Left_Clickable_Flag_Node))
             emit left_clicked();
     }
 

@@ -59,7 +59,7 @@ void permission_model::set_cible(entidt num, bool visible){
 //////////////////////////////////////////////////////// mot_cle_permission_model ///////////////////////////////
 mot_cle_permission_model::mot_cle_permission_model(b2d::bdd_predef &bdd, QObject *parent)
     : permission_model(bdd,Nc_Nom_Ref_Offset,parent) {
-    m_data.set_tree(bdd.get_arbre<entities::mot_cle>(),[this](const entities::mot_cle &ent) {
+    m_data.set_tree_ref(bdd.get_arbre<entities::mot_cle>(),[this](const entities::mot_cle &ent) {
         auto node = std::make_unique<mot_cle_permission_node>(this);
         node->set_ent(ent);
         return node;
@@ -69,7 +69,7 @@ mot_cle_permission_model::mot_cle_permission_model(b2d::bdd_predef &bdd, QObject
 //////////////////////////////////////////////////////// type_permission_model ///////////////////////////////
 type_permission_model::type_permission_model(b2d::bdd_predef &bdd, QObject *parent)
     : permission_model(bdd,Nc_Nom_Ref_Offset,parent) {
-    m_data.set_tree(bdd.get_arbre<entities::type>(),[this](const entities::type &ent) {
+    m_data.set_tree_ref(bdd.get_arbre<entities::type>(),[this](const entities::type &ent) {
         auto node = std::make_unique<type_permission_node>(this);
         node->set_ent(ent);
         return node;

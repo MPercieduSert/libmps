@@ -162,7 +162,7 @@ protected:
     //! Retourne vrai s'il n'existe pas.
     bool is_leaf(idt id) override {
         arbre node(id);
-        return !get(node) || node.feuille();
+        return !m_manager_arbre.get(node) || node.feuille();
     }
 
     //! Sauve un arbre où le changement de structure consite seulement l'ajout de nouveaux noeuds.

@@ -33,7 +33,7 @@ public:
     ~abstract_tab() override = default;
 
     //! Connect l'onglet aux signaux commun à tous les onglets.
-    virtual void connect_tab(abstract_tab_module *tab) const;
+    virtual void connect_tab(abstract_tab_module *tab);
 
     //! Créateur d'onglet.
     virtual abstract_tab_module *create_tab(const tab_index &pair,
