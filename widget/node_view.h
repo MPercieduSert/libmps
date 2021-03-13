@@ -42,7 +42,7 @@ public:
 
     //! Met à jour les données à partir des données du model.
     void update_data(flag role) {
-        if(role.test(model_base::Flag_Role))
+        if(role.test(model_base::Flag_Change_Flag))
             set_flags(m_index.flags());
     }
 

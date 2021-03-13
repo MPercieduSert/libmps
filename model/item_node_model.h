@@ -32,51 +32,58 @@ enum cible_data_node {
 };
 
 //! Role des données
-enum role_node : flag::flag_type {
-    No_Role =0x0,
+enum role_node {
+    No_Role = 0x0,
     //Forme Role
-    Tool_Tip_Role = 0x1,                                //!< Info bulle (QString)
-    Status_Tip_Role = Tool_Tip_Role * 0x2,              //!< Info dans la barre de tache (QString)
-    What_This_Role = Tool_Tip_Role * 0x4,               //!< Info dans "What's this" (QString)
-    Font_Role = Tool_Tip_Role * 0x8,                    //!< Police d'affichage principale (QFont)
-    Texte_Alignement_Role = Tool_Tip_Role * 0x10,       //!< Alignement du texte principale (Qt:Alignment)
-    Background_Role = Tool_Tip_Role * 0x20,             //!< Fond du texte principale (QBrush)
-    Foreground_Role = Tool_Tip_Role * 0x40,             //!< Rendu du texte principale (QBrush)
-    Form_All_Role = Tool_Tip_Role | Status_Tip_Role | What_This_Role | Font_Role | Texte_Alignement_Role
-                    | Background_Role | Foreground_Role,
+    Tool_Tip_Role,              //!< Info bulle (QString)
+    Status_Tip_Role,            //!< Info dans la barre de tache (QString)
+    What_This_Role,             //!< Info dans "What's this" (QString)
+    Font_Role,                  //!< Police d'affichage principale (QFont)
+    Texte_Alignement_Role,      //!< Alignement du texte principale (Qt:Alignment)
+    Background_Role,            //!< Fond du texte principale (QBrush)
+    Foreground_Role,            //!< Rendu du texte principale (QBrush),
     //Label Role
-    Label_Role = Tool_Tip_Role * 0x80,                  //!< Titre (QString)
-    Font_Label_Role = Label_Role * 0x2,                 //!< Police du titre (QFont)
-    Alignement_Label_Role = Label_Role * 0x4,           //!< Alignement du texte du label (Qt:Alignment)
-    Background_Label_Role = Label_Role * 0x8,           //!< Fond du label (QBrush)
-    Foreground_Label_Role = Label_Role * 0x10,          //!< Rendu du label (QBrush)
-    Label_All_Role = Label_Role | Font_Label_Role | Alignement_Label_Role | Background_Label_Role | Foreground_Label_Role,
+    Label_Role,                 //!< Titre (QString)
+    Font_Label_Role,            //!< Police du titre (QFont)
+    Alignement_Label_Role,      //!< Alignement du texte du label (Qt:Alignment)
+    Background_Label_Role,      //!< Fond du label (QBrush)
+    Foreground_Label_Role ,     //!< Rendu du label (QBrush)
     //Configuration Role
-    Flag_Role = Label_Role * 0x20,                      //!< Code (flag)
-    Orientation_Role = Flag_Role * 0x2,                 //!< Orientation (Qt::Orientation)
-    Type_Role = Flag_Role * 0x4,                        //!< Type des donnée (int)
-    Nombre_Role = Flag_Role * 0x8,                      //!< Nombre de composants (szt)
-    Config_All_Role = Flag_Role | Orientation_Role | Type_Role,
+    Flag_Role,                  //!< Drapeaux (flag)
+    Orientation_Role,           //!< Orientation (Qt::Orientation)
+    Type_Role,                  //!< Type des donnée (int)
+    Nombre_Role,                //!< Nombre de composants (szt)
     // Donnée Principale role
-    String_Role = Flag_Role * 0x10,                     //!< Donnée principale sous forme de texte (QString)
-    Check_State_Role = String_Role * 0x2,               //!< Donnée principale sous forme d'état des cases à cocher (Qt::CheckState)
-    Date_Role = String_Role * 0x4,                      //!< Donnée principale sous forme de date (QDate)
-    Date_Time_Role = String_Role * 0x8,                 //!< Donnée principale sous forme de date et horaire (QDateTime)
-    Time_Role = String_Role * 0x10,                     //!< Donnée principale sous forme d'horraire (QTime)
-    Id_Role = String_Role * 0x20,                       //!< Donnée principale sous forme d'identifiant (uint)
-    Int_Role = String_Role * 0x40,                      //!< Donnée principale sous forme d'un entier (int)
-    Num_Role = Int_Role * 0x2,                          //!< Donnée principale sous forme d'un numéro (uint)
-    Variant_Role = Int_Role * 0x4,                      //!< Donnée principale sous forme d'un variant (QVariant)
-    Bool_Role = Int_Role * 0x8,                         //!< Donnée principale sous forme d'un booléen (bool)
-    Double_Role = Int_Role * 0x10,                      //!< Donnée principale sous forme d'un double (double)
-    Decoration_Role = Int_Role * 0x20,                  //!< Donnée principale sous forme d'image (QColor,QIcon,QPixmap)
-    String_List_Role = Int_Role * 0x40,                 //!< Donnée principale sous forme d'une liste de texte (QStringlist)
-    List_Role = Int_Role * 0x80,                        //!< Donnée principale sous forme d'une liste de variant (QList<QVariant>)
-    Map_Role = Int_Role * 0x100,                        //!< Donnée principlae sous forme d'une map (QMap<QString,QVariant>)
-    Main_All_Role = String_Role | Check_State_Role | Date_Role | Date_Time_Role | Time_Role | Int_Role | Num_Role
-                    | Variant_Role | Bool_Role | Double_Role | Decoration_Role | String_List_Role | List_Role | Map_Role,
-    All_Role = Form_All_Role | Label_All_Role | Config_All_Role | Main_All_Role,
-    Cible_Role = Int_Role,                              //!< Cible (int).
+    String_Role,                //!< Donnée principale sous forme de texte (QString)
+    Check_State_Role,           //!< Donnée principale sous forme d'état des cases à cocher (Qt::CheckState)
+    Date_Role,                  //!< Donnée principale sous forme de date (QDate)
+    Date_Time_Role,             //!< Donnée principale sous forme de date et horaire (QDateTime)
+    Time_Role,                  //!< Donnée principale sous forme d'horraire (QTime)
+    Id_Role,                    //!< Donnée principale sous forme d'identifiant (uint)
+    Cible_Role,                 //!< Cible (int).
+    Int_Role,                   //!< Donnée principale sous forme d'un entier (int)
+    Num_Role,                   //!< Donnée principale sous forme d'un numéro (uint)
+    Variant_Role,               //!< Donnée principale sous forme d'un variant (QVariant)
+    Bool_Role ,                 //!< Donnée principale sous forme d'un booléen (bool)
+    Double_Role,                //!< Donnée principale sous forme d'un double (double)
+    Decoration_Role,            //!< Donnée principale sous forme d'image (QColor,QIcon,QPixmap)
+    String_List_Role,           //!< Donnée principale sous forme d'une liste de texte (QStringlist)
+    List_Role,                  //!< Donnée principale sous forme d'une liste de variant (QList<QVariant>)
+    Map_Role ,                  //!< Donnée principlae sous forme d'une map (QMap<QString,QVariant>)
+};
+
+//! Drapeaux des signaux de modifications
+enum change_flag : flag::flag_type {
+    No_Change_Flag = 0x0,
+    Same_Change_Flag = 0x1,
+    Main_Data_Change_Flag = 0x2,
+    Main_Same_Change_Flag = Same_Change_Flag | Main_Data_Change_Flag,
+    Label_Change_Flag = 0x4,
+    Flag_Change_Flag = 0x8,
+    Setting_Change_Flag = 0x10,
+    Type_Change_Flag = 0x20,
+    All_Data_Change_Flag = Main_Same_Change_Flag | Label_Change_Flag | Flag_Change_Flag | Setting_Change_Flag
+
 };
 
 //! Types des sous-noeuds.
@@ -160,7 +167,7 @@ public:
     }
 
     //! Mutateur de la donnée associé.
-    virtual flag set_data(int /*cible*/, const QVariant &/*value*/, int /*role*/, numt /*num*/ = 0) {return No_Role;}
+    virtual flag set_data(int /*cible*/, const QVariant &/*value*/, int /*role*/, numt /*num*/ = 0) {return No_Change_Flag;}
 
     //! Accesseur du type du noeud.
     int type() const {return m_type;}
@@ -177,6 +184,7 @@ protected:
     numt m_num = 0;                                     //!< Numéro.
     node_iter m_iter = static_cast<void *>(nullptr);     //!< Itérateur pointant sur un noeud du model.
     item_node_model *m_model = nullptr;                  //!< Pointeur sur le model.
+    QObject *m_source;
     enum {root_count = 1};
 public:
     using sub_index = std::pair<int,numt>;
@@ -222,6 +230,10 @@ public:
     //! Teste si l'index est la racine.
     bool is_root() const
         {return m_iter.root();}
+
+    //! Teste si un QObject est la source.
+    bool is_source(QObject *ptr) const noexcept
+        {return m_source && m_source == ptr;}
 
     //! Teste si l'index est valide.
     bool is_valid() const noexcept
@@ -269,6 +281,10 @@ public:
     //! Mutateur de la cible.
     void set_num(numt num) noexcept
         {m_num = num;}
+
+    //! Mutateur de la source.
+    void set_source(QObject *src) noexcept
+        {m_source = src;}
 
     //! Retourne le sous index.
     sub_index sub() const noexcept

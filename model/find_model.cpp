@@ -19,7 +19,7 @@ std::list<node_iter> find_model::insert(const node_index &parent, numt pos, numt
             return item_node_model::insert(parent,pos,count,type);
         else if (count != 0 &&pos == 0) {
             node_ptr node = m_data.move_node(parent, std::make_unique<find_node>(this,Et,Operation_Node_Type));
-            emit data_changed(parent,Type_Role);
+            emit data_changed(parent,Type_Change_Flag);
             std::list<node_iter> list;
             begin_insert_nodes(parent,0,1);
                 list.push_back(m_data.push_front(parent,std::move(node)));
@@ -76,7 +76,7 @@ bool find_model::remove(const node_index &node, numt count){
                 m_data.move(node.last_brother(),node.parent());
             else
                 m_data.move(node.first_brother(),node.parent());
-            emit data_changed(node.parent(),Type_Role);
+            emit data_changed(node.parent(),Type_Change_Flag);
             return item_node_model::remove(node.first_brother(),count + 1);
         }
         else
@@ -98,7 +98,7 @@ bool find_model::set(const node_index &index, const QVariant &value, int role) {
                 m_data.set_node(index,node_condition_factory(value.toUInt()));
             else
                 static_cast<find_node &>(get_node(index)).set_pos(value.toUInt());
-            emit data_changed(index.index(Node_Cible),Type_Role);
+            emit data_changed(index.index(Node_Cible),Type_Change_Flag);
             return true;
         }
         return item_node_model::set(index,value,role);
@@ -223,14 +223,14 @@ flag find_node::set_data(int cible, const QVariant &value, int role, numt num) {
     case find_model::Neg_Cible:
         if(role == Check_State_Role){
             m_negation = value.toBool();
-            return Check_State_Role;
+            return Main_Same_Change_Flag;
         }
         break;
     case find_model::Colonne_Cible:
     case find_model::Op_Cible:
         if(role == Variant_Role){
             m_pos = value.toUInt();
-            return Variant_Role;
+            return Main_Same_Change_Flag;
         }
         break;
     }
@@ -265,7 +265,7 @@ QVariant comparaison_node::data(int cible, int role, numt num) const{
 flag comparaison_node::set_data(int cible, const QVariant &value, int role, numt num) {
     if(cible == find_model::Comparaison_Cible && role == Variant_Role) {
         m_comp = value.toUInt();
-        return Variant_Role;
+        return Main_Same_Change_Flag;
     }
     return find_node::set_data(cible,value,role,num);
 }
@@ -316,11 +316,11 @@ flag bool_node::set_data(int cible, const QVariant &value, int role, numt num) {
     if(role == Check_State_Role) {
         if(cible == find_model::True_Cible){
             m_true = value.toBool();
-            return Check_State_Role;
+            return Main_Same_Change_Flag;
         }
         if(cible == find_model::False_Cible){
             m_false = value.toBool();
-            return Check_State_Role;
+            return Main_Same_Change_Flag;
         }
     }
     return find_node::set_data(cible,value,role,num);
@@ -354,7 +354,7 @@ QVariant date_node::data(int cible, int role, numt num) const {
 flag date_node::set_data(int cible, const QVariant &value, int role, numt num) {
     if(cible == find_model::Date_Cible &&role == Date_Role) {
         m_date = value.toDate();
-        return Date_Role;
+        return Main_Same_Change_Flag;
     }
     return comparaison_node::set_data(cible,value,role,num);
 }
@@ -436,21 +436,21 @@ flag texte_node::set_data(int cible, const QVariant &value, int role, numt num) 
                 m_texte = value.toString();
                 if(m_regex)
                     m_regular.setPattern(m_texte);
-                return String_Role;
+                return Main_Same_Change_Flag;
         }
         break;
     case find_model::Case_Cible:
         if(role == Check_State_Role) {
             m_regular.setPatternOptions((m_case = value.toBool())? QRegularExpression::NoPatternOption
                                                                  : QRegularExpression::CaseInsensitiveOption);
-            return Check_State_Role;
+            return Main_Same_Change_Flag;
         }
         break;
     case find_model::Regex_Cible:
         if(role == Check_State_Role
                 &&(m_regex = value.toBool())) {
             m_regular.setPattern(m_texte);
-            return Check_State_Role;
+            return Main_Same_Change_Flag;
         }
         break;
     }

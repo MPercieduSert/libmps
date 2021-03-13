@@ -176,7 +176,7 @@ void arc_node_view_widget::set_node_widget(node_widget *widget) {
         m_node->set_etat_selection(node_widget::Current);
     else if(m_view->selection_model()->is_selected(m_node->index()))
         m_node->set_etat_selection(node_widget::Selected);
-    m_node->update_data(m_node->index(),All_Role);
+    m_node->update_data(m_node->index(),All_Data_Change_Flag);
     connect(m_node,&node_widget::left_clicked,this,[this]()
         {m_view->click_left_on(m_node->index());});
     if(m_node_arc_visible)
@@ -213,6 +213,7 @@ QSize arc_node_view_widget::sizeHint() const{
 ///////////////////////////////////////// indexed_widget /////////////////////////////////////////
 indexed_widget::indexed_widget(const node_index &index, QWidget *parent)
     : QWidget(parent), m_index(index) {
+    m_index.set_source(this);
     if(index.data(model_base::Orientation_Role).toUInt() == Qt::Horizontal)
         m_main_layout = new QHBoxLayout(this);
     else
@@ -328,7 +329,7 @@ void node_view::update_data(const node_index &index, flag role) {
     if(m_connexion_update_data) {
         auto it = m_arc_map.find(index.internal_pointer());
         if(it != m_arc_map.end()){
-            if(index.cible() == Node_Cible && index.num() == model_base::Node_Num && role & Type_Role)
+            if(index.cible() == Node_Cible && index.num() == model_base::Node_Num && role & Type_Change_Flag)
                 it->second->set_node_widget(index);
             else
                 it->second->node()->update_data(index,role);  
@@ -346,13 +347,13 @@ void node_widget::add_sub_node_widget(sub_node_widget *sub_node) {
     m_main_layout->addWidget(sub_node);
     m_cible_map.insert({sub_node->index().sub(),sub_node});
     connect(sub_node,&QObject::destroyed,this,&node_widget::remove_sub_node_widget);
-    sub_node->update_data(model_base::All_Role);
+    sub_node->update_data(model_base::All_Data_Change_Flag);
 }
 
 void node_widget::update_data() {
-    indexed_widget::update_data(model_base::All_Role);
+    indexed_widget::update_data(model_base::All_Data_Change_Flag);
     for (auto it = m_cible_map.begin(); it != m_cible_map.end(); ++it)
-        it->second->update_data(model_base::All_Role);
+        it->second->update_data(model_base::All_Data_Change_Flag);
 }
 
 void node_widget::update_data(const model_base::node_index &index, flag role) {
@@ -361,6 +362,7 @@ void node_widget::update_data(const model_base::node_index &index, flag role) {
     else {
         auto cible_it = m_cible_map.equal_range(index.sub());
         for (auto it = cible_it.first; it != cible_it.second; ++it)
-            it->second->update_data(role);
+            if(!(role & Same_Change_Flag) || !index.is_source(it->second))
+                it->second->update_data(role);
     }
 }

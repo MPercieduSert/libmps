@@ -9,16 +9,16 @@ check_sub_node_widget::check_sub_node_widget(const node_index &index, QWidget *p
     : sub_node_widget(index,parent) {
     m_check_box = new QCheckBox;
     m_main_layout->addWidget(m_check_box);
-    connect(m_check_box,&QCheckBox::stateChanged,[this]() {
+    connect(m_check_box,&QCheckBox::stateChanged,[this](){
         if(connexion_enable())
             m_index.model()->set_data(m_index,m_check_box->isChecked(),model_base::Check_State_Role);});
 }
 
 void check_sub_node_widget::update_data_sub_node(flag role) {
     sub_node_widget::update_data_sub_node(role);
-    if(role.test(model_base::Label_Role))
+    if(role.test(model_base::Label_Change_Flag))
         m_check_box->setText(m_index.data(model_base::Label_Role).toString());
-    if(role.test(model_base::Check_State_Role))
+    if(role.test(model_base::Main_Data_Change_Flag))
         m_check_box->setChecked(m_index.data(model_base::Check_State_Role).toBool());
 }
 
@@ -27,14 +27,14 @@ code_sub_node_widget::code_sub_node_widget(const code_widget::vec_option_case &c
     : label_sub_node_widget(index,parent) {
     m_code_widget = new code_widget(cases);
     m_main_layout->addWidget(m_code_widget);
-    connect(m_code_widget,&code_widget::code_changed,this,[this]() {
+    connect(m_code_widget,&code_widget::code_changed,this,[this](){
         if(connexion_enable())
             m_index.model()->set_data(m_index,m_code_widget->code().value(),model_base::Num_Role);});
 }
 
 void code_sub_node_widget::update_data_sub_node(flag role) {
     label_sub_node_widget::update_data_sub_node(role);
-    if(role.test(model_base::Num_Role))
+    if(role.test(model_base::Main_Data_Change_Flag))
         m_code_widget->set_code(m_index.data(model_base::Num_Role).toUInt());
 }
 
@@ -44,20 +44,20 @@ combo_box_sub_node_widget::combo_box_sub_node_widget(const node_index &index, QW
     m_combo_box = new QComboBox;
     m_combo_box->setSizeAdjustPolicy(QComboBox::AdjustToContents);
     m_main_layout->addWidget(m_combo_box);
-    connect(m_combo_box,qOverload<int>(&QComboBox::currentIndexChanged),this,[this]() {
+    connect(m_combo_box,qOverload<int>(&QComboBox::currentIndexChanged),this,[this](){
         if(connexion_enable())
             m_index.model()->set_data(m_index,m_combo_box->currentData(),model_base::Variant_Role);});
 }
 
 void combo_box_sub_node_widget::update_data_sub_node(flag role) {
     label_sub_node_widget::update_data_sub_node(role);
-    if(role.test(model_base::Map_Role)){
+    if(role.test(model_base::Setting_Change_Flag)){
         m_combo_box->clear();
         auto map = m_index.data(model_base::Map_Role).toMap();
         for (auto it = map.cbegin(); it != map.cend(); ++it)
             m_combo_box->addItem(it.key(),it.value());
     }
-    if(role.test(model_base::Variant_Role | model_base::Map_Role))
+    if(role.test(model_base::Main_Data_Change_Flag | model_base::Setting_Change_Flag))
         m_combo_box->setCurrentIndex(m_combo_box->findData(m_index.data(model_base::Variant_Role)));
 }
 
@@ -70,7 +70,7 @@ label_sub_node_widget::label_sub_node_widget(const node_index &index, QWidget *p
 
 void label_sub_node_widget::update_data_sub_node(flag role) {
     sub_node_widget::update_data_sub_node(role);
-    if(role.test(model_base::Label_Role))
+    if(role.test(model_base::Label_Change_Flag))
         m_label->setText(m_index.data(model_base::Label_Role).toString());
 }
 
@@ -80,14 +80,14 @@ date_sub_node_widget::date_sub_node_widget(const node_index &index, QWidget *par
     m_dateEdit = new QDateEdit;
     m_dateEdit->setCalendarPopup(true);
     m_main_layout->addWidget(m_dateEdit);
-    connect(m_dateEdit,&QDateEdit::dateChanged,this,[this]() {
+    connect(m_dateEdit,&QDateEdit::dateChanged,this,[this](){
         if(connexion_enable())
             m_index.model()->set_data(m_index,m_dateEdit->date(),model_base::Date_Role);});
 }
 
 void date_sub_node_widget::update_data_sub_node(flag role) {
     label_sub_node_widget::update_data_sub_node(role);
-    if(role.test(model_base::Date_Role))
+    if(role.test(model_base::Main_Data_Change_Flag))
         m_dateEdit->setDate(m_index.data(model_base::Date_Role).toDate());
 }
 
@@ -96,14 +96,14 @@ line_edit_sub_node_widget::line_edit_sub_node_widget(const node_index &index, QW
     : label_sub_node_widget(index,parent) {
     m_lineEdit = new QLineEdit;
     m_main_layout->addWidget(m_lineEdit);
-    connect(m_lineEdit,&QLineEdit::textChanged,this,[this]() {
+    connect(m_lineEdit,&QLineEdit::textChanged,this,[this](){
         if(connexion_enable())
             m_index.model()->set_data(m_index,m_lineEdit->text(),model_base::String_Role);});
 }
 
 void line_edit_sub_node_widget::update_data_sub_node(flag role) {
     label_sub_node_widget::update_data_sub_node(role);
-    if(role.test(model_base::String_Role))
+    if(role.test(model_base::Main_Data_Change_Flag))
         m_lineEdit->setText(m_index.data(model_base::String_Role).toString());
 }
 
@@ -112,14 +112,14 @@ texte_edit_node_widget::texte_edit_node_widget(const node_index &index, QWidget 
     : sub_node_widget(index,parent) {
     m_texteEdit = new QTextEdit;
     m_main_layout->addWidget(m_texteEdit);
-    connect(m_texteEdit,&QTextEdit::textChanged,[this]() {
+    connect(m_texteEdit,&QTextEdit::textChanged,[this](){
         if(connexion_enable())
             m_index.model()->set_data(m_index,m_texteEdit->toPlainText(),model_base::String_Role);});
 }
 
 void texte_edit_node_widget::update_data_sub_node(flag role) {
     sub_node_widget::update_data_sub_node(role);
-    if(role.test(model_base::String_Role))
+    if(role.test(model_base::Main_Data_Change_Flag))
         m_texteEdit->setPlainText(m_index.data(model_base::String_Role).toString());
 }
 

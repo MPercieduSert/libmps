@@ -307,25 +307,25 @@ template<class Ent, class Permission> flag permission_node<Ent,Permission>::
     case permission_model::Nc_Cible:
         if(role == String_Role) {
             m_ent.set_nc(value.toString());
-            return String_Role;
+            return Main_Same_Change_Flag;
         }
         break;
     case permission_model::Nom_Cible:
         if(role == String_Role) {
             m_ent.set_nom(value.toString());
-            return String_Role;
+            return Main_Same_Change_Flag;
         }
         break;
     case permission_model::Ref_Cible:
         if(role == String_Role) {
             m_ent.set_ref(value.toString());
-            return String_Role;
+            return Main_Same_Change_Flag;
         }
         break;
     case permission_model::Permission_Cible:
         if(role == Num_Role) {
             m_permission_map[m_model->cible(num)] = value.toUInt();
-            return Num_Role;
+            return Main_Same_Change_Flag;
         }
         break;
     }
