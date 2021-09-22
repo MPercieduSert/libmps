@@ -15,39 +15,36 @@ namespace model_base {
 class permission_model : public item_node_bdd_model {
     Q_OBJECT
 protected:
-    const enumt m_offset;                               //!< Offset de postion des cibles.
+    //const enumt m_offset;                               //!< Offset de postion des cibles.
     std::vector<entidt> m_cible_vec;                    //!< Vecteur de cibles à afficher.
     std::vector<std::pair<int,QString>> m_id_nom_vec;   //!< Vecteur d'information sur les cibles (cible en bdd, info).
 
 public:
     enum {Type_Node = 1,
-         Nc_Nom_Offset = 2,
-         Nc_Nom_Ref_Offset = 3};
+          Nc_Nom_Offset = 2,
+          Nc_Nom_Ref_Offset = 3};
+
     //! Cible des données du model.
-    enum data_cible {Nc_Cible,
-                    Nom_Cible,
-                    Ref_Cible,
-                    Permission_Cible};
-    //! position des sous-noeud.
-    enum position_node {Zero_Position,
-                      Un_Position,
-                      Deux_Position,
-                      Nom_Position = Zero_Position,
-                      Nc_Position = Un_Position,
-                      Ref_Position = Deux_Position};
+    enum data_cible {
+        Nc_Cible,
+        Nom_Cible,
+        Ref_Cible,
+        Permission_Cible};
+
     //! Constructeur.
-    permission_model(b2d::bdd_predef &bdd, enumt offset = Nc_Nom_Offset, QObject *parent = nullptr);
+    permission_model(b2d::bdd_predef &bdd, QObject *parent = nullptr);
 
     //! Accesseur de la base de données.
     b2d::bdd_predef &bdd() const
         {return static_cast<b2d::bdd_predef &>(m_bdd);}
 
-    //! Accesseur des données du model.
-    QVariant data(const node_index &index, int role) const override;
-
     //! Numero de cible.
     int cible(entidt num) const
         {return m_id_nom_vec.at(m_cible_vec.at(num)).first;}
+
+    //! Nombre de cible.
+    szt cible_size() const
+        {return m_cible_vec.size();}
 
     //! Accesseur de la liste des cibles.
     const std::vector<std::pair<int,QString>> &id_nom_vec() const noexcept
@@ -57,10 +54,6 @@ public:
     const QString &nom_cible(entidt num) const
         {return m_id_nom_vec.at(m_cible_vec.at(num)).second;}
 
-    //! Accesseur de l'offset de postion des cibles
-    enumt offset() const noexcept
-        {return m_offset;}
-
     //! Muateur de la présence d'une cible.
     void set_cible(entidt num, bool visible);
 };
@@ -69,12 +62,22 @@ public:
  *\brief Classe abstraite mère des neuds d'un model de permission.
  */
 class abstract_permission_node : public item_bdd_node {
+protected:
+    std::map<int,flag> m_permission_map;     //!< Map des permission du type.
+    permission_model *m_model;              //!< Pointeur sur le model.
 public:
+    //! Constructeur.
+    abstract_permission_node(permission_model *model)
+        : item_bdd_node(permission_model::Type_Node), m_model(model) {}
+
     //! Constructeur.
     using item_bdd_node::item_bdd_node;
 
     //! Ajoute une cible aux permissions.
     virtual void add_cible(int cible) = 0;
+
+    //! Accesseur des données du noeud.
+    QVariant data(int cible, int role, numt num = 0) const override;
 };
 
 /*! \ingroup groupe_model
@@ -83,13 +86,11 @@ public:
 template<class Ent, class Permission> class permission_node : public abstract_permission_node {
 protected:
     Ent m_ent;                              //!< Type associé au noeud.
-    std::map<int,flag> m_permission_map;     //!< Map des permission du type.
-    permission_model *m_model;              //!< Pointeur sur le model.
+
 public:
     enum {NoFlag = 0};
     //! Constructeur.
-    permission_node(permission_model *model)
-        : abstract_permission_node(permission_model::Type_Node), m_model(model) {}
+    using abstract_permission_node::abstract_permission_node;
 
     NODE_COPIE(permission_node)
 
@@ -213,50 +214,19 @@ template<class Ent, class Permission> void permission_node<Ent,Permission>::add_
             m_permission_map[cible] = NoFlag;
     }
 }
+
 template<class Ent, class Permission> QVariant permission_node<Ent,Permission>::data(int cible, int role, numt num) const {
-    switch (cible) {
-    case permission_model::Nc_Cible:
-        switch (role) {
-        case Label_Role:
-            return "Nom abrégé :";
-        case String_Role:
+    if(role == String_Role){
+        switch (cible) {
+        case permission_model::Nc_Cible:
             return m_ent.nc();
-        case Type_Role:
-            return Line_Edit_Sub_Node;
-        }
-        break;
-    case permission_model::Nom_Cible:
-        switch (role) {
-        case Label_Role:
-            return "Nom :";
-        case String_Role:
+        case permission_model::Nom_Cible:
             return m_ent.nom();
-        case Type_Role:
-            return Line_Edit_Sub_Node;
-        }
-        break;
-    case permission_model::Ref_Cible:
-        switch (role) {
-        case Label_Role:
-            return "Référence :";
-        case String_Role:
+        case permission_model::Ref_Cible:
             return m_ent.ref();
-        case Type_Role:
-            return Line_Edit_Sub_Node;
         }
-        break;
-    case permission_model::Permission_Cible:
-        switch (role) {
-        case Label_Role:
-            return m_model->nom_cible(num);
-        case Num_Role:
-            return m_permission_map.at(m_model->cible(num)).value();
-        case Type_Role:
-            return Code_Sub_Node;
-        }
-        break;
     }
-    return item_node::data(cible,role,num);
+    return abstract_permission_node::data(cible,role,num);
 }
 
 template<class Ent, class Permission> flag permission_node<Ent,Permission>::flags(int cible, numt num) const {
@@ -291,6 +261,7 @@ template<class Ent, class Permission> flag permission_node<Ent,Permission>::flag
     }
     return flag;
 }
+
 template<class Ent, class Permission> void permission_node<Ent,Permission>::save_permission(b2d::bdd &bdd) {
     for(auto iter = m_permission_map.cbegin(); iter != m_permission_map.cend(); ++iter) {
         Permission perm;

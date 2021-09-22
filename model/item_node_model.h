@@ -19,6 +19,7 @@ namespace mps {
 namespace model_base {
 class item_node;
 class item_node_model;
+class node_index;
 class tree_for_node_model;
 //! Classe des noeud de l'arbre de données
 using node_ptr = std::unique_ptr<item_node>;
@@ -28,6 +29,7 @@ using node_iter = tree<node_ptr>::const_iterator;
 //! Cible de donnée prédéfinies.
 enum cible_data_node {
     Node_Cible = -1,
+    No_Cible = -2,
     Externe_Cible = -3
 };
 
@@ -49,6 +51,7 @@ enum role_node {
     Background_Label_Role,      //!< Fond du label (QBrush)
     Foreground_Label_Role ,     //!< Rendu du label (QBrush)
     //Configuration Role
+    Cibles_Role,                 //!< Cibles (QList<QVariant> = QList<QPair<cible,num>>).
     Flag_Role,                  //!< Drapeaux (flag)
     Orientation_Role,           //!< Orientation (Qt::Orientation)
     Type_Role,                  //!< Type des donnée (int)
@@ -60,7 +63,6 @@ enum role_node {
     Date_Time_Role,             //!< Donnée principale sous forme de date et horaire (QDateTime)
     Time_Role,                  //!< Donnée principale sous forme d'horraire (QTime)
     Id_Role,                    //!< Donnée principale sous forme d'identifiant (uint)
-    Cible_Role,                 //!< Cible (int).
     Int_Role,                   //!< Donnée principale sous forme d'un entier (int)
     Num_Role,                   //!< Donnée principale sous forme d'un numéro (uint)
     Variant_Role,               //!< Donnée principale sous forme d'un variant (QVariant)
@@ -116,27 +118,18 @@ enum flag_node : flag::flag_type {
 //! Numéro du noeud et des sous-noeuds.
 enum num_node {
     Node_Num,
-    Un_Sub_Node,
-    Deux_Sub_Node,
-    Trois_Sub_Node,
-    Quatre_Sub_Node,
-    Cinq_Sub_Node,
-    Six_Sub_Node,
-    Sept_Sub_Node,
-    Huit_Sub_Node,
-    Neuf_Sub_Node,
-    Dix_Sub_Node,
-    Off_Set_Sub_Node = Un_Sub_Node
+    Off_Set_Num_Sub_Node
 };
 
 /*! \ingroup groupe_model
  *\brief Classe mère des noeuds.
  */
 class item_node {
+    friend item_node_model;
     friend tree_for_node_model;
 protected:
-    node_iter m_iter = static_cast<void *>(nullptr);     //! Iterateur sur le noeud de l'arbre contenant ce noeud.
-    int m_type;                                         //! type du noeud.
+    node_iter m_iter = static_cast<void *>(nullptr);    //!< Iterateur sur le noeud de l'arbre contenant ce noeud.
+    int m_type;                                         //!< type du noeud.
 public:
     enum {No_Type = -1,
           No_Data = 0};
@@ -151,7 +144,7 @@ public:
         {return std::make_unique<item_node>(*this);}
 
     //! Accesseur de la donnée associé à column.
-    virtual QVariant data(int cible, int role, numt /*num*/ = 0) const;
+    virtual QVariant data(int cible, int role, numt num = 0) const;
 
     //! Supprime les donnée du noeud.
     virtual bool del(/*b2d::bdd &*/) {return true;}
@@ -181,7 +174,7 @@ class node_index {
     friend tree_for_node_model;
 protected:
     int m_cible = Node_Cible;                            //!< Cible de l'index.
-    numt m_num = 0;                                     //!< Numéro.
+    numt m_num = 0;                                      //!< Numéro.
     node_iter m_iter = static_cast<void *>(nullptr);     //!< Itérateur pointant sur un noeud du model.
     item_node_model *m_model = nullptr;                  //!< Pointeur sur le model.
     QObject *m_source;
@@ -371,12 +364,20 @@ public:
         {set_node(to,take_node(from));}
 
     //! Ajoute un fils cadet au noeud index.
+    node_iter push_back(node_iter it, node_ptr &&node)
+        {return update_iter(m_tree.push_back(it,std::move(node)));}
+
+    //! Ajoute un fils cadet au noeud index.
     node_iter push_back(const node_index &index, node_ptr &&node)
-        {return update_iter(m_tree.push_back(index.m_iter,std::move(node)));}
+        {return push_back(index.m_iter,std::move(node));}
+
+    //! Ajoute un fils ainé au noeud index.
+    node_iter push_front(node_iter it, node_ptr &&node)
+        {return update_iter(m_tree.push_front(it,std::move(node)));}
 
     //! Ajoute un fils ainé au noeud index.
     node_iter push_front(const node_index &index, node_ptr &&node)
-        {return update_iter(m_tree.push_front(index.m_iter,std::move(node)));}
+        {return push_front(index.m_iter,std::move(node));}
 
     //! Supprime des noeuds du model.
     bool remove_nodes(const node_index &parent, numt pos, numt count);
@@ -456,6 +457,10 @@ public:
 
     //! Accesseur des données du model.
     virtual QVariant data(const node_index &index, int role) const;
+
+    //! Emet un signal de changement de données.
+    void emit_data_changed(const item_node &node, int cible, flag role, numt num = 0)
+        {emit data_changed(create_index(node.m_iter,cible,num),role);}
 
     //! Drapeaux assossiés à une donnée.
     virtual flag flags(const node_index &index) const;
@@ -644,7 +649,7 @@ template<class Factory> std::list<node_iter> tree_for_node_model::insert_nodes(c
     auto iter = parent.m_iter;
     if(pos == parent.child_count())
         for(numt i = 0; i != count; ++i)
-            list.push_back(update_iter(m_tree.push_back(iter,factory(parent, pos + i))));
+            list.push_back(push_back(iter,factory(parent, pos + i)));
     else {
         iter.to_child_u(pos);
         for(numt i = count; i != 0; --i)

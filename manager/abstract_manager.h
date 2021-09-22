@@ -63,7 +63,8 @@ public:
  */
 class abstract_manager {
 protected:
-    enum {No_Child = 0};
+    enum {No_Brother = 1,
+          No_Child = 0};
 public:   
     //! Constructeur.
     abstract_manager() = default;
@@ -108,6 +109,9 @@ public:
     //! ayant le même identifiant que ent.
     //! Retourne True si l'opération s'est correctement déroulée.
     virtual bool get(entity &ent) = 0;
+
+    //! Renvoie l'arbre des identifiant de racine d'identifiant id pour une entité de type arbre.
+    virtual tree<idt> get_id_arbre(idt id) = 0;
 
     //! Renvoie l'identifiant du descendant direct du parent d'identifiant id_parent de position pos dans la fratrie.
     virtual idt get_id_child(idt id_parent, int num) = 0;
@@ -202,7 +206,11 @@ public:
     }
 
     //! Renvoie le nombre de descendants directs.
-    virtual int size_child(const entity &/*ent*/)
+    virtual int size_brother(idt /*id*/)
+        {return No_Brother;}
+
+    //! Renvoie le nombre de descendants directs.
+    virtual int size_child(idt /*id*/)
         {return No_Child;}
 
     //! Test la restriction de modification de l'entité d'identifiant id.
@@ -311,6 +319,9 @@ public:
 
     //! Renvoie le descendant direct du parent d'identifiant id_parent de position pos dans la fratrie.
     virtual Ent get_child(idt id_parent, int num);
+
+    //! Renvoie l'arbre des identifiants de racine d'identifiant id pour une entité de type arbre.
+    tree<idt> get_id_arbre(idt id) override;
 
     //! Renvoie l'identifiant du descendant direct du parent d'identifiant id_parent de position pos dans la fratrie.
     idt get_id_child(idt id_parent, int num) override;
@@ -695,6 +706,10 @@ template<class Ent> tree<Ent> abstract_manager_temp<Ent>::get_arbre(idt /*id*/)
 
 template<class Ent> Ent abstract_manager_temp<Ent>::get_child(idt /*id_parent*/, int /*num*/)
     {throw std::invalid_argument(QString("La méthode 'get_child' n'est pas définie pour le manager des : ")
+                                 .append(Ent::Name()).append(".").toStdString());}
+
+template<class Ent> tree<idt> abstract_manager_temp<Ent>::get_id_arbre(idt /*id*/)
+    {throw std::invalid_argument(QString("La méthode 'get_id_arbre' n'est pas définie pour le manager des : ")
                                  .append(Ent::Name()).append(".").toStdString());}
 
 template<class Ent> idt abstract_manager_temp<Ent>::get_id_child(idt /*id_parent*/, int /*num*/)

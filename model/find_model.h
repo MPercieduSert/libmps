@@ -63,17 +63,9 @@ public:
 
    //! Structure d'informations sur une colonne du model.
     struct colonne_info {
-        int type = No_Type;      //!< Type de la colonne.
-        QString nom;      //!< Nom de la colonne.
+        int type = No_Type;     //!< Type de la colonne.
+        QString nom;            //!< Nom de la colonne.
     };
-
-    //! Nombre de sous-noueds.
-    enum nombre_sub_node {
-        Bool_Nombre = 4,
-        Date_Nombre = 4,
-        Choice_Nombre = 1,
-        Operation_Nombre = 2,
-        Texte_Nombre = 5};
 
 protected:
     std::vector<colonne_info> m_colonnes;   //!< Informations sur les colonnes.
@@ -146,10 +138,6 @@ public:
     enum {Vide = -1,
           No_Colonne = 0};
 
-    //! position des sous-noeud.
-    enum position_node {Negation_Position = Un_Sub_Node,
-                      Colonne_Operation_Position = Deux_Sub_Node};
-
     //! Constructeur.
     find_node(find_model *model, numt pos, int type = No_Type)
         : item_node(type), m_model(model), m_pos(pos) {}
@@ -193,8 +181,6 @@ class comparaison_node : public find_node {
 protected:
     numt m_comp;    //!< Indice de la comparaison.
 public:
-    //! position des sous-noeud.
-    enum position_node {Comparaison_Position = Trois_Sub_Node};
     static const std::array<QString, find_model::Nbr_Comparaison> Strings;        //!< Labels des comparaisons.
     //! Constructeur.
     comparaison_node(find_model *model, numt pos, numt comp = find_model::Egal,int type = No_Type)
@@ -219,9 +205,6 @@ protected:
     QString m_false_label;  //!< Label du filtre faux.
     QString m_true_label;   //!< Label du filtre faux.
 public:
-    //! position des sous-noeud.
-    enum position_node {True_Position = Trois_Sub_Node,
-                      False_Position = Quatre_Sub_Node};
     //! Constructeur.
     bool_node(find_model *model, numt pos, const QString &false_label = QString(), const QString true_label = QString(),
              bool true_checked = true, bool false_checked = true)
@@ -256,9 +239,6 @@ class date_node : public comparaison_node {
 protected:
     QDate m_date;       //!< Date de filtrage.
 public:
-    //! position des sous-noeud.
-    enum position_node {Date_Position = Quatre_Sub_Node};
-
     //! Constructeur.
     date_node(find_model *model, numt pos,const QDate &date = QDate(), numt comp = find_model::Egal)
         : comparaison_node(model,pos,comp,find_model::Date_Node_Type), m_date(date) {}
@@ -292,19 +272,8 @@ protected:
     bool m_case;                    //!< Recherche sensible à la case.
     bool m_regex;                   //!< La recherche est une expression régulière.
 public:
-    //! position des sous-noeud.
-    enum position_node {Texte_Position = Trois_Sub_Node,
-                      Case_Position = Quatre_Sub_Node,
-                      Regex_Position = Cinq_Sub_Node};
     //! Constructeur.
-    texte_node(find_model *model, numt pos,const QString &texte = QString(), bool c = false,bool regex = false)
-        : find_node(model,pos,find_model::Texte_Node_Type), m_texte(texte), m_case(c), m_regex(regex) {
-        if(m_regex){
-            m_regular.setPattern(m_texte);
-            if(!m_case)
-                m_regular.setPatternOptions(QRegularExpression::CaseInsensitiveOption);
-        }
-    }
+    texte_node(find_model *model, numt pos,const QString &texte = QString(), bool c = false,bool regex = false);
 
     //! Destructeur.
     ~texte_node() override = default;

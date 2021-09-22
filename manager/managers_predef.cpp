@@ -331,10 +331,12 @@ void managers_predef::enable_texte(const QString &table, const QString &cible_ta
     info_bdd info_ts(source_texte::Name(),texte_source_table,source_texte::Nbr_Att,{unique_ts::Nbr_Unique});
     info_ts.set_attribut(source_texte::Id_Source,"idSr");
     info_ts.set_attribut(source_texte::Id_Texte,"idTxt");
+    info_ts.set_attribut(source_texte::Type,"tp");
     info_ts.set_unique(source_texte::Id_Source,unique_ts::Id_1_Unique);
     info_ts.set_unique(source_texte::Id_Texte,unique_ts::Id_2_Unique);
     info_ts.set_foreign_key(source_texte::Id_Source,info_source);
     info_ts.set_foreign_key(source_texte::Id_Texte,info_texte);
+    set_type_foreign_key<source_texte>(info_ts);
     set_manager<source_texte>(std::make_unique<manager_sql<source_texte>>(info_ts, std::make_unique<unique_ts>()));
     set_cible<source_texte>(b2d::cible_id::Source_Texte);
 

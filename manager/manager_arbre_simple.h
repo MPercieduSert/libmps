@@ -17,6 +17,7 @@ protected:
 public:
     using abstract_manager_arbre<Ent>::abstract_manager_arbre;
     using ma_sql::exists;
+    using ma_sql::fonction_agrega;
     using ma_sql::get;
     using ma_sql::get_list;
     using ma_sql::get_list_id;
@@ -114,6 +115,22 @@ public:
         exception_parent_invalid(ent);
         ma_sql::save(ent);
     }
+
+    //! Renvoie le nombre de frères.
+    int size_brother(idt id) {
+        Ent entity(id);
+        if(get(entity)) {
+            if(entity.parent())
+                return size_child(entity.parent());
+            else
+                return 1;
+        }
+        return 0;
+    }
+
+    //! Renvoie le nombre de fils du noeud.
+    int size_child(idt id_parent) override
+        {return fonction_agrega(b2d::agrega::Nombre,Ent::Parent,Ent::Parent,id_parent).toInt();;}
 
     //! Retourne le type du manager.
     virtual flag type_manager() const

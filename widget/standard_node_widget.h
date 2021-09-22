@@ -142,7 +142,7 @@ protected:
 /*! \ingroup groupe_Widget
  *\brief Classe des sous-noeuds d'un texte à éditer.
  */
-class texte_edit_node_widget : public sub_node_widget {
+class texte_edit_node_widget : public label_sub_node_widget {
     Q_OBJECT
 protected:
     QTextEdit *m_texteEdit;       //! Éditeur de texte du sous-noeud.
@@ -151,8 +151,10 @@ public:
     texte_edit_node_widget(const node_index &index, QWidget *parent);
 
     //! Met à jour le widget après un changement de drapeaux.
-    void update_flags() override
-        {m_texteEdit->setReadOnly(!m_flags.test(model_base::Enable_Flag_Node));}
+    void update_flags() override {
+        label_sub_node_widget::update_flags();
+        m_texteEdit->setReadOnly(!m_flags.test(model_base::Enable_Flag_Node));
+    }
 protected:
     //! Met à jour les données du label à partir des données du model.
     void update_data_sub_node(flag role) override;

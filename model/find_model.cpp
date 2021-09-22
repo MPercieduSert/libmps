@@ -186,34 +186,16 @@ QVariant find_node::data(int cible, int role, numt num) const {
         }
         break;
     case Node_Cible:
-        switch (num) {
-        case Node_Num:
-            if(role == Nombre_Role) {
-                switch (type()) {
-                case find_model::Choice_Node_Type:
-                    return find_model::Choice_Nombre;
-                case find_model::Operation_Node_Type:
-                    return find_model::Operation_Nombre;
-                }
-            }
-            break;
-        case Negation_Position:
-            if(type() != find_model::Choice_Node_Type) {
-                if(role == Cible_Role)
-                    return find_model::Neg_Cible;
-                break;
-            }
-        [[clang::fallthrough]];
-        case Colonne_Operation_Position:
-            if(role == Cible_Role) {
-                if(type() == find_model::Operation_Node_Type)
-                    return find_model::Op_Cible;
-                else
-                    return find_model::Colonne_Cible;
-            }
-            break;
+        if(num == Node_Num && role == Cibles_Role){
+            QList<QVariant> cibles;
+            if(type() != find_model::Choice_Node_Type)
+                cibles.append(find_model::Neg_Cible);
+            if(type() == find_model::Operation_Node_Type)
+                cibles.append(find_model::Op_Cible);
+            else
+                cibles.append(find_model::Colonne_Cible);
+            return cibles;
         }
-        break;
     }
     return item_node::data(cible,role,num);
 }
@@ -257,8 +239,8 @@ QVariant comparaison_node::data(int cible, int role, numt num) const{
             return map;
         }}
     }
-    else if (cible == Node_Cible && num == Comparaison_Position && role == Cible_Role)
-        return find_model::Comparaison_Cible;
+    if(cible == Node_Cible && num == Node_Num && role == Cibles_Role)
+        return find_node::data(cible,role,num).toList() << find_model::Comparaison_Cible;
     return find_node::data(cible,role,num);
 }
 
@@ -293,21 +275,9 @@ QVariant bool_node::data(int cible, int role, numt num) const {
         }
         break;
     case Node_Cible:
-        switch (num) {
-        case Node_Num:
-            if (role == Nombre_Role)
-                return find_model::Bool_Nombre;
-            break;
-        case True_Position:
-            if(role == Cible_Role)
-                return find_model::True_Cible;
-            break;
-        case False_Position:
-            if(role == Cible_Role)
-                return find_model::False_Cible;
-            break;
-        }
-        break;
+        if(num == Node_Num && role == Cibles_Role)
+            return find_node::data(cible,role,num).toList() << find_model::True_Cible
+                                                            << find_model::False_Cible;
     }
     return find_node::data(cible,role,num);
 }
@@ -339,13 +309,8 @@ QVariant date_node::data(int cible, int role, numt num) const {
         }
         break;
     case Node_Cible:
-        if(num == Node_Num) {
-            if(role == Nombre_Role)
-                return find_model::Date_Nombre;
-        }
-        else if (num == Date_Position && role == Cible_Role)
-                return find_model::Date_Cible;
-        break;
+        if(num == Node_Num && role == Cibles_Role)
+            return comparaison_node::data(cible,role,num).toList() << find_model::Date_Cible;
     }
     return comparaison_node::data(cible,role,num);
 }
@@ -378,6 +343,15 @@ bool date_node::test_value(const QVariant &value) const {
     }
 }
 ///////////////////////////// texte_node ///////////////////////////
+texte_node::texte_node(find_model *model, numt pos,const QString &texte, bool c,bool regex)
+    : find_node(model,pos,find_model::Texte_Node_Type), m_texte(texte), m_case(c), m_regex(regex) {
+    if(m_regex){
+        m_regular.setPattern(m_texte);
+        if(!m_case)
+            m_regular.setPatternOptions(QRegularExpression::CaseInsensitiveOption);
+    }
+}
+
 QVariant texte_node::data(int cible, int role, numt num) const {
     switch (cible) {
     case find_model::Texte_Cible:
@@ -411,20 +385,10 @@ QVariant texte_node::data(int cible, int role, numt num) const {
         }
         break;
     case Node_Cible:
-        if(num == Node_Num) {
-            if(role == Nombre_Role)
-                return find_model::Texte_Nombre;
-        }
-        else if (role == Cible_Role) {
-            switch (num) {
-            case Texte_Position:
-                return find_model::Texte_Cible;
-            case Case_Position:
-                return find_model::Case_Cible;
-            case Regex_Position:
-                return find_model::Regex_Cible;
-            }
-        }
+        if(num == Node_Num && role == Cibles_Role)
+            return find_node::data(cible,role,num).toList() << find_model::Texte_Cible
+                                                            << find_model::Case_Cible
+                                                            << find_model::Regex_Cible;
     }
     return find_node::data(cible,role,num);
 }
@@ -448,7 +412,7 @@ flag texte_node::set_data(int cible, const QVariant &value, int role, numt num) 
         break;
     case find_model::Regex_Cible:
         if(role == Check_State_Role
-                &&(m_regex = value.toBool())) {
+                && (m_regex = value.toBool())) {
             m_regular.setPattern(m_texte);
             return Main_Same_Change_Flag;
         }

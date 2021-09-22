@@ -138,9 +138,13 @@ public:
     void save(const Ent &ent) override
         {save_const(ent);}
 
+    //! Renvoie le nombre de frères du noed..
+    int size_brother(idt id) override
+        {return m_manager_arbre.size_brother(id);}
+
     //! Renvoie le nombre de fils du noeud.
-    int size_child(const entity &ent) override
-        {return m_manager_arbre.size(ent.id());}
+    int size_child(idt id) override
+        {return m_manager_arbre.size(id);}
 
     //! Retourne le type du manager.
     virtual flag type_manager() const override

@@ -109,7 +109,7 @@ void line_edit_sub_node_widget::update_data_sub_node(flag role) {
 
 ////////////////////////////////////////////////// TexteEditsub_node_widget //////////////////////////////////////////
 texte_edit_node_widget::texte_edit_node_widget(const node_index &index, QWidget *parent)
-    : sub_node_widget(index,parent) {
+    : label_sub_node_widget(index,parent) {
     m_texteEdit = new QTextEdit;
     m_main_layout->addWidget(m_texteEdit);
     connect(m_texteEdit,&QTextEdit::textChanged,[this](){
@@ -118,7 +118,7 @@ texte_edit_node_widget::texte_edit_node_widget(const node_index &index, QWidget 
 }
 
 void texte_edit_node_widget::update_data_sub_node(flag role) {
-    sub_node_widget::update_data_sub_node(role);
+    label_sub_node_widget::update_data_sub_node(role);
     if(role.test(model_base::Main_Data_Change_Flag))
         m_texteEdit->setPlainText(m_index.data(model_base::String_Role).toString());
 }
@@ -234,13 +234,16 @@ node_widget *standard_node_delegate::create_node(const node_index &index, QWidge
     Q_ASSERT(index.cible() == model_base::Node_Cible);
     auto node = new node_widget(index,parent);
     node->set_painter(std::make_unique<rounded_node_painter>());
-    auto nbr_sub_node = index.data(model_base::Nombre_Role).toUInt() + model_base::Off_Set_Sub_Node;
-    auto ind = index;
-    for(numt num = model_base::Off_Set_Sub_Node; num != nbr_sub_node; ++num) {
-        ind.set_num(num);
-        node->add_sub_node_widget(create_sub_node(index.index(ind.data(model_base::Cible_Role).toInt(),
-                                                              ind.data(model_base::Num_Role).toUInt()),node));
+    auto cibles = index.data(model_base::Cibles_Role).toList();
+    for(auto it = cibles.cbegin(); it != cibles.cend(); ++it) {
+        if(it->canConvert(QMetaType::QVariantList)) {
+            auto l = it->toList();
+            node->add_sub_node_widget(create_sub_node(index.index(l.front().toInt(),l.back().toUInt()),node));
+        }
+        else
+            node->add_sub_node_widget(create_sub_node(index.index(it->toInt()),node));
     }
+
     return node;
 }
 

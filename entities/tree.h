@@ -1300,6 +1300,10 @@ public:
         return tree(pos.m_ptr);
     }
 
+    //! Renvoie la plus grande distance à l'une de ses feuilles.
+    size_type hauteur() const noexcept
+        {return cbegin().hauteur();}
+
     //! Insert un nouveau noeud de donnée data avant le noeud pointé par pos dans la fratrie sauf si le pointé est la racine,
     //! dans ce cas le nouveau noeud est inseré en tant que fils ainé. Retourne un itérateur sur ce nouveau noeud.
     template<class iter_tree> iter_tree insert(iter_tree pos, const T &data = T()) {

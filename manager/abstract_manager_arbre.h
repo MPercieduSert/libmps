@@ -18,8 +18,9 @@ protected:
     using ma_sql::del;
 public:
     using ma_sql::manager_sql;
-    using ma_sql::get_list_childs_id;
+    using ma_sql::exists;
     using ma_sql::get;
+    using ma_sql::get_list_childs_id;
     using ma_sql::is_leaf;
     using ma_sql::save;
 
@@ -45,7 +46,7 @@ public:
     tree<Ent> get_arbre(const Ent &ent) override
         {return get_arbre(ent.id());}
 
-    //! Renvoie l'arbre l'entity d'identifiant.
+    //! Renvoie l'arbre de racine d'identifiant.
     tree<Ent> get_arbre(idt id) override {
         Ent ent(id);
         if(get(ent)) {
@@ -56,6 +57,25 @@ public:
                     auto listChilds = get_list_childs_id(it->id());
                     for(auto it_child = listChilds.cbegin(); it_child != listChilds.cend(); ++it_child)
                         get(*tree.emplace_back(it,*it_child));
+                }
+                ++it;
+            }
+            return tree;
+        }
+        else
+            throw std::invalid_argument("L'identifiant transmise en argument de get_arbre ne correspond à aucune entité.");
+    }
+
+    //! Renvoie l'arbre des identifiants de racine d'identifiant id.
+    tree<idt> get_id_arbre(idt id) override {
+        if(exists(Ent(id))) {
+            tree<idt> tree(id);
+            auto it = tree.begin();
+            while(it){
+                if(!is_leaf(*it)){
+                    auto listChilds = get_list_childs_id(*it);
+                    for(auto it_child = listChilds.cbegin(); it_child != listChilds.cend(); ++it_child)
+                        tree.push_back(it,*it_child);
                 }
                 ++it;
             }

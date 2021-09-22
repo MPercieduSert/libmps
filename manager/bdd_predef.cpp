@@ -139,14 +139,59 @@ void bdd_predef::del_entity_in_donnee(idt id_cible, int cible, int num) {
     }
 }
 
+QVariant bdd_predef::donnee_ref(const QString & ref, const entity & ent, int num) {
+    donnee_cible cb;
+    cb.set_cible(cible(ent.id_entity()));
+    cb.set_id_cible(ent.id());
+    cb.set_num(num);
+    cb.set_id_donnee(ref_to_id<donnee>(ref));
+    get_unique(cb);
+    return cb.valeur();
+}
+
 void bdd_predef::hydrate_attribut_xml(entities::entity &ent, post pos, xml_iterator iter, QString &controle){
-    if(iter->has_attributes() &&iter->attributes().cbegin()->first == "type"
-                             &&iter->attributes().cbegin()->second == "cible") {
+    if(iter->has_attributes() && iter->attributes().cbegin()->first == "type"
+                             && iter->attributes().cbegin()->second == "cible") {
         auto i = m_manager->find(iter->text());
         if(i == nbr_entity())
             controle.append("Cible invalide : ").append(iter->text());
         else
             ent.set_data(pos, cible(i));
+    }
+    else if (iter->has_attributes() && iter->attributes().cbegin()->first == "cible") {
+        auto ent_cible = make_entity(iter->attributes().cbegin()->second);
+        if(!ent_cible)
+            controle.append("-> Nom d'entité inconnu : ").append(iter->attributes().cbegin()->second);
+        else {
+            auto p = position_xml(*ent_cible,"ref",controle);
+            if(controle.isEmpty()) {
+                ent_cible->set_data(p,iter->text());
+                if(!exists_unique(*ent_cible))
+                    controle.append("-> Il n'existe pas d'entité de type ")
+                        .append(iter->attributes().cbegin()->second)
+                        .append("d'attribut ref = ")
+                        .append(iter->text());
+                else {
+                    p = position_xml(ent,"cible",controle);
+                    if (controle.isEmpty()) {
+                        ent.set_data(p,cible(ent_cible->id_entity()));
+                        ent.set_data(pos,ent_cible->id());
+                    }
+                }
+            }
+        }
+    }
+    else if (ent.id_entity() == donnee_cible::ID && iter->name() == "id_donnee") {
+        if(iter->attributes().size() != 1 || iter->attributes().cbegin()->first != "ref")
+            controle.append("-> L'attribut id_donnee de donnee_cible doit-être hydraté par une attribut xml ref");
+        else {
+            auto id_dn = ref_to_id<donnee>(iter->attributes().cbegin()->second);
+            if(id_dn)
+                ent.set_data(pos,id_dn);
+            else
+                controle.append("-> Il n'existe pas de donnee de ref = ")
+                        .append(iter->attributes().cbegin()->second);
+        }
     }
     else
         bdd::hydrate_attribut_xml(ent, pos,iter,controle);
@@ -198,6 +243,23 @@ void bdd_predef::hydrate_attribut_associated_xml(entity &ent_ass, const std::pai
             }
         }
     }
+    else if (pair.first == "card") {
+        auto pos = position_xml(ent_ass,"card",controle);
+        if(controle.isEmpty()){
+            bool ok;
+            pair.second.toInt(&ok);
+            if(ok)
+                ent_ass.set_data(pos,pair.second);
+            else
+                ent_ass.set_data(pos,str_categorie_to_enum(pair.second,Style_Num,controle));
+        }
+
+    }
+    else if (pair.first == "exact") {
+        auto pos = position_xml(ent_ass,"exact",controle);
+        if(controle.isEmpty())
+            ent_ass.set_data(pos,str_id_to_enum(pair.second,donnee_card::ID,controle));
+    }
     else
         bdd::hydrate_attribut_associated_xml(ent_ass,pair,ent,controle);
 }
@@ -221,6 +283,14 @@ std::pair<int, int> bdd_predef::interval_entity_in_donnee(idt id_cible, int cibl
         interval.second += managers().nbr_att_cible(i->valeur().toInt());
     }
     return interval;
+}
+
+bool bdd_predef::is_associated_xml(xml_iterator iter, entity &ent) const {
+    if(ent.id_entity() == donnee_cible::ID && iter->name() == "id_donnee")
+        return false;
+    if(iter->attributes().size() == 1 && iter->attributes().cbegin()->first == "cible")
+        return false;
+    return bdd::is_associated_xml(iter,ent);
 }
 
 bool bdd_predef::is_multiple_associated_xml(const std::pair<const QString, QString> &pair) const {
@@ -363,6 +433,8 @@ enumt bdd_predef::str_id_to_enum(const QString &str, idt id_entity, QString &con
             return donnee_info::No_Donnee;
         if(str == "int")
             return donnee_info::Int;
+        if(str == "unsigned")
+            return donnee_info::Unsigned;
         if(str == "string")
             return donnee_info::String;
         if(str == "bool")
@@ -380,10 +452,12 @@ enumt bdd_predef::str_id_to_enum(const QString &str, idt id_entity, QString &con
         if(str == "exact")
             return donnee_info::Exact;
         if(str == "au_plus")
-            return donnee_info::AuPlus;
+            return donnee_info::Au_Plus;
         if(str == "au_moins")
-            return donnee_info::AuMoins;
+            return donnee_info::Au_Moins;
         break;
+    case donnee_cible::ID:
+        return str_categorie_to_enum(str,Style_Num,controle);
     case evenement_style::ID:
         if(str == "rectangle")
             return evenement_style::Rectangle;

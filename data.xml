@@ -6,13 +6,21 @@
     <nc>config</nc>
     <ref>config_root</ref>
     <restriction code="modification|suppression"/>
-    <type_permission id_1_cible="donnee" code="visible" restriction="modification|suppression"/>
+    <type_permission id_1_cible="donnee" code="visible|attribuable" restriction="modification|suppression"/>
   </type>
   <type>
     <parent ref="config_root"/>
     <nom>Valeur par defaut</nom>
     <nc>defaut</nc>
     <ref>valeur_defaut</ref>
+    <restriction code="modification|suppression"/>
+    <type_permission id_1_cible="donnee" code="visible|attribuable" restriction="modification|suppression"/>
+  </type>
+    <type>
+    <parent ref="config_root"/>
+    <nom>Valeur de configuration</nom>
+    <nc>valeur</nc>
+    <ref>valeur_config</ref>
     <restriction code="modification|suppression"/>
     <type_permission id_1_cible="donnee" code="visible|attribuable" restriction="modification|suppression"/>
   </type>
@@ -58,8 +66,17 @@
     <nom>Date par defaut</nom>
     <ref>date_defaut</ref>
     <type ref="valeur_defaut"/>
-    <tp_val>Date</tp_val>
+    <tp_val>date</tp_val>
     <restriction code="modification|suppression"/>
+  </donnee>
+  <donnee>
+    <arbre ref_parent="config_root"/>
+    <nom>Style de numérotation</nom>
+    <ref>style_num</ref>
+    <type ref="valeur_config"/>
+    <tp_val>int</tp_val>
+    <restriction code="modification|suppression"/>
+    <donnee_card id_1_cible="type" card="1" exact="au_moins"/>
   </donnee>
   <!-- evenement -->
   <evenement_style>

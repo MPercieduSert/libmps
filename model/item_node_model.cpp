@@ -7,22 +7,14 @@ using namespace model_base;
 item_node::~item_node() = default;
 
 QVariant item_node::data(int cible, int role, numt num) const {
-    if(cible == Node_Cible){
+    if(cible == Node_Cible && num == Node_Num) {
         switch (role) {
-        case Type_Role:
-            if(num == Node_Num)
-                return type();
-            else
-                return item_node_model::Default_Type;
-        case Num_Role:
-            if(num != Node_Num)
-                return 0;
-            break;
         case Orientation_Role:
-            if(num == Node_Num)
-                return Qt::Horizontal;
-            else
-                return Qt::Vertical;
+            return Qt::Horizontal;
+        case Type_Role:
+            return type();
+        case Cibles_Role:
+            return QList<QVariant>();
         }
     }
     return QVariant();

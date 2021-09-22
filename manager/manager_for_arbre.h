@@ -91,6 +91,18 @@ public:
     int size(idt id_parent)
         {return fonction_agrega(b2d::agrega::Nombre,arbre::Parent,arbre::Parent,id_parent).toInt();}
 
+    //! Renvoie le nombre de frères.
+    int size_brother(idt id) {
+        arbre arb(id);
+        if(get(arb)) {
+            if(arb.parent())
+                return size(arb.parent());
+            else
+                return 1;
+        }
+        return 0;
+    }
+    
     //! Teste s'il y a dans la base de donnée un noeud ayant exactement les mêmes attributs id, num et parent.
     bool same_in_bdd(const arbre &node) override {
         arbre node_bdd(node.id());

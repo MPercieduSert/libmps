@@ -71,6 +71,9 @@ public:
     //! Suppresseur d'une entité enregistrée comme donnée.
     void del_entity_in_donnee(idt id_cible, int cible, int num = 0);
 
+    //! Accesseur d'un donnée associée à une entitée dans la basee de donnée par une référencce.
+    QVariant donnee_ref(const QString & ref, const entity & ent, int num = 0);
+
     //! Accesseur d'une entité enregistrée comme donnée.
     template<class Ent> Ent get_entity_in_donnee(idt id_cible, int cible, int num = 0);
 
@@ -112,6 +115,9 @@ protected:
 
     //! Renvoie le numero de début d'enregistrement d'une entité.
     std::pair<int, int> interval_entity_in_donnee(idt id_cible, int cible, int num);
+
+    //! Teste si un attribut est une entité associée.
+    bool is_associated_xml(xml_iterator iter, entity &ent) const override;
 
     //! Teste si un attribut d'une entité associée est multiple.
     bool is_multiple_associated_xml(const std::pair<const QString,QString> &pair) const override;

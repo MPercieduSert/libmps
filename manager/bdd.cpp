@@ -409,7 +409,7 @@ bool bdd::is_associated_xml(xml_iterator iter, entity &ent) const {
         if(iter->attributes().size() > 1)
             return true;
         auto att = iter->attributes().cbegin()->first;
-        if(att == "type")
+        if(att == "type" || att == "cible")
             return false;
         if(att == "restriction")
             return true;
@@ -601,8 +601,14 @@ void bdd::set_name(const QString &name) {
     m_bdd.setDatabaseName(name);
 }
 
+int bdd::size_brother(const entity &ent)
+    {return m_manager->get(ent.id_entity()).size_brother(ent.id());}
+
+int bdd::size_child(const entity &ent)
+    {return m_manager->get(ent.id_entity()).size_child(ent.id());}
+
 enumt bdd::str_categorie_to_enum(const QString &str, flag categorie, QString &controle) const noexcept {
-    if(categorie &Restriction_Code) {
+    if(categorie & Restriction_Code) {
         if(str == "aucune")
             return b2d::Aucune;
         if(str == QString("modification"))
@@ -610,7 +616,7 @@ enumt bdd::str_categorie_to_enum(const QString &str, flag categorie, QString &co
         if(str == QString("suppression"))
             return b2d::Suppr;
     }
-    if(categorie &Line_Style) {
+    if(categorie & Line_Style) {
         if(str == "solid_line")
             return Qt::SolidLine;
         if(str == "dash_line")
@@ -622,7 +628,7 @@ enumt bdd::str_categorie_to_enum(const QString &str, flag categorie, QString &co
         if(str == "dash_dot_dot_line")
             return Qt::DashDotDotLine;
     }
-    if(categorie &Brush_Style) {
+    if(categorie & Brush_Style) {
         if(str == "no_brush")
             return Qt::NoBrush;
         if(str == "solid_pattern")
@@ -662,7 +668,7 @@ enumt bdd::str_categorie_to_enum(const QString &str, flag categorie, QString &co
         if(str == "texture_pattern")
             return Qt::TexturePattern;
     }
-    if(categorie &Font_Weight) {
+    if(categorie & Font_Weight) {
         if(str == "thin")
             return QFont::Thin;
         if(str == "extra_light")
@@ -681,7 +687,24 @@ enumt bdd::str_categorie_to_enum(const QString &str, flag categorie, QString &co
             return QFont::ExtraBold;
         if(str == "black")
             return QFont::Black;
-
+    }
+    if(categorie & Style_Num){
+        if(str == "arabe_style_num")
+            return divers::num_to_string::Arabe_Style;
+        if(str == "arabe_suivant_style_num")
+            return divers::num_to_string::Arabe_Suivant_Style;
+        if(str == "grec_majuscule_style_num")
+            return divers::num_to_string::Grec_Majuscule_Style;
+        if(str == "grec_minuscule_style_num")
+            return divers::num_to_string::Grec_Minuscule_Style;
+        if(str == "majuscule_style_num")
+            return divers::num_to_string::Majuscule_Style;
+        if(str == "minuscule_style_num")
+            return divers::num_to_string::Minuscule_Style;
+        if(str == "romain_style_num")
+            return divers::num_to_string::Romain_Style;
+        if(str == "romain_suivant_style_num")
+            return divers::num_to_string::Romain_Suivant_Style;
     }
     controle.append("-> Enum invalide de categorie ").append(QString::number(static_cast<uint>(categorie))).append(": ").append(str);
     return Invalide_Enum;

@@ -44,7 +44,8 @@ public:
                                       Permission_Code = 0x2,
                                       Line_Style = 0x4,
                                       Brush_Style = 0x8,
-                                      Font_Weight = 0x10
+                                      Font_Weight = 0x10,
+                                      Style_Num = 0x20
                                      };
     //! Options d'exportation xml
     enum export_option : flag::flag_type {Restriction_Exportation_Xml = 0x1};
@@ -218,6 +219,9 @@ public:
 
     //! Renvoie le descendant direct du parent d'identifiant id_parent de position pos dans la fratrie.
     template<class Ent> Ent get_child(idt id_parent, int num);
+
+    //! Renvoie l'arbre des identifiants de racine d'identifiant id pour une entité de type arbre.
+    template<class Ent> tree<idt> get_id_arbre(idt id);
 
     //! Renvoie l'identifiant du descendant direct du parent d'identifiant id_parent de position pos dans la fratrie.
     template<class Ent> idt get_id_child(idt id_parent, int num);
@@ -641,9 +645,17 @@ public:
     //! Modifie les restrictions de modification pour une entité donnée.
     template<class Ent> void set_restriction(const Ent &ent, flag restrict);
 
+    //! Renvoie le nombre de frères.
+    int size_brother(const entity &ent);
+
+    //! Renvoie le nombre de frères.
+    template<class Ent> int size_brother(idt id);
+
     //! Renvoie le nombre de descendants directs.
-    int size_child(const entity &ent)
-        {return m_manager->get(ent.id()).size_child(ent);}
+    int size_child(const entity &ent);
+
+    //! Renvoie le nombre de descendants directs.
+    template<class Ent> int size_child(idt id);
 
     //! Renvoie l'enumeration associé à str pour un groupe de catégorie.
     virtual enumt str_categorie_to_enum(const QString &str, flag categorie, QString &controle) const noexcept;
@@ -897,6 +909,9 @@ template<class Ent> tree<Ent> bdd::get_arbre(const Ent &ent)
 template<class Ent> Ent bdd::get_child(idt id_parent, int num)
     {return m_manager->get<Ent>().get_child(id_parent,num);}
 
+template<class Ent> tree<idt> bdd::get_id_arbre(idt id)
+    {return m_manager->get<Ent>().get_id_arbre(id);}
+
 template<class Ent> idt bdd::get_id_child(idt id_parent, int num)
     {return m_manager->get<Ent>().get_id_child(id_parent,num);}
 
@@ -1139,5 +1154,11 @@ template<class Ent> void bdd::save(tree<Ent> &arbre, tree_save n)
 
 template<class Ent> void bdd::set_restriction(const Ent &ent, flag restrict)
     {m_manager->get<Ent>().set_restriction(ent.id(), restrict);}
+
+template<class Ent> int bdd::size_brother(idt id)
+    {return m_manager->get<Ent>().size_brother(id);}
+
+template<class Ent> int bdd::size_child(idt id)
+    {return m_manager->get<Ent>().size_child(id);}
 }}
 #endif // BDD_H

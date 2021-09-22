@@ -16,23 +16,24 @@ namespace donnee_info {
     //! Différents catégories de données.
     enum typeDn {Alpha = 0,
                 Perso,
-                ProgramationInterne,
+                Programation_Interne,
                 Contenu};
 
     //! Différents types des valeurs des données
     enum typeVal {No_Donnee = 0,
                   Int = 1,
-                  String = 2,
-                  Bool = 3,
-                  Float = 4,
-                  Double = 5,
-                  Date = 6,
-                  Date_Time = 7};
+                  Unsigned = 2,
+                  String = 3,
+                  Bool = 4,
+                  Float = 5,
+                  Double = 6,
+                  Date = 7,
+                  Date_Time = 8};
 
     //! Exact
     enum cardinalCode {Exact,
-                       AuPlus,
-                       AuMoins,
+                       Au_Plus,
+                       Au_Moins,
     };
 }
 
@@ -331,7 +332,7 @@ using namespace ensemble_restriction;
  */
 namespace ensemble_texte {
 using source = entities_base::nc_nom_type_entity<info_entity::Source>;
-RELATION_ENTITY(source_texte,relation,info_entity::source_texte,Source,source,Texte,texte)
+RELATION_ENTITY(source_texte,relation_type,info_entity::source_texte,Source,source,Texte,texte)
 using texte = entities_base::texte_entity<info_entity::Texte>;
 ID1_ENTITY(texte_cible,cible_date_time_current_num_type,info_entity::Texte_Cible,Texte,texte)
 }
