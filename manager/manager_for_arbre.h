@@ -92,7 +92,7 @@ public:
         {return fonction_agrega(b2d::agrega::Nombre,arbre::Parent,arbre::Parent,id_parent).toInt();}
 
     //! Renvoie le nombre de frères.
-    int size_brother(idt id) {
+    int size_brother(idt id) override{
         arbre arb(id);
         if(get(arb)) {
             if(arb.parent())

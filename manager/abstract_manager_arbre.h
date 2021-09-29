@@ -20,6 +20,7 @@ public:
     using ma_sql::manager_sql;
     using ma_sql::exists;
     using ma_sql::get;
+    using ma_sql::get_id_parent;
     using ma_sql::get_list_childs_id;
     using ma_sql::is_leaf;
     using ma_sql::save;
@@ -68,7 +69,7 @@ public:
 
     //! Renvoie l'arbre des identifiants de racine d'identifiant id.
     tree<idt> get_id_arbre(idt id) override {
-        if(exists(Ent(id))) {
+        if(exists(id)) {
             tree<idt> tree(id);
             auto it = tree.begin();
             while(it){
@@ -83,6 +84,16 @@ public:
         }
         else
             throw std::invalid_argument("L'identifiant transmise en argument de get_arbre ne correspond à aucune entité.");
+    }
+
+    //! Returne l'identifiant de la racine du noeud d'identifiant id.
+    idt get_id_root(idt id) override {
+        if(!exists(id))
+            return 0;
+        idt id_parent = id;
+        while ((id_parent = get_id_parent(id_parent)))
+            id = id_parent;
+        return id;
     }
 
     //! Enregistre l'arbre d'entités.

@@ -229,6 +229,12 @@ public:
     //! Renvoie l'identifiant du parent (si le manager est de type arbre).
     idt get_id_parent(const entity &ent);
 
+    //! Renvoie l'identifiant de la racine (si le manager est de type arbre).
+    idt get_id_root(const entity &ent);
+
+    //! Renvoie l'identifiant de la racine (si le manager est de type arbre).
+    template<class Ent> idt get_id_root(idt id);
+
     //! Renvoie la liste des entités de la table des entités d'identifiant ent_id ordonnée suivant la colonne d'identifiant ordre.
     vector_ptr<entity> get_list(entidt ent_id);
 
@@ -914,6 +920,9 @@ template<class Ent> tree<idt> bdd::get_id_arbre(idt id)
 
 template<class Ent> idt bdd::get_id_child(idt id_parent, int num)
     {return m_manager->get<Ent>().get_id_child(id_parent,num);}
+
+template<class Ent> idt bdd::get_id_root(idt id)
+    {return m_manager->get<Ent>().get_id_root(id);}
 
 template<class Ent> vector_ptr<Ent> bdd::get_list(typename Ent::position ordre, bool croissant)
     {return m_manager->get<Ent>().get_list(ordre, croissant);}

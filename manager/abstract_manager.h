@@ -119,6 +119,9 @@ public:
     //! Renvoie l'identifiant du parent (si le manager est de type arbre).
     virtual idt get_id_parent(idt id) = 0;
 
+    //! Renvoie l'identifiant de la racine (si le manager est de type arbre).
+    virtual idt get_id_root(idt id) = 0;
+
     //! Renvoie la référence du parent (si le manager est de type arbre).
     virtual QString get_ref_parent(idt id) = 0;
 
@@ -239,6 +242,9 @@ public:
     ~abstract_manager_temp() override = default;
 
     // Méthode d'existence
+    //! Teste s'il existe une entité d'identifiant id en base de donnée.
+    virtual bool exists(idt id) = 0;
+
     //! Teste s'il existe une entité de même identifiant que entity en base de donnée.
     virtual bool exists(const Ent &ent) = 0;
 
@@ -328,6 +334,9 @@ public:
 
     //! Renvoie l'identifiant du parent (si le manager est de type arbre).
     idt get_id_parent(idt id) override;
+
+    //! Renvoie l'identifiant du parent (si le manager est de type arbre).
+    idt get_id_root(idt id) override;
 
     // Obtention d'une liste.
     //! Renvoie la liste des entités de la table des entités Ent ordonnée suivant la colonne d'identifiant ordre.
@@ -718,6 +727,10 @@ template<class Ent> idt abstract_manager_temp<Ent>::get_id_child(idt /*id_parent
 
 template<class Ent> idt abstract_manager_temp<Ent>::get_id_parent(idt /*id*/)
     {throw std::invalid_argument(QString("La méthode 'get_id_parent' n'est pas définie pour le manager des : ")
+                                 .append(Ent::Name()).append(".").toStdString());}
+
+template<class Ent> idt abstract_manager_temp<Ent>::get_id_root(idt /*id*/)
+    {throw std::invalid_argument(QString("La méthode 'get_id_root' n'est pas définie pour le manager des : ")
                                  .append(Ent::Name()).append(".").toStdString());}
 
 template<class Ent> QString abstract_manager_temp<Ent>::get_ref_parent(idt /*id*/)

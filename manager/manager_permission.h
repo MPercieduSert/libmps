@@ -35,7 +35,7 @@ public:
     //! Teste s'il y a dans la base de donnée une entité d'identifiant id ayant exactement les mêmes attributs.
     bool same_in_bdd(const Ent &ent, idt id) {
         if(is_virtual(ent))
-            return !exists(Ent(id));
+            return !exists(id);
         else
             return ma_sql::same_in_bdd(ent,id);
     }

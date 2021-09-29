@@ -139,15 +139,19 @@ public:
                                                       .append(name()).append(">::exist(const entity &)"),ent);
     }
 
-    //! Teste s'il existe une entité de même identifiant que entity en base de donnée.
-    bool exists(const Ent &ent) override {
+    //! Teste s'il existe une entité d'identifiant id en base de donnée.
+    bool exists(idt id) override {
         prepare(m_exists);
-        m_link.set_id(ent);
+        bind_value(0,id);
         exec();
         bool bb = next();
         finish();
         return bb;
     }
+
+    //! Teste s'il existe une entité de même identifiant que entity en base de donnée.
+    bool exists(const Ent &ent) override
+        {return exists(ent.id());}
 
     //! Teste s'il existe une entité vérifiant une condition.
     bool exists(typename Ent::position cle, const QVariant &value, b2d::condition cond = b2d::condition::Egal) override {

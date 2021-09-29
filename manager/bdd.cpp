@@ -202,6 +202,9 @@ bool bdd::get(entity &ent)
 idt bdd::get_id_parent(const entity &ent)
     {return m_manager->get(ent.id_entity()).get_id_parent(ent.id());}
 
+idt bdd::get_id_root(const entity &ent)
+    {return m_manager->get(ent.id_entity()).get_id_root(ent.id());}
+
 vector_ptr<entity> bdd::get_list(entidt id_ent)
     {return m_manager->get(id_ent).get_vector_entity();}
 

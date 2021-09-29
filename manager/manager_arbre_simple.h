@@ -70,6 +70,13 @@ public:
         return 0;
     }
 
+    //! Renvoie l'identifiant du parent (si le manager est de type arbre).
+    idt get_id_parent(idt id) override {
+        Ent ent(id);
+        get(ent);
+        return ent.parent();
+    }
+
     //! Renvoie le liste des descendant direct d'entity.
     vector_ptr<Ent> get_list_childs(const Ent &ent, typename Ent::position ordre = Ent::Ordre) override {
         return ent.id() ? get_list(Ent::Parent,ent.id(),ordre)
@@ -102,7 +109,7 @@ public:
 
     //! Test la validité de la paternité.
     bool is_valid_parent(const Ent &ent)
-        {return ent.parent() == 0 || exists(Ent(ent.parent()));}
+        {return ent.parent() == 0 || exists(ent.parent());}
 
     //! Enregistre l'entité entity en base de donnée.
     void save(Ent &ent) override {
