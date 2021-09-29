@@ -124,6 +124,13 @@ public:
     //! Crée dans la base de donnée la table associée l'entité du manageur.
     void creer() override;
 
+
+    //! Teste si la table est vide.
+    bool empty() override {
+        exec(m_exists_where.arg("true"));
+        return !next();
+    }
+
     //! Teste s'il existe une entité de même identifiant que entity en base de donnée.
     bool exists(const entity &ent) override {
         if(Ent::Verif_entity(ent)) {
@@ -985,7 +992,7 @@ template<class Ent> void manager_sql<Ent>::write_string_sql() {
     // ExisteWhere
     m_exists_where.append("SELECT 1 FROM ");
     m_exists_where.append(table()).append(" WHERE %1 LIMIT 1");
-    m_exists.squeeze();
+    m_exists_where.squeeze();
 
     // Existe
     m_exists.append(m_exists_where.arg(idEgal));

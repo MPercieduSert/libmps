@@ -673,6 +673,9 @@ public:
         return Invalide_Enum;
     }
 
+    //! Teste si une table est vide.
+    template<class Ent> bool table_empty();
+
     //! Renvoie un vecteur des noms des entités correspondant à une table de la base de données
     //! (trié par ordre alphabétique).
     vector_id_name table_entity_names(bool arbre = false) const;
@@ -1169,5 +1172,8 @@ template<class Ent> int bdd::size_brother(idt id)
 
 template<class Ent> int bdd::size_child(idt id)
     {return m_manager->get<Ent>().size_child(id);}
+
+template<class Ent> bool bdd::table_empty()
+    {return m_manager->get<Ent>().empty();}
 }}
 #endif // BDD_H

@@ -92,6 +92,8 @@ template<class Form> void fen_principale::connect_action_to_new_modif_dialog(QAc
                             dialogue::new_modif_dialog diag(form,this);
                             diag.exec();
                         });
+    if(!new_ent)
+        action->setDisabled(noyau()->bdd().table_empty<typename Form::entity_of_form>());
 }
 }}
 #endif // FEN_PRINCIPALE_H

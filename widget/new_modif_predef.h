@@ -47,6 +47,7 @@ protected:
     QVBoxLayout *m_fin_layout;                      //!< Calque du choix de la fin de l'événement.
 
 public:
+    using entity_of_form = evenement;
     //! Constructeur.
     evenement_new_modif_form(b2d::bdd &bdd, bool new_ent, QWidget *parent = nullptr);
 
@@ -129,6 +130,7 @@ protected:
     QHBoxLayout *m_texte_layout;            //!< Calque du groupe texte.
     QHBoxLayout *m_titre_layout;            //!< Calque du groupe titre
 public:
+    using entity_of_form = evenement_style;
     //! Constructeur.
     evenement_style_new_modif_form(b2d::bdd &bdd, bool new_ent, QWidget *parent = nullptr);
 
@@ -163,6 +165,7 @@ class source_new_modif_form : public dialogue::abstract_type_nc_nom_new_modif_fo
 protected:
     using source = entities::source;
 public:
+    using entity_of_form = source;
     //! Constructeur.
     source_new_modif_form(b2d::bdd &bdd, bool new_ent, QWidget *parent = nullptr)
         : abstract_type_nc_nom_new_modif_form(static_cast<b2d::bdd_predef &>(bdd),"source_root",source::ID,

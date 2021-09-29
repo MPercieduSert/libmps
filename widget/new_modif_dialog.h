@@ -32,7 +32,7 @@ namespace dialogue {
 class abstract_new_modif_form : public QWidget {
     Q_OBJECT
 protected:
-    const bool m_new;                   //! true->création et false->modification ou suppression.
+    const bool m_new;               //! true->création et false->modification ou suppression.
     b2d::bdd &m_bdd;                //! Base de données.
 
 public:

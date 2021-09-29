@@ -83,6 +83,9 @@ public:
     //! Crée dans la base de donnée la table associée à l'entité du manageur.
     virtual void creer() = 0;
 
+    //! Teste si la table est vide.
+    virtual bool empty() = 0;
+
     //! Accesseur des restrictions gérées.
     virtual flag enable_restriction() const
         {return b2d::Aucune;}
