@@ -56,6 +56,8 @@ enum role_node {
     Orientation_Role,           //!< Orientation (Qt::Orientation)
     Type_Role,                  //!< Type des donnée (int)
     Nombre_Role,                //!< Nombre de composants (szt)
+    Min_role,                   //!< Minimum (int)
+    Max_role,                   //!< Maximum (int)
     // Donnée Principale role
     String_Role,                //!< Donnée principale sous forme de texte (QString)
     Check_State_Role,           //!< Donnée principale sous forme d'état des cases à cocher (Qt::CheckState)
@@ -96,6 +98,7 @@ enum sub_node_type {
     Date_Sub_Node,
     Label_Sub_Node,
     Line_Edit_Sub_Node,
+    Spin_Box_Sub_Node,
     Texte_Edit_Sub_Node
 };
 
@@ -110,8 +113,9 @@ enum flag_node : flag::flag_type {
     Elder_Enable_Flag_Node = 0x20,
     Brother_Enable_Flag_Node = 0x40,
     Del_Enable_Flag_Node = 0x80,
+    Auto_Expend_Flag_Node = 0x100,
     Default_Flag_Node = Visible_Flag_Node | Enable_Flag_Node | Left_Clickable_Flag_Node | Selectable_Flag_Node,
-    Default_Root_Flag_Node = Default_Flag_Node | Expendable_FLag_Node | Elder_Enable_Flag_Node,
+    Default_Root_Flag_Node = Default_Flag_Node | Expendable_FLag_Node | Elder_Enable_Flag_Node | Auto_Expend_Flag_Node,
     Default_Node_Flag_Node = Default_Root_Flag_Node | Brother_Enable_Flag_Node | Del_Enable_Flag_Node
 };
 

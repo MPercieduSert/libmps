@@ -21,7 +21,7 @@ void arc_node_view_widget::draw_node(bool next) {
         auto y = 0;
         auto &arc_painter = *m_view->m_arc_painter;
         for (auto it = parent_arc->m_arc_child.begin(); it != parent_arc->m_arc_child.end(); ++it) {
-            if (!next &&!draw &&*it == this) {
+            if (!next && !draw && *it == this) {
                 draw = true;
                 if(it ==  parent_arc->m_arc_child.begin()) {
                     if(parent_arc->m_node_arc_visible)
@@ -36,6 +36,11 @@ void arc_node_view_widget::draw_node(bool next) {
                     (*it)->move(arc_painter.left_expanded_margin(),y);
                 else
                     (*it)->move(node_view::arc_painter::No_Margin,y);
+                if((*it)->must_be_expended()){
+                    (*it)->m_arc_child.front()->draw_node();
+                    (*it)->m_expanded = true;
+                }
+                (*it)->adjustSize();
                 (*it)->setVisible(true);
                 y = (*it)->geometry().bottom();
             }
@@ -48,8 +53,21 @@ void arc_node_view_widget::draw_node(bool next) {
     }
 }
 
+void arc_node_view_widget::hydrate_arc_child() {
+    auto index = m_node->index();
+    m_arc_child.resize(index.child_count());
+    auto child = index.model()->index(index,0);
+    for (auto vec_it = m_arc_child.begin(); vec_it != m_arc_child.end(); ++vec_it) {
+        *vec_it = new arc_node_view_widget(child,m_view,this);
+        if(!(*vec_it)->leaf() && (*vec_it)->node()->flags().test(Auto_Expend_Flag_Node))
+            (*vec_it)->hydrate_arc_child();
+        child.to_next();
+    }
+}
+
+
 void arc_node_view_widget::insert_nodes(numt pos, numt count){
-    if(count > 0 &&pos <= m_arc_child.size()) {
+    if(count > 0 && pos <= m_arc_child.size()) {
         set_leaf(false);
         if(m_expanded) {
             auto first_it = m_arc_child.insert(std::next(m_arc_child.cbegin(),pos), count, nullptr);
@@ -63,6 +81,8 @@ void arc_node_view_widget::insert_nodes(numt pos, numt count){
             }
             (*first_it)->draw_node();
         }
+        else if (node()->flags().test(Auto_Expend_Flag_Node))
+            set_expanded(true);
     }
 }
 
@@ -135,13 +155,7 @@ void arc_node_view_widget::set_expanded(bool bb){
     if(m_expanded != bb && !m_leaf) {
         m_expanded = bb && !m_leaf;
         if(m_expanded) {
-            auto index = m_node->index();
-            m_arc_child.resize(index.child_count());
-            auto child = index.model()->index(index,0);
-            for (auto vec_it = m_arc_child.begin(); vec_it != m_arc_child.end(); ++vec_it) {
-                *vec_it = new arc_node_view_widget(child,m_view,this);
-                child.to_next();
-            }
+            hydrate_arc_child();
             m_arc_child.front()->draw_node();
         }
         else {

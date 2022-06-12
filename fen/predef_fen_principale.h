@@ -45,7 +45,7 @@ protected:
     void add_menu_bdd();
 
     //! Connecte une QAction à l'ouverture d'un onglet.
-    void connect_action_to_ppen_tab(QAction *action, const abstract_tab::tab_index &index,
+    void connect_action_to_open_tab(QAction *action, const abstract_tab::tab_index &index,
                                 const std::vector<QVariant> &vec = std::vector<QVariant>());
 public slots:
     //! Exporte des entités de la base de données dans un fichier xml.

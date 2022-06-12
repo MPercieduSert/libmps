@@ -28,15 +28,15 @@
 //! \ingroup groupe_macro_entity
 //! Macro implémentant une classe ayant 2 clés dont la seconde négative.
 #define RELATION_ENTITY_NEG(ENTITY,TYPE,IDT,ID1,id1,ID2,id2) \
-    ENTITY_ALIAS_DEBUT(ENTITY,TYPE,IDT,ID1,ID2)\
+    ENTITY_ALIAS_DEBUT(ENTITY,TYPE,IDT)\
     ENUM_##TYPE(ID1,ID2) \
-    ALIAS_CLE_NEG(id1,1)\
-    ALIAS_CLE(id2,2)};
+    ALIAS_CLE(id1,1)\
+    ALIAS_CLE_NEG(id2,2)};
 
 //! \ingroup groupe_macro_entity
 //! Macro implémentant une classe ayant 2 clés négatives.
 #define RELATION_ENTITY_NEG_NEG(ENTITY,TYPE,IDT,ID1,id1,ID2,id2) \
-    ENTITY_ALIAS_DEBUT(ENTITY,TYPE,IDT,ID1,ID2)\
+    ENTITY_ALIAS_DEBUT(ENTITY,TYPE,IDT)\
     ENUM_##TYPE(ID1,ID2) \
     ALIAS_CLE_NEG(id1,1)\
     ALIAS_CLE_NEG(id2,2)};
@@ -332,6 +332,45 @@ public:
 };
 
 template<entidt IDM > relation_num_entity<IDM>::~relation_num_entity() {}
+
+//! \ingroup groupe_macro_entity
+//! Macro définissant les positions des attributs pour une relation avec un attribut num et code.
+#define ENUM_relation_num_code(ID1,ID2) /*! \brief positions des attributs */ \
+    enum position:post {Id, Id_1 = mere::Id_1, Id_2 = mere::Id_2, Num = mere::Num, Code = mere::Code \
+    Nbr_Att = mere::Nbr_Att, Id_ ## ID1 = Id_1, Id_ ## ID2 = Id_2};
+
+/*! \ingroup groupe_base_entity
+ *\brief Classe de base des entités ayant pour attribut deux clés, un numero et un code.
+ */
+template<entidt IDM > class relation_num_code_entity : public entity_ids<IDM,relation_attribut,num_attribut,code_attribut> {
+public:
+    using eaid = entity_ids<IDM,relation_attribut,num_attribut,code_attribut>;
+    //! positions des attributs.
+    enum position:post {Id = position_enum<id_attribut,eaid>::Position,
+                   Id_1 = position_enum<id_1_attribut,eaid>::Position,
+                   Id_2 = position_enum<id_2_attribut,eaid>::Position,
+                   Num = position_enum<num_attribut,eaid>::Position,
+                   Code = position_enum<code_attribut,eaid>::Position,
+                   Nbr_Att = eaid::Nbr_Att};
+
+    using entity_ids<IDM,relation_attribut,num_attribut,code_attribut>::entity_ids;
+    using eaid::set_id_1;
+    using eaid::set_id_2;
+    using eaid::set_num;
+    using eaid::set_code;
+    BASE_ENTITY(relation_num_code_entity)
+
+    //! Constructeur à partir des valeurs attributs.
+    relation_num_code_entity(idt id_1, idt id_2, int num = 0, flag code = 0, idt id = 0)
+        : eaid(id) {
+        set_id_1(id_1);
+        set_id_2(id_2);
+        set_num(num);
+        set_code(code);
+    }
+};
+
+template<entidt IDM > relation_num_code_entity<IDM>::~relation_num_code_entity() {}
 
 //! \ingroup groupe_macro_entity
 //! Macro définissant les positions des attributs pour une relation avec un attribut type.

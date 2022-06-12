@@ -17,13 +17,62 @@
 namespace mps {
 namespace entities_base {
 //! \ingroup groupe_macro_entity
-//! Macro définissant les positions des attributs pour une clé étrangère, un nom cours, un nom et un type.
+//! Macro définissant les positions des attributs pour une clé étrangère et un nom.
+#define ENUM_id_nom_temp(ID1) /*! \brief positions des attributs */ \
+    enum position:post {Id = mere::Id, Id_1 = mere::Id_1, Nom = mere::Nom, Nbr_Att = mere::Nbr_Att,\
+    Id_ ## ID1 = Id_1};
+
+/*! \ingroup groupe_base_entity
+ *\brief Classe de base des entités ayant un attribut clé et nom.
+ */
+template<entidt IDM , class Id_1_Att> class id_nom_entity_temp :
+        public entity_ids<IDM,Id_1_Att,nom_attribut> {
+public:
+    using Id_1_Trans = typename Id_1_Att::att_trans;
+    using eaid = entity_ids<IDM,Id_1_Att,nom_attribut>;
+    //! positions des attributs.
+    enum position:post {Id = position_enum<id_attribut,eaid>::Position,
+                   Id_1 = position_enum<Id_1_Att,eaid>::Position,
+                   Nom = position_enum<nom_attribut,eaid>::Position,
+                   Nbr_Att = eaid::Nbr_Att};
+
+    using entity_ids<IDM,Id_1_Att,nc_nom_attribut>::entity_ids;
+    using eaid::set_id_1;
+    using eaid::set_nom;
+
+    BASE_ENTITY(id_nom_entity_temp)
+
+    //! Constructeur à partir d'un jeux de valeurs attributs unique.
+    id_nom_entity_temp(Id_1_Trans id_1, idt id)
+        : eaid(id)
+        {set_id_1(id_1);}
+
+    //! Constructeur à partir d'un jeux de valeurs attributs unique.
+    id_nom_entity_temp(const QString &nom, idt id = 0)
+        : eaid(id)
+        {set_nom(nom);}
+};
+
+template<entidt IDM , class Id_1_Att> id_nom_entity_temp<IDM,Id_1_Att>::~id_nom_entity_temp() {}
+
+template<entidt IDM > using id_nom_entity = id_nom_entity_temp<IDM,id_1_attribut>;
+#define ENUM_id_nom(ID1) ENUM_id_nom_temp(ID1)
+
+template<entidt IDM > using id_null_nom_entity = id_nom_entity_temp<IDM,id_1_null_attribut>;
+#define ENUM_id_null_nom(ID1) ENUM_id_nom_temp(ID1)
+
+template<entidt IDM > using id_neg_nom_entity = id_nom_entity_temp<IDM,id_1_neg_attribut>;
+#define ENUM_id_neg_nom(ID1) ENUM_id_nom_temp(ID1)
+
+
+//! \ingroup groupe_macro_entity
+//! Macro définissant les positions des attributs pour une clé étrangère, un nom cours et un nom.
 #define ENUM_id_nc_nom_temp(ID1) /*! \brief positions des attributs */ \
     enum position:post {Id = mere::Id, Id_1 = mere::Id_1,  Nc = mere::Nc, Nom = mere::Nom, Nbr_Att = mere::Nbr_Att,\
     Id_ ## ID1 = Id_1};
 
 /*! \ingroup groupe_base_entity
- *\brief Classe de base des entités ayant un attribut clé, nom cours, nom et type.
+ *\brief Classe de base des entités ayant un attribut clé, nom cours et nom.
  */
 template<entidt IDM , class Id_1_Att> class id_nc_nom_entity_temp :
         public entity_ids<IDM,Id_1_Att,nc_nom_attribut> {
@@ -1232,6 +1281,113 @@ template<entidt IDM > using cible_neg_date_time_valide_num_tp_val_valeur_int_ent
 template<entidt IDM > using cible_neg_date_time_valide_num_tp_val_valeur_variant_entity
     = cible_date_time_num_tp_val_valeur_entity_temp<IDM,date_time_valide_attribut,valeur_variant_attribut,id_1_neg_attribut>;
 #define ENUM_cible_neg_date_time_valide_num_tp_val_valeur_variant(ID1) ENUM_cible_date_time_num_tp_val_valeur_temp(ID1)
+
+
+//! \ingroup groupe_macro_entity
+//! Macro définissant les positions des attributs pour une clé étrangère, un numéro et un code.
+#define ENUM_id_num_code_temp(ID1) /*! \brief positions des attributs */ \
+    enum position:post {Id = mere::Id, Id_1 = mere::Id_1,  Num = mere::Num, Code = mere::Code, Nbr_Att = mere::Nbr_Att,\
+    Id_ ## ID1 = Id_1};
+
+/*! \ingroup groupe_base_entity
+ *\brief Classe de base des entités ayant un attribut clé, num et code.
+ */
+template<entidt IDM , class Id_1_Att> class id_num_code_entity_temp :
+        public entity_ids<IDM,Id_1_Att,num_attribut,code_attribut> {
+public:
+    using Id_1_Trans = typename Id_1_Att::att_trans;
+    using eaid = entity_ids<IDM,Id_1_Att,num_attribut,code_attribut>;
+    //! positions des attributs.
+    enum position:post {Id = position_enum<id_attribut,eaid>::Position,
+                   Id_1 = position_enum<Id_1_Att,eaid>::Position,
+                   Num = position_enum<num_attribut,eaid>::Position,
+                   Code = position_enum<code_attribut,eaid>::Position,
+                   Nbr_Att = eaid::Nbr_Att};
+
+    using entity_ids<IDM,Id_1_Att,num_attribut,code_attribut>::entity_ids;
+    using eaid::set_id_1;
+    using eaid::set_num;
+    using eaid::set_code;
+
+    BASE_ENTITY(id_num_code_entity_temp)
+
+    //! Constructeur à partir d'un jeux de valeurs attributs unique.
+    id_num_code_entity_temp(Id_1_Trans id_1, int num, idt id = 0)
+        : eaid(id) {
+        set_id_1(id_1);
+        set_num(num);
+        }
+
+    //! Constructeur à partir des valeurs attributs.
+    id_num_code_entity_temp(Id_1_Trans id_1, int num, flag code, idt id = 0)
+        : id_num_code_entity_temp(id_1, num, id) {
+        set_code(code);
+    }
+};
+
+template<entidt IDM , class Id_1_Att> id_num_code_entity_temp<IDM,Id_1_Att>::~id_num_code_entity_temp() {}
+
+template<entidt IDM > using id_num_code_entity = id_num_code_entity_temp<IDM,id_1_attribut>;
+#define ENUM_id_num_code(ID1) ENUM_id_num_code_temp(ID1)
+
+template<entidt IDM > using id_null_num_code_entity = id_num_code_entity_temp<IDM,id_1_null_attribut>;
+#define ENUM_id_null_num_code(ID1) ENUM_id_num_code_temp(ID1)
+
+template<entidt IDM > using id_neg_num_code_entity = id_num_code_entity_temp<IDM,id_1_neg_attribut>;
+#define ENUM_id_neg_num_code(ID1) ENUM_id_num_code_temp(ID1)
+
+//! \ingroup groupe_macro_entity
+//! Macro définissant les positions des attributs pour une clé étrangère, un numéro et un nom.
+#define ENUM_id_num_nom_temp(ID1) /*! \brief positions des attributs */ \
+    enum position:post {Id = mere::Id, Id_1 = mere::Id_1,  Num = mere::Num, Nom = mere::Nom, Nbr_Att = mere::Nbr_Att,\
+    Id_ ## ID1 = Id_1};
+
+/*! \ingroup groupe_base_entity
+ *\brief Classe de base des entités ayant un attribut clé, num et nom.
+ */
+template<entidt IDM , class Id_1_Att> class id_num_nom_entity_temp :
+        public entity_ids<IDM,Id_1_Att,num_attribut,nom_attribut> {
+public:
+    using Id_1_Trans = typename Id_1_Att::att_trans;
+    using eaid = entity_ids<IDM,Id_1_Att,num_attribut,nom_attribut>;
+    //! positions des attributs.
+    enum position:post {Id = position_enum<id_attribut,eaid>::Position,
+                   Id_1 = position_enum<Id_1_Att,eaid>::Position,
+                   Num = position_enum<num_attribut,eaid>::Position,
+                   Nom = position_enum<nom_attribut,eaid>::Position,
+                   Nbr_Att = eaid::Nbr_Att};
+
+    using entity_ids<IDM,Id_1_Att,num_attribut,nom_attribut>::entity_ids;
+    using eaid::set_id_1;
+    using eaid::set_num;
+    using eaid::set_nom;
+
+    BASE_ENTITY(id_num_nom_entity_temp)
+
+    //! Constructeur à partir d'un jeux de valeurs attributs unique.
+    id_num_nom_entity_temp(Id_1_Trans id_1, int num, idt id = 0)
+        : eaid(id) {
+        set_id_1(id_1);
+        set_num(num);
+        }
+
+    //! Constructeur à partir des valeurs attributs.
+    id_num_nom_entity_temp(Id_1_Trans id_1, int num, const QString & nom, idt id = 0)
+        : id_num_nom_entity_temp(id_1, num, id) {
+        set_nom(nom);
+    }
+};
+
+template<entidt IDM , class Id_1_Att> id_num_nom_entity_temp<IDM,Id_1_Att>::~id_num_nom_entity_temp() {}
+
+template<entidt IDM > using id_num_nom_entity = id_num_nom_entity_temp<IDM,id_1_attribut>;
+#define ENUM_id_num_nom(ID1) ENUM_id_num_nom_temp(ID1)
+
+template<entidt IDM > using id_null_num_nom_entity = id_num_nom_entity_temp<IDM,id_1_null_attribut>;
+#define ENUM_id_null_num_nom(ID1) ENUM_id_num_nom_temp(ID1)
+
+template<entidt IDM > using id_neg_num_nom_entity = id_num_nom_entity_temp<IDM,id_1_neg_attribut>;
+#define ENUM_id_neg_num_nom(ID1) ENUM_id_num_nom_temp(ID1)
 
 //! \ingroup groupe_macro_entity
 //! Macro définissant les positions des attributs pour une clé, num et Valeur.

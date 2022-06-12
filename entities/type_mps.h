@@ -60,7 +60,7 @@ public:
     flag operator ^ (flag f) const noexcept
         {return m_value ^ f.m_value;}
 
-    //! Revoie un drapeaux correspondant à un ou exclusif.
+    //! Revoie un drapeaux correspondant à la négation.
     flag operator ~ () const noexcept
         {return ~m_value;}
 
@@ -132,9 +132,13 @@ public:
     void set_value(flag_type value) noexcept
         {m_value = value;}
 
+    //! Mutateur de la valeur.
+    void set_value(flag_type value, bool ok) noexcept
+        {m_value = ok ? m_value | value : m_value ^ value;}
+
     //! Teste si l'intersection n'est pas vide.
     bool test(flag_type value) const noexcept
-        {return m_value &value;}
+        {return m_value & value;}
 
     //! Accesseur de la valeur.
     flag_type value() const noexcept

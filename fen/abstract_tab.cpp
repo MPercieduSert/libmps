@@ -24,6 +24,7 @@ bool abstract_tab::open_tab(const tab_index &pair, const std::vector<QVariant> &
 void abstract_tab::connect_tab(abstract_tab_module *tab){
     connect(tab,&abstract_tab_module::action_permise,this,&abstract_tab::action_permise);
     connect(tab,&abstract_tab_module::open_tab_requested,this,[this](const tab_index &pair){open_tab(pair);});
+    connect(tab,&abstract_tab_module::title_changed,this,[this](const QString & title){setTabText(currentIndex(),title);});
 }
 
 void abstract_tab::current_change() {

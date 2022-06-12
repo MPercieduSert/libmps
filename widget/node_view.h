@@ -25,8 +25,8 @@ class indexed_widget : public QWidget {
     Q_OBJECT
 protected:
     using node_index = model_base::node_index;
-    flag m_flags;             //!< Drapeaux associé aux noeud.
-    node_index m_index;                  //!< Index associé aux noeuds.
+    flag m_flags;                       //!< Drapeaux associé aux noeud.
+    node_index m_index;                 //!< Index associé aux noeuds.
     QBoxLayout *m_main_layout;          //!< Calque principale du sous-noeud.
 public:
     //! Constructeur.
@@ -130,7 +130,8 @@ protected:
 public:
     //! Constructeur.
     node_widget(const node_index &index, QWidget *parent = nullptr)
-        : indexed_widget(index, parent), m_painter(std::make_unique<node_painter>()) {}
+        : indexed_widget(index, parent), m_painter(std::make_unique<node_painter>())
+    {m_index.set_cible(model_base::Node_Cible);}
 
     //! Destructeur.
     ~node_widget() override;
@@ -397,6 +398,9 @@ public:
     bool expanded() const noexcept
         {return m_expanded;}
 
+    //! Hydrate les arc descendants directs.
+    void hydrate_arc_child();
+
     //! Prend en compte l'insertion de noeuds enfants.
     void insert_nodes(numt pos, numt count);
 
@@ -437,6 +441,10 @@ public:
     node_view *view() const noexcept
         {return m_view;}
 protected:
+    //! Teste si le noeud doit être développer.
+    bool must_be_expended() const noexcept
+        {return !(m_expanded || m_arc_child.empty());}
+
     //! Gestionnaire de click de souris.
     void mousePressEvent(QMouseEvent *event) override;
 
@@ -445,7 +453,7 @@ protected:
 };
 
 /*! \ingroup groupe_Widget
- *\brief Widget contenant un noeud et ses descendants.
+ *\brief Widget de la racine.
  */
 class root_node_view_widget : public arc_node_view_widget {
     Q_OBJECT

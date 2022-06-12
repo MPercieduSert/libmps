@@ -107,6 +107,26 @@ void line_edit_sub_node_widget::update_data_sub_node(flag role) {
         m_lineEdit->setText(m_index.data(model_base::String_Role).toString());
 }
 
+////////////////////////////////////////////////// spin_box_sub_node_widget //////////////////////////////////////////
+spin_box_sub_node_widget::spin_box_sub_node_widget(const node_index &index, QWidget *parent)
+    : label_sub_node_widget(index,parent) {
+    m_spin_box = new QSpinBox;
+    m_main_layout->addWidget(m_spin_box);
+    connect(m_spin_box,qOverload<int>(&QSpinBox::valueChanged),this,[this](){
+        if(connexion_enable())
+            m_index.model()->set_data(m_index,m_spin_box->value(),model_base::Int_Role);});
+}
+
+void spin_box_sub_node_widget::update_data_sub_node(flag role) {
+    label_sub_node_widget::update_data_sub_node(role);
+    if(role.test(model_base::Main_Data_Change_Flag))
+        m_spin_box->setValue(m_index.data(model_base::Int_Role).toInt());
+    if(role.test(model_base::Setting_Change_Flag)) {
+        m_spin_box->setMinimum(m_index.data(model_base::Min_role).toInt());
+        m_spin_box->setMaximum(m_index.data(model_base::Max_role).toInt());
+    }
+}
+
 ////////////////////////////////////////////////// TexteEditsub_node_widget //////////////////////////////////////////
 texte_edit_node_widget::texte_edit_node_widget(const node_index &index, QWidget *parent)
     : label_sub_node_widget(index,parent) {
@@ -259,6 +279,8 @@ sub_node_widget *standard_node_delegate::create_sub_node(const node_index &index
         return  new label_sub_node_widget(index,parent);
     case model_base::Line_Edit_Sub_Node:
         return new line_edit_sub_node_widget(index,parent);
+    case model_base::Spin_Box_Sub_Node:
+        return new spin_box_sub_node_widget(index,parent);
     case model_base::Texte_Edit_Sub_Node:
         return  new texte_edit_node_widget(index,parent);
     }

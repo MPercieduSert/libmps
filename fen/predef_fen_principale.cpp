@@ -31,7 +31,7 @@ void predef_fen_principale::add_menu_bdd(){
     //connect(schXml,&QAction::triggered,this,&predef_fen_principale::schema_xml);
 }
 
-void predef_fen_principale::connect_action_to_ppen_tab(QAction *action, const abstract_tab::tab_index &index,
+void predef_fen_principale::connect_action_to_open_tab(QAction *action, const abstract_tab::tab_index &index,
                                            const std::vector<QVariant> &vec)
     {connect(action,&QAction::triggered,this,[this,index,vec](){centrale_zone()->open_tab(index,vec);});}
 

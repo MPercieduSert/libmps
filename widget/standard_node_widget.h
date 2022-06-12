@@ -9,6 +9,7 @@
 #include <QDateEdit>
 #include <QLabel>
 #include <QLineEdit>
+#include <QSpinBox>
 #include <QTextEdit>
 #include "code_widget.h"
 #include "node_view.h"
@@ -133,6 +134,27 @@ public:
     void update_flags() override {
         label_sub_node_widget::update_flags();
         m_lineEdit->setReadOnly(!m_flags.test(model_base::Enable_Flag_Node));
+    }
+protected:
+    //! Met à jour les données du label à partir des données du model.
+    void update_data_sub_node(flag role) override;
+};
+
+/*! \ingroup groupe_Widget
+ *\brief Classe des sous-noeuds composés d'un label et d'un spin box.
+ */
+class spin_box_sub_node_widget : public label_sub_node_widget {
+    Q_OBJECT
+protected:
+    QSpinBox *m_spin_box;       //! Spin box du sous-noeud.
+public:
+    //! Constructeur.
+    spin_box_sub_node_widget(const node_index &index, QWidget *parent);
+
+    //! Met à jour le widget après un changement de drapeaux.
+    void update_flags() override {
+        label_sub_node_widget::update_flags();
+        m_spin_box->setReadOnly(!m_flags.test(model_base::Enable_Flag_Node));
     }
 protected:
     //! Met à jour les données du label à partir des données du model.

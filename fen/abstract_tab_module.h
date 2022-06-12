@@ -43,6 +43,9 @@ signals:
     //! Demande l'ouverture d'un onglet.
     void open_tab_requested(const tab_index &);
 
+    //! Signal de changement de titre.
+    void title_changed(const QString &);
+
 public slots:
     //! Action à effectuer lorsque l'onglet devient actif.
     virtual void become_current();
