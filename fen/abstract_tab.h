@@ -69,7 +69,7 @@ public slots:
     void remove_tab(const tab_index &pair);
 
     //! Demande à l'onglet actif de sauvegarder.
-    void sauver()     {static_cast<abstract_tab_module*>(currentWidget())->sauver();}
+    virtual void sauver()     {static_cast<abstract_tab_module*>(currentWidget())->sauver();}
 
     //! Demande à l'onglet actif de supprimer.
     void supprimer()    {static_cast<abstract_tab_module*>(currentWidget())->supprimer();}
