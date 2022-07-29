@@ -56,12 +56,12 @@ tab_gestion_type::tab_gestion_type(b2d::bdd &bdd, const tab_index &index, QWidge
     m_model = new model_base::type_permission_model(static_cast<b2d::bdd_predef &>(bdd),this);
     m_view->set_model(m_model);
     m_view->set_delegate(new delegate::code_standard_node_delegate(cases,this));
+    m_cible_label = new QLabel(tr("Cible associées au type sélectionné :"));
     m_cible_list_widget = new QListWidget;
-    numt num = 0;
-    for (auto it = m_model->id_nom_vec().cbegin(); it != m_model->id_nom_vec().cend(); ++it,++num) {
+    for (auto it = m_model->id_nom_vec().cbegin(); it != m_model->id_nom_vec().cend(); ++it) {
         auto item = new QListWidgetItem(it->second,m_cible_list_widget);
-        item->setData(Qt::UserRole,num);
-        item->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
+        item->setData(Qt::UserRole,it->first);
+        item->setFlags(Qt::ItemIsUserCheckable);
         item->setCheckState(Qt::Unchecked);
     }
     m_cible_list_widget->setSizePolicy(QSizePolicy::Minimum,QSizePolicy::Expanding);
@@ -71,6 +71,7 @@ tab_gestion_type::tab_gestion_type(b2d::bdd &bdd, const tab_index &index, QWidge
 
     // Calque
     m_cible_layout = new QVBoxLayout;
+    m_cible_layout->addWidget(m_cible_label);
     m_cible_layout->addWidget(m_cible_list_widget);
     m_cible_layout->addWidget(m_save_bouton);
     m_main_layout = new QHBoxLayout(this);
@@ -80,3 +81,13 @@ tab_gestion_type::tab_gestion_type(b2d::bdd &bdd, const tab_index &index, QWidge
 
 void tab_gestion_type::become_current()
     {emit action_permise(fenetre::Sauver_Action);}
+
+void tab_gestion_type::set_current_permission(const mps::model_base::node_index &/*index*/) {
+
+//    for (auto it = m_model->id_nom_vec().cbegin(); it != m_model->id_nom_vec().cend(); ++it) {
+//        auto item = new QListWidgetItem(it->second,m_cible_list_widget);
+//        item->setData(Qt::UserRole,it->first);
+//        item->setFlags(Qt::ItemIsUserCheckable);
+//        item->setCheckState(Qt::Unchecked);
+//    }
+}

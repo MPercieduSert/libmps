@@ -140,6 +140,8 @@ public:
     //! Constructeur.
     item_node(int type = No_Type) : m_type(type){}
 
+    CONSTR_AFFECT_DEFAUT(item_node)
+
     //! Destructeur.
     virtual ~item_node();
 
@@ -436,11 +438,11 @@ protected:
     };
     //! Information sur les modifications apporté à un noeud.
     struct node_change {
-        numt type;
-        numt pos;
-        numt count;
         node_iter iter = static_cast<void *>(nullptr);
-        node_ptr node;
+        node_ptr node = nullptr;
+        numt type = Set_Data;
+        numt pos = 0;
+        numt count = 0;
     };
     std::list<node_change> m_change_list;               //!< Liste des modifications du model.
     std::forward_list<node_info> m_insert_nodes_pile;   //!< Pile des informations d'insertion de noeuds.
@@ -506,7 +508,7 @@ public:
 
 signals:
     //! Signal le changement d'une donnée.
-    void data_changed(const node_index &index, flag role);
+    void data_changed(const mps::model_base::item_node_model::node_index &index, mps::flag role);
 
     //! Signal de début de réinitialisation du model.
     void model_about_to_be_reset();
@@ -521,16 +523,16 @@ signals:
     void model_reset_data();
 
     //! Signal de début d'insertion de noeuds.
-    void nodes_about_to_be_inserted(const node_index &parent, numt pos, numt count);
+    void nodes_about_to_be_inserted(const mps::model_base::item_node_model::node_index &parent, mps::numt pos, mps::numt count);
 
     //! Signal de début de suppression de noeuds.
-    void nodes_about_to_be_removed(const node_index &parent, numt pos, numt count);
+    void nodes_about_to_be_removed(const mps::model_base::item_node_model::node_index &parent, mps::numt pos, mps::numt count);
 
     //! Signal de fin d'insertion de noeuds.
-    void nodes_inserted(const node_index &parent, numt pos, numt count);
+    void nodes_inserted(const mps::model_base::item_node_model::node_index &parent, mps::numt pos, mps::numt count);
 
     //! Signal de fin de suppression de noeuds.
-    void nodes_removed(const node_index &parent, numt pos, numt count);
+    void nodes_removed(const mps::model_base::item_node_model::node_index &parent, mps::numt pos, mps::numt count);
 
 protected:
     //! Début d'insertions de noeuds.
@@ -615,6 +617,11 @@ class item_bdd_node : public item_node{
 public:
     //! Constructeur.
     using item_node::item_node;
+
+    CONSTR_AFFECT_DEFAUT(item_bdd_node)
+
+    //! Destructeur.
+    ~item_bdd_node() override;
 
     NODE_COPIE(item_bdd_node)
 

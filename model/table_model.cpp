@@ -23,7 +23,7 @@ void table_model::coller(const QModelIndexList &selection) {
                               tr("Ce type de séléction multiple n'est pas valide pour éffectuer un collage"));
     else {
         auto str = QApplication::clipboard()->text();
-        auto rows = str.splitRef('\n');
+        auto rows = str.split('\n');
         if(!rows.isEmpty() &&rows.last().isEmpty())
             {rows.removeLast();}
         auto num_rows = rows.count();
@@ -49,7 +49,7 @@ void table_model::coller(const QModelIndexList &selection) {
                         auto row = range.top() + i;
                         auto column = range.left() + j;
                         if (row < rowCount() &&column < columnCount())
-                            setData(index(row, column), columns.at(j).toString());
+                            setData(index(row, column), columns.at(j));
                     }
                 }
             }
@@ -62,7 +62,7 @@ void table_model::coller(const QModelIndexList &selection) {
                         auto column =  j < range.column_count() ?
                                     range.column(j) : range.columns().back() + j - range.column_count() + 1;
                         if (row < rowCount() &&column < columnCount())
-                            setData(index(row, column), columns.at(j).toString());
+                            setData(index(row, column), columns.at(j));
                     }
                 }
             }

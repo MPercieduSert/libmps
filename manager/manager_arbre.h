@@ -105,13 +105,13 @@ public:
         return ent.id() ? ma_sql::get_list_join(m_manager_arbre.table(),m_manager_arbre.attribut(arbre::Id),
                                      m_manager_arbre.attribut(arbre::Parent),ent.id(),ordre)
                         : ma_sql::get_list_join(m_manager_arbre.table(),m_manager_arbre.attribut(arbre::Id),
-                                                m_manager_arbre.attribut(arbre::Parent),QVariant(QVariant::Int),ordre,b2d::Is);
+                                                m_manager_arbre.attribut(arbre::Parent),QVariant(QMetaType(QMetaType::Int)),ordre,b2d::Is);
     }
 
     //! Renvoie le liste des identifiants des descendant direct de l'entité d'identifiant id (ordre inactif) .
     std::list<idt> get_list_childs_id(idt id,typename Ent::position /*ordre*/ = Ent::Id) override {
         return id ? m_manager_arbre.get_list_id(arbre::Parent,id,arbre::Num)
-                  : m_manager_arbre.get_list_id(arbre::Parent,QVariant(QVariant::Int),arbre::Id,mps::b2d::Is);
+                  : m_manager_arbre.get_list_id(arbre::Parent,QVariant(QMetaType(QMetaType::Int)),arbre::Id,mps::b2d::Is);
     }
 
     //! Renvoie le liste des identifiants des descendant direct de l'entité d'identifiant id

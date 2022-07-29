@@ -54,7 +54,7 @@ public:
     managers_base(entidt nbr_entity, const QString &version_table,
                   std::map<entidt,std::unique_ptr<abstract_manager>> &&managers
                         = std::map<entidt,std::unique_ptr<abstract_manager>>(),
-                  const QSqlQuery &req = QSqlQuery());
+                  QSqlQuery &&req = QSqlQuery());
 
     //! Creé la table de l'entité version_bdd
     void creer_version();
@@ -107,7 +107,7 @@ public:
     void save_version(int num, numt type);
 
     //! Modifie le pointeur vers l'objet requête.
-    void set_requete(const QSqlQuery &req);
+    void set_requete(QSqlQuery &&req);
 
     //! Teste si le manager d'identifiant id est valide.
     bool valide(entidt id) const noexcept

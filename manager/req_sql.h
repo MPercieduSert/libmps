@@ -38,7 +38,7 @@ namespace manager {
  */
 class req_sql {
 protected:
-    static QSqlQuery *m_Requete;  //!< Référence vers la requète employée dans le manageur.
+    static QSqlQuery *m_requete;  //!< Pointeur vers la requète employée dans le manageur.
 public:
     CONSTR_DEFAUT(req_sql)
     DESTR_VIDE(req_sql)
@@ -50,11 +50,11 @@ public:
     static QString type_attribut_sql_string(b2d::type_attribut_bdd n);
 
     QString last_query() const
-        {return m_Requete->lastQuery();}
+        {return m_requete->lastQuery();}
 
     //! Modifie le pointeur vers l'objet requête.
     static void set_requete(QSqlQuery *req)
-        {m_Requete = req;}
+        {m_requete = req;}
 
     //! Renvoie une QString correspondant au type.
     static QString word_sql_string(b2d::word_sql n);
@@ -62,21 +62,21 @@ public:
 protected:
     //! Transmet une valeur à la requète.
     void bind_value(numt n, const QVariant &value)
-        {m_Requete->bindValue(static_cast<int>(n),value);}
+        {m_requete->bindValue(static_cast<int>(n),value);}
 
     //! Transmet une valeur à la requète.
     void bind_value(int n, const QVariant &value)
-        {m_Requete->bindValue(n,value);}
+        {m_requete->bindValue(n,value);}
 
     //! Exécute la dernière requète préparée et lance une execption si celle-ci n'est pas valide.
     void exec() {
-        m_Requete->exec();
+        m_requete->exec();
         aff_error();
     }
 
     //! Exécute la requéte SQL donnée en argument et lance une execption si celle-ci n'est pas valide.
     void exec(const QString &requete) {
-        m_Requete->exec(requete);
+        m_requete->exec(requete);
         aff_error();
     }
 
@@ -94,7 +94,7 @@ protected:
 
     //! Termine la requète.
     void finish()
-        {m_Requete->finish();}
+        {m_requete->finish();}
 
     //! Accesseur de l'identifiant.
     idt id(post pos = entity::Id) const
@@ -102,27 +102,27 @@ protected:
 
     //! Place la requète sur la position suivante.
     bool next()
-        {return m_Requete->next();}
+        {return m_requete->next();}
 
     //! Prepare la requète SQL.
     void prepare(const QString &requete)
-        {m_Requete->prepare(requete);}
+        {m_requete->prepare(requete);}
 
     //! Récupère la nième valeur de la requète au type T.
     template<class T> inline T value(post n = 0) const;
 
-    //! Convertit un entier en QVariant, en remplaçant 0 par QVariant(QVariant::Int).
+    //! Convertit un entier en QVariant, en remplaçant 0 par QVariant(QMetaType(QMetaType::Int)).
     template<class T> QVariant zero_to_null(T n) const
-        {return n != 0 ? n : QVariant(QVariant::Int);}
+        {return n != 0 ? n : QVariant(QMetaType(QMetaType::Int));}
 };
 
 template<class T> inline T req_sql::value(post n) const
-    {return m_Requete->value(static_cast<int>(n)).value<T>();}
+    {return m_requete->value(static_cast<int>(n)).value<T>();}
 
 template<> inline flag req_sql::value<flag>(post n) const
-    {return m_Requete->value(static_cast<int>(n)).toUInt();}
+    {return m_requete->value(static_cast<int>(n)).toUInt();}
 
 template<> inline QVariant req_sql::value<QVariant>(post n) const
-    {return m_Requete->value(static_cast<int>(n));}
+    {return m_requete->value(static_cast<int>(n));}
 }}
 #endif // REQ_SQL_H

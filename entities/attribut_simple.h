@@ -105,6 +105,7 @@ public:
     using att_pre = no_attribut;
     using att_suiv = no_attribut;
     CONSTR_DEFAUT(attribut_entity)
+    CONSTR_AFFECT_DEFAUT(attribut_entity)
 
     //! Destructeur.
     virtual ~attribut_entity();
@@ -228,7 +229,7 @@ using attribut_double = attribut_entity_val<double>;
 using attribut_float = attribut_entity_val<float>;
 using attribut_int = attribut_entity_val<int>;
 using attribut_unsigned = attribut_entity_val<unsigned>;
-using Attribut_id = attribut_entity_val<idt>;
+using attribut_id = attribut_entity_val<idt>;
 
 using attribut_date = attribut_entity_ref<QDate>;
 using attribut_date_time = attribut_entity_ref<QDateTime>;
@@ -366,52 +367,52 @@ public:
 /*! \ingroup groupe_attribut_entity
  *\brief Classe mère des attributs de type entier positif renvoyant _null pour zéro dans la base de données.
  */
-template<class T> class Attribut_zero_null : public attribut_entity_val<T> {
+template<class T> class attribut_zero_null : public attribut_entity_val<T> {
 protected:
     using attribut_entity_val<T>::m_valeur;
 public:
     enum {Zero = 0};
-    CONSTR_DEFAUT(Attribut_zero_null)
-    CONSTR_AFFECT_DEFAUT(Attribut_zero_null)
+    CONSTR_DEFAUT(attribut_zero_null)
+    CONSTR_AFFECT_DEFAUT(attribut_zero_null)
 
     //! Destructeur.
-    ~Attribut_zero_null() override;
+    ~attribut_zero_null() override;
 
     //! Accesseur de l'attribut pour la base de données.
     QVariant get_to_bdd() const override
-        {return m_valeur == Zero ? QVariant(QVariant::UInt) : m_valeur;}
+        {return m_valeur == Zero ? QVariant(QMetaType(QMetaType::UInt)) : m_valeur;}
 };
 
-template<class T> Attribut_zero_null<T>::~Attribut_zero_null<T>() = default;
+template<class T> attribut_zero_null<T>::~attribut_zero_null<T>() = default;
 
-using Attribut_id_null = Attribut_zero_null<idt>;
-using attribut_unsigned_null = Attribut_zero_null<unsigned>;
+using attribut_id_null = attribut_zero_null<idt>;
+using attribut_unsigned_null = attribut_zero_null<unsigned>;
 
 /*! \ingroup groupe_attribut_entity
  *\brief _template des attributs de type entier supérieur ou égal à N.
  */
-template<class T, T N> class Attribut_sup : public attribut_entity_val<T> {
+template<class T, T N> class attribut_sup : public attribut_entity_val<T> {
 protected:
     using attribut_entity_val<T>::m_valeur;
 public:
-    CONSTR_DEFAUT(Attribut_sup)
+    CONSTR_DEFAUT(attribut_sup)
     //! Constructeur.
     using attribut_entity_val<T>::attribut_entity_val;
-    CONSTR_AFFECT_DEFAUT(Attribut_sup)
+    CONSTR_AFFECT_DEFAUT(attribut_sup)
 
     //! Destruteur.
-    ~Attribut_sup() override;
+    ~attribut_sup() override;
 
     //! Teste la validité de la valeur.
     bool is_valid_attribut() const final override
         {return m_valeur >= N;}
 };
 
-template<class T, T N> Attribut_sup<T,N>::~Attribut_sup() = default;
+template<class T, T N> attribut_sup<T,N>::~attribut_sup() = default;
 
-template<idt N> using Attribut_id_sup = Attribut_sup<idt, N>;
-template<int N> using attribut_int_sup = Attribut_sup<int, N>;
-template<unsigned N> using attribut_unsigned_sup = Attribut_sup<unsigned, N>;
+template<idt N> using attribut_id_sup = attribut_sup<idt, N>;
+template<int N> using attribut_int_sup = attribut_sup<int, N>;
+template<unsigned N> using attribut_unsigned_sup = attribut_sup<unsigned, N>;
 
 /*! \ingroup groupe_attribut_entity
  *\brief _template des attributs de type entier inférieur strict à N.
@@ -618,7 +619,7 @@ public:
     CONSTR_AFFECT_DEFAUT(attribut_string_not_empty)
 
     //!Destructeur.
-    ~attribut_string_not_empty();
+    ~attribut_string_not_empty() override;
 
     //! Teste la validité de la valeur.
     bool is_valid_attribut() const final
@@ -628,16 +629,16 @@ public:
 /*! \ingroup groupe_attribut_entity
  *\brief Classe mère des attributs de type référence.
  */
-class Attribut_ref : public attribut_string {
+class attribut_ref : public attribut_string {
 public:
-    CONSTR_DEFAUT(Attribut_ref)
-    CONSTR_AFFECT_DEFAUT(Attribut_ref)
+    CONSTR_DEFAUT(attribut_ref)
+    CONSTR_AFFECT_DEFAUT(attribut_ref)
 
     //! Expression régulière de vérification d'une référence.
     static const QRegularExpression Reg;
 
     //!Destructeur.
-    ~Attribut_ref();
+    ~attribut_ref() override;
 
     //! Teste la validité de la valeur.
     bool is_valid_attribut() const final
@@ -664,31 +665,31 @@ SINGLE_ATTRIBUT(exact_attribut,attribut_code,Exact,exact)
 SINGLE_ATTRIBUT(feuille_attribut,attribut_bool,Feuille,feuille)
 SINGLE_ATTRIBUT(fin_attribut,attribut_date_time_valide,Fin,fin)
 SINGLE_ATTRIBUT(forme_attribut,attribut_int,Forme,forme)
-SINGLE_ATTRIBUT(id_attribut,Attribut_id,Id,id)
-SINGLE_ATTRIBUT(id_cible_attribut,Attribut_id_sup<1>,Id_Cible,id_cible)
-SINGLE_ATTRIBUT(id_etat_attribut,Attribut_id_sup<1>,Id_Etat,id_etat)
-SINGLE_ATTRIBUT(id_prog_attribut,Attribut_id_null,Id_Prog,id_prog)
-SINGLE_ATTRIBUT_ID(id_1_attribut,Attribut_id_sup<1>,1)
+SINGLE_ATTRIBUT(id_attribut,attribut_id,Id,id)
+SINGLE_ATTRIBUT(id_cible_attribut,attribut_id_sup<1>,Id_Cible,id_cible)
+SINGLE_ATTRIBUT(id_etat_attribut,attribut_id_sup<1>,Id_Etat,id_etat)
+SINGLE_ATTRIBUT(id_prog_attribut,attribut_id_null,Id_Prog,id_prog)
+SINGLE_ATTRIBUT_ID(id_1_attribut,attribut_id_sup<1>,1)
 SINGLE_ATTRIBUT_ID(id_1_neg_attribut,attribut_int,1)
-SINGLE_ATTRIBUT_ID(id_1_null_attribut,Attribut_id_null,1)
-SINGLE_ATTRIBUT_ID(id_1_zero_attribut,Attribut_id,1)
-SINGLE_ATTRIBUT_ID(id_2_attribut,Attribut_id_sup<1>,2)
+SINGLE_ATTRIBUT_ID(id_1_null_attribut,attribut_id_null,1)
+SINGLE_ATTRIBUT_ID(id_1_zero_attribut,attribut_id,1)
+SINGLE_ATTRIBUT_ID(id_2_attribut,attribut_id_sup<1>,2)
 SINGLE_ATTRIBUT_ID(id_2_neg_attribut,attribut_int,2)
-SINGLE_ATTRIBUT_ID(id_2_null_attribut,Attribut_id_null,2)
-SINGLE_ATTRIBUT_ID(id_3_attribut,Attribut_id_sup<1>,3)
-SINGLE_ATTRIBUT_ID(id_3_null_attribut,Attribut_id_null,3)
-SINGLE_ATTRIBUT_ID(id_4_attribut,Attribut_id_sup<1>,4)
-SINGLE_ATTRIBUT_ID(id_5_attribut,Attribut_id_sup<1>,5)
+SINGLE_ATTRIBUT_ID(id_2_null_attribut,attribut_id_null,2)
+SINGLE_ATTRIBUT_ID(id_3_attribut,attribut_id_sup<1>,3)
+SINGLE_ATTRIBUT_ID(id_3_null_attribut,attribut_id_null,3)
+SINGLE_ATTRIBUT_ID(id_4_attribut,attribut_id_sup<1>,4)
+SINGLE_ATTRIBUT_ID(id_5_attribut,attribut_id_sup<1>,5)
 SINGLE_ATTRIBUT(nc_attribut,attribut_string_not_empty,Nc,nc)
 SINGLE_ATTRIBUT(nom_attribut,attribut_string_not_empty,Nom,nom)
 SINGLE_ATTRIBUT(modif_attribut,attribut_code,Modif,modif)
 SINGLE_ATTRIBUT(modification_attribut,attribut_date_time_current,Modification,modification)
 SINGLE_ATTRIBUT(num_attribut,attribut_int_sup<0>,Num,num)
-SINGLE_ATTRIBUT(parent_attribut,Attribut_id_null,Parent,parent)
+SINGLE_ATTRIBUT(parent_attribut,attribut_id_null,Parent,parent)
 SINGLE_ATTRIBUT(police_attribut,attribut_string_not_empty,Font,font)
 SINGLE_ATTRIBUT(police_texte_attribut,attribut_string_not_empty,Police_Texte,police_texte)
 SINGLE_ATTRIBUT(police_titre_attribut,attribut_string_not_empty,Police_Titre,police_titre)
-SINGLE_ATTRIBUT(ref_attribut,Attribut_ref,Ref,ref)
+SINGLE_ATTRIBUT(ref_attribut,attribut_ref,Ref,ref)
 SINGLE_ATTRIBUT(saisie_attribut,attribut_code,Saisie,saisie)
 SINGLE_ATTRIBUT(style_num_attribut,attribut_style_num,Style_Num,style_num)
 SINGLE_ATTRIBUT(texte_attribut,attribut_string,Texte,texte)
@@ -696,8 +697,8 @@ SINGLE_ATTRIBUT(texture_attribut,attribut_brush,Texture,texture)
 SINGLE_ATTRIBUT(titre_attribut,attribut_string_not_empty,Titre,titre)
 SINGLE_ATTRIBUT(total_attribut,attribut_int_sup<1>,Total,total)
 SINGLE_ATTRIBUT(tp_val_attribut,attribut_int,Tp_Val,tp_val)
-SINGLE_ATTRIBUT(type_attribut,Attribut_id_sup<1>,Type,type)
-SINGLE_ATTRIBUT(type_id_attribut,Attribut_id,Type,type)
+SINGLE_ATTRIBUT(type_attribut,attribut_id_sup<1>,Type,type)
+SINGLE_ATTRIBUT(type_id_attribut,attribut_id,Type,type)
 SINGLE_ATTRIBUT(valeur_double_attribut,attribut_double,Valeur,valeur)
 SINGLE_ATTRIBUT(valeur_int_attribut,attribut_int,Valeur,valeur)
 SINGLE_ATTRIBUT(valeur_variant_attribut,attribut_variant,Valeur,valeur)

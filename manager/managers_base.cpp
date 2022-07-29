@@ -5,9 +5,9 @@ using namespace manager;
 
 managers_base::managers_base(const entidt nbr_entity, const QString &version_table,
                    std::map<entidt,std::unique_ptr<abstract_manager>> &&managers,
-                   const QSqlQuery &req)
+                   QSqlQuery &&req)
       : m_nbr_entity(nbr_entity),
-        m_requete(req),
+        m_requete(std::move(req)),
         m_managers(nbr_entity) {
       using UniqueVersion = num_type_unique_sql<version_bdd>;
       info_bdd info_version("Version",version_table,version_bdd::Nbr_Att,{UniqueVersion::Nbr_Unique});
@@ -71,7 +71,7 @@ int managers_base::num_version(numt type)
 void managers_base::save_version(int num, numt type)
     {m_manager_version->save(version_bdd(num,type));}
 
-void managers_base::set_requete(const QSqlQuery &req) {
-    m_requete = req;
+void managers_base::set_requete(QSqlQuery &&req) {
+    m_requete = std::move(req);
     abstract_manager_sql::set_requete(&m_requete);
 }

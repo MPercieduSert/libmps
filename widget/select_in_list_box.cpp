@@ -6,8 +6,8 @@ using namespace widget;
 select_in_list_box::select_in_list_box(const QString &titre_gauche,
                                  const QString &titre_droite,
                                  bool ordre, bool repetition,
-                                 const std::map<QVariant, QString> &choices_gauche,
-                                 const std::map<QVariant, QString> &choices_droite,
+                                 const std::map<uint, QString> &choices_gauche,
+                                 const std::map<uint, QString> &choices_droite,
                                  QWidget *parent)
     : QWidget(parent),
       m_ordre(ordre),
@@ -126,7 +126,9 @@ void select_in_list_box::append(QListWidget *list, QListWidgetItem *item, bool e
     }
     else {
         auto i = 0;
-        while(i < list->count() &&list->item(i)->data(Qt::UserRole) < item->data(Qt::UserRole))
+        while(i < list->count() &&
+              (QVariant::compare(list->item(i)->data(Qt::UserRole), item->data(Qt::UserRole))
+                                 == QPartialOrdering::Less))
             i += 1;
         list->insertItem(i,item);
     }
@@ -180,7 +182,7 @@ void select_in_list_box::remove(QList<QListWidgetItem*> && list, QVariant n) {
     }
 }
 
-void select_in_list_box::set_value(const std::map<QVariant,QString> &choices_gauche, const std::map<QVariant,QString> &choices_droite){
+void select_in_list_box::set_value(const std::map<uint,QString> &choices_gauche, const std::map<uint,QString> &choices_droite){
     clear();
     for(auto i = choices_droite.cbegin(); i != choices_droite.cend(); ++i)
         append(i->first, i->second, true);

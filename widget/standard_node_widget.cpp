@@ -256,7 +256,7 @@ node_widget *standard_node_delegate::create_node(const node_index &index, QWidge
     node->set_painter(std::make_unique<rounded_node_painter>());
     auto cibles = index.data(model_base::Cibles_Role).toList();
     for(auto it = cibles.cbegin(); it != cibles.cend(); ++it) {
-        if(it->canConvert(QMetaType::QVariantList)) {
+        if(it->canConvert<QVariantList>()) {
             auto l = it->toList();
             node->add_sub_node_widget(create_sub_node(index.index(l.front().toInt(),l.back().toUInt()),node));
         }

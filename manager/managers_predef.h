@@ -113,8 +113,8 @@ public:
     managers_predef(entidt nbr_entity, entidt nbr_cible, const QString &version_table,
                     std::map<entidt,std::unique_ptr<abstract_manager>> &&managers
                         = std::map<entidt,std::unique_ptr<abstract_manager>>(),
-                    const QSqlQuery &req = QSqlQuery())
-        : managers_base (nbr_entity,version_table,std::move(managers),req),
+                     QSqlQuery && req = QSqlQuery())
+        : managers_base (nbr_entity,version_table,std::move(managers),std::move(req)),
           m_cible_array(nbr_entity,b2d::nature_id::Vide),
           m_cible_nbr_att_array(nbr_cible,0) {}
 

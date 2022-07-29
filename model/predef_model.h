@@ -63,8 +63,8 @@ public:
  */
 class abstract_permission_node : public item_bdd_node {
 protected:
-    std::map<int,flag> m_permission_map;     //!< Map des permission du type.
-    permission_model *m_model;              //!< Pointeur sur le model.
+    std::map<int,flag> m_permission_map;        //!< Map des permission du type.
+    permission_model *m_model;                  //!< Pointeur sur le model.
 public:
     //! Constructeur.
     abstract_permission_node(permission_model *model)

@@ -42,7 +42,7 @@ bool config::is_valid() {
     open_read();
     QXmlStreamReader xml(&m_file);
     if (xml.readNextStartElement())
-        if (xml.name() != "conf")
+        if (xml.name() != QString("conf"))
                 xml.raiseError(QObject::tr("Le fichier config.xml n'est pas valide"));
     close();
     return !xml.error();

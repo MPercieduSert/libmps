@@ -206,7 +206,7 @@ public:
         {return pos < Nbr_Att ? attributs<entity,Attribut>::multiple_nom(pos) : QString();}
 
     //! Retourne un vecteur contenant les noms des attributs.
-    static std::vector<QString> Attribut_names() {
+    static std::vector<QString> attribut_names() {
         std::vector<QString> vect(Nbr_Att);
         for (post i =0; i < Nbr_Att; ++i)
             vect[i] = attributs<entity,Attribut>::attribut_name(i);

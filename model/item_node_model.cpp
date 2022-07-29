@@ -20,6 +20,9 @@ QVariant item_node::data(int cible, int role, numt num) const {
     return QVariant();
 }
 
+//////////////////////////////////// item_bdd_node ////////////////////////////
+item_bdd_node::~item_bdd_node() = default;
+
 //////////////////////////////////// item_node_model ////////////////////////////
 QVariant item_node_model::data(const node_index &index, int role) const {
     if(check_index(index))

@@ -52,8 +52,8 @@ public:
     //!Constructeur
     explicit select_in_list_box(const QString &titre_gauche = QString(), const QString &titre_droite = QString(),
                                 bool ordre = false, bool repetition = false,
-                                const std::map<QVariant,QString> &choices_gauche = std::map<QVariant,QString>(),
-                                const std::map<QVariant,QString> &choices_droite = std::map<QVariant,QString>(),
+                                const std::map<uint,QString> &choices_gauche = std::map<uint,QString>(),
+                                const std::map<uint,QString> &choices_droite = std::map<uint,QString>(),
                                 QWidget *parent = nullptr);
 
     //! Destructeur par default.
@@ -72,7 +72,7 @@ public:
     }
 
     //! Mutateur des deux listes.
-    void set_value(const std::map<QVariant,QString> &choices_gauche, const std::map<QVariant,QString> &choices_droite);
+    void set_value(const std::map<uint,QString> &choices_gauche, const std::map<uint,QString> &choices_droite);
 
     //! Retourne une paire contenant deux listes d'entiters, la liste des données (Qt::UserData) de la liste gauche
     //! et celles de la liste de droite.

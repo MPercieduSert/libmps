@@ -278,7 +278,7 @@ void bdd::hydrate_attribut_xml(entities::entity &ent, post pos,
                 else if(iter_police->name() == "poids") {
                     auto p = str_categorie_to_enum(iter_police->text(),Font_Weight,controle);
                     if(controle.isEmpty())
-                        police.setWeight(static_cast<int>(p));
+                        police.setWeight(static_cast<QFont::Weight>(p));
                     else
                         controle.prepend(QString("-> Dans le poids de la police de : ")
                                          .append(iter->name()).append(" = ").append(iter_police->text()).append("\n"));
@@ -534,7 +534,7 @@ fichier::doc_xml bdd::schema_xml_for_import() const{
                     }
                     else {
                         auto k = managers().find(key_it->second);
-                        auto str = key_it->second;
+                        //auto str = key_it->second;
                         if(managers().info(k).nbr_set_unique() != 0) {
                             att_it = schema.emplace_back(att_it,"xs:complexType");
                             if(managers().info(k).nbr_set_unique() == 1) {
@@ -594,7 +594,7 @@ void bdd::set_bdd() {
     m_bdd.exec("PRAGMA foreign_keys = ON;");
     QSqlQuery req = QSqlQuery(m_bdd);
     req.setForwardOnly(true);
-    m_manager->set_requete(req);
+    m_manager->set_requete(std::move(req));
 }
 
 void bdd::set_name(const QString &name) {

@@ -88,29 +88,29 @@ void arc_node_view_widget::insert_nodes(numt pos, numt count){
 
 void arc_node_view_widget::mousePressEvent(QMouseEvent *event) {
     if(m_node_arc_visible && event->button() == Qt::LeftButton) {
-        if(event->y() > m_node->geometry().bottom() + m_view->m_arc_painter->bottom_node_margin()
-                && event->y() <= m_node->geometry().bottom() + m_view->m_arc_painter->bottom_node_margin()
+        if(event->position().y() > m_node->geometry().bottom() + m_view->m_arc_painter->bottom_node_margin()
+                && event->position().y() <= m_node->geometry().bottom() + m_view->m_arc_painter->bottom_node_margin()
                                                              + m_view->m_arc_painter->height_tool_zone()
-                && event->x() < m_view->m_arc_painter->width_tool_zone(node_view::End_Of_Tool)){
-            if(event->x() < m_view->m_arc_painter->width_tool_zone(node_view::Expand_Tool)) {
+                && event->position().x() < m_view->m_arc_painter->width_tool_zone(node_view::End_Of_Tool)){
+            if(event->position().x() < m_view->m_arc_painter->width_tool_zone(node_view::Expand_Tool)) {
                 if(!m_leaf && m_node->flags().test(Expendable_FLag_Node))
                     set_expanded(!m_expanded);
             }
-            else if (event->x() < m_view->m_arc_painter->width_tool_zone(node_view::Elder_Tool)) {
+            else if (event->position().x() < m_view->m_arc_painter->width_tool_zone(node_view::Elder_Tool)) {
                 if(m_node->flags().test(Elder_Enable_Flag_Node))
                     m_node->index().model()->insert_nodes(m_node->index(),0,1);
             }
-            else if (event->x() < m_view->m_arc_painter->width_tool_zone(node_view::Brother_Tool)) {
+            else if (event->position().x() < m_view->m_arc_painter->width_tool_zone(node_view::Brother_Tool)) {
                 if(m_node->flags().test(Brother_Enable_Flag_Node))
                     m_node->index().model()->insert_nodes(m_node->index().parent(),m_node->index().position() + 1,1);
             }
-            else if (event->x() < m_view->m_arc_painter->width_tool_zone(node_view::Del_Tool)) {
+            else if (event->position().x() < m_view->m_arc_painter->width_tool_zone(node_view::Del_Tool)) {
                 if(m_node->flags().test(Del_Enable_Flag_Node))
                     m_node->index().model()->remove_nodes(m_node->index());
             }
         }
-        else if((m_expanded && event->x() < m_view->m_arc_painter->left_expanded_margin()
-                            && event->y() > m_node->geometry().bottom()))
+        else if((m_expanded && event->position().x() < m_view->m_arc_painter->left_expanded_margin()
+                            && event->position().y() > m_node->geometry().bottom()))
             set_expanded(false);
     }
 }

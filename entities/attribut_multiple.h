@@ -27,20 +27,20 @@ public:
     CONSTR_AFFECT_DEFAUT(attributs)
 };
 
-template <class Attribut_Premier, class... Attribut_Suivant> class attributs<Attribut_Premier, Attribut_Suivant...>
-        : public Attribut_Premier, public attributs<Attribut_Suivant...> {
+template <class attribut_Premier, class... attribut_Suivant> class attributs<attribut_Premier, attribut_Suivant...>
+        : public attribut_Premier, public attributs<attribut_Suivant...> {
 public:
     //! Nombre d'attribut de l'entité.
-    enum {Nbr_Att = Attribut_Premier::Nbr_Att + attributs<Attribut_Suivant...>::Nbr_Att};
+    enum {Nbr_Att = attribut_Premier::Nbr_Att + attributs<attribut_Suivant...>::Nbr_Att};
     //!Filliation des attributs
-    using att_pre = Attribut_Premier;
-    using att_suiv = attributs<Attribut_Suivant...>;
+    using att_pre = attribut_Premier;
+    using att_suiv = attributs<attribut_Suivant...>;
     CONSTR_DEFAUT(attributs)
     CONSTR_AFFECT_DEFAUT(attributs)
 
     //! Renvoie une chaine de caractère contenant les noms, les validités et les valeurs des attributs.
     QString affiche() const override
-        {return Attribut_Premier::affiche().append("\n").append(attributs<Attribut_Suivant...>::affiche());}
+        {return attribut_Premier::affiche().append("\n").append(attributs<attribut_Suivant...>::affiche());}
 
     //! Retourne un QVariant contenant la donnée souhaitée ou un QVariant nulle si num est invalide.
     QVariant data(numt num) const
@@ -48,43 +48,43 @@ public:
 
     //! Teste si l'entité est valide.
     bool is_valid() const override
-        {return Attribut_Premier::is_valid() &&attributs<Attribut_Suivant...>::is_valid();}
+        {return attribut_Premier::is_valid() &&attributs<attribut_Suivant...>::is_valid();}
 
     //! Retourne le nom de l'attribut donnée souhaitée, pos doit être valide.
     static QString Name(numt pos)
-        {return pos < Attribut_Premier::Nbr_Att ? Attribut_Premier::Name(pos)
-                                                : attributs<Attribut_Suivant...>::Name(pos - Attribut_Premier::Nbr_Att);}
+        {return pos < attribut_Premier::Nbr_Att ? attribut_Premier::Name(pos)
+                                                : attributs<attribut_Suivant...>::Name(pos - attribut_Premier::Nbr_Att);}
 
     //! Renvoie une chaine de caractère contenant les valeurs de l'attribut.
     QString to_string() const override
-        {return Attribut_Premier::to_string().append(",").append(attributs<Attribut_Suivant...>::to_string());}
+        {return attribut_Premier::to_string().append(",").append(attributs<attribut_Suivant...>::to_string());}
 
     //! Test d'égalité entre cette entité et celle transmise en argument.
-    bool operator ==(const attributs<Attribut_Premier, Attribut_Suivant...> &ent) const
-        {return Attribut_Premier::operator ==(ent) && attributs<Attribut_Suivant...>::operator ==(ent);}
+    bool operator ==(const attributs<attribut_Premier, attribut_Suivant...> &ent) const
+        {return attribut_Premier::operator ==(ent) && attributs<attribut_Suivant...>::operator ==(ent);}
 
 protected:
     //! Retourne le nom de l'attribut donnée souhaitée, pos doit être valide.
     QString multiple_nom(numt pos) const
-        {return pos < Attribut_Premier::Nbr_Att ? Attribut_Premier::multiple_nom(pos)
-                                                : attributs<Attribut_Suivant...>::multiple_nom(pos - Attribut_Premier::Nbr_Att);}
+        {return pos < attribut_Premier::Nbr_Att ? attribut_Premier::multiple_nom(pos)
+                                                : attributs<attribut_Suivant...>::multiple_nom(pos - attribut_Premier::Nbr_Att);}
 
     //! Retourne un QVariant contenant la donnée souhaitée, pos doit être valide.
     QVariant data_v(numt pos) const override
-        {return pos < Attribut_Premier::Nbr_Att ? Attribut_Premier::data_v(pos)
-                                                : attributs<Attribut_Suivant...>::data_v(pos - Attribut_Premier::Nbr_Att);}
+        {return pos < attribut_Premier::Nbr_Att ? attribut_Premier::data_v(pos)
+                                                : attributs<attribut_Suivant...>::data_v(pos - attribut_Premier::Nbr_Att);}
 
     //! Remplace les attributs de l'entité par celle de l'entité transmise.
-    void set(const  attributs<Attribut_Premier, Attribut_Suivant...> &ent) {
-        Attribut_Premier::set(ent);
-        attributs<Attribut_Suivant...>::set(ent);
+    void set(const  attributs<attribut_Premier, attribut_Suivant...> &ent) {
+        attribut_Premier::set(ent);
+        attributs<attribut_Suivant...>::set(ent);
     }
 
     //! Modifie la donnée à partir d'un QVariant, pos doit être valide.
    void set_data_v(numt pos, const QVariant &value) override
-        {return pos < Attribut_Premier::Nbr_Att ? Attribut_Premier::set_data_v(pos, value)
-                                                : attributs<Attribut_Suivant...>
-                                                  ::set_data_v(pos - Attribut_Premier::Nbr_Att, value);}
+        {return pos < attribut_Premier::Nbr_Att ? attribut_Premier::set_data_v(pos, value)
+                                                : attributs<attribut_Suivant...>
+                                                  ::set_data_v(pos - attribut_Premier::Nbr_Att, value);}
 };
 
 /*! \ingroup groupe_entity

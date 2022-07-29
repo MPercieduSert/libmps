@@ -4,7 +4,7 @@ using namespace mps;
 using namespace mps::attribut;
 constexpr std::array<int, attribut_decimale::Nbr_Values> attribut_decimale::Decimale{{1,2,3,4,5,6,7,8,9,10,20,40,50,100,200,400,500,1000}};
 constexpr std::array<int, attribut_decimale::Nbr_Values> attribut_decimale::Precision{{0,1,2,2,1,2,3,3,3,1,2,3,2,2,3,4,3,3}};
-const QRegularExpression Attribut_ref::Reg {"^[a-z][a-z0-9_]*$"};
+const QRegularExpression attribut_ref::Reg {"^[a-z][a-z0-9_]*$"};
 QString attribut_entity::affiche() const
         {return attribut_nom().append(" : ").append(classe_nom())
                                             .append(" (").append(valid_to_string())
@@ -22,7 +22,7 @@ DESTR_VIDE_DEF(attribut_date_time_null)
 DESTR_VIDE_DEF(attribut_date_time_valide)
 DESTR_VIDE_DEF(attribut_date_time_valide_or_current)
 DESTR_VIDE_DEF(attribut_decimale)
-DESTR_VIDE_DEF(Attribut_ref)
+DESTR_VIDE_DEF(attribut_ref)
 DESTR_VIDE_DEF(attribut_string_not_empty)
 
 DESTR_VIDE_DEF(bordure_attribut)

@@ -91,7 +91,8 @@ public:
 
         //! Compare entre deux lignes ( ligne_1 < ligne_2).
         virtual bool compare(szt ligne_1, szt ligne_2) const
-            {return data(ligne_1,Qt::DisplayRole) < data(ligne_2,Qt::DisplayRole);}
+            {return QVariant::compare(data(ligne_1,Qt::DisplayRole),data(ligne_2,Qt::DisplayRole))
+                    == QPartialOrdering::Less;}
 
         //! Accesseur de la donnée d'indice id dans la colonne.
         virtual QVariant data(szt /*id*/, int /*role*/ = Qt::DisplayRole) const {return QVariant();}

@@ -2,12 +2,12 @@
 
 using namespace mps::manager;
 
-QSqlQuery *req_sql::m_Requete = nullptr;
+QSqlQuery *req_sql::m_requete = nullptr;
 
 void req_sql::aff_error() const {
-    QSqlError err(m_Requete->lastError());
+    QSqlError err(m_requete->lastError());
     if(err.isValid())
-        throw std::invalid_argument(err.text().append("\n"+err.nativeErrorCode()+"\n"+m_Requete->lastQuery()).toStdString());
+        throw std::invalid_argument(err.text().append("\n"+err.nativeErrorCode()+"\n"+m_requete->lastQuery()).toStdString());
 }
 
 QString req_sql::type_attribut_sql_string(b2d::type_attribut_bdd n) {

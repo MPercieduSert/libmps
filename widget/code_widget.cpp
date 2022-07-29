@@ -36,7 +36,7 @@ code_widget::code_widget(const vec_option_case &cases, int cote, QWidget *parent
 
 void code_widget::mousePressEvent(QMouseEvent *event) {
     if(!m_read_only &&event->button() == Qt::LeftButton)
-        set_code(m_code ^ m_cases.at(static_cast<szt>(event->x()/m_cote)).code);
+        set_code(m_code ^ m_cases.at(static_cast<szt>(event->position().x()/m_cote)).code);
 }
 
 void code_widget::paintEvent(QPaintEvent */*event*/) {

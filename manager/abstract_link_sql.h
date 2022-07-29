@@ -75,7 +75,7 @@ public:
 
     //! Mutateur de l'identifiant.
     void set_id(const entity &ent, post pos = 0)
-        {m_Requete->bindValue(static_cast<int>(pos),ent.id());}
+        {m_requete->bindValue(static_cast<int>(pos),ent.id());}
 };
 
 template<class Ent> class link_sql : public link_sql_attribut<Ent> {

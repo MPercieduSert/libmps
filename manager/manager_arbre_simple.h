@@ -80,13 +80,13 @@ public:
     //! Renvoie le liste des descendant direct d'entity.
     vector_ptr<Ent> get_list_childs(const Ent &ent, typename Ent::position ordre = Ent::Ordre) override {
         return ent.id() ? get_list(Ent::Parent,ent.id(),ordre)
-                        : get_list(Ent::Parent,QVariant(QVariant::Int),ordre,mps::b2d::Is);
+                        : get_list(Ent::Parent,QVariant(QMetaType(QMetaType::Int)),ordre,mps::b2d::Is);
     }
 
     //! Renvoie le liste des identifiants des descendant direct de l'entité d'identifiant id.
     std::list<idt> get_list_childs_id(idt id,typename Ent::position ordre = Ent::Ordre) override{
         return id ? get_list_id(Ent::Parent,id,ordre)
-                  : get_list_id(Ent::Parent,QVariant(QVariant::Int),ordre,mps::b2d::Is);
+                  : get_list_id(Ent::Parent,QVariant(QMetaType(QMetaType::Int)),ordre,mps::b2d::Is);
     }
 
     //! Renvoie le liste des identifiants des descendant direct de l'entité d'identifiant id

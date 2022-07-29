@@ -47,9 +47,10 @@ class tab_gestion_type : public abstract_tab_module_with_bdd {
     Q_OBJECT
 protected:
     model_base::type_permission_model *m_model;    //!< Model.
-    widget::node_view *m_view;               //!< Vue.
-    QListWidget *m_cible_list_widget;            //!< Sélection des cibles.
-    QPushButton *m_save_bouton;                 //!< Bouton de sauvegarde.
+    widget::node_view *m_view;                      //!< Vue.
+    QLabel * m_cible_label;                         //!< Titre de sélection des cibles.
+    QListWidget *m_cible_list_widget;               //!< Sélection des cibles.
+    QPushButton *m_save_bouton;                     //!< Bouton de sauvegarde.
 
     // Calque
     QVBoxLayout *m_cible_layout;                //!< Calque des cibles.
@@ -70,6 +71,9 @@ public:
 public slots:
     //! Action à effectuer lorsque l'onglet devient actif.
     void become_current() override;
+
+    //! Mise à jour de la liste des permission.
+    void set_current_permission(const mps::model_base::node_index &index);
 
     //! Slot coorepondant à l'action sauver.
     void sauver() override
