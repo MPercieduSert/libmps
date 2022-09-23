@@ -25,9 +25,9 @@ class indexed_widget : public QWidget {
     Q_OBJECT
 protected:
     using node_index = model_base::node_index;
-    flag m_flags;                       //!< Drapeaux associé aux noeud.
     node_index m_index;                 //!< Index associé aux noeuds.
     QBoxLayout *m_main_layout;          //!< Calque principale du sous-noeud.
+    flag m_flags;                       //!< Drapeaux associé aux noeud.
 public:
     //! Constructeur.
     indexed_widget(const node_index &index, QWidget *parent = nullptr);
@@ -80,7 +80,7 @@ public:
 
 public slots:
     //! Met à jour les données du sous-noeud à partir des données du model.
-    void update_data(flag role) {
+    void update_data(mps::flag role) {
         set_connexion(false);
         update_data_sub_node(role);
         set_connexion(true);
@@ -114,7 +114,7 @@ public:
         node_painter() = default;
 
         //! Destructeur.
-        virtual ~node_painter() = default;
+        virtual ~node_painter();
 
         //! Dessine widget.
         virtual void paint(QWidget */*widget*/) {}
@@ -169,7 +169,7 @@ public slots:
     virtual void update_data();
 
     //! Met à jour les données du widget pour l'index index à partir des données du model.
-    virtual void update_data(const node_index &index, flag role);
+    virtual void update_data(const mps::widget::node_widget::node_index &index, mps::flag role);
 
 signals:
     //! Emit lorsque le noeud est cliqué avec le bouton gauche.
@@ -202,7 +202,7 @@ public:
 namespace widget {
 class arc_node_view_widget;
 /*! \ingroup groupe_Widget
- *\brief Vue pour un modèle hérité de Abstractnode_ptrModel.
+ *\brief Vue pour un modèle hérité de abstract_node_model.
  */
 class node_view : public QScrollArea {
     Q_OBJECT
@@ -277,20 +277,20 @@ protected:
     using node_model = model_base::item_node_model;
     using node_index = model_base::node_index;
     using select_model = model_base::node_selection_model;
-    bool m_connexion_update_data = true;                    //!< Etat de connexion de la mise à jour des données.
     std::unique_ptr<arc_painter> m_arc_painter;             //!< Dessine les arc.
     node_delegate *m_delegate = nullptr;                    //!< Délégate de la vue.
     node_model *m_model = nullptr;                          //!< Model associé à la vue.
-    mode_selection m_selection_mode = Single_Selection;     //!< Mode de sélection.
     select_model *m_selection_model = nullptr;              //!< Model de sélection.
     std::map<void*,arc_node_view_widget *> m_arc_map;       //!< Map des arc.
+    mode_selection m_selection_mode = Single_Selection;     //!< Mode de sélection.
+    bool m_connexion_update_data = true;                    //!< Etat de connexion de la mise à jour des données.
 public:
 
     //! Constructeur.
     node_view(std::unique_ptr<arc_painter> &&painter = std::make_unique<arc_painter>(), QWidget *parent = nullptr);
 
     //! Destructeur.
-    ~node_view()
+    ~node_view() override
         {delete_root();}
 
     //! Gestion d'un click sur un noeud.
@@ -334,20 +334,21 @@ public:
 
 public slots:
     //! Prend en compte l'insertion de nouveau noeud du model.
-    void insert_nodes(const node_index &parent, numt pos, numt count);
+    void insert_nodes(const mps::widget::node_widget::node_index &parent, mps::numt pos, mps::numt count);
 
     //! Prend en compte la suppression de noeud du model.
-    void remove_nodes(const node_index &parent, numt pos, numt count);
+    void remove_nodes(const mps::widget::node_widget::node_index &parent, mps::numt pos, mps::numt count);
 
     //! Met à jour toutes les données.
     void updateAllData();
 
     //! Met à jour les donnée du node_widget associé à l'index.
-    void update_data(const node_index &index, flag role);
+    void update_data(const mps::widget::node_widget::node_index &index, mps::flag role);
 
 protected slots:
     //! Change le noeud courant.
-    void current_changed(const node_index &current, const node_index &previous);
+    void current_changed(const mps::widget::node_widget::node_index &current,
+                         const mps::widget::node_widget::node_index &previous);
 
     //! Vide le map d'arc et supprime l'arbre d'arc.
     void delete_root();
@@ -365,18 +366,20 @@ protected slots:
 class arc_node_view_widget : public QWidget {
     Q_OBJECT
 protected:
-    bool m_draw_node = true;                            //!< Verrou de dessin des noeuds.
-    bool m_expanded = false;                            //!< Etat de la branche.
-    bool m_leaf = true;                                 //!< Le noeud est une feuille.
-    const bool m_root;                                  //!< Le noeud est la racine.
-    const bool m_node_arc_visible;                      //!< Le noeud et l'arc sont visible
     node_view *m_view;                                  //!< Vue contenant le widget.
     node_widget *m_node = nullptr;                      //!< Widget de noeud.
     std::vector<arc_node_view_widget *> m_arc_child;    //!< Vecteur des arcs fils.
+    bool m_draw_node = true;                            //!< Verrou de dessin des noeuds.
+    bool m_expanded = false;                            //!< Etat de la branche.
+    bool m_leaf = true;                                 //!< Le noeud est une feuille.
+    const bool m_tool_zone;                             //!< Présence de la zone outils.
+    const bool m_root;                                  //!< Le noeud est la racine.
+    const bool m_node_arc_visible;                      //!< Le noeud et l'arc sont visible
+
 public:
     //! Constructeur.
     arc_node_view_widget(node_widget *node, node_view *view, QWidget *parent = nullptr,
-                         bool root = false, bool node_arc_visible = true);
+                         bool root = false, bool node_arc_visible = true, bool tool_zone = true);
 
     //! Constructeur.
     arc_node_view_widget(const model_base::node_index &index, node_view *view, QWidget *parent = nullptr,

@@ -9,8 +9,8 @@ using namespace widget;
 abstract_node_delegate::abstract_node_delegate(QObject *parent) : QObject(parent) {}
 
 ////////////////////////////////////// arc_node_view_widget //////////////////////////////////////////
-arc_node_view_widget::arc_node_view_widget(node_widget *node, node_view *view, QWidget *parent, bool root, bool node_arc_visible)
-    : QWidget (parent), m_leaf(node->index().leaf()), m_root(root), m_node_arc_visible(node_arc_visible), m_view(view)
+arc_node_view_widget::arc_node_view_widget(node_widget *node, node_view *view, QWidget *parent, bool root, bool node_arc_visible, bool tool_zone)
+    : QWidget (parent), m_view(view), m_leaf(node->index().leaf()), m_tool_zone(tool_zone), m_root(root), m_node_arc_visible(node_arc_visible)
     {set_node_widget(node);}
 
 void arc_node_view_widget::draw_node(bool next) {
@@ -87,7 +87,7 @@ void arc_node_view_widget::insert_nodes(numt pos, numt count){
 }
 
 void arc_node_view_widget::mousePressEvent(QMouseEvent *event) {
-    if(m_node_arc_visible && event->button() == Qt::LeftButton) {
+    if(m_node_arc_visible && m_tool_zone && event->button() == Qt::LeftButton) {
         if(event->position().y() > m_node->geometry().bottom() + m_view->m_arc_painter->bottom_node_margin()
                 && event->position().y() <= m_node->geometry().bottom() + m_view->m_arc_painter->bottom_node_margin()
                                                              + m_view->m_arc_painter->height_tool_zone()
@@ -380,3 +380,5 @@ void node_widget::update_data(const model_base::node_index &index, flag role) {
                 it->second->update_data(role);
     }
 }
+
+node_widget::node_painter::~node_painter() = default;

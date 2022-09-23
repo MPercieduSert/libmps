@@ -80,7 +80,7 @@ public:
         {return QSize(m_cote *static_cast<int>(m_cases.size()),m_cote);}
 signals:
     //! Signal emit lors du changment de code.
-    void code_changed(flag code);
+    void code_changed(mps::flag code);
 protected:
     //! Gestionnaire de click de souris.
     void mousePressEvent(QMouseEvent *event) override;

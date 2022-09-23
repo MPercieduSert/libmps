@@ -23,9 +23,9 @@ tab_gestion_bdd::tab_gestion_bdd(b2d::bdd &bdd, const tab_index &index, QWidget 
     m_insert_bouton = new QPushButton(tr("Ajouter"));
     m_save_bouton = new QPushButton(tr("Sauvegarder"));
     m_suppr_bouton = new QPushButton(tr("Supprimer"));
-    connect(m_insert_bouton,&QPushButton::clicked,[this](){m_model->insertRow(m_model->rowCount());});
+    connect(m_insert_bouton,&QPushButton::clicked,this,[this](){m_model->insertRow(m_model->rowCount());});
     connect(m_save_bouton,&QPushButton::clicked,m_model,&QSqlTableModel::submitAll);
-    connect(m_suppr_bouton,&QPushButton::clicked,[this]()
+    connect(m_suppr_bouton,&QPushButton::clicked,this,[this]()
         {
             auto indexList = m_view->selectionModel()->selectedRows();
             for(auto j = indexList.cbegin(); j != indexList.cend(); ++j)
@@ -57,22 +57,17 @@ tab_gestion_type::tab_gestion_type(b2d::bdd &bdd, const tab_index &index, QWidge
     m_view->set_model(m_model);
     m_view->set_delegate(new delegate::code_standard_node_delegate(cases,this));
     m_cible_label = new QLabel(tr("Cible associées au type sélectionné :"));
-    m_cible_list_widget = new QListWidget;
-    for (auto it = m_model->id_nom_vec().cbegin(); it != m_model->id_nom_vec().cend(); ++it) {
-        auto item = new QListWidgetItem(it->second,m_cible_list_widget);
-        item->setData(Qt::UserRole,it->first);
-        item->setFlags(Qt::ItemIsUserCheckable);
-        item->setCheckState(Qt::Unchecked);
-    }
-    m_cible_list_widget->setSizePolicy(QSizePolicy::Minimum,QSizePolicy::Expanding);
-    connect(m_cible_list_widget,&QListWidget::itemChanged,this,[this](QListWidgetItem *item)
-        {m_model->set_cible(item->data(Qt::UserRole).toUInt(), item->checkState() == Qt::Checked);});
+    m_cible_view = new widget::node_view;
+    m_interface = new model_base::cible_permission_interface_model(m_model,this);
+    m_cible_view->set_model(m_interface);
+    //m_cible_view->set_delegate(new delegate::code_standard_node_delegate(cases,this));
+
     connect(m_save_bouton,&QPushButton::clicked,this,&tab_gestion_type::sauver);
 
     // Calque
     m_cible_layout = new QVBoxLayout;
     m_cible_layout->addWidget(m_cible_label);
-    m_cible_layout->addWidget(m_cible_list_widget);
+    m_cible_layout->addWidget(m_cible_view);
     m_cible_layout->addWidget(m_save_bouton);
     m_main_layout = new QHBoxLayout(this);
     m_main_layout->addWidget(m_view);

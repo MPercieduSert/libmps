@@ -36,7 +36,7 @@ public:
     tab_gestion_bdd(b2d::bdd &bdd, const tab_index &index, QWidget *parent = nullptr);
 
     //! Accesseur du titre.
-    QString title() const
+    QString title() const override
         {return QString("Table : ").append(m_info.name());}
 };
 
@@ -46,15 +46,16 @@ public:
 class tab_gestion_type : public abstract_tab_module_with_bdd {
     Q_OBJECT
 protected:
-    model_base::type_permission_model *m_model;    //!< Model.
-    widget::node_view *m_view;                      //!< Vue.
-    QLabel * m_cible_label;                         //!< Titre de sélection des cibles.
-    QListWidget *m_cible_list_widget;               //!< Sélection des cibles.
-    QPushButton *m_save_bouton;                     //!< Bouton de sauvegarde.
+    model_base::type_permission_model *m_model;                 //!< Model.
+    model_base::cible_permission_interface_model *m_interface;  //!< Interface du model pour l'affichage des cibles.
+    widget::node_view *m_view;                                  //!< Vue.
+    widget::node_view *m_cible_view;                            //! Vue des cibles.
+    QLabel * m_cible_label;                                     //!< Titre de sélection des cibles.
+    QPushButton *m_save_bouton;                                 //!< Bouton de sauvegarde.
 
     // Calque
-    QVBoxLayout *m_cible_layout;                //!< Calque des cibles.
-    QHBoxLayout *m_main_layout;                 //!< Calque principal.
+    QVBoxLayout *m_cible_layout;                                //!< Calque des cibles.
+    QHBoxLayout *m_main_layout;                                 //!< Calque principal.
 
 public:
     //! position des cases.

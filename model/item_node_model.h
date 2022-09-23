@@ -51,7 +51,7 @@ enum role_node {
     Background_Label_Role,      //!< Fond du label (QBrush)
     Foreground_Label_Role ,     //!< Rendu du label (QBrush)
     //Configuration Role
-    Cibles_Role,                 //!< Cibles (QList<QVariant> = QList<QPair<cible,num>>).
+    Cibles_Role,                //!< Cibles (QList<QVariant> = QList<QPair<cible,num>>).
     Flag_Role,                  //!< Drapeaux (flag)
     Orientation_Role,           //!< Orientation (Qt::Orientation)
     Type_Role,                  //!< Type des donnée (int)
@@ -651,6 +651,22 @@ public:
 public slots:
     //! Enregistre les données du model.
     virtual void save();
+};
+
+/*! \ingroup groupe_model
+ *\brief Classe mère interface de models à noeuds, ne contient pas de donnée mais un lien vers un model la contenant.
+ */
+class interface_node_model : public item_node_model {
+    Q_OBJECT
+protected:
+    item_node_model *m_model;           //!< Lien vers les données.
+public:
+    //! Constructeur.
+    interface_node_model(item_node_model *model, QObject *parent = nullptr) : item_node_model(parent), m_model(model) {}
+
+    //! Accesseur du model.
+    virtual item_node_model *model() const
+        {return m_model;}
 };
 
 ///////////////////////////////////// Definition de tree_for_node_model //////////////////////////////////
