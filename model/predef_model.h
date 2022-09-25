@@ -50,9 +50,6 @@ public:
     //! Nom d'une cible.
     const QString &nom_cible(numt num) const
         {return m_id_nom.at(num);}
-
-//    //! Muateur de la présence d'une cible.
-//    void set_cible(entidt num, bool visible);
 };
 
 /*! \ingroup groupe_model
@@ -110,6 +107,9 @@ public:
     //! Mutateur de la cible.
     void set_cible(numt cible)
         {m_cible = cible;}
+
+    //! Mutateur des données du noeud.
+    flag set_data(int cible, const QVariant &value, int role, numt num = 0) override;
 };
 
 /*! \ingroup groupe_model
@@ -268,7 +268,8 @@ template<class Ent, class Permission> void permission_node<Ent,Permission>::hydr
     }
 }
 
-template<class Ent, class Permission> QVariant permission_node<Ent,Permission>::data(int cible, int role, numt num) const {
+template<class Ent, class Permission>
+                        QVariant permission_node<Ent,Permission>::data(int cible, int role, numt num) const {
     if(role == String_Role){
         switch (cible) {
         case permission_model::Nc_Cible:
@@ -321,7 +322,7 @@ template<class Ent, class Permission> void permission_node<Ent,Permission>::save
         perm.set_id_1(m_ent.id());
         perm.set_cible(static_cast<int>(iter->first));
         perm.set_code(iter->second);
-        bdd.save(perm);
+        bdd.save_unique(perm);
     }
 }
 
@@ -348,7 +349,10 @@ template<class Ent, class Permission> flag permission_node<Ent,Permission>::
         break;
     case permission_model::Permission_Cible:
         if(role == Num_Role) {
-            m_permission_map[num] = value.toUInt();
+            if(value.toUInt() != NoFlag)
+                m_permission_map[num] = value.toUInt();
+            else if(m_permission_map.find(num) != m_permission_map.end())
+                m_permission_map[num] = NoFlag;
             return Main_Same_Change_Flag;
         }
         break;

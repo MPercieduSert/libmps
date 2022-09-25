@@ -17,26 +17,6 @@ void permission_model::hydrate_permission(const node_index &index) {
             static_cast<abstract_permission_node &>(get_node(index)).hydrate_permission();
 }
 
-//void permission_model::set_cible(entidt num, bool visible){
-//    if(visible) {
-//        if(std::find(m_cible_vec.cbegin(),m_cible_vec.cend(),num) == m_cible_vec.cend()) {
-//            begin_reset_data();
-//                m_cible_vec.push_back(num);
-//                for (auto iter = m_data.cbegin(); iter; ++iter)
-//                    static_cast<abstract_permission_node &>(**iter).add_cible(m_id_nom.at(num).first);
-//            end_reset_data();
-//        }
-//    }
-//    else {
-//        auto iter = std::find(m_cible_vec.cbegin(),m_cible_vec.cend(),num);
-//        if(iter != m_cible_vec.cend()) {
-//            model_about_to_reset_data();
-//                m_cible_vec.erase(iter);
-//            model_reset_data();
-//        }
-//    }
-//}
-
 /////////////////////////////////////////////// cible_permission_interface_model ////////////////////////////////
 cible_permission_interface_model::cible_permission_interface_model(permission_model *model, QObject *parent)
     : current_index_interface_node_model(model, parent) {
@@ -72,9 +52,7 @@ QVariant cible_permission_interface_node::data(int cible, int role, numt num) co
     case Cibles_Role:
         if(cible == Node_Cible && num == Node_Num){
             QList<QVariant> cibles({cible_permission_interface_model::Nom_Cible,
-                                   cible_permission_interface_model::Permission_Cible});//,permission_model::Permission_Cible});
-//            for (auto i = 0; i != static_cast<int>(m_model->cible_size()); ++i)
-//                cibles.append(QList<QVariant>({permission_model::Permission_Cible,i}));
+                                   cible_permission_interface_model::Permission_Cible});
             return cibles;
         }
         break;
@@ -88,6 +66,13 @@ flag cible_permission_interface_node::flags(int cible, numt num) const{
     return item_node::flags(cible,num);
 }
 
+flag cible_permission_interface_node::set_data(int cible, const QVariant &value, int role, numt num){
+    if(cible == cible_permission_interface_model::Permission_Cible
+            && role == Num_Role)
+        return m_model->model()->set_data(m_model->current().index(permission_model::Permission_Cible,m_cible)
+                                          ,value,Num_Role);
+    return item_node::set_data(cible,value,role,num);
+}
 
 //////////////////////////////////////////////////////// mot_cle_permission_model ///////////////////////////////
 mot_cle_permission_model::mot_cle_permission_model(b2d::bdd_predef &bdd, QObject *parent)
