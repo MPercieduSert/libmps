@@ -268,7 +268,7 @@ protected:
     widget::code_widget::vec_option_case m_cases;
 public:
     //! Constructeur.
-    code_standard_node_delegate(const widget::code_widget::vec_option_case cases, QObject *parent = nullptr)
+    code_standard_node_delegate(const widget::code_widget::vec_option_case &cases, QObject *parent = nullptr)
         : standard_node_delegate(parent), m_cases(cases) {}
 
     //! Crée un sous-noeud.

@@ -55,12 +55,12 @@ tab_gestion_type::tab_gestion_type(b2d::bdd &bdd, const tab_index &index, QWidge
     m_view = new widget::node_view(std::make_unique<widget::rounded_arc_painter>());
     m_model = new model_base::type_permission_model(static_cast<b2d::bdd_predef &>(bdd),this);
     m_view->set_model(m_model);
-    m_view->set_delegate(new delegate::code_standard_node_delegate(cases,this));
+    m_view->set_delegate(new delegate::standard_node_delegate(this));
     m_cible_label = new QLabel(tr("Cible associées au type sélectionné :"));
-    m_cible_view = new widget::node_view;
+    m_cible_view = new widget::node_view;//(std::make_unique<widget::rounded_arc_painter>());
     m_interface = new model_base::cible_permission_interface_model(m_model,this);
     m_cible_view->set_model(m_interface);
-    //m_cible_view->set_delegate(new delegate::code_standard_node_delegate(cases,this));
+    m_cible_view->set_delegate(new delegate::code_standard_node_delegate(cases,this));
 
     connect(m_save_bouton,&QPushButton::clicked,this,&tab_gestion_type::sauver);
 

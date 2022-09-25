@@ -79,8 +79,7 @@ public:
  */
 class cible_permission_interface_node : public item_node {
 protected:
-    numt m_cible;                                    //! Numero de cible.
-    QString m_nom;                                  //! Nom de la cible.
+    numt m_cible;                                   //! Numero de cible.
     cible_permission_interface_model *m_model;      //! Pointeur sur le model.
 
 public:
@@ -94,11 +93,12 @@ public:
     //! Accesseur des données du noeud.
     QVariant data(int cible, int role, numt num = 0) const override;
 
+    //! Accesseur des drapeaux associés à column.
+    flag flags(int cible, numt num = 0) const override;
+
     //! Mutateur de la cible.
-    void set_cible(numt cible, const QString &nom) {
-        m_cible = cible;
-        m_nom = nom;
-    }
+    void set_cible(numt cible)
+        {m_cible = cible;}
 };
 
 /*! \ingroup groupe_model
@@ -106,7 +106,7 @@ public:
  */
 class abstract_permission_node : public item_bdd_node {
 protected:
-    std::map<numt,flag> m_permission_map;        //!< Map des permission du type.
+    std::map<numt,flag> m_permission_map;       //!< Map des permission du type.
     permission_model *m_model;                  //!< Pointeur sur le model.
 public:
     //! Constructeur.
