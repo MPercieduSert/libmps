@@ -669,6 +669,27 @@ public:
         {return m_model;}
 };
 
+/*! \ingroup groupe_model
+ *\brief Classe mère interface de models à noeuds doté d'un noeud courant pointant sur le modèle interfacé.
+ */
+class current_index_interface_node_model : public interface_node_model {
+    Q_OBJECT
+protected:
+    node_index m_current;           //!< Indexe sut le noeud courant du model interfacé.
+public:
+    //! Constructeur.
+    using interface_node_model::interface_node_model;
+
+    const node_index &current() const
+        {return m_current;}
+
+public slots:
+    //! Mutateur de l'index.
+    virtual void set_current(const model_base::node_index &current, const model_base::node_index &/*previous*/ = node_index())
+        {m_current = current;
+        emit model_reset();}
+};
+
 ///////////////////////////////////// Definition de tree_for_node_model //////////////////////////////////
 template<class Factory> std::list<node_iter> tree_for_node_model::insert_nodes(const node_index &parent, numt pos,
                                                                                numt count, Factory factory) {

@@ -62,6 +62,8 @@ tab_gestion_type::tab_gestion_type(b2d::bdd &bdd, const tab_index &index, QWidge
     m_cible_view->set_model(m_interface);
     m_cible_view->set_delegate(new delegate::code_standard_node_delegate(cases,this));
 
+    connect(m_view->selection_model(),&model_base::node_selection_model::current_changed,
+            m_interface,&model_base::cible_permission_interface_model::set_current);
     connect(m_save_bouton,&QPushButton::clicked,this,&tab_gestion_type::sauver);
 
     // Calque

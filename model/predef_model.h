@@ -40,6 +40,9 @@ public:
     szt cible_size() const
         {return m_id_nom.size();}
 
+    //! Hydrate les permissions d'un noeud.
+    void hydrate_permission(const node_index &index);
+
     //! Accesseur de la liste des cibles.
     const auto &id_nom() const noexcept
         {return m_id_nom;}
@@ -55,7 +58,7 @@ public:
 /*! \ingroup groupe_model
  *\brief Model interface de gestion des cibles de permissions.
  */
-class cible_permission_interface_model : public interface_node_model {
+class cible_permission_interface_model : public current_index_interface_node_model {
     Q_OBJECT
 public:
     //! Cible des données du model.
@@ -72,6 +75,14 @@ public:
     //! Acceseur du model.
     permission_model *model() const override
         {return static_cast<permission_model *>(m_model);}
+
+public slots:
+    //! Mutateur de l'index.
+    void set_current(const model_base::node_index &current,
+                     const model_base::node_index &previous = node_index()) override {
+        model()->hydrate_permission(current);
+        current_index_interface_node_model::set_current(current, previous);
+    }
 };
 
 /*! \ingroup groupe_model
@@ -109,6 +120,7 @@ protected:
     std::map<numt,flag> m_permission_map;       //!< Map des permission du type.
     permission_model *m_model;                  //!< Pointeur sur le model.
 public:
+    enum {NoFlag = 0};
     //! Constructeur.
     abstract_permission_node(permission_model *model)
         : item_bdd_node(permission_model::Type_Node), m_model(model) {}
@@ -116,8 +128,8 @@ public:
     //! Constructeur.
     using item_bdd_node::item_bdd_node;
 
-    //! Ajoute une cible aux permissions.
-    virtual void hydrate_permission() = 0;
+    //! Hydrate les permissions.
+    virtual void hydrate_permission(bool if_empty = true) = 0;
 
     //! Accesseur des données du noeud.
     QVariant data(int cible, int role, numt num = 0) const override;
@@ -130,14 +142,13 @@ template<class Ent, class Permission> class permission_node : public abstract_pe
 protected:
     Ent m_ent;                              //!< Type associé au noeud.
 public:
-    enum {NoFlag = 0};
     //! Constructeur.
     using abstract_permission_node::abstract_permission_node;
 
     NODE_COPIE(permission_node)
 
     //! Ajoute une cible aux permissions.
-    void hydrate_permission() override;
+    void hydrate_permission(bool if_empty = true) override;
 
     //! Accesseur des données du noeud.
     QVariant data(int cible, int role, numt num = 0) const override;
@@ -245,15 +256,15 @@ public:
 };
 
 ///////////////////////////////////////////////// definition permission_node ///////////////////////////////////
-template<class Ent, class Permission> void permission_node<Ent,Permission>::hydrate_permission() {
-    for(auto iter = m_model->id_nom().cbegin(); iter != m_model->id_nom().cend(); ++iter) {
-        Permission perm;
-        perm.set_cible(static_cast<int>(iter->first));
-        perm.set_id_1(m_ent.id());
-        if(m_model->bdd().get_unique(perm))
-            m_permission_map[iter->first] = perm.code();
-        else
-            m_permission_map[iter->first] = NoFlag;
+template<class Ent, class Permission> void permission_node<Ent,Permission>::hydrate_permission(bool if_empty) {
+    if(!if_empty || m_permission_map.empty()){
+        for(auto iter = m_model->id_nom().cbegin(); iter != m_model->id_nom().cend(); ++iter) {
+            Permission perm;
+            perm.set_cible(static_cast<int>(iter->first));
+            perm.set_id_1(m_ent.id());
+            if(m_model->bdd().get_unique(perm))
+                m_permission_map[iter->first] = perm.code();
+        }
     }
 }
 

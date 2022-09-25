@@ -77,22 +77,22 @@ public slots:
     void reset() {}
 
     //! Sélectionne (émet selectionChanged)
-    void select(const node_index &/*index*/, flag /*selection_flag*/) {}
+    void select(const model_base::node_index &/*index*/, mps::flag /*selection_flag*/) {}
 
     //! Sélectionne (émet selectionChanged)
-    void select(const std::list<node_index> &/*index*/, flag /*selection_flag*/) {}
+    void select(const std::list<model_base::node_index> &/*index*/, mps::flag /*selection_flag*/) {}
 
     //! Mutateur de l'index courant.
-    void set_current_index(const node_index &index, flag selection_flag);
+    void set_current_index(const model_base::node_index &index, mps::flag selection_flag);
 signals:
     //! L'index courant a changé.
-    void current_changed(const node_index &current, const node_index &previous);
+    void current_changed(const model_base::node_index &current, const model_base::node_index &previous);
 
     //! Le model a changé.
-    void model_changed(item_node_model *model);
+    void model_changed(model_base::item_node_model *model);
 
     //! La sélection à changé.
-    void selection_changed(const std::list<node_index> &selected, const std::list<node_index> &deselected);
+    void selection_changed(const std::list<model_base::node_index> &selected, const std::list<model_base::node_index> &deselected);
 protected:
     //! Compare les deux sélections puis émét selectionChanged.
     void emit_selection_changed(const std::list<node_index> &/*new_selection*/, const std::list<node_index> &/*old_selection*/) {}

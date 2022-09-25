@@ -12,6 +12,11 @@ permission_model::permission_model(b2d::bdd_predef &bdd, QObject *parent)
     }
 }
 
+void permission_model::hydrate_permission(const node_index &index) {
+    if(check_index(index))
+            static_cast<abstract_permission_node &>(get_node(index)).hydrate_permission();
+}
+
 //void permission_model::set_cible(entidt num, bool visible){
 //    if(visible) {
 //        if(std::find(m_cible_vec.cbegin(),m_cible_vec.cend(),num) == m_cible_vec.cend()) {
@@ -34,7 +39,7 @@ permission_model::permission_model(b2d::bdd_predef &bdd, QObject *parent)
 
 /////////////////////////////////////////////// cible_permission_interface_model ////////////////////////////////
 cible_permission_interface_model::cible_permission_interface_model(permission_model *model, QObject *parent)
-    : interface_node_model(model, parent) {
+    : current_index_interface_node_model(model, parent) {
     m_data.set_root(std::make_unique<cible_permission_interface_node>(this));
     for(auto iter = model->id_nom().cbegin(); iter != model->id_nom().cend(); ++iter) {
         auto node = std::make_unique<cible_permission_interface_node>(this);
@@ -60,10 +65,10 @@ QVariant cible_permission_interface_node::data(int cible, int role, numt num) co
             return Code_Sub_Node;
         }
         break;
-//    case Num_Role:
-//        if(cible == permission_model::Permission_Cible)
-//            return ;
-//        break;
+    case Num_Role:
+        if(cible == cible_permission_interface_model::Permission_Cible)
+            return m_model->current().index(permission_model::Permission_Cible,m_cible).data(Num_Role);
+        break;
     case Cibles_Role:
         if(cible == Node_Cible && num == Node_Num){
             QList<QVariant> cibles({cible_permission_interface_model::Nom_Cible,
@@ -128,8 +133,13 @@ QVariant abstract_permission_node::data(int cible, int role, numt num) const {
         }
         break;
     case Num_Role:
-        if(cible == permission_model::Permission_Cible)
-            return m_permission_map.at(num).value();
+        if(cible == permission_model::Permission_Cible) {
+            auto iter = m_permission_map.find(num);
+            if(iter != m_permission_map.end())
+                return iter->second.value();
+            else
+                return NoFlag;
+        }
         break;
     case Cibles_Role:
         if(cible == Node_Cible && num == Node_Num){
