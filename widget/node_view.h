@@ -124,8 +124,8 @@ public:
     };
 protected:
     using sub_index = model_base::node_index::sub_index;
-    std::multimap<sub_index,sub_node_widget*> m_cible_map;      //!< Association des sous-index et des sous-noeuds.
     etat_selection m_etat_selection = Initial;                  //!< État de sélection.
+    std::multimap<sub_index,sub_node_widget*> m_cible_map;      //!< Association des sous-index et des sous-noeuds.
     std::unique_ptr<node_painter> m_painter;                    //!< Dessineur du noeud
 public:
     //! Constructeur.
@@ -195,8 +195,13 @@ public:
     using node_widget = widget::node_widget;
     //! Constructeur.
     abstract_node_delegate(QObject *parent = nullptr);
+
     //! Crée un noeud.
     virtual node_widget *create_node(const node_index &index, QWidget *parent = nullptr) const = 0;
+
+    //! Crée un node painter.
+    virtual std::unique_ptr<node_widget::node_painter>
+    node_painter(const mps::widget::node_widget::node_index &index) const = 0;
 };
 }
 namespace widget {
@@ -384,7 +389,8 @@ public:
     //! Constructeur.
     arc_node_view_widget(const model_base::node_index &index, node_view *view, QWidget *parent = nullptr,
                          bool root = false, bool node_arc_visible = true)
-        : arc_node_view_widget(view->delegate()->create_node(index),view,parent,root,node_arc_visible) {}
+        : arc_node_view_widget(view->delegate()->create_node(index),view,parent,root,node_arc_visible,
+                               index.flags().test(model_base::Tools_Zone_Flag_Node)) {}
 
     //! Destructeur.
     ~arc_node_view_widget() override

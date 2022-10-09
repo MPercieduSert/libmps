@@ -114,8 +114,10 @@ enum flag_node : flag::flag_type {
     Brother_Enable_Flag_Node = 0x40,
     Del_Enable_Flag_Node = 0x80,
     Auto_Expend_Flag_Node = 0x100,
+    Tools_Zone_Flag_Node = 0x200,
     Default_Flag_Node = Visible_Flag_Node | Enable_Flag_Node | Left_Clickable_Flag_Node | Selectable_Flag_Node,
-    Default_Root_Flag_Node = Default_Flag_Node | Expendable_FLag_Node | Elder_Enable_Flag_Node | Auto_Expend_Flag_Node,
+    Default_Root_Flag_Node = Default_Flag_Node | Expendable_FLag_Node | Elder_Enable_Flag_Node
+                                | Auto_Expend_Flag_Node | Tools_Zone_Flag_Node,
     Default_Node_Flag_Node = Default_Root_Flag_Node | Brother_Enable_Flag_Node | Del_Enable_Flag_Node
 };
 

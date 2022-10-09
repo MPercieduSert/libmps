@@ -296,9 +296,9 @@ template<class Ent, class Permission> flag permission_node<Ent,Permission>::flag
         if(restriction.code().test(b2d::Modif)
                 && (cible == permission_model::Nom_Cible || cible == permission_model::Nc_Cible
                     || cible == permission_model::Ref_Cible))
-            flag ^= Enable_Flag_Node;
-        if(restriction.code().test(b2d::Suppr) &&(cible == Node_Cible))
-            flag ^= Del_Enable_Flag_Node;
+            flag &= ~Enable_Flag_Node;
+        if(restriction.code().test(b2d::Suppr) && (cible == Node_Cible))
+            flag &= ~Del_Enable_Flag_Node;
     }
     if(cible == permission_model::Permission_Cible){
         Permission perm;
@@ -310,7 +310,7 @@ template<class Ent, class Permission> flag permission_node<Ent,Permission>::flag
             restriction.set_id_cible(perm.id());
             m_model->bdd().get_unique(restriction);
             if(restriction.code().test(b2d::Modif))
-                flag ^= Enable_Flag_Node;
+                flag &= ~Enable_Flag_Node;
         }
     }
     return flag;

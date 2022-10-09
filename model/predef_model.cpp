@@ -63,7 +63,9 @@ QVariant cible_permission_interface_node::data(int cible, int role, numt num) co
 flag cible_permission_interface_node::flags(int cible, numt num) const{
     if(m_iter.root())
         return No_Flag_Node;
-    return item_node::flags(cible,num);
+    if(cible == cible_permission_interface_model::Permission_Cible)
+        return m_model->current().index(permission_model::Permission_Cible,m_cible).flags();
+    return item_node::flags(cible,num) & ~model_base::Tools_Zone_Flag_Node;
 }
 
 flag cible_permission_interface_node::set_data(int cible, const QVariant &value, int role, numt num){

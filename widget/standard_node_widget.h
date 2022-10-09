@@ -237,6 +237,38 @@ public:
     //! Mutateur de l'état de sélection.
     void set_etat_selection(node_widget::etat_selection etat) override;
 };
+
+/*! \ingroup groupe_Widget
+ *\brief Classe dessinant les nodes widgets étroit.
+ */
+class less_arc_painter : public node_view::arc_painter {
+public:
+    enum parametre {No_Margin = 0
+    };
+    //! Constructeur.
+    using node_view::arc_painter::arc_painter;
+
+    //! Renvoie la marge au dessous du noeud.
+    virtual int bottom_node_margin() const override {return No_Margin;}
+
+    //! Renvoie la marge au dessous de la zone outils.
+    virtual int bottom_tools_zone_margin() const override {return No_Margin;}
+
+    //! Renvoie la marge à gauche pour tracer l'arc.
+    virtual int left_expanded_margin() const override {return No_Margin;}
+
+    //! Renvoie la marge à gauche du noeud.
+    virtual int left_node_margin() const override {return No_Margin;}
+
+    //! Renvoie la marge à droite du noeud.
+    virtual int right_node_margin() const override {return No_Margin;}
+
+    //! Renvoie la marge au dessus du noeud.
+    virtual int top_node_margin() const override {return No_Margin;}
+
+    //! Renvoie taille horizontale de la zone de demande d'expansion.
+    virtual int width_tool_zone(node_view::tools_node /*num*/) const override{return No_Margin;}
+};
 }
 
 namespace delegate {
@@ -257,6 +289,11 @@ public:
 
     //! Crée un sous-noeud.
     virtual sub_node_widget *create_sub_node(const node_index &index, QWidget *parent = nullptr) const;
+
+    //! Crée un node painter.
+    std::unique_ptr<node_widget::node_painter>
+    node_painter(const mps::widget::node_widget::node_index &/*index*/) const override
+        {return std::make_unique<widget::rounded_node_painter>();}
 };
 
 /*! \ingroup groupe_delegate
@@ -277,6 +314,21 @@ public:
     //! Muateur de cases.
     void setCases(const widget::code_widget::vec_option_case cases)
         {m_cases = cases;}
+};
+
+/*! \ingroup groupe_delegate
+ *\brief Delegate standard à un node_view avec des noeud de type code.
+ */
+class less_code_delegate: public code_standard_node_delegate {
+    Q_OBJECT
+public:
+    //! Constructeur.
+    using code_standard_node_delegate::code_standard_node_delegate;
+
+    //! Crée un node painter.
+    std::unique_ptr<node_widget::node_painter>
+    node_painter(const mps::widget::node_widget::node_index &/*index*/) const override
+        {return std::make_unique<widget::node_widget::node_painter>();}
 };
 }}
 #endif // STANDARD_NODE_WIDGET_H
