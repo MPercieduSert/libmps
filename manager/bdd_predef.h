@@ -18,7 +18,7 @@ namespace b2d {
     namespace code {
         enum permission : flag::flag_type {Interdit = 0,
                               Visible = 0x1,
-                              Attribuable = 0x3};
+                              Attribuable = 0x2};
     }
 
 /*! \ingroup groupe_file

@@ -201,7 +201,7 @@ template<int Debut> QString num_to_string::Decomposition_grec(int num) {
 template<int Base, int Debut> int num_to_string::Recomposition(const QString &str) {
     if(str.isEmpty())
         return 0;
-    if(str.count() == 1)
+    if(str.size() == 1)
         return str.back().unicode() - Debut;
     auto iter = str.cbegin();
     int num = iter->unicode() - Debut + 1;
@@ -217,7 +217,7 @@ template<int Base, int Debut> int num_to_string::Recomposition(const QString &st
 template<int Debut> int num_to_string::Recomposition_grec(const QString &str) {
     if(str.isEmpty())
         return 0;
-    if(str.count() == 1) {
+    if(str.size() == 1) {
         int num = str.back().unicode() - Debut;
         if(num >= Sigma)
             --num;

@@ -23,7 +23,7 @@ void check_sub_node_widget::update_data_sub_node(flag role) {
 }
 
 ////////////////////////////////////////////////// code_sub_node_widget //////////////////////////////////////////
-code_sub_node_widget::code_sub_node_widget(const code_widget::vec_option_case &cases, const node_index &index, QWidget *parent)
+code_sub_node_widget::code_sub_node_widget(const code_widget::option_code &cases, const node_index &index, QWidget *parent)
     : label_sub_node_widget(index,parent) {
     m_code_widget = new code_widget(cases);
     m_main_layout->addWidget(m_code_widget);
@@ -263,7 +263,6 @@ node_widget *standard_node_delegate::create_node(const node_index &index, QWidge
         else
             node->add_sub_node_widget(create_sub_node(index.index(it->toInt()),node));
     }
-
     return node;
 }
 
@@ -289,6 +288,6 @@ sub_node_widget *standard_node_delegate::create_sub_node(const node_index &index
 
 sub_node_widget *code_standard_node_delegate::create_sub_node(const node_index &index, QWidget *parent) const {
     if(index.data(model_base::Type_Role).toInt() == model_base::Code_Sub_Node)
-        return new code_sub_node_widget(m_cases,index,parent);
+        return new code_sub_node_widget(m_option,index,parent);
     return standard_node_delegate::create_sub_node(index,parent);
 }

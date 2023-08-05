@@ -82,8 +82,8 @@ int num_to_string::Romain_to_num(const QString &str) {
     int num = 0;
     int pos = 0;
     auto it = m_Romain.cbegin();
-    while(it != m_Romain.cend() &&pos != str.count()) {
-        if(it->second.count() == 1){
+    while(it != m_Romain.cend() &&pos != str.size()) {
+        if(it->second.size() == 1){
             if(str.at(pos) == it->second) {
                 num += it->first;
                 ++pos;
@@ -92,7 +92,7 @@ int num_to_string::Romain_to_num(const QString &str) {
                 ++it;
         }
         else {
-            if( pos + 1 != str.count() &&str.at(pos) == it->second.front() &&str.at(pos + 1) == it->second.back()) {
+            if( pos + 1 != str.size() &&str.at(pos) == it->second.front() &&str.at(pos + 1) == it->second.back()) {
                 num += it->first;
                 pos += 2;
             }

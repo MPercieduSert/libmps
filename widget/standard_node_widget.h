@@ -65,7 +65,7 @@ protected:
     widget::code_widget *m_code_widget;       //! Choix des drapeaux.
 public:
     //! Constructeur.
-    code_sub_node_widget(const code_widget::vec_option_case &cases, const node_index &index, QWidget *parent);
+    code_sub_node_widget(const code_widget::option_code &cases, const node_index &index, QWidget *parent);
 
     //! Met à jour le widget après un changement de drapeaux.
     void update_flags() override {
@@ -302,18 +302,18 @@ public:
 class code_standard_node_delegate : public standard_node_delegate {
     Q_OBJECT
 protected:
-    widget::code_widget::vec_option_case m_cases;
+    widget::code_widget::option_code m_option;
 public:
     //! Constructeur.
-    code_standard_node_delegate(const widget::code_widget::vec_option_case &cases, QObject *parent = nullptr)
-        : standard_node_delegate(parent), m_cases(cases) {}
+    code_standard_node_delegate(const widget::code_widget::option_code &option, QObject *parent = nullptr)
+        : standard_node_delegate(parent), m_option(option) {}
 
     //! Crée un sous-noeud.
     sub_node_widget *create_sub_node(const node_index &index, QWidget *parent = nullptr) const override;
 
     //! Muateur de cases.
-    void setCases(const widget::code_widget::vec_option_case cases)
-        {m_cases = cases;}
+    void setCases(const widget::code_widget::option_code option)
+        {m_option = option;}
 };
 
 /*! \ingroup groupe_delegate

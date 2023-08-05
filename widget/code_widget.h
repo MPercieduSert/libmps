@@ -18,9 +18,9 @@ namespace widget {
 class code_widget : public QWidget {
     Q_OBJECT
 public:
-    //! Options de représentation.
+    //! Options de représentation d'une case.
     struct option_case {
-        flag code;
+        flag code;                      //! Code la case
         QBrush background_false;
         QBrush background_true;
         QBrush foreground_false;
@@ -31,23 +31,26 @@ public:
         QFont font_true;
         QString text_false;
         QString text_true;};
-    //! Type de représentation d'un drapeaux.
-    using vec_option_case = std::vector<option_case>;
+    //! Options de représentation d'un drapeaux.
+    struct option_code {
+        std::vector<option_case> cases;                   //!< Référence au mode de représantation d'un code.
+        std::function<flag(flag, flag)> transition;       //!< Fonction de transition de code.
+    };
     //! Style des cases préconfigurer.
     enum style_case {
         Visible,
         Attribuable};
 protected:
-    int m_cote;                     //!< Taille des coté des carrés.
-    const vec_option_case &m_cases;          //!< Référence au mode de représantation d'un code.
-    flag m_code;                    //!< Le code représenté.
-    bool m_read_only = false;        //!< Le widget est-il en lecture seule.
+    int m_cote;                           //!< Taille des coté des carrés.
+    flag m_code;                          //!< Le code représenté.
+    const option_code & m_option;         //!< Options de représentation du code.
+    bool m_read_only = false;             //!< Le widget est-il en lecture seule.
 
 public:
     //! Taille.
     enum {Cote_Size = 25, Font_Size = 12};
     //! Constructeur.
-    code_widget(const vec_option_case &cases, int cote = Cote_Size, QWidget *parent = nullptr);
+    code_widget(const option_code &option, int cote = Cote_Size, QWidget *parent = nullptr);
 
     //! Style d'une case.
     static option_case case_style(style_case sc, flag code);
@@ -77,7 +80,7 @@ public:
 
     //! Taille du widget
     QSize sizeHint() const override
-        {return QSize(m_cote *static_cast<int>(m_cases.size()),m_cote);}
+        {return QSize(m_cote *static_cast<int>(m_option.cases.size()),m_cote);}
 signals:
     //! Signal emit lors du changment de code.
     void code_changed(mps::flag code);

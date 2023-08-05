@@ -47,9 +47,15 @@ tab_gestion_bdd::tab_gestion_bdd(b2d::bdd &bdd, const tab_index &index, QWidget 
 /////////////////////////////////////////////////////// tab_gestion_type //////////////////////////////////////////////
 tab_gestion_type::tab_gestion_type(b2d::bdd &bdd, const tab_index &index, QWidget *parent)
     : abstract_tab_module_with_bdd (bdd, index, parent) {
-    widget::code_widget::vec_option_case cases(NbrCase);
-    cases.at(Attribuable) = widget::code_widget::case_style(widget::code_widget::Attribuable, b2d::code::Attribuable);
-    cases.at(Visible) = widget::code_widget::case_style(widget::code_widget::Visible, b2d::code::Visible);
+    widget::code_widget::option_code option;
+    option.cases.resize(NbrCase);
+    option.cases.at(Attribuable) = widget::code_widget::case_style(widget::code_widget::Attribuable, b2d::code::Attribuable);
+    option.cases.at(Visible) = widget::code_widget::case_style(widget::code_widget::Visible, b2d::code::Visible);
+    option.transition = [](flag code_value, flag code_case)-> flag {
+        if(code_case == b2d::code::Visible)
+            return code_value ? b2d::code::Interdit : b2d::code::Visible;
+        return code_value == (b2d::code::Visible | b2d::code::Attribuable) ? b2d::code::Visible : b2d::code::Visible | b2d::code::Attribuable;
+    };
     // Widget
     m_save_bouton = new QPushButton(tr("Sauvegarder"));
     m_view = new widget::node_view(std::make_unique<widget::rounded_arc_painter>());
@@ -60,7 +66,7 @@ tab_gestion_type::tab_gestion_type(b2d::bdd &bdd, const tab_index &index, QWidge
     m_cible_view = new widget::node_view;
     m_interface = new model_base::cible_permission_interface_model(m_model,this);
     m_cible_view->set_model(m_interface);
-    m_cible_view->set_delegate(new delegate::code_standard_node_delegate(cases,this));
+    m_cible_view->set_delegate(new delegate::code_standard_node_delegate(option,this));
 
     connect(m_view->selection_model(),&model_base::node_selection_model::current_changed,
             m_interface,&model_base::cible_permission_interface_model::set_current);
